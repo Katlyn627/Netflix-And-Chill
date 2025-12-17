@@ -52,22 +52,27 @@ class MatchingEngine {
   static findSharedWatchHistory(user1, user2) {
     const sharedShows = [];
     
+    // Create a map of user2's watch history for O(1) lookups
+    const user2Titles = new Map();
+    user2.watchHistory.forEach(item => {
+      const normalizedTitle = item.title.toLowerCase().trim();
+      user2Titles.set(normalizedTitle, item);
+    });
+    
+    // Check user1's watch history against user2's
     user1.watchHistory.forEach(item1 => {
-      user2.watchHistory.forEach(item2 => {
-        if (item1.title === item2.title) {
-          sharedShows.push({
-            title: item1.title,
-            type: item1.type,
-            genre: item1.genre
-          });
-        }
-      });
+      const normalizedTitle = item1.title.toLowerCase().trim();
+      if (user2Titles.has(normalizedTitle)) {
+        const item2 = user2Titles.get(normalizedTitle);
+        sharedShows.push({
+          title: item1.title,
+          type: item1.type,
+          genre: item1.genre
+        });
+      }
     });
 
-    // Remove duplicates
-    return sharedShows.filter((show, index, self) =>
-      index === self.findIndex(s => s.title === show.title)
-    );
+    return sharedShows;
   }
 
   static findSharedGenres(user1, user2) {

@@ -108,13 +108,6 @@ document.getElementById('watch-history-form').addEventListener('submit', async (
         await api.addWatchHistory(currentUserId, watchData);
         showMessage('Watch history updated!');
         e.target.reset();
-        
-        // Offer to go to preferences after adding a few items
-        setTimeout(() => {
-            if (confirm('Would you like to set your preferences now?')) {
-                showSection('preferences');
-            }
-        }, 1000);
     } catch (error) {
         showMessage('Error adding to watch history: ' + error.message, true);
     }
@@ -200,6 +193,14 @@ document.getElementById('find-matches-btn').addEventListener('click', async () =
         showMessage('Error finding matches: ' + error.message, true);
     }
 });
+
+// Skip to preferences button
+const skipToPreferencesBtn = document.getElementById('skip-to-preferences-btn');
+if (skipToPreferencesBtn) {
+    skipToPreferencesBtn.addEventListener('click', () => {
+        showSection('preferences');
+    });
+}
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
