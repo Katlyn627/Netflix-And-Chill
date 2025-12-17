@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix and Chill - Dating App</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Netflix and Chill</h1>
+            <p class="tagline">Find your perfect binge-watching partner</p>
+            <div style="text-align: center; margin-top: 10px;">
+                <a href="homepage.html" style="color: white; text-decoration: underline;">← Back to Home</a>
+            </div>
+        </header>
+
+        <main>
+            <!-- Create Profile Section -->
+            <section id="create-profile" class="card">
+                <h2>Create Your Profile</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" min="18" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location" name="location">
+                    </div>
+                    <div class="form-group">
+                        <label for="bio">Bio:</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself and your watching habits..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Profile</button>
+                </form>
+            </section>
+
+            <!-- Streaming Services Section -->
+            <section id="streaming-services" class="card" style="display: none;">
+                <h2>Connect Your Streaming Services</h2>
+                <div id="services-list">
+                    <div class="service-option">
+                        <input type="checkbox" id="netflix" value="Netflix">
+                        <label for="netflix">Netflix</label>
+                    </div>
+                    <div class="service-option">
+                        <input type="checkbox" id="hulu" value="Hulu">
+                        <label for="hulu">Hulu</label>
+                    </div>
+                    <div class="service-option">
+                        <input type="checkbox" id="disney" value="Disney+">
+                        <label for="disney">Disney+</label>
+                    </div>
+                    <div class="service-option">
+                        <input type="checkbox" id="prime" value="Amazon Prime">
+                        <label for="prime">Amazon Prime</label>
+                    </div>
+                    <div class="service-option">
+                        <input type="checkbox" id="hbo" value="HBO Max">
+                        <label for="hbo">HBO Max</label>
+                    </div>
+                    <div class="service-option">
+                        <input type="checkbox" id="apple" value="Apple TV+">
+                        <label for="apple">Apple TV+</label>
+                    </div>
+                </div>
+                <button id="add-services-btn" class="btn btn-primary">Add Services</button>
+            </section>
+
+            <!-- Watch History Section -->
+            <section id="watch-history" class="card" style="display: none;">
+                <h2>Add to Your Watch History</h2>
+                <form id="watch-history-form">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type:</label>
+                        <select id="type" name="type" required>
+                            <option value="">Select type...</option>
+                            <option value="movie">Movie</option>
+                            <option value="tvshow">TV Show</option>
+                            <option value="series">Series</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="genre">Genre:</label>
+                        <input type="text" id="genre" name="genre" placeholder="e.g., Action, Comedy, Drama">
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Service:</label>
+                        <select id="service" name="service">
+                            <option value="">Select service...</option>
+                            <option value="Netflix">Netflix</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Disney+">Disney+</option>
+                            <option value="Amazon Prime">Amazon Prime</option>
+                            <option value="HBO Max">HBO Max</option>
+                            <option value="Apple TV+">Apple TV+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="episodes">Episodes Watched (for TV shows):</label>
+                        <input type="number" id="episodes" name="episodes" min="1" value="1">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add to History</button>
+                    <button type="button" id="skip-to-preferences-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip to Preferences</button>
+                </form>
+            </section>
+
+            <!-- Preferences Section -->
+            <section id="preferences" class="card" style="display: none;">
+                <h2>Set Your Preferences</h2>
+                <form id="preferences-form">
+                    <div class="form-group">
+                        <label>Favorite Genres (select multiple):</label>
+                        <div class="genre-options">
+                            <label><input type="checkbox" name="genre" value="Action"> Action</label>
+                            <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                            <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                            <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                            <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
+                            <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+                            <label><input type="checkbox" name="genre" value="Documentary"> Documentary</label>
+                            <label><input type="checkbox" name="genre" value="Thriller"> Thriller</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="binge-count">How many episodes do you typically binge in one sitting?</label>
+                        <input type="number" id="binge-count" name="bingeCount" min="1" value="3">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                </form>
+            </section>
+
+            <!-- Find Matches Section -->
+            <section id="find-matches" class="card" style="display: none;">
+                <h2>Profile Setup Complete!</h2>
+                <p>Your profile has been created successfully. You can now find matches based on your streaming preferences.</p>
+                <a href="matches.html" class="btn btn-primary btn-large">Go to Matches</a>
+                <div style="margin-top: 20px;">
+                    <a href="homepage.html" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </section>
+
+            <!-- User Info Display -->
+            <div id="user-info" style="display: none;"></div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+
+    <script src="src/services/api.js"></script>
+    <script src="src/components/app.js"></script>
+</body>
+</html>
