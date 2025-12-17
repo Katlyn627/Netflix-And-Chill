@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const userRoutes = require('./routes/users');
 const matchRoutes = require('./routes/matches');
 
@@ -11,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
@@ -20,8 +24,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Netflix and Chill API is running' });
 });
 
-// Root endpoint
+// Root endpoint - serve the frontend HTML
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
+// API info endpoint
+app.get('/api', (req, res) => {
   res.json({
     name: 'Netflix and Chill API',
     version: '1.0.0',
