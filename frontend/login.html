@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/login.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Netflix and Chill</h1>
+            <p class="tagline">Welcome Back!</p>
+        </header>
+
+        <main>
+            <div class="login-container">
+                <div class="card login-card">
+                    <h2>Login to Your Account</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="user-id">User ID:</label>
+                            <input type="text" id="user-id" name="userId" placeholder="Enter your user ID" required>
+                            <p class="input-hint">Use the user ID from when you created your profile</p>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large">Login</button>
+                    </form>
+                    
+                    <div class="login-footer">
+                        <p>Don't have an account? <a href="profile.html">Create Profile</a></p>
+                        <p><a href="homepage.html">Back to Home</a></p>
+                    </div>
+                </div>
+
+                <div id="error-message" class="error-message" style="display: none;"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+
+    <script src="src/services/api.js"></script>
+    <script src="src/components/login.js"></script>
+</body>
+</html>
