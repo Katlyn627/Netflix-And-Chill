@@ -20,9 +20,11 @@ function displayMatches(matches) {
                    </div>`
                 : '';
             
+            const matchDescription = match.matchDescription || `${match.matchScore}% Movie Match`;
+            
             html += `
                 <div class="match-card">
-                    <div class="match-score">Match Score: ${match.matchScore}%</div>
+                    <div class="match-score">${matchDescription}</div>
                     <div class="match-details">
                         <h3>${match.user.username}</h3>
                         <p><strong>Age:</strong> ${match.user.age}</p>

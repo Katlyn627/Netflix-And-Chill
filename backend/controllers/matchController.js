@@ -45,6 +45,7 @@ class MatchController {
           return {
             matchId: match.id,
             matchScore: match.matchScore,
+            matchDescription: match.matchDescription,
             sharedContent: match.sharedContent,
             user: {
               id: matchedUser.id,

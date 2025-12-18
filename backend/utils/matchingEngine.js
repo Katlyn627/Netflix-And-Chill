@@ -4,6 +4,7 @@ class MatchingEngine {
   // Scoring constants
   static POINTS_PER_SHARED_SNACK = 3;
   static POINTS_PER_SHARED_DEBATE = 2;
+  static POINTS_PER_EMOTIONAL_TONE = 10; // Max points for emotional tone alignment
   /**
    * Calculate match score between two users based on shared content
    * @param {User} user1 
@@ -52,6 +53,10 @@ class MatchingEngine {
     const debateCompatibility = this.calculateDebateCompatibility(user1, user2);
     score += debateCompatibility;
 
+    // Emotional tone alignment
+    const emotionalToneCompatibility = this.calculateEmotionalToneAlignment(user1, user2);
+    score += emotionalToneCompatibility;
+
     // Bonus for matching video chat preference
     if (user1.videoChatPreference && user2.videoChatPreference) {
       if (user1.videoChatPreference === user2.videoChatPreference || 
@@ -64,6 +69,17 @@ class MatchingEngine {
     // Normalize score to 0-100 range
     const normalizedScore = Math.min(100, score);
 
+    // Generate match description
+    const matchDescription = this.generateMatchDescription(normalizedScore, {
+      sharedFavoriteMovies,
+      sharedGenres,
+      sharedShows,
+      quizCompatibility,
+      emotionalToneCompatibility,
+      user1,
+      user2
+    });
+
     return {
       score: normalizedScore,
       sharedContent: sharedContent,
@@ -72,7 +88,9 @@ class MatchingEngine {
       sharedFavoriteMovies: sharedFavoriteMovies,
       quizCompatibility: quizCompatibility,
       snackCompatibility: snackCompatibility,
-      debateCompatibility: debateCompatibility
+      debateCompatibility: debateCompatibility,
+      emotionalToneCompatibility: emotionalToneCompatibility,
+      matchDescription: matchDescription
     };
   }
 
@@ -224,6 +242,190 @@ class MatchingEngine {
     return score;
   }
 
+  /**
+   * Calculate emotional tone alignment based on genre preferences
+   * Emotional tone categories:
+   * - Intense (Action, Thriller, Horror)
+   * - Lighthearted (Comedy, Romance, Family)
+   * - Emotional (Drama, Documentary)
+   * - Adventurous (Adventure, Fantasy, Sci-Fi)
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score from emotional tone alignment
+   */
+  static calculateEmotionalToneAlignment(user1, user2) {
+    const user1Genres = user1.preferences.genres || [];
+    const user2Genres = user2.preferences.genres || [];
+    
+    if (user1Genres.length === 0 || user2Genres.length === 0) return 0;
+    
+    // Define emotional tone mappings
+    const toneMappings = {
+      intense: ['Action', 'Thriller', 'Horror', 'Crime', 'War'],
+      lighthearted: ['Comedy', 'Romance', 'Family', 'Animation', 'Music'],
+      emotional: ['Drama', 'Documentary', 'Biography', 'History'],
+      adventurous: ['Adventure', 'Fantasy', 'Science Fiction', 'Sci-Fi', 'Mystery', 'Western']
+    };
+    
+    // Get emotional tone profile for each user
+    const getToneProfile = (genres) => {
+      const profile = { intense: 0, lighthearted: 0, emotional: 0, adventurous: 0 };
+      
+      genres.forEach(genre => {
+        const genreName = typeof genre === 'string' ? genre : (genre.name || genre.id || '');
+        
+        // Check which tone category this genre belongs to
+        Object.keys(toneMappings).forEach(tone => {
+          if (toneMappings[tone].some(g => genreName.toLowerCase().includes(g.toLowerCase()) || g.toLowerCase().includes(genreName.toLowerCase()))) {
+            profile[tone]++;
+          }
+        });
+      });
+      
+      return profile;
+    };
+    
+    const user1Tone = getToneProfile(user1Genres);
+    const user2Tone = getToneProfile(user2Genres);
+    
+    // Calculate similarity between tone profiles
+    // Use normalized difference: smaller difference = higher score
+    let totalDifference = 0;
+    let totalGenres = 0;
+    
+    Object.keys(user1Tone).forEach(tone => {
+      const max = Math.max(user1Tone[tone], user2Tone[tone]);
+      if (max > 0) {
+        const diff = Math.abs(user1Tone[tone] - user2Tone[tone]) / max;
+        totalDifference += diff;
+        totalGenres++;
+      }
+    });
+    
+    if (totalGenres === 0) return 0;
+    
+    // Calculate alignment score: less difference = higher score
+    const alignmentRatio = 1 - (totalDifference / totalGenres);
+    const score = alignmentRatio * this.POINTS_PER_EMOTIONAL_TONE;
+    
+    return Math.max(0, score);
+  }
+
+  /**
+   * Generate a descriptive match message based on compatibility factors
+   * @param {number} score - Match score (0-100)
+   * @param {Object} matchData - Contains shared movies, genres, quiz compatibility, etc.
+   * @returns {string} Descriptive match message
+   */
+  static generateMatchDescription(score, matchData) {
+    const {
+      sharedFavoriteMovies = [],
+      sharedGenres = [],
+      sharedShows = [],
+      quizCompatibility = 0,
+      emotionalToneCompatibility = 0,
+      user1,
+      user2
+    } = matchData;
+    
+    const descriptions = [];
+    
+    // Check for shared favorite movies
+    if (sharedFavoriteMovies.length > 0) {
+      if (sharedFavoriteMovies.length === 1) {
+        descriptions.push(`You both love "${sharedFavoriteMovies[0].title}"`);
+      } else if (sharedFavoriteMovies.length === 2) {
+        descriptions.push(`You both love "${sharedFavoriteMovies[0].title}" and "${sharedFavoriteMovies[1].title}"`);
+      } else {
+        descriptions.push(`You share ${sharedFavoriteMovies.length} favorite movies`);
+      }
+    }
+    
+    // Check for genre overlap
+    if (sharedGenres.length > 0) {
+      const genreList = sharedGenres.slice(0, 3).map(g => {
+        const genreName = typeof g === 'string' ? g : (g.name || g.id || g);
+        // Make genre names lowercase for natural reading
+        return genreName.toLowerCase() + 's';
+      });
+      
+      if (genreList.length === 1) {
+        descriptions.push(`love ${genreList[0]}`);
+      } else if (genreList.length === 2) {
+        descriptions.push(`love ${genreList[0]} and ${genreList[1]}`);
+      } else {
+        descriptions.push(`love ${genreList.slice(0, -1).join(', ')}, and ${genreList[genreList.length - 1]}`);
+      }
+    }
+    
+    // Check for viewing style compatibility (quiz)
+    if (quizCompatibility >= 20) {
+      descriptions.push('have similar viewing preferences');
+    }
+    
+    // Check for emotional tone alignment
+    if (emotionalToneCompatibility >= 7) {
+      descriptions.push('share the same emotional vibe');
+    }
+    
+    // Check for binge-watching patterns
+    const bingeDiff = Math.abs(
+      (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
+    );
+    if (bingeDiff <= 2 && user1.preferences.bingeWatchCount > 0) {
+      descriptions.push('are both binge-watchers');
+    }
+    
+    // Check quiz responses for specific details
+    if (user1.quizResponses && user2.quizResponses) {
+      const q1 = user1.quizResponses;
+      const q2 = user2.quizResponses;
+      
+      // Check for spoiler preferences
+      if (q1.q3 === q2.q3 && q1.q3 === 'hate') {
+        descriptions.push('hate spoilers');
+      }
+      
+      // Check for movie length preferences
+      if (q1.q2 === q2.q2 && q1.q2 === 'over_120') {
+        descriptions.push('love long epic movies');
+      }
+      
+      // Check for talking during movies
+      if (q1.q5 === q2.q5 && q1.q5 === 'never') {
+        descriptions.push('prefer silence during movies');
+      } else if (q1.q5 === q2.q5 && q1.q5 === 'often') {
+        descriptions.push('love discussing movies while watching');
+      }
+      
+      // Check for rewatching preferences
+      if (q1.q6 === q2.q6 && q1.q6 === 'infinite') {
+        descriptions.push('could rewatch favorites endlessly');
+      }
+    }
+    
+    // Build final description
+    let finalDescription = `${Math.round(score)}% Movie Match`;
+    
+    if (descriptions.length > 0) {
+      // Join descriptions naturally
+      if (descriptions.length === 1) {
+        finalDescription += ` – ${descriptions[0].charAt(0).toUpperCase() + descriptions[0].slice(1)}`;
+      } else if (descriptions.length === 2) {
+        finalDescription += ` – ${descriptions[0].charAt(0).toUpperCase() + descriptions[0].slice(1)} and ${descriptions[1]}`;
+      } else {
+        // Capitalize first description, join with commas and "and"
+        const capitalized = descriptions[0].charAt(0).toUpperCase() + descriptions[0].slice(1);
+        const rest = descriptions.slice(1, -1).join(', ');
+        const last = descriptions[descriptions.length - 1];
+        finalDescription += ` – ${capitalized}, ${rest}, and ${last}`;
+      }
+    }
+    
+    return finalDescription;
+  }
+
+
 
   /**
    * Find matches for a user from a pool of users
@@ -250,7 +452,8 @@ class MatchingEngine {
             user.id,
             otherUser.id,
             matchResult.score,
-            matchResult.sharedContent
+            matchResult.sharedContent,
+            matchResult.matchDescription
           ));
         }
       }

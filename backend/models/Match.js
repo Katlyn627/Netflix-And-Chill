@@ -1,10 +1,11 @@
 class Match {
-  constructor(user1Id, user2Id, score, sharedContent) {
+  constructor(user1Id, user2Id, score, sharedContent, matchDescription) {
     this.id = this.generateId();
     this.user1Id = user1Id;
     this.user2Id = user2Id;
     this.matchScore = score;
     this.sharedContent = sharedContent || [];
+    this.matchDescription = matchDescription || `${Math.round(score)}% Movie Match`;
     this.createdAt = new Date().toISOString();
   }
 
@@ -19,6 +20,7 @@ class Match {
       user2Id: this.user2Id,
       matchScore: this.matchScore,
       sharedContent: this.sharedContent,
+      matchDescription: this.matchDescription,
       createdAt: this.createdAt
     };
   }
