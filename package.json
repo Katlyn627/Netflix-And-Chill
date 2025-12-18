@@ -8,12 +8,19 @@
     "dev": "node backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["dating", "streaming", "netflix", "matching", "entertainment"],
+  "keywords": [
+    "dating",
+    "streaming",
+    "netflix",
+    "matching",
+    "entertainment"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
     "node-fetch": "^2.7.0"
   }
 }
