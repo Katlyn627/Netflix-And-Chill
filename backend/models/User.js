@@ -21,6 +21,11 @@ class User {
     };
     this.likes = data.likes || [];
     this.superLikes = data.superLikes || [];
+    this.leastFavoriteMovies = data.leastFavoriteMovies || [];
+    this.movieDebateTopics = data.movieDebateTopics || [];
+    this.favoriteSnacks = data.favoriteSnacks || [];
+    this.quizResponses = data.quizResponses || {};
+    this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -93,6 +98,11 @@ class User {
       preferences: this.preferences,
       likes: this.likes,
       superLikes: this.superLikes,
+      leastFavoriteMovies: this.leastFavoriteMovies,
+      movieDebateTopics: this.movieDebateTopics,
+      favoriteSnacks: this.favoriteSnacks,
+      quizResponses: this.quizResponses,
+      videoChatPreference: this.videoChatPreference,
       createdAt: this.createdAt
     };
   }

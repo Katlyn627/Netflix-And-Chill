@@ -169,6 +169,174 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async uploadProfilePicture(req, res) {
+    try {
+      const { userId } = req.params;
+      const { photoUrl } = req.body;
+
+      if (!photoUrl) {
+        return res.status(400).json({ error: 'Photo URL is required' });
+      }
+
+      // Basic URL validation - must be absolute HTTP/HTTPS URL
+      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+        return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
+      }
+
+      try {
+        new URL(photoUrl); // Validate URL format
+      } catch (urlError) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const updatedUser = await dataStore.updateUser(userId, {
+        profilePicture: photoUrl
+      });
+
+      res.json({
+        message: 'Profile picture updated successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async addPhotoToGallery(req, res) {
+    try {
+      const { userId } = req.params;
+      const { photoUrl } = req.body;
+
+      if (!photoUrl) {
+        return res.status(400).json({ error: 'Photo URL is required' });
+      }
+
+      // Basic URL validation - must be absolute HTTP/HTTPS URL
+      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+        return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
+      }
+
+      try {
+        new URL(photoUrl); // Validate URL format
+      } catch (urlError) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Check photo limit before adding
+      if (user.photoGallery && user.photoGallery.length >= 6) {
+        return res.status(400).json({ error: 'Photo gallery is full. Maximum 6 photos allowed.' });
+      }
+
+      const userObj = new User(user);
+      userObj.addPhoto(photoUrl);
+
+      const updatedUser = await dataStore.updateUser(userId, {
+        photoGallery: userObj.photoGallery
+      });
+
+      res.json({
+        message: 'Photo added to gallery successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async removePhotoFromGallery(req, res) {
+    try {
+      const { userId } = req.params;
+      const { photoUrl } = req.body;
+
+      if (!photoUrl) {
+        return res.status(400).json({ error: 'Photo URL is required' });
+      }
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const userObj = new User(user);
+      userObj.removePhoto(photoUrl);
+
+      const updatedUser = await dataStore.updateUser(userId, {
+        photoGallery: userObj.photoGallery
+      });
+
+      res.json({
+        message: 'Photo removed from gallery successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async updateProfileDetails(req, res) {
+    try {
+      const { userId } = req.params;
+      const { leastFavoriteMovies, movieDebateTopics, favoriteSnacks, videoChatPreference } = req.body;
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const updates = {};
+      if (leastFavoriteMovies !== undefined) updates.leastFavoriteMovies = leastFavoriteMovies;
+      if (movieDebateTopics !== undefined) updates.movieDebateTopics = movieDebateTopics;
+      if (favoriteSnacks !== undefined) updates.favoriteSnacks = favoriteSnacks;
+      if (videoChatPreference !== undefined) updates.videoChatPreference = videoChatPreference;
+
+      const updatedUser = await dataStore.updateUser(userId, updates);
+
+      res.json({
+        message: 'Profile details updated successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async submitQuizResponses(req, res) {
+    try {
+      const { userId } = req.params;
+      const { quizResponses } = req.body;
+
+      if (!quizResponses || typeof quizResponses !== 'object') {
+        return res.status(400).json({ error: 'Valid quiz responses object is required' });
+      }
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const updatedUser = await dataStore.updateUser(userId, {
+        quizResponses: { ...user.quizResponses, ...quizResponses }
+      });
+
+      res.json({
+        message: 'Quiz responses submitted successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();
