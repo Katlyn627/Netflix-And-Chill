@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Profile Features - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Netflix and Chill</h1>
+            <p class="tagline">Profile Features Test Page</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2>Test Profile Features</h2>
+                <p>This page allows you to test the new profile features without logging in.</p>
+                
+                <div class="form-group">
+                    <label>Test User ID:</label>
+                    <input type="text" id="test-user-id" value="user_1766020788533_ysutbyu3p" style="width: 100%;">
+                </div>
+
+                <button onclick="viewProfile()" class="btn btn-primary">View Profile</button>
+                <button onclick="testPhotoUpload()" class="btn btn-secondary">Test Photo Upload</button>
+                <button onclick="testProfileDetails()" class="btn btn-secondary">Test Profile Details</button>
+                <button onclick="testQuiz()" class="btn btn-secondary">Test Quiz</button>
+            </section>
+
+            <section class="card">
+                <h2>Test Results</h2>
+                <div id="results" style="background: #f5f5f5; padding: 15px; border-radius: 5px; min-height: 100px;">
+                    <em>Results will appear here...</em>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Quick Links</h2>
+                <a href="profile-view.html?userId=user_1766020788533_ysutbyu3p" class="btn btn-primary">Open Profile View Page</a>
+                <a href="homepage.html" class="btn btn-secondary">Back to Homepage</a>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+
+        async function viewProfile() {
+            const userId = document.getElementById('test-user-id').value;
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+                const user = await response.json();
+                document.getElementById('results').innerHTML = `<pre>${JSON.stringify(user, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testPhotoUpload() {
+            const userId = document.getElementById('test-user-id').value;
+            const photoUrl = 'https://picsum.photos/400/400?random=' + Date.now();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}/photos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ photoUrl })
+                });
+                const result = await response.json();
+                document.getElementById('results').innerHTML = `
+                    <p style="color: green;">✓ Photo uploaded successfully!</p>
+                    <p>Photo Gallery now has ${result.user.photoGallery.length} photos</p>
+                    <pre>${JSON.stringify(result.user.photoGallery, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testProfileDetails() {
+            const userId = document.getElementById('test-user-id').value;
+            const details = {
+                leastFavoriteMovies: ['Test Movie 1', 'Test Movie 2'],
+                movieDebateTopics: ['Best director ever', 'Most overrated film'],
+                favoriteSnacks: ['Popcorn', 'Candy', 'Soda'],
+                videoChatPreference: 'zoom'
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-details`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(details)
+                });
+                const result = await response.json();
+                document.getElementById('results').innerHTML = `
+                    <p style="color: green;">✓ Profile details updated successfully!</p>
+                    <pre>${JSON.stringify({
+                        leastFavoriteMovies: result.user.leastFavoriteMovies,
+                        movieDebateTopics: result.user.movieDebateTopics,
+                        favoriteSnacks: result.user.favoriteSnacks,
+                        videoChatPreference: result.user.videoChatPreference
+                    }, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testQuiz() {
+            const userId = document.getElementById('test-user-id').value;
+            const quizResponses = {
+                q1: 'subtitles',
+                q2: 'over_120',
+                q3: 'hate',
+                q4: 'popcorn',
+                q5: 'sometimes',
+                q6: 'infinite'
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}/quiz`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quizResponses })
+                });
+                const result = await response.json();
+                document.getElementById('results').innerHTML = `
+                    <p style="color: green;">✓ Quiz submitted successfully!</p>
+                    <pre>${JSON.stringify(result.user.quizResponses, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

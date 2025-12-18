@@ -7,8 +7,16 @@ class ProfileView {
     }
 
     init() {
-        // Get user ID from localStorage or URL
-        this.userId = localStorage.getItem('currentUserId');
+        // Get user ID from URL params, localStorage, or redirect to login
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdFromUrl = urlParams.get('userId');
+        
+        if (userIdFromUrl) {
+            this.userId = userIdFromUrl;
+            localStorage.setItem('currentUserId', userIdFromUrl);
+        } else {
+            this.userId = localStorage.getItem('currentUserId');
+        }
         
         if (!this.userId) {
             alert('Please log in first');
@@ -105,46 +113,50 @@ class ProfileView {
 
         // Least favorite movies
         const leastFavList = document.getElementById('least-favorite-movies-list');
+        const noLeastFav = document.getElementById('no-least-favorites');
         if (user.leastFavoriteMovies && user.leastFavoriteMovies.length > 0) {
             leastFavList.innerHTML = user.leastFavoriteMovies.map(movie => 
                 `<span class="tag">${movie}</span>`
             ).join(' ');
-            document.getElementById('no-least-favorites').style.display = 'none';
+            if (noLeastFav) noLeastFav.style.display = 'none';
         } else {
-            document.getElementById('no-least-favorites').style.display = 'block';
+            leastFavList.innerHTML = '<em id="no-least-favorites">No least favorite movies added yet.</em>';
         }
 
         // Debate topics
         const debateList = document.getElementById('debate-topics-list');
+        const noDebate = document.getElementById('no-debate-topics');
         if (user.movieDebateTopics && user.movieDebateTopics.length > 0) {
             debateList.innerHTML = user.movieDebateTopics.map(topic => 
                 `<span class="tag">${topic}</span>`
             ).join(' ');
-            document.getElementById('no-debate-topics').style.display = 'none';
+            if (noDebate) noDebate.style.display = 'none';
         } else {
-            document.getElementById('no-debate-topics').style.display = 'block';
+            debateList.innerHTML = '<em id="no-debate-topics">No debate topics added yet.</em>';
         }
 
         // Favorite snacks
         const snacksList = document.getElementById('favorite-snacks-list');
+        const noSnacks = document.getElementById('no-snacks');
         if (user.favoriteSnacks && user.favoriteSnacks.length > 0) {
             snacksList.innerHTML = user.favoriteSnacks.map(snack => 
                 `<span class="tag">${snack}</span>`
             ).join(' ');
-            document.getElementById('no-snacks').style.display = 'none';
+            if (noSnacks) noSnacks.style.display = 'none';
         } else {
-            document.getElementById('no-snacks').style.display = 'block';
+            snacksList.innerHTML = '<em id="no-snacks">No favorite snacks added yet.</em>';
         }
 
         // Video chat preference
         const videoPref = document.getElementById('video-chat-pref');
+        const noVideoPref = document.getElementById('no-video-pref');
         if (user.videoChatPreference) {
             const prefText = user.videoChatPreference === 'facetime' ? 'FaceTime' :
                            user.videoChatPreference === 'zoom' ? 'Zoom' : 'Either';
             videoPref.innerHTML = `<strong>${prefText}</strong>`;
-            document.getElementById('no-video-pref').style.display = 'none';
+            if (noVideoPref) noVideoPref.style.display = 'none';
         } else {
-            document.getElementById('no-video-pref').style.display = 'block';
+            videoPref.innerHTML = '<em id="no-video-pref">Not set</em>';
         }
     }
 
@@ -154,9 +166,8 @@ class ProfileView {
         
         if (Object.keys(quiz).length > 0) {
             quizContainer.innerHTML = '<p><strong>Quiz completed!</strong> Your responses help match you with compatible users.</p>';
-            document.getElementById('no-quiz-responses').style.display = 'none';
         } else {
-            document.getElementById('no-quiz-responses').style.display = 'block';
+            quizContainer.innerHTML = '<em id="no-quiz-responses">No quiz responses yet.</em>';
         }
     }
 
@@ -168,9 +179,8 @@ class ProfileView {
             servicesContainer.innerHTML = services.map(service => 
                 `<span class="tag">${service.name}</span>`
             ).join(' ');
-            document.getElementById('no-services').style.display = 'none';
         } else {
-            document.getElementById('no-services').style.display = 'block';
+            servicesContainer.innerHTML = '<em id="no-services">No streaming services connected yet.</em>';
         }
     }
 
@@ -184,9 +194,8 @@ class ProfileView {
                     <strong>${item.title}</strong> (${item.type}) - ${item.genre || 'N/A'}
                 </div>`
             ).join('');
-            document.getElementById('no-watch-history').style.display = 'none';
         } else {
-            document.getElementById('no-watch-history').style.display = 'block';
+            historyContainer.innerHTML = '<em id="no-watch-history">No watch history yet.</em>';
         }
     }
 
