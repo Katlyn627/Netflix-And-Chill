@@ -1,36 +1,12 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
-// Update profile icon in navigation
-async function updateProfileIcon() {
-    if (!currentUserId) {
-        window.location.href = 'login.html';
-        return;
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    if (currentUserId) {
+        updateNavProfileIcon(currentUserId);
     }
-
-    try {
-        const result = await api.getUser(currentUserId);
-        if (result && result.id) {
-            // Update profile navigation button
-            const profileNavIcon = document.getElementById('profile-nav-icon');
-            const profileNavBtn = document.getElementById('profile-nav-btn');
-            
-            if (result.profilePicture) {
-                profileNavIcon.innerHTML = `<img src="${result.profilePicture}" alt="Profile">`;
-            }
-            
-            // Update href to include userId
-            profileNavBtn.href = `profile-view.html?userId=${currentUserId}`;
-        } else {
-            localStorage.removeItem('currentUserId');
-            window.location.href = 'login.html';
-        }
-    } catch (error) {
-        console.error('Error fetching user info:', error);
-        localStorage.removeItem('currentUserId');
-        window.location.href = 'login.html';
-    }
-}
+});
 
 // Display matches
 function displayMatches(matches) {
@@ -118,5 +94,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    updateProfileIcon();
+    if (currentUserId) {
+        updateNavProfileIcon(currentUserId);
+    }
 });

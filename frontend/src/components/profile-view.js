@@ -1094,30 +1094,8 @@ class ProfileView {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new ProfileView();
-    updateNavProfileIcon();
-});
-
-// Update profile icon in navigation
-async function updateNavProfileIcon() {
     const userId = localStorage.getItem('currentUserId');
-    if (!userId) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
-        if (!response.ok) return;
-        
-        const user = await response.json();
-        const profileNavIcon = document.getElementById('profile-nav-icon');
-        const profileNavBtn = document.getElementById('profile-nav-btn');
-        
-        if (user.profilePicture && profileNavIcon) {
-            profileNavIcon.innerHTML = `<img src="${user.profilePicture}" alt="Profile">`;
-        }
-        
-        if (profileNavBtn) {
-            profileNavBtn.href = `profile-view.html?userId=${userId}`;
-        }
-    } catch (error) {
-        console.error('Error updating nav profile icon:', error);
+    if (userId) {
+        updateNavProfileIcon(userId);
     }
-}
+});
