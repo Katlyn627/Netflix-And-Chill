@@ -1,13 +1,6 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    if (currentUserId) {
-        updateNavProfileIcon(currentUserId);
-    }
-});
-
 // Display matches
 function displayMatches(matches) {
     const matchesContainer = document.getElementById('matches-container');
