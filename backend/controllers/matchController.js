@@ -9,6 +9,18 @@ class MatchController {
     try {
       const { userId } = req.params;
       const limit = parseInt(req.query.limit) || 10;
+      
+      // Extract filter parameters from query
+      const filters = {};
+      if (req.query.minAge || req.query.maxAge) {
+        filters.ageRange = {
+          min: parseInt(req.query.minAge) || 18,
+          max: parseInt(req.query.maxAge) || 100
+        };
+      }
+      if (req.query.locationRadius !== undefined) {
+        filters.locationRadius = parseInt(req.query.locationRadius);
+      }
 
       const user = await dataStore.findUserById(userId);
       if (!user) {
@@ -19,7 +31,7 @@ class MatchController {
       const userObjects = allUsers.map(u => new User(u));
       const currentUser = new User(user);
 
-      const matches = MatchingEngine.findMatches(currentUser, userObjects, limit);
+      const matches = MatchingEngine.findMatches(currentUser, userObjects, limit, filters);
 
       // Save matches to database
       for (const match of matches) {
@@ -40,6 +52,8 @@ class MatchController {
               age: matchedUser.age,
               location: matchedUser.location,
               bio: matchedUser.bio,
+              profilePicture: matchedUser.profilePicture,
+              photoGallery: matchedUser.photoGallery,
               streamingServices: matchedUser.streamingServices
             }
           };

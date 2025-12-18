@@ -5,28 +5,45 @@ A modern dating application that matches users based on their streaming preferen
 ## Features
 
 - **User Profiles**: Create detailed profiles with bio, age, and location
+- **Profile Pictures & Photo Galleries**: Upload profile pictures and up to 6 photos
 - **Streaming Service Integration**: Connect multiple streaming platforms (Netflix, Hulu, Disney+, Amazon Prime, HBO Max, Apple TV+)
+- **Real Streaming API Integration**: Get real movie/TV show data from TMDB API
 - **Watch History Tracking**: Track movies, TV shows, and series you've watched
 - **Smart Matching Algorithm**: Get matched with users based on:
   - Shared streaming services
   - Common shows and movies watched
   - Similar genre preferences
   - Compatible binge-watching patterns
+- **Advanced Filters**: Filter matches by age range and location radius
+- **Personalized Recommendations**: AI-powered show/movie recommendations based on your watch history and preferences
+- **Social Features**: Like and Super Like other users, with mutual match detection
 - **Match Scoring**: Each match gets a score (0-100) indicating compatibility
+- **Multiple Database Support**: Choose between file-based storage, MongoDB, or PostgreSQL
+- **Mobile Ready**: React Native guide for iOS and Android apps
+- **Cloud Deployment Ready**: Comprehensive guides for AWS, Heroku, Vercel, and more
 - **Cross-Platform Ready**: Built with web technologies for easy deployment across platforms
 
 ## Technology Stack
 
 ### Backend
 - **Node.js** with Express.js
-- File-based data storage (easily upgradable to MongoDB/PostgreSQL)
+- Multiple database support:
+  - File-based storage (default)
+  - MongoDB (NoSQL)
+  - PostgreSQL (SQL)
 - RESTful API architecture
+- TMDB API integration for real streaming data
 
 ### Frontend
 - **HTML5/CSS3/JavaScript**
 - Responsive design for mobile and desktop
 - Modern gradient UI
 - Can be enhanced with React/React Native for native apps
+
+### Deployment
+- Docker support
+- Cloud platform guides (AWS, Heroku, Vercel, Netlify)
+- Kubernetes ready
 
 ## Installation
 
@@ -41,7 +58,16 @@ cd Netflix-And-Chill
 npm install
 ```
 
-3. Start the backend server:
+3. Configure environment (optional):
+```bash
+# Copy example env file
+cp .env.example .env
+
+# Edit .env and add your TMDB API key (optional, for recommendations)
+# Get free API key at: https://www.themoviedb.org/settings/api
+```
+
+4. Start the backend server:
 ```bash
 npm start
 ```
@@ -67,8 +93,17 @@ The server will run on `http://localhost:3000`
 - `PUT /api/users/:userId/preferences` - Update preferences
 
 #### Matches
-- `GET /api/matches/:userId` - Find matches for a user
+- `GET /api/matches/:userId` - Find matches for a user (supports filters)
 - `GET /api/matches/:userId/history` - Get match history
+
+#### Recommendations
+- `GET /api/recommendations/:userId` - Get personalized show/movie recommendations
+
+#### Social Features
+- `POST /api/likes` - Send a like or super like
+- `GET /api/likes/:userId` - Get likes sent by user
+- `GET /api/likes/:userId/received` - Get likes received by user
+- `GET /api/likes/:userId/mutual` - Get mutual likes (matches)
 
 ### Creating a Profile
 
@@ -84,29 +119,51 @@ The server will run on `http://localhost:3000`
 ```
 Netflix-And-Chill/
 ├── backend/
+│   ├── config/
+│   │   └── config.js           # Configuration settings
 │   ├── controllers/
-│   │   ├── userController.js      # User management logic
-│   │   └── matchController.js     # Matching logic
+│   │   ├── userController.js   # User management logic
+│   │   └── matchController.js  # Matching logic
+│   ├── database/
+│   │   ├── databaseFactory.js  # Database factory
+│   │   ├── mongodbAdapter.js   # MongoDB adapter
+│   │   └── postgresqlAdapter.js # PostgreSQL adapter
 │   ├── models/
-│   │   ├── User.js                # User model
-│   │   └── Match.js               # Match model
+│   │   ├── User.js             # User model
+│   │   ├── Match.js            # Match model
+│   │   └── Like.js             # Like model
 │   ├── routes/
-│   │   ├── users.js               # User routes
-│   │   └── matches.js             # Match routes
+│   │   ├── users.js            # User routes
+│   │   ├── matches.js          # Match routes
+│   │   ├── recommendations.js  # Recommendation routes
+│   │   └── likes.js            # Like routes
+│   ├── services/
+│   │   ├── streamingAPIService.js    # TMDB API integration
+│   │   └── recommendationService.js  # Recommendation engine
 │   ├── utils/
-│   │   ├── dataStore.js           # Data persistence
-│   │   └── matchingEngine.js     # Matching algorithm
-│   └── server.js                  # Express server
+│   │   ├── dataStore.js        # File-based data persistence
+│   │   └── matchingEngine.js   # Matching algorithm
+│   └── server.js               # Express server
 ├── frontend/
-│   ├── index.html                 # Main HTML page
+│   ├── index.html              # Main HTML page
 │   └── src/
 │       ├── components/
-│       │   └── app.js             # Frontend application logic
+│       │   └── app.js          # Frontend application logic
 │       ├── services/
-│       │   └── api.js             # API service layer
+│       │   └── api.js          # API service layer
 │       └── styles/
-│           └── main.css           # Styling
-├── data/                          # User data storage (auto-generated)
+│           └── main.css        # Styling
+├── docs/
+│   ├── deployment/
+│   │   ├── AWS.md              # AWS deployment guide
+│   │   ├── HEROKU.md           # Heroku deployment guide
+│   │   ├── VERCEL-NETLIFY.md   # Vercel/Netlify guide
+│   │   └── DOCKER.md           # Docker deployment guide
+│   ├── mobile/
+│   │   └── REACT-NATIVE.md     # React Native mobile app guide
+│   └── DATABASE-MIGRATION.md   # Database migration guide
+├── data/                       # User data storage (auto-generated)
+├── .env.example                # Environment variables template
 ├── package.json
 ├── .gitignore
 └── README.md
@@ -132,30 +189,59 @@ Match scores are normalized to a 0-100 scale, with higher scores indicating bett
 
 ## Future Enhancements
 
-- [ ] User authentication and security
+- [x] Integration with actual streaming APIs (TMDB)
+- [x] Mobile apps (React Native guide available)
+- [x] Profile pictures and photo galleries
+- [x] Advanced filters (age range, location radius)
+- [x] Recommendation system for new shows
+- [x] Social features (likes, super likes)
+- [x] Database migration (MongoDB/PostgreSQL)
+- [x] Deployment guides for cloud platforms
+- [ ] User authentication and security (JWT)
 - [ ] Real-time chat between matches
-- [ ] Integration with actual streaming APIs
-- [ ] Mobile apps (React Native)
-- [ ] Profile pictures and photo galleries
-- [ ] Advanced filters (age range, location radius)
-- [ ] Recommendation system for new shows
-- [ ] Social features (likes, super likes)
-- [ ] Database migration (MongoDB/PostgreSQL)
-- [ ] Deployment guides for cloud platforms
+- [ ] Video chat integration
+- [ ] Push notifications
+- [ ] Advanced analytics and insights
 
 ## Cross-Platform Deployment
 
 ### Web
 - The current version works in any modern web browser
-- Can be hosted on platforms like Vercel, Netlify, or Heroku
+- Deploy to:
+  - **Heroku**: See [docs/deployment/HEROKU.md](docs/deployment/HEROKU.md)
+  - **AWS**: See [docs/deployment/AWS.md](docs/deployment/AWS.md)
+  - **Vercel/Netlify**: See [docs/deployment/VERCEL-NETLIFY.md](docs/deployment/VERCEL-NETLIFY.md)
+  - **Docker**: See [docs/deployment/DOCKER.md](docs/deployment/DOCKER.md)
 
-### Mobile (Future)
-- Frontend can be converted to React Native
-- Same backend API can serve mobile apps
+### Mobile
+- React Native guide available: [docs/mobile/REACT-NATIVE.md](docs/mobile/REACT-NATIVE.md)
+- Same backend API serves mobile apps
+- iOS and Android support
 
 ### Desktop (Future)
 - Electron wrapper for desktop applications
 - Progressive Web App (PWA) capabilities
+
+## Database Options
+
+Choose the database that best fits your needs:
+
+### File-Based (Default)
+- No setup required
+- Perfect for development and small deployments
+- Data stored in JSON files
+
+### MongoDB
+- NoSQL database
+- Great for flexible schema
+- Free tier available on MongoDB Atlas
+- See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
+
+### PostgreSQL
+- SQL database
+- ACID compliance
+- Free tier on Heroku, Supabase, etc.
+- See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
 
 ## Contributing
 

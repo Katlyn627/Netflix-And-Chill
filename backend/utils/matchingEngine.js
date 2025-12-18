@@ -86,13 +86,19 @@ class MatchingEngine {
    * @param {User} user 
    * @param {Array<User>} userPool 
    * @param {number} limit 
+   * @param {Object} filters - Optional filters (ageRange, locationRadius)
    * @returns {Array<Match>}
    */
-  static findMatches(user, userPool, limit = 10) {
+  static findMatches(user, userPool, limit = 10, filters = {}) {
     const matches = [];
 
     userPool.forEach(otherUser => {
       if (otherUser.id !== user.id) {
+        // Apply filters
+        if (!this.passesFilters(user, otherUser, filters)) {
+          return;
+        }
+
         const matchResult = this.calculateMatch(user, otherUser);
         
         if (matchResult.score > 0) {
@@ -111,6 +117,63 @@ class MatchingEngine {
 
     // Return top matches
     return matches.slice(0, limit);
+  }
+
+  /**
+   * Check if a user passes the applied filters
+   * @param {User} user 
+   * @param {User} otherUser 
+   * @param {Object} filters 
+   * @returns {boolean}
+   */
+  static passesFilters(user, otherUser, filters) {
+    // Validate filters
+    if (filters.ageRange) {
+      if (typeof filters.ageRange.min !== 'number' || typeof filters.ageRange.max !== 'number') {
+        throw new Error('Invalid ageRange filter: min and max must be numbers');
+      }
+      if (filters.ageRange.min < 0 || filters.ageRange.max < 0 || filters.ageRange.min > filters.ageRange.max) {
+        throw new Error('Invalid ageRange filter: min must be less than max and both must be non-negative');
+      }
+    }
+    if (filters.locationRadius !== undefined && (typeof filters.locationRadius !== 'number' || filters.locationRadius < 0)) {
+      throw new Error('Invalid locationRadius filter: must be a non-negative number');
+    }
+
+    // Age range filter
+    if (filters.ageRange) {
+      const { min, max } = filters.ageRange;
+      if (otherUser.age < min || otherUser.age > max) {
+        return false;
+      }
+    } else if (user.preferences.ageRange) {
+      const { min, max } = user.preferences.ageRange;
+      if (otherUser.age < min || otherUser.age > max) {
+        return false;
+      }
+    }
+
+    // Location radius filter (simplified - would need proper geolocation in production)
+    const MAX_GLOBAL_RADIUS = 1000; // Maximum radius to consider as "anywhere" (in miles/km)
+    
+    if (filters.locationRadius !== undefined || user.preferences.locationRadius !== undefined) {
+      // In a real implementation, this would calculate actual distance
+      // For now, we just check if locations are similar (same city/area)
+      const radius = filters.locationRadius !== undefined ? filters.locationRadius : user.preferences.locationRadius;
+      if (radius !== null && radius !== undefined && radius < MAX_GLOBAL_RADIUS) {
+        // Simplified: if locations don't match at all and radius is set, skip
+        // In production, use proper geocoding and distance calculation
+        if (user.location && otherUser.location) {
+          const userLoc = user.location.toLowerCase();
+          const otherLoc = otherUser.location.toLowerCase();
+          if (!userLoc.includes(otherLoc.split(',')[0]) && !otherLoc.includes(userLoc.split(',')[0])) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 }
 
