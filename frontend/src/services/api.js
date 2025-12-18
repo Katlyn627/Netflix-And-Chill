@@ -12,13 +12,13 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
-    async loginUser(userId, password) {
+    async loginUser(email, password) {
         const response = await fetch(`${API_BASE_URL}/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userId, password })
+            body: JSON.stringify({ email, password })
         });
         return await response.json();
     }

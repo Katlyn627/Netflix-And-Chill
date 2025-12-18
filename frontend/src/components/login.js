@@ -21,12 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const userId = document.getElementById('user-id').value.trim();
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('error-message');
         
-        if (!userId) {
-            errorDiv.textContent = 'Please enter your user ID';
+        if (!email) {
+            errorDiv.textContent = 'Please enter your email';
             errorDiv.style.display = 'block';
             return;
         }
@@ -39,11 +39,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             // Login with password
-            const result = await api.loginUser(userId, password);
+            const result = await api.loginUser(email, password);
             
             if (result && !result.error) {
                 // Save user ID to localStorage
-                localStorage.setItem('currentUserId', userId);
+                localStorage.setItem('currentUserId', result.userId || email);
                 
                 // Show success and redirect
                 errorDiv.style.display = 'none';
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = 'matches.html';
                 }, 1500);
             } else {
-                errorDiv.textContent = result.error || 'Invalid credentials. Please check your user ID and password.';
+                errorDiv.textContent = result.error || 'Invalid credentials. Please check your email and password.';
                 errorDiv.style.display = 'block';
             }
         } catch (error) {
