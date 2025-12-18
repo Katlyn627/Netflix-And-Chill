@@ -422,21 +422,28 @@ class ProfileView {
                 return;
             }
 
-            // Convert file to base64
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const base64Data = e.target.result;
-                    await this.addPhoto(base64Data);
-                } catch (error) {
-                    // Error is already handled and alerted in addPhoto(), just log for debugging
-                    console.error('Error in FileReader onload:', error);
+            // Upload file to server
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetch(`${API_BASE_URL}/uploads/image`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to upload image');
                 }
-            };
-            reader.onerror = () => {
-                alert('Failed to read file. Please try again.');
-            };
-            reader.readAsDataURL(file);
+
+                const data = await response.json();
+                // Use the uploaded image URL
+                await this.addPhoto(data.imageUrl);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Failed to upload image: ' + error.message);
+            }
         } else {
             // Use URL input
             const photoUrl = urlInput.value.trim();
