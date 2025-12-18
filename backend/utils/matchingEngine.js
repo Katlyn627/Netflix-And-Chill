@@ -345,8 +345,16 @@ class MatchingEngine {
     if (sharedGenres.length > 0) {
       const genreList = sharedGenres.slice(0, 3).map(g => {
         const genreName = typeof g === 'string' ? g : (g.name || g.id || g);
-        // Make genre names lowercase for natural reading
-        return genreName.toLowerCase() + 's';
+        // Make genre names lowercase for natural reading and handle pluralization
+        const lowerName = genreName.toLowerCase();
+        // Special pluralization rules
+        if (lowerName.endsWith('y')) {
+          return lowerName.slice(0, -1) + 'ies'; // comedy -> comedies
+        } else if (lowerName.endsWith('s') || lowerName.endsWith('sh') || lowerName.endsWith('ch')) {
+          return lowerName + 'es';
+        } else {
+          return lowerName + 's';
+        }
       });
       
       if (genreList.length === 1) {
