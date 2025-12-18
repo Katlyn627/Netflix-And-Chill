@@ -37,7 +37,12 @@ class DataStore {
 
   async addUser(user) {
     const users = await this.loadUsers();
-    users.push(user.toJSON());
+    // Save the full user object including password
+    const userData = {
+      ...user.toJSON(),
+      password: user.password // Include password for storage
+    };
+    users.push(userData);
     await this.saveUsers(users);
     return user;
   }
