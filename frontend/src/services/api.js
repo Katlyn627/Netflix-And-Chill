@@ -218,6 +218,12 @@ class NetflixAndChillAPI {
                 'Content-Type': 'application/json',
             }
         });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to delete user');
+        }
+        
         return await response.json();
     }
 

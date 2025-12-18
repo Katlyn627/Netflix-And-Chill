@@ -1215,15 +1215,19 @@ class ProfileView {
             return;
         }
 
-        // Second confirmation to prevent accidental deletion
+        // Second confirmation - require username input for extra security
         const username = this.userData.username;
-        const secondConfirmation = confirm(
+        const userInput = prompt(
             `Final confirmation:\n\n` +
-            `Type your username "${username}" in your mind and click OK to permanently delete your profile.\n\n` +
-            `Are you absolutely sure?`
+            `To permanently delete your profile, please type your username exactly as shown below:\n\n` +
+            `"${username}"\n\n` +
+            `Enter your username to confirm deletion:`
         );
 
-        if (!secondConfirmation) {
+        if (userInput !== username) {
+            if (userInput !== null) {
+                alert('Username does not match. Profile deletion cancelled.');
+            }
             return;
         }
 

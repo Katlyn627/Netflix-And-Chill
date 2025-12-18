@@ -79,13 +79,15 @@ class DataStore {
       return null;
     }
     
+    // Clean up related data first before deleting the user
+    // This ensures data consistency if cleanup fails
+    await this.deleteUserLikes(userId);
+    await this.deleteUserMatches(userId);
+    
+    // Now delete the user
     const deletedUser = users[index];
     users.splice(index, 1);
     await fs.writeFile(this.usersFile, JSON.stringify(users, null, 2));
-    
-    // Clean up related data
-    await this.deleteUserLikes(userId);
-    await this.deleteUserMatches(userId);
     
     return deletedUser;
   }
