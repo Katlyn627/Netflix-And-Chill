@@ -297,7 +297,7 @@ class ProfileView {
 
         // Edit profile button
         document.getElementById('edit-profile-btn').addEventListener('click', () => {
-            window.location.href = 'profile.html';
+            window.location.href = `profile-view.html?userId=${this.userId}`;
         });
 
         // Change password button
