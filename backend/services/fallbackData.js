@@ -4,6 +4,9 @@
  */
 
 // Comprehensive list of genres (combined from TMDB movie and TV genres)
+// Genre IDs correspond to TMDB's official genre IDs from their API
+// See: https://developers.themoviedb.org/3/genres/get-movie-list
+// and: https://developers.themoviedb.org/3/genres/get-tv-list
 const fallbackGenres = [
   { id: 28, name: 'Action', types: ['movie'] },
   { id: 12, name: 'Adventure', types: ['movie'] },

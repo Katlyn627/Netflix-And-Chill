@@ -78,6 +78,18 @@ function renderStreamingProviders(providers) {
     // Clear existing content
     servicesList.innerHTML = '';
     
+    // Validate logo URL is from a trusted source
+    const isValidLogoUrl = (url) => {
+        if (!url) return false;
+        try {
+            const urlObj = new URL(url);
+            // Only allow TMDB image URLs or empty/null
+            return urlObj.hostname === 'image.tmdb.org' || url === '';
+        } catch {
+            return false;
+        }
+    };
+    
     // Render providers from TMDB
     providers.forEach(provider => {
         const serviceOption = document.createElement('div');
@@ -94,8 +106,8 @@ function renderStreamingProviders(providers) {
         const label = document.createElement('label');
         label.setAttribute('for', `provider-${provider.id}`);
         
-        // Add logo if available
-        if (provider.logoUrl) {
+        // Add logo if available and from trusted source
+        if (provider.logoUrl && isValidLogoUrl(provider.logoUrl)) {
             const logoImg = document.createElement('img');
             logoImg.src = provider.logoUrl;
             logoImg.alt = provider.name;

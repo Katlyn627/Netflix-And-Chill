@@ -186,16 +186,25 @@ class ProfileView {
 
         if (services.length > 0) {
             servicesContainer.innerHTML = services.map(service => {
+                // Escape HTML to prevent XSS
+                const escapeHtml = (str) => {
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                };
+                
+                const serviceName = escapeHtml(service.name);
+                
                 // Check if service has logo URL
                 if (service.logoUrl) {
                     return `
                         <span class="tag" style="display: inline-flex; align-items: center; gap: 8px;">
-                            <img src="${service.logoUrl}" alt="${service.name}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;">
-                            ${service.name}
+                            <img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;">
+                            ${serviceName}
                         </span>
                     `;
                 }
-                return `<span class="tag">${service.name}</span>`;
+                return `<span class="tag">${serviceName}</span>`;
             }).join(' ');
         } else {
             servicesContainer.innerHTML = '<em id="no-services">No streaming services connected yet.</em>';
