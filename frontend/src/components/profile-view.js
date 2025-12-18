@@ -428,8 +428,8 @@ class ProfileView {
                     const base64Data = e.target.result;
                     await this.addPhoto(base64Data);
                 } catch (error) {
+                    // Error is already handled and alerted in addPhoto(), just log for debugging
                     console.error('Error in FileReader onload:', error);
-                    alert('Failed to add photo. Please try again.');
                 }
             };
             reader.onerror = () => {
