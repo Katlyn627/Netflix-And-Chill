@@ -198,12 +198,30 @@ class ProfileView {
         const historyContainer = document.getElementById('watch-history-list');
 
         if (history.length > 0) {
-            historyContainer.innerHTML = history.slice(0, 10).map(item => 
-                `<div class="watch-item">
-                    <strong>${item.title}</strong> (${item.type}) - ${item.genre || 'N/A'}
-                </div>`
-            ).join('');
+            historyContainer.className = 'watch-history-grid';
+            
+            // Escape HTML to prevent XSS - defined once for efficiency
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+            
+            historyContainer.innerHTML = history.map(item => {
+                const posterUrl = item.posterPath 
+                    ? `https://image.tmdb.org/t/p/w200${item.posterPath}`
+                    : 'https://via.placeholder.com/150x225?text=No+Poster';
+                
+                return `
+                    <div class="watch-history-item">
+                        <img src="${posterUrl}" alt="${escapeHtml(item.title)}" 
+                             class="watch-history-poster">
+                        <div class="watch-history-title">${escapeHtml(item.title)}</div>
+                    </div>
+                `;
+            }).join('');
         } else {
+            historyContainer.className = '';
             historyContainer.innerHTML = '<em id="no-watch-history">No watch history yet.</em>';
         }
     }
@@ -870,7 +888,9 @@ class ProfileView {
                     type: type,
                     genre: genre || '',
                     service: service || '',
-                    episodesWatched: type === 'tvshow' || type === 'series' ? episodes : 1
+                    episodesWatched: type === 'tvshow' || type === 'series' ? episodes : 1,
+                    posterPath: selectedItem.posterPath || null,
+                    tmdbId: selectedItem.id ? selectedItem.id.toString() : null
                 };
 
                 const result = await api.addWatchHistory(this.userId, watchData);

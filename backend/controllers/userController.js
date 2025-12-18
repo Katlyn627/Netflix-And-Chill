@@ -160,7 +160,7 @@ class UserController {
   async addWatchHistory(req, res) {
     try {
       const { userId } = req.params;
-      const { title, type, genre, service, episodesWatched } = req.body;
+      const { title, type, genre, service, episodesWatched, posterPath, tmdbId } = req.body;
 
       if (!title || !type) {
         return res.status(400).json({ error: 'Title and type are required' });
@@ -172,7 +172,7 @@ class UserController {
       }
 
       const user = new User(userData);
-      user.addToWatchHistory({ title, type, genre, service, episodesWatched });
+      user.addToWatchHistory({ title, type, genre, service, episodesWatched, posterPath, tmdbId });
 
       await this.saveUserData(userId, user);
 

@@ -56,6 +56,8 @@ class User {
       genre: item.genre,
       service: item.service,
       episodesWatched: item.episodesWatched || 1,
+      posterPath: item.posterPath || null,
+      tmdbId: item.tmdbId || null,
       watchedAt: new Date().toISOString()
     });
   }

@@ -128,7 +128,9 @@ document.getElementById('watch-history-form').addEventListener('submit', async (
         type: formData.get('type'),
         genre: formData.get('genre'),
         service: formData.get('service'),
-        episodesWatched: parseInt(formData.get('episodes'))
+        episodesWatched: parseInt(formData.get('episodes')),
+        posterPath: formData.get('posterPath') || null,
+        tmdbId: formData.get('tmdbId') || null
     };
     
     try {
@@ -190,6 +192,7 @@ function initializeMovieSearch() {
     const selectedTitle = document.getElementById('selected-title');
     const selectedType = document.getElementById('selected-type');
     const selectedTmdbId = document.getElementById('selected-tmdb-id');
+    const selectedPosterPath = document.getElementById('selected-poster-path');
 
     if (!titleSearchInput) return;
 
@@ -238,6 +241,9 @@ function initializeMovieSearch() {
                                 titleSearchInput.value = details.title;
                                 titleInput.value = details.title;
                                 selectedTmdbId.value = details.id;
+                                if (selectedPosterPath) {
+                                    selectedPosterPath.value = details.posterPath || '';
+                                }
                                 
                                 // Set type
                                 if (details.type === 'movie') {
@@ -259,6 +265,9 @@ function initializeMovieSearch() {
                                 titleSearchInput.value = title;
                                 titleInput.value = title;
                                 selectedTmdbId.value = id;
+                                if (selectedPosterPath) {
+                                    selectedPosterPath.value = '';
+                                }
                                 
                                 if (type === 'movie') {
                                     typeSelect.value = 'movie';
