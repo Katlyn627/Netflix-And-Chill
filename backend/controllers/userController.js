@@ -4,6 +4,12 @@ const DataStore = require('../utils/dataStore');
 const dataStore = new DataStore();
 
 class UserController {
+  // Helper method to save user data with password preserved
+  async saveUserData(userId, user) {
+    const userDataToStore = { ...user.toJSON(), password: user.password };
+    return await dataStore.updateUser(userId, userDataToStore);
+  }
+
   async createUser(req, res) {
     try {
       const { username, email, password, age, location, bio } = req.body;
@@ -28,11 +34,13 @@ class UserController {
       };
 
       const user = new User(userData);
-      await dataStore.addUser(user.toJSON());
+      
+      // Save user data including password
+      const userDataToStore = { ...user.toJSON(), password: user.password };
+      await dataStore.addUser(userDataToStore);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.status(201).json({
         message: 'User created successfully',
@@ -110,11 +118,10 @@ class UserController {
       const user = new User(userData);
       user.updateBio(bio);
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Bio updated successfully',
@@ -142,11 +149,10 @@ class UserController {
       const user = new User(userData);
       user.addStreamingService({ name: serviceName });
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Streaming service added successfully',
@@ -174,11 +180,10 @@ class UserController {
       const user = new User(userData);
       user.addToWatchHistory({ title, type, genre, service, episodesWatched });
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Watch history updated successfully',
@@ -214,11 +219,10 @@ class UserController {
         user.preferences.locationRadius = locationRadius;
       }
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Preferences updated successfully',
@@ -246,11 +250,10 @@ class UserController {
       const user = new User(userData);
       user.profilePicture = profilePicture;
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Profile picture uploaded successfully',
@@ -283,11 +286,10 @@ class UserController {
 
       user.addPhoto(photoUrl);
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Photo added to gallery successfully',
@@ -315,11 +317,10 @@ class UserController {
       const user = new User(userData);
       user.removePhoto(photoUrl);
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Photo removed from gallery successfully',
@@ -356,11 +357,10 @@ class UserController {
         }
       });
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Profile details updated successfully',
@@ -388,11 +388,10 @@ class UserController {
       const user = new User(userData);
       user.quizResponses = { ...user.quizResponses, ...quizResponses };
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       // Don't send password in response
       const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
 
       res.json({
         message: 'Quiz responses submitted successfully',
@@ -425,7 +424,7 @@ class UserController {
 
       user.updatePassword(newPassword);
 
-      await dataStore.updateUser(userId, user.toJSON());
+      await this.saveUserData(userId, user);
 
       res.json({
         message: 'Password updated successfully'
@@ -451,7 +450,7 @@ class UserController {
       const user = new User(userData);
       user.updatePassword(newPassword);
 
-      await dataStore.updateUser(user.id, user.toJSON());
+      await this.saveUserData(user.id, user);
 
       res.json({
         message: 'Password reset successfully'
