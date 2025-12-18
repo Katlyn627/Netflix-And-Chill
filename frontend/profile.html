@@ -181,7 +181,133 @@
                         <label for="binge-count">How many episodes do you typically binge in one sitting?</label>
                         <input type="number" id="binge-count" name="bingeCount" min="1" value="3">
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </form>
+            </section>
+
+            <!-- Movie Preferences Section -->
+            <section id="movie-preferences" class="card" style="display: none;">
+                <h2>Movie Watching Preferences</h2>
+                <form id="movie-preferences-form">
+                    <div class="form-group">
+                        <label>What are your favorite movie snacks? (select all that apply)</label>
+                        <div class="snack-options">
+                            <label><input type="checkbox" name="snack" value="Popcorn"> 🍿 Popcorn</label>
+                            <label><input type="checkbox" name="snack" value="Candy"> 🍬 Candy</label>
+                            <label><input type="checkbox" name="snack" value="Chips"> 🥨 Chips</label>
+                            <label><input type="checkbox" name="snack" value="Ice Cream"> 🍦 Ice Cream</label>
+                            <label><input type="checkbox" name="snack" value="Pizza"> 🍕 Pizza</label>
+                            <label><input type="checkbox" name="snack" value="Nachos"> 🧀 Nachos</label>
+                            <label><input type="checkbox" name="snack" value="Fruit"> 🍇 Fruit</label>
+                            <label><input type="checkbox" name="snack" value="No Snacks"> ❌ No Snacks</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>What's your video chat preference for virtual watch parties?</label>
+                        <select id="video-chat-pref" name="videoChatPreference">
+                            <option value="">Select...</option>
+                            <option value="facetime">FaceTime</option>
+                            <option value="zoom">Zoom</option>
+                            <option value="either">Either works for me</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                    <button type="button" id="skip-movie-prefs-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip</button>
+                </form>
+            </section>
+
+            <!-- Movie Debate Topics Section -->
+            <section id="debate-topics" class="card" style="display: none;">
+                <h2>Movie Debate Preferences</h2>
+                <p>Let's see where you stand on some classic movie debates!</p>
+                <form id="debate-topics-form">
+                    <div class="form-group">
+                        <label>Select topics you enjoy debating: (optional)</label>
+                        <div class="debate-options">
+                            <label><input type="checkbox" name="debate" value="Best Star Wars trilogy"> Best Star Wars trilogy</label>
+                            <label><input type="checkbox" name="debate" value="Marvel vs DC"> Marvel vs DC</label>
+                            <label><input type="checkbox" name="debate" value="Book vs Movie adaptations"> Book vs Movie adaptations</label>
+                            <label><input type="checkbox" name="debate" value="Remakes and reboots"> Remakes and reboots</label>
+                            <label><input type="checkbox" name="debate" value="Horror movie rankings"> Horror movie rankings</label>
+                            <label><input type="checkbox" name="debate" value="Best decade for movies"> Best decade for movies</label>
+                            <label><input type="checkbox" name="debate" value="Director styles"> Director styles</label>
+                            <label><input type="checkbox" name="debate" value="Ending interpretations"> Ending interpretations</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                    <button type="button" id="skip-debate-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip</button>
+                </form>
+            </section>
+
+            <!-- Compatibility Quiz Section -->
+            <section id="compatibility-quiz" class="card" style="display: none;">
+                <h2>Compatibility Quiz</h2>
+                <p>Answer these questions to help us find your perfect match!</p>
+                <form id="compatibility-quiz-form">
+                    <div class="form-group">
+                        <label>Do you prefer subtitles or dubbing for foreign films?</label>
+                        <select name="q1">
+                            <option value="">Select...</option>
+                            <option value="subtitles">Subtitles</option>
+                            <option value="dubbing">Dubbing</option>
+                            <option value="no_preference">No preference</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's your ideal movie length?</label>
+                        <select name="q2">
+                            <option value="">Select...</option>
+                            <option value="under_90">Under 90 minutes</option>
+                            <option value="90_120">90-120 minutes</option>
+                            <option value="over_120">Over 2 hours - the longer the better!</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>How do you feel about movie spoilers?</label>
+                        <select name="q3">
+                            <option value="">Select...</option>
+                            <option value="hate">Absolutely hate them</option>
+                            <option value="dont_mind">Don't mind them</option>
+                            <option value="like">Actually prefer knowing what happens</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's your preferred movie-watching time?</label>
+                        <select name="q4">
+                            <option value="">Select...</option>
+                            <option value="morning">Morning person</option>
+                            <option value="afternoon">Afternoon</option>
+                            <option value="evening">Evening</option>
+                            <option value="late_night">Late night owl</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>When watching with someone, do you prefer to:</label>
+                        <select name="q5">
+                            <option value="">Select...</option>
+                            <option value="silent">Watch in silence</option>
+                            <option value="occasional_comments">Make occasional comments</option>
+                            <option value="full_discussion">Have a full running commentary</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>How do you choose what to watch?</label>
+                        <select name="q6">
+                            <option value="">Select...</option>
+                            <option value="plan_ahead">Plan ahead</option>
+                            <option value="browse">Browse until something clicks</option>
+                            <option value="rewatch">Rewatch favorites</option>
+                            <option value="recommendations">Follow recommendations</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Complete Setup</button>
+                    <button type="button" id="skip-quiz-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip</button>
                 </form>
             </section>
 
