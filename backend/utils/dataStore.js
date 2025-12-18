@@ -68,6 +68,28 @@ class DataStore {
     return users[index];
   }
 
+  async deleteUser(userId) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.usersFile);
+    
+    const users = await this.loadUsers();
+    const index = users.findIndex(u => u.id === userId);
+    
+    if (index === -1) {
+      return null;
+    }
+    
+    const deletedUser = users[index];
+    users.splice(index, 1);
+    await fs.writeFile(this.usersFile, JSON.stringify(users, null, 2));
+    
+    // Clean up related data
+    await this.deleteUserLikes(userId);
+    await this.deleteUserMatches(userId);
+    
+    return deletedUser;
+  }
+
   async loadUsers() {
     await this.ensureDataDir();
     await this.ensureFile(this.usersFile);
@@ -145,6 +167,26 @@ class DataStore {
     });
     
     return mutual;
+  }
+
+  async deleteUserLikes(userId) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.likesFile);
+    
+    const likes = await this.loadLikes();
+    // Remove all likes from and to the user
+    const filteredLikes = likes.filter(l => l.fromUserId !== userId && l.toUserId !== userId);
+    await fs.writeFile(this.likesFile, JSON.stringify(filteredLikes, null, 2));
+  }
+
+  async deleteUserMatches(userId) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.matchesFile);
+    
+    const matches = await this.loadMatches();
+    // Remove all matches involving the user
+    const filteredMatches = matches.filter(m => m.user1Id !== userId && m.user2Id !== userId);
+    await fs.writeFile(this.matchesFile, JSON.stringify(filteredMatches, null, 2));
   }
 
   async loadLikes() {

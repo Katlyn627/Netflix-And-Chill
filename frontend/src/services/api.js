@@ -211,6 +211,16 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
+    async deleteUser(userId) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        return await response.json();
+    }
+
     async getGenres(type = null) {
         const url = type ? `${API_BASE_URL}/streaming/genres?type=${type}` : `${API_BASE_URL}/streaming/genres`;
         const response = await fetch(url);

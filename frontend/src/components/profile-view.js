@@ -347,6 +347,11 @@ class ProfileView {
             this.changePassword();
         });
 
+        // Delete profile button
+        document.getElementById('delete-profile-btn').addEventListener('click', () => {
+            this.deleteProfile();
+        });
+
         // Toggle password visibility for all password fields
         document.querySelectorAll('.toggle-password').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1191,6 +1196,55 @@ class ProfileView {
                 alert('Failed to update preferences: ' + error.message);
             }
         });
+    }
+
+    async deleteProfile() {
+        // First confirmation
+        const firstConfirmation = confirm(
+            '⚠️ WARNING: This action cannot be undone!\n\n' +
+            'Are you sure you want to delete your profile?\n\n' +
+            'This will permanently delete:\n' +
+            '• Your profile information\n' +
+            '• All your photos and watch history\n' +
+            '• Your matches and likes\n' +
+            '• All your preferences and data\n\n' +
+            'Click OK to continue or Cancel to keep your profile.'
+        );
+
+        if (!firstConfirmation) {
+            return;
+        }
+
+        // Second confirmation to prevent accidental deletion
+        const username = this.userData.username;
+        const secondConfirmation = confirm(
+            `Final confirmation:\n\n` +
+            `Type your username "${username}" in your mind and click OK to permanently delete your profile.\n\n` +
+            `Are you absolutely sure?`
+        );
+
+        if (!secondConfirmation) {
+            return;
+        }
+
+        try {
+            const response = await api.deleteUser(this.userId);
+            
+            if (response.error) {
+                throw new Error(response.error);
+            }
+
+            // Clear local storage
+            localStorage.removeItem('currentUserId');
+            
+            alert('Your profile has been permanently deleted. You will now be redirected to the home page.');
+            
+            // Redirect to home page
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Error deleting profile:', error);
+            alert('Failed to delete profile: ' + error.message);
+        }
     }
 }
 

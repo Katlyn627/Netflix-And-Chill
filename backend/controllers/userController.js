@@ -536,6 +536,25 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async deleteUser(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      await dataStore.deleteUser(userId);
+
+      res.json({
+        message: 'User profile and all associated data deleted successfully'
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();
