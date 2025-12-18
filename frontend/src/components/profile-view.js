@@ -383,12 +383,10 @@ class ProfileView {
             // If user has no profile picture yet, automatically set this as profile picture
             if (!this.userData.profilePicture) {
                 await this.setAsProfilePicture(photoUrl);
-                // After setting profile picture, reload user data to ensure sync
-                await this.loadProfile();
-            } else {
-                // Just render the gallery if profile picture already exists
-                this.renderPhotoGallery();
             }
+            
+            // Render the gallery to show the updated photos
+            this.renderPhotoGallery();
             
             document.getElementById('add-photo-form').style.display = 'none';
             document.getElementById('show-add-photo-btn').style.display = 'inline-block';
