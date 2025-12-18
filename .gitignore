@@ -8,3 +8,7 @@ build/
 *.tmp
 .vscode/
 .idea/
+# Ignore uploaded user images but keep the directory
+frontend/assets/uploads/*
+!frontend/assets/uploads/.gitkeep
+
