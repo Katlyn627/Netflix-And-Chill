@@ -104,7 +104,7 @@ class MatchingEngine {
     const quiz1 = user1.quizResponses || {};
     const quiz2 = user2.quizResponses || {};
     
-    const commonQuestions = Object.keys(quiz1).filter(q => quiz2.hasOwnProperty(q));
+    const commonQuestions = Object.keys(quiz1).filter(q => Object.prototype.hasOwnProperty.call(quiz2, q));
     if (commonQuestions.length === 0) return 0;
 
     let matches = 0;

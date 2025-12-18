@@ -179,6 +179,17 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
+      // Basic URL validation - must be absolute HTTP/HTTPS URL
+      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+        return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
+      }
+
+      try {
+        new URL(photoUrl); // Validate URL format
+      } catch (urlError) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
       const user = await dataStore.findUserById(userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -206,9 +217,25 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
+      // Basic URL validation - must be absolute HTTP/HTTPS URL
+      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+        return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
+      }
+
+      try {
+        new URL(photoUrl); // Validate URL format
+      } catch (urlError) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
       const user = await dataStore.findUserById(userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Check photo limit before adding
+      if (user.photoGallery && user.photoGallery.length >= 6) {
+        return res.status(400).json({ error: 'Photo gallery is full. Maximum 6 photos allowed.' });
       }
 
       const userObj = new User(user);
