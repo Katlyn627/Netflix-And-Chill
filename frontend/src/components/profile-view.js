@@ -424,8 +424,13 @@ class ProfileView {
             // Convert file to base64
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const base64Data = e.target.result;
-                await this.addPhoto(base64Data);
+                try {
+                    const base64Data = e.target.result;
+                    await this.addPhoto(base64Data);
+                } catch (error) {
+                    console.error('Error in FileReader onload:', error);
+                    alert('Failed to add photo. Please try again.');
+                }
             };
             reader.onerror = () => {
                 alert('Failed to read file. Please try again.');
