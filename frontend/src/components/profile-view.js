@@ -1094,4 +1094,8 @@ class ProfileView {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new ProfileView();
+    const userId = localStorage.getItem('currentUserId');
+    if (userId) {
+        updateNavProfileIcon(userId);
+    }
 });

@@ -1,41 +1,6 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
-// Display user info
-async function displayUserInfo() {
-    if (!currentUserId) {
-        window.location.href = 'login.html';
-        return;
-    }
-
-    try {
-        const result = await api.getUser(currentUserId);
-        if (result && result.id) {
-            const userInfoDiv = document.getElementById('user-info');
-            
-            // Get profile picture or use default icon
-            const profilePicture = result.profilePicture || '';
-            const profileImageHtml = profilePicture 
-                ? `<img src="${profilePicture}" alt="Profile" class="profile-icon">` 
-                : `<div class="profile-icon-default">👤</div>`;
-            
-            userInfoDiv.innerHTML = `
-                <a href="profile-view.html?userId=${currentUserId}" class="profile-link" title="View My Profile">
-                    ${profileImageHtml}
-                </a>
-                <p>Logged in as: <strong>${result.username}</strong> (ID: <span class="user-id">${currentUserId}</span>)</p>
-            `;
-        } else {
-            localStorage.removeItem('currentUserId');
-            window.location.href = 'login.html';
-        }
-    } catch (error) {
-        console.error('Error fetching user info:', error);
-        localStorage.removeItem('currentUserId');
-        window.location.href = 'login.html';
-    }
-}
-
 // Display matches
 function displayMatches(matches) {
     const matchesContainer = document.getElementById('matches-container');
@@ -122,5 +87,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    displayUserInfo();
+    if (currentUserId) {
+        updateNavProfileIcon(currentUserId);
+    }
 });

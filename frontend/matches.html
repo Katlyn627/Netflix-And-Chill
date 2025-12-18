@@ -10,6 +10,13 @@
 <body>
     <div class="container">
         <header>
+            <div class="nav-icons">
+                <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
+                <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
+                <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
+                    <span id="profile-nav-icon">👤</span>
+                </a>
+            </div>
             <div class="logo-banner">
                 <h1>NETFLIX & CHILL</h1>
             </div>
@@ -17,8 +24,6 @@
         </header>
 
         <main>
-            <div id="user-info" class="user-info-bar"></div>
-
             <div class="matches-page">
                 <div class="card">
                     <div class="matches-header">
@@ -36,11 +41,6 @@
 
                     <div id="matches-container"></div>
                 </div>
-
-                <div class="navigation-links">
-                    <a href="profile-view.html" class="btn btn-secondary">View My Profile</a>
-                    <a href="homepage.html" class="btn btn-secondary">Home</a>
-                </div>
             </div>
         </main>
 
@@ -50,6 +50,7 @@
     </div>
 
     <script src="src/services/api.js"></script>
+    <script src="src/utils/navigation.js"></script>
     <script src="src/components/matches.js"></script>
 </body>
 </html>
