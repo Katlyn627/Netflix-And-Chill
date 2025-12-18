@@ -3,7 +3,17 @@ const DataStore = require('../utils/dataStore');
 
 const dataStore = new DataStore();
 
+// Constants
+const MAX_PHOTOS_IN_GALLERY = 6;
+
 class UserController {
+  // Helper method to filter sensitive data from user response
+  filterSensitiveData(user) {
+    const userData = typeof user.toJSON === 'function' ? user.toJSON() : user;
+    const { password, ...filteredData } = userData;
+    return filteredData;
+  }
+
   // Helper method to save user data with password preserved
   async saveUserData(userId, user) {
     const userDataToStore = { ...user.toJSON(), password: user.password };
@@ -39,12 +49,9 @@ class UserController {
       const userDataToStore = { ...user.toJSON(), password: user.password };
       await dataStore.addUser(userDataToStore);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.status(201).json({
         message: 'User created successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -69,13 +76,9 @@ class UserController {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-      delete userResponse.password;
-
       res.json({
         message: 'Login successful',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -91,11 +94,7 @@ class UserController {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Don't send password in response
-      const userResponse = { ...userData };
-      delete userResponse.password;
-
-      res.json(userResponse);
+      res.json(this.filterSensitiveData(userData));
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -120,12 +119,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Bio updated successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -151,12 +147,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Streaming service added successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -182,12 +175,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Watch history updated successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -221,12 +211,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Preferences updated successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -252,12 +239,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Profile picture uploaded successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -280,20 +264,17 @@ class UserController {
 
       const user = new User(userData);
       
-      if (user.photoGallery.length >= 6) {
-        return res.status(400).json({ error: 'Maximum 6 photos allowed in gallery' });
+      if (user.photoGallery.length >= MAX_PHOTOS_IN_GALLERY) {
+        return res.status(400).json({ error: `Maximum ${MAX_PHOTOS_IN_GALLERY} photos allowed in gallery` });
       }
 
       user.addPhoto(photoUrl);
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Photo added to gallery successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -319,12 +300,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Photo removed from gallery successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -359,12 +337,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Profile details updated successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -390,12 +365,9 @@ class UserController {
 
       await this.saveUserData(userId, user);
 
-      // Don't send password in response
-      const userResponse = { ...user.toJSON() };
-
       res.json({
         message: 'Quiz responses submitted successfully',
-        user: userResponse
+        user: this.filterSensitiveData(user)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

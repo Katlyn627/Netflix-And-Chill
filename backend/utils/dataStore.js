@@ -16,7 +16,10 @@ class DataStore {
     try {
       await fs.mkdir(this.dataDir, { recursive: true });
     } catch (error) {
-      // Directory already exists
+      // Only ignore if directory already exists
+      if (error.code !== 'EEXIST') {
+        throw error;
+      }
     }
   }
 
