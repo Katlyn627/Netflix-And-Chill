@@ -37,9 +37,17 @@ class MatchingEngine {
       score += 15;
     }
 
-    // Quiz response compatibility
+    // Quiz response compatibility (increased weight to 30 points)
     const quizCompatibility = this.calculateQuizCompatibility(user1, user2);
     score += quizCompatibility;
+
+    // Snack preferences compatibility
+    const snackCompatibility = this.calculateSnackCompatibility(user1, user2);
+    score += snackCompatibility;
+
+    // Movie debate topics compatibility
+    const debateCompatibility = this.calculateDebateCompatibility(user1, user2);
+    score += debateCompatibility;
 
     // Bonus for matching video chat preference
     if (user1.videoChatPreference && user2.videoChatPreference) {
@@ -58,7 +66,10 @@ class MatchingEngine {
       sharedContent: sharedContent,
       sharedServices: sharedServices,
       sharedGenres: sharedGenres,
-      sharedFavoriteMovies: sharedFavoriteMovies
+      sharedFavoriteMovies: sharedFavoriteMovies,
+      quizCompatibility: quizCompatibility,
+      snackCompatibility: snackCompatibility,
+      debateCompatibility: debateCompatibility
     };
   }
 
@@ -164,10 +175,52 @@ class MatchingEngine {
       }
     });
 
-    // Award up to 20 points for quiz compatibility
-    const compatibilityScore = (matches / commonQuestions.length) * 20;
+    // Award up to 30 points for quiz compatibility (increased from 20)
+    // Quiz is now more important as it reflects viewing style compatibility
+    const compatibilityScore = (matches / commonQuestions.length) * 30;
     return compatibilityScore;
   }
+
+  /**
+   * Calculate compatibility based on snack preferences
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score from snacks
+   */
+  static calculateSnackCompatibility(user1, user2) {
+    const snacks1 = user1.favoriteSnacks || [];
+    const snacks2 = user2.favoriteSnacks || [];
+    
+    if (snacks1.length === 0 || snacks2.length === 0) return 0;
+    
+    // Find shared snacks
+    const sharedSnacks = snacks1.filter(snack => snacks2.includes(snack));
+    
+    // Award up to 10 points for snack compatibility
+    const score = Math.min(10, sharedSnacks.length * 3);
+    return score;
+  }
+
+  /**
+   * Calculate compatibility based on movie debate topics
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score from debate topics
+   */
+  static calculateDebateCompatibility(user1, user2) {
+    const debates1 = user1.movieDebateTopics || [];
+    const debates2 = user2.movieDebateTopics || [];
+    
+    if (debates1.length === 0 || debates2.length === 0) return 0;
+    
+    // Find shared debate topics
+    const sharedDebates = debates1.filter(debate => debates2.includes(debate));
+    
+    // Award up to 10 points for debate compatibility
+    const score = Math.min(10, sharedDebates.length * 2);
+    return score;
+  }
+
 
   /**
    * Find matches for a user from a pool of users
