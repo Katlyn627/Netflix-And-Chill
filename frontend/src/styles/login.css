@@ -8,6 +8,34 @@
     margin-bottom: 20px;
 }
 
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper input {
+    flex: 1;
+    padding-right: 80px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    padding: 5px 15px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background 0.3s;
+}
+
+.toggle-password:hover {
+    background: #5568d3;
+}
+
 .input-hint {
     font-size: 0.9em;
     color: #666;

@@ -3,6 +3,7 @@ class User {
     this.id = data.id || this.generateId();
     this.username = data.username;
     this.email = data.email;
+    this.password = data.password; // Store password (in production, this should be hashed)
     this.bio = data.bio || '';
     this.age = data.age;
     this.location = data.location || '';
@@ -92,6 +93,11 @@ class User {
       superLikes: this.superLikes,
       createdAt: this.createdAt
     };
+  }
+
+  // Method to verify password without exposing it
+  verifyPassword(password) {
+    return this.password === password;
   }
 }
 

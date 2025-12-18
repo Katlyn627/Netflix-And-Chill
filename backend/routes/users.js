@@ -6,6 +6,9 @@ const router = express.Router();
 // Create a new user profile
 router.post('/', userController.createUser.bind(userController));
 
+// Login user
+router.post('/login', userController.loginUser.bind(userController));
+
 // Get user profile
 router.get('/:userId', userController.getUser.bind(userController));
 

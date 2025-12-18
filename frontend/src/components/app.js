@@ -11,6 +11,25 @@ function showSection(sectionId) {
     });
 }
 
+// Toggle password visibility
+document.addEventListener('DOMContentLoaded', () => {
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePasswordBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                togglePasswordBtn.textContent = 'Show';
+            }
+        });
+    }
+    showSection('create-profile');
+});
+
 // Display messages
 function showMessage(message, isError = false) {
     const messageDiv = document.createElement('div');
@@ -40,6 +59,7 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
     const userData = {
         username: formData.get('username'),
         email: formData.get('email'),
+        password: formData.get('password'),
         age: parseInt(formData.get('age')),
         location: formData.get('location'),
         bio: formData.get('bio')
@@ -149,8 +169,3 @@ if (skipToPreferencesBtn) {
         showSection('preferences');
     });
 }
-
-// Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-    showSection('create-profile');
-});

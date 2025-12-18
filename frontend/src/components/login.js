@@ -1,8 +1,23 @@
 // Login functionality
+// Toggle password visibility
+document.getElementById('toggle-password').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('toggle-password');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.textContent = 'Hide';
+    } else {
+        passwordInput.type = 'password';
+        toggleBtn.textContent = 'Show';
+    }
+});
+
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const userId = document.getElementById('user-id').value.trim();
+    const password = document.getElementById('password').value;
     const errorDiv = document.getElementById('error-message');
     
     if (!userId) {
@@ -10,12 +25,18 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         errorDiv.style.display = 'block';
         return;
     }
+
+    if (!password) {
+        errorDiv.textContent = 'Please enter your password';
+        errorDiv.style.display = 'block';
+        return;
+    }
     
     try {
-        // Verify user exists
-        const result = await api.getUser(userId);
+        // Login with password
+        const result = await api.loginUser(userId, password);
         
-        if (result && result.id) {
+        if (result && !result.error) {
             // Save user ID to localStorage
             localStorage.setItem('currentUserId', userId);
             
@@ -31,7 +52,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
                 window.location.href = 'matches.html';
             }, 1500);
         } else {
-            errorDiv.textContent = 'User not found. Please check your user ID or create a new profile.';
+            errorDiv.textContent = result.error || 'Invalid credentials. Please check your user ID and password.';
             errorDiv.style.display = 'block';
         }
     } catch (error) {
