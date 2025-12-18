@@ -179,24 +179,10 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
-      // Validate URL or base64 data
-      if (photoUrl.startsWith('data:image/')) {
-        // It's base64 encoded image - validate format
-        const validBase64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
-        if (!validBase64Pattern.test(photoUrl)) {
-          return res.status(400).json({ error: 'Invalid image format. Only JPEG, PNG, GIF, and WebP are supported.' });
-        }
-      } else {
-        // It's a URL - validate format
-        if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
-          return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
-        }
-
-        try {
-          new URL(photoUrl); // Validate URL format
-        } catch (urlError) {
-          return res.status(400).json({ error: 'Invalid URL format' });
-        }
+      // Validate photo URL or base64
+      const validationError = this.validatePhotoUrl(photoUrl);
+      if (validationError) {
+        return res.status(400).json({ error: validationError });
       }
 
       const user = await dataStore.findUserById(userId);
@@ -226,24 +212,10 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
-      // Validate URL or base64 data
-      if (photoUrl.startsWith('data:image/')) {
-        // It's base64 encoded image - validate format
-        const validBase64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
-        if (!validBase64Pattern.test(photoUrl)) {
-          return res.status(400).json({ error: 'Invalid image format. Only JPEG, PNG, GIF, and WebP are supported.' });
-        }
-      } else {
-        // It's a URL - validate format
-        if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
-          return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
-        }
-
-        try {
-          new URL(photoUrl); // Validate URL format
-        } catch (urlError) {
-          return res.status(400).json({ error: 'Invalid URL format' });
-        }
+      // Validate photo URL or base64
+      const validationError = this.validatePhotoUrl(photoUrl);
+      if (validationError) {
+        return res.status(400).json({ error: validationError });
       }
 
       const user = await dataStore.findUserById(userId);
@@ -270,6 +242,29 @@ class UserController {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+  }
+
+  // Helper method to validate photo URL or base64 data
+  validatePhotoUrl(photoUrl) {
+    if (photoUrl.startsWith('data:image/')) {
+      // It's base64 encoded image - validate format
+      const validBase64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+      if (!validBase64Pattern.test(photoUrl)) {
+        return 'Invalid image format. Only JPEG, PNG, GIF, and WebP are supported.';
+      }
+    } else {
+      // It's a URL - validate format
+      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+        return 'Photo URL must be an absolute HTTP or HTTPS URL';
+      }
+
+      try {
+        new URL(photoUrl); // Validate URL format
+      } catch (urlError) {
+        return 'Invalid URL format';
+      }
+    }
+    return null; // No error
   }
 
   async removePhotoFromGallery(req, res) {
