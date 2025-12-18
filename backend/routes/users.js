@@ -21,6 +21,9 @@ router.post('/:userId/streaming-services', userController.addStreamingService.bi
 // Add to watch history
 router.post('/:userId/watch-history', userController.addWatchHistory.bind(userController));
 
+// Remove from watch history
+router.delete('/:userId/watch-history', userController.removeWatchHistory.bind(userController));
+
 // Update preferences
 router.put('/:userId/preferences', userController.updatePreferences.bind(userController));
 

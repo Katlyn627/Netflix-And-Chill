@@ -61,6 +61,17 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
+    async removeWatchHistory(userId, watchedAt) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/watch-history`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ watchedAt })
+        });
+        return await response.json();
+    }
+
     async updatePreferences(userId, preferences) {
         const response = await fetch(`${API_BASE_URL}/users/${userId}/preferences`, {
             method: 'PUT',

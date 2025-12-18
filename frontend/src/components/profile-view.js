@@ -213,13 +213,22 @@ class ProfileView {
                     : 'https://via.placeholder.com/150x225?text=No+Poster';
                 
                 return `
-                    <div class="watch-history-item">
+                    <div class="watch-history-item" style="position: relative;">
+                        <button class="remove-watch-history-btn" data-watched-at="${item.watchedAt}" style="position: absolute; top: 5px; right: 5px; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 10;" title="Remove from watch history">×</button>
                         <img src="${posterUrl}" alt="${escapeHtml(item.title)}" 
                              class="watch-history-poster">
                         <div class="watch-history-title">${escapeHtml(item.title)}</div>
                     </div>
                 `;
             }).join('');
+
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-watch-history-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const watchedAt = e.target.getAttribute('data-watched-at');
+                    await this.removeWatchHistory(watchedAt);
+                });
+            });
         } else {
             historyContainer.className = '';
             historyContainer.innerHTML = '<em id="no-watch-history">No watch history yet.</em>';
@@ -984,6 +993,26 @@ class ProfileView {
         overview.textContent = item.overview || 'No description available.';
 
         display.style.display = 'block';
+    }
+
+    async removeWatchHistory(watchedAt) {
+        if (!confirm('Are you sure you want to remove this item from your watch history?')) {
+            return;
+        }
+
+        try {
+            const result = await api.removeWatchHistory(this.userId, watchedAt);
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Reload profile to show updated watch history
+            await this.loadProfile();
+            alert('Item removed from watch history successfully!');
+        } catch (error) {
+            console.error('Error removing watch history item:', error);
+            alert('Failed to remove item from watch history: ' + error.message);
+        }
     }
 
     // Preferences functionality

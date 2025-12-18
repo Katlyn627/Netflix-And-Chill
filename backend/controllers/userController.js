@@ -185,6 +185,34 @@ class UserController {
     }
   }
 
+  async removeWatchHistory(req, res) {
+    try {
+      const { userId } = req.params;
+      const { watchedAt } = req.body;
+
+      if (!watchedAt) {
+        return res.status(400).json({ error: 'watchedAt timestamp is required' });
+      }
+
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.removeFromWatchHistory(watchedAt);
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Watch history item removed successfully',
+        user: this.filterSensitiveData(user)
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async updatePreferences(req, res) {
     try {
       const { userId } = req.params;
