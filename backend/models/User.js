@@ -62,6 +62,10 @@ class User {
     });
   }
 
+  removeFromWatchHistory(watchedAt) {
+    this.watchHistory = this.watchHistory.filter(item => item.watchedAt !== watchedAt);
+  }
+
   updateBio(bio) {
     this.bio = bio;
   }
