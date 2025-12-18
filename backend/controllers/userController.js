@@ -78,6 +78,7 @@ class UserController {
 
       res.json({
         message: 'Login successful',
+        userId: user.id,
         user: this.filterSensitiveData(user)
       });
     } catch (error) {
