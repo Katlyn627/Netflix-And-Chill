@@ -93,9 +93,18 @@ class ProfileView {
         gallery.forEach(photo => {
             const photoDiv = document.createElement('div');
             photoDiv.style.position = 'relative';
+            
+            // Check if this photo is the current profile picture
+            const isProfilePic = this.userData.profilePicture === photo.url;
+            const profilePicBadge = isProfilePic 
+                ? '<div style="position: absolute; top: 5px; left: 5px; background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;">Profile Pic</div>' 
+                : '';
+            
             photoDiv.innerHTML = `
                 <img src="${photo.url}" alt="Gallery photo" style="width: 100%; height: 150px; object-fit: cover; border-radius: 5px;">
-                <button class="remove-photo-btn" data-url="${photo.url}" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 12px;">×</button>
+                ${profilePicBadge}
+                <button class="remove-photo-btn" data-url="${photo.url}" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 12px; z-index: 2;">×</button>
+                ${!isProfilePic ? `<button class="set-profile-pic-btn" data-url="${photo.url}" style="position: absolute; bottom: 5px; left: 5px; right: 5px; background: rgba(102, 126, 234, 0.95); color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold;">Set as Profile Picture</button>` : ''}
             `;
             galleryContainer.appendChild(photoDiv);
         });
@@ -105,6 +114,14 @@ class ProfileView {
             btn.addEventListener('click', (e) => {
                 const photoUrl = e.target.getAttribute('data-url');
                 this.removePhoto(photoUrl);
+            });
+        });
+
+        // Add set as profile picture event listeners
+        document.querySelectorAll('.set-profile-pic-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const photoUrl = e.target.getAttribute('data-url');
+                this.setAsProfilePicture(photoUrl);
             });
         });
 
@@ -362,6 +379,12 @@ class ProfileView {
             if (!response.ok) throw new Error('Failed to add photo');
 
             this.userData = (await response.json()).user;
+            
+            // If user has no profile picture yet, automatically set this as profile picture
+            if (!this.userData.profilePicture) {
+                await this.setAsProfilePicture(photoUrl);
+            }
+            
             this.renderPhotoGallery();
             
             document.getElementById('add-photo-form').style.display = 'none';
@@ -438,6 +461,40 @@ class ProfileView {
         } catch (error) {
             console.error('Error removing photo:', error);
             alert('Failed to remove photo. Please try again.');
+        }
+    }
+
+    async setAsProfilePicture(photoUrl) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/profile-picture`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profilePicture: photoUrl })
+            });
+
+            if (!response.ok) throw new Error('Failed to set profile picture');
+
+            this.userData = (await response.json()).user;
+            
+            // Update the profile picture display in the header
+            const profilePictureImg = document.getElementById('profile-picture');
+            const noPhotoDiv = document.getElementById('no-photo');
+            if (profilePictureImg && noPhotoDiv) {
+                profilePictureImg.src = photoUrl;
+                profilePictureImg.style.display = 'block';
+                noPhotoDiv.style.display = 'none';
+            }
+            
+            // Re-render gallery to show the new profile pic badge
+            this.renderPhotoGallery();
+            
+            // Update navigation icon
+            await updateNavProfileIcon(this.userId);
+            
+            alert('Profile picture updated successfully!');
+        } catch (error) {
+            console.error('Error setting profile picture:', error);
+            alert('Failed to set profile picture. Please try again.');
         }
     }
 
