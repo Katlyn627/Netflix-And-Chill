@@ -39,4 +39,10 @@ router.put('/:userId/profile-details', userController.updateProfileDetails.bind(
 // Submit quiz responses
 router.put('/:userId/quiz', userController.submitQuizResponses.bind(userController));
 
+// Update password
+router.put('/:userId/password', userController.updatePassword.bind(userController));
+
+// Reset password (forgot password)
+router.post('/reset-password', userController.resetPassword.bind(userController));
+
 module.exports = router;

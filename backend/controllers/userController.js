@@ -179,15 +179,24 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
-      // Basic URL validation - must be absolute HTTP/HTTPS URL
-      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
-        return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
-      }
+      // Validate URL or base64 data
+      if (photoUrl.startsWith('data:image/')) {
+        // It's base64 encoded image - validate format
+        const validBase64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+        if (!validBase64Pattern.test(photoUrl)) {
+          return res.status(400).json({ error: 'Invalid image format. Only JPEG, PNG, GIF, and WebP are supported.' });
+        }
+      } else {
+        // It's a URL - validate format
+        if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+          return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
+        }
 
-      try {
-        new URL(photoUrl); // Validate URL format
-      } catch (urlError) {
-        return res.status(400).json({ error: 'Invalid URL format' });
+        try {
+          new URL(photoUrl); // Validate URL format
+        } catch (urlError) {
+          return res.status(400).json({ error: 'Invalid URL format' });
+        }
       }
 
       const user = await dataStore.findUserById(userId);
@@ -217,15 +226,24 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
-      // Basic URL validation - must be absolute HTTP/HTTPS URL
-      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
-        return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
-      }
+      // Validate URL or base64 data
+      if (photoUrl.startsWith('data:image/')) {
+        // It's base64 encoded image - validate format
+        const validBase64Pattern = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
+        if (!validBase64Pattern.test(photoUrl)) {
+          return res.status(400).json({ error: 'Invalid image format. Only JPEG, PNG, GIF, and WebP are supported.' });
+        }
+      } else {
+        // It's a URL - validate format
+        if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+          return res.status(400).json({ error: 'Photo URL must be an absolute HTTP or HTTPS URL' });
+        }
 
-      try {
-        new URL(photoUrl); // Validate URL format
-      } catch (urlError) {
-        return res.status(400).json({ error: 'Invalid URL format' });
+        try {
+          new URL(photoUrl); // Validate URL format
+        } catch (urlError) {
+          return res.status(400).json({ error: 'Invalid URL format' });
+        }
       }
 
       const user = await dataStore.findUserById(userId);
@@ -332,6 +350,82 @@ class UserController {
       res.json({
         message: 'Quiz responses submitted successfully',
         user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async updatePassword(req, res) {
+    try {
+      const { userId } = req.params;
+      const { currentPassword, newPassword } = req.body;
+
+      // Validate inputs
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'Current password and new password are required' });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+      }
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const userObj = new User(user);
+      
+      // Verify current password
+      if (!userObj.verifyPassword(currentPassword)) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+
+      // Update password
+      userObj.updatePassword(newPassword);
+
+      const updatedUser = await dataStore.updateUser(userId, {
+        password: userObj.password
+      });
+
+      res.json({
+        message: 'Password updated successfully',
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const { email, newPassword } = req.body;
+
+      // Validate inputs
+      if (!email || !newPassword) {
+        return res.status(400).json({ error: 'Email and new password are required' });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+      }
+
+      const user = await dataStore.findUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ error: 'User with this email not found' });
+      }
+
+      const userObj = new User(user);
+      userObj.updatePassword(newPassword);
+
+      const updatedUser = await dataStore.updateUser(user.id, {
+        password: userObj.password
+      });
+
+      res.json({
+        message: 'Password reset successfully',
+        userId: user.id
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -111,6 +111,12 @@ class User {
   verifyPassword(password) {
     return this.password === password;
   }
+
+  // Method to update password
+  updatePassword(newPassword) {
+    // In production, this should hash the password
+    this.password = newPassword;
+  }
 }
 
 module.exports = User;

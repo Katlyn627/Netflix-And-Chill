@@ -50,6 +50,9 @@ class ProfileView {
         document.getElementById('profile-location').textContent = user.location || 'N/A';
         document.getElementById('profile-bio').textContent = user.bio || 'No bio added yet.';
 
+        // User email in account settings
+        document.getElementById('user-email').textContent = user.email || 'N/A';
+
         // Profile picture
         if (user.profilePicture) {
             document.getElementById('profile-picture').src = user.profilePicture;
@@ -211,13 +214,19 @@ class ProfileView {
             document.getElementById('add-photo-form').style.display = 'none';
             document.getElementById('show-add-photo-btn').style.display = 'inline-block';
             document.getElementById('photo-url').value = '';
+            document.getElementById('photo-file').value = '';
         });
 
         // Add photo
         document.getElementById('add-photo-btn').addEventListener('click', () => {
-            const photoUrl = document.getElementById('photo-url').value.trim();
-            if (photoUrl) {
-                this.addPhoto(photoUrl);
+            this.handlePhotoAdd();
+        });
+
+        // Handle file selection
+        document.getElementById('photo-file').addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                // Clear URL input when file is selected
+                document.getElementById('photo-url').value = '';
             }
         });
 
@@ -257,6 +266,38 @@ class ProfileView {
         document.getElementById('edit-profile-btn').addEventListener('click', () => {
             window.location.href = 'profile.html';
         });
+
+        // Change password button
+        document.getElementById('change-password-btn').addEventListener('click', () => {
+            this.showChangePasswordModal();
+        });
+
+        // Cancel password change
+        document.getElementById('cancel-password-change-btn').addEventListener('click', () => {
+            document.getElementById('change-password-modal').style.display = 'none';
+            document.getElementById('change-password-form').reset();
+        });
+
+        // Submit password change
+        document.getElementById('change-password-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.changePassword();
+        });
+
+        // Toggle password visibility for all password fields
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.target.getAttribute('data-target');
+                const input = document.getElementById(target);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    e.target.textContent = 'Hide';
+                } else {
+                    input.type = 'password';
+                    e.target.textContent = 'Show';
+                }
+            });
+        });
     }
 
     async addPhoto(photoUrl) {
@@ -275,11 +316,55 @@ class ProfileView {
             document.getElementById('add-photo-form').style.display = 'none';
             document.getElementById('show-add-photo-btn').style.display = 'inline-block';
             document.getElementById('photo-url').value = '';
+            document.getElementById('photo-file').value = '';
             
             alert('Photo added successfully!');
         } catch (error) {
             console.error('Error adding photo:', error);
             alert('Failed to add photo. Please try again.');
+        }
+    }
+
+    async handlePhotoAdd() {
+        const fileInput = document.getElementById('photo-file');
+        const urlInput = document.getElementById('photo-url');
+
+        // Check if a file is selected
+        if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            // Convert file to base64
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64Data = e.target.result;
+                await this.addPhoto(base64Data);
+            };
+            reader.onerror = () => {
+                alert('Failed to read file. Please try again.');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Use URL input
+            const photoUrl = urlInput.value.trim();
+            if (photoUrl) {
+                await this.addPhoto(photoUrl);
+            } else {
+                alert('Please enter a URL or select a file');
+            }
         }
     }
 
@@ -399,6 +484,54 @@ class ProfileView {
         } catch (error) {
             console.error('Error submitting quiz:', error);
             alert('Failed to submit quiz. Please try again.');
+        }
+    }
+
+    showChangePasswordModal() {
+        document.getElementById('change-password-form').reset();
+        document.getElementById('change-password-modal').style.display = 'flex';
+    }
+
+    async changePassword() {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        // Validate inputs
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            alert('New password must be at least 6 characters long');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/password`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to update password');
+            }
+
+            document.getElementById('change-password-modal').style.display = 'none';
+            document.getElementById('change-password-form').reset();
+            alert('Password updated successfully!');
+        } catch (error) {
+            console.error('Error changing password:', error);
+            alert('Failed to update password: ' + error.message);
         }
     }
 }
