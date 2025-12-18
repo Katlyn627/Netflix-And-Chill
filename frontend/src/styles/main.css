@@ -226,8 +226,8 @@ header h1 {
 }
 
 .apple-logo::before {
-    content: "";
-    font-size: 1.3em;
+    content: "TV+";
+    font-size: 0.75em;
 }
 
 .service-name {

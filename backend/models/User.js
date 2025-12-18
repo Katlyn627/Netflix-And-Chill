@@ -3,6 +3,8 @@ class User {
     this.id = data.id || this.generateId();
     this.username = data.username;
     this.email = data.email;
+    // NOTE: In production, passwords should be hashed using bcrypt or similar
+    // This is stored in plain text for demo purposes only
     this.password = data.password; // Store password (in production, this should be hashed)
     this.bio = data.bio || '';
     this.age = data.age;
