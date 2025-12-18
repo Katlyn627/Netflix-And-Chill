@@ -200,21 +200,21 @@ class ProfileView {
         if (history.length > 0) {
             historyContainer.className = 'watch-history-grid';
             
+            // Escape HTML to prevent XSS - defined once for efficiency
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+            
             historyContainer.innerHTML = history.map(item => {
                 const posterUrl = item.posterPath 
                     ? `https://image.tmdb.org/t/p/w200${item.posterPath}`
                     : 'https://via.placeholder.com/150x225?text=No+Poster';
                 
-                // Escape HTML to prevent XSS
-                const escapeHtml = (str) => {
-                    const div = document.createElement('div');
-                    div.textContent = str;
-                    return div.innerHTML;
-                };
-                
                 return `
                     <div class="watch-history-item">
-                        <img src="${escapeHtml(posterUrl)}" alt="${escapeHtml(item.title)}" 
+                        <img src="${posterUrl}" alt="${escapeHtml(item.title)}" 
                              class="watch-history-poster">
                         <div class="watch-history-title">${escapeHtml(item.title)}</div>
                     </div>
