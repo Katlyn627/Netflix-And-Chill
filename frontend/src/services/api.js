@@ -114,6 +114,83 @@ class NetflixAndChillAPI {
         });
         return await response.json();
     }
+
+    async uploadProfilePicture(userId, profilePicture) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-picture`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ profilePicture })
+        });
+        return await response.json();
+    }
+
+    async addPhotoToGallery(userId, photoUrl) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/photos`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ photoUrl })
+        });
+        return await response.json();
+    }
+
+    async removePhotoFromGallery(userId, photoUrl) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/photos`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ photoUrl })
+        });
+        return await response.json();
+    }
+
+    async updateProfileDetails(userId, updates) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-details`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updates)
+        });
+        return await response.json();
+    }
+
+    async submitQuizResponses(userId, quizResponses) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/quiz`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quizResponses })
+        });
+        return await response.json();
+    }
+
+    async updatePassword(userId, currentPassword, newPassword) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+        return await response.json();
+    }
+
+    async resetPassword(email, newPassword) {
+        const response = await fetch(`${API_BASE_URL}/users/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, newPassword })
+        });
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();

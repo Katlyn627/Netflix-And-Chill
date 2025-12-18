@@ -133,7 +133,147 @@
                 <div id="watch-history-list">
                     <em id="no-watch-history">No watch history yet.</em>
                 </div>
+                <button id="add-watch-history-btn" class="btn btn-primary" style="margin-top: 15px;">+ Add to Watch History</button>
             </section>
+
+            <!-- Favorite Movies Section -->
+            <section id="favorite-movies-section" class="card">
+                <h2>Favorite Movies</h2>
+                <p style="color: #888; font-size: 0.9em;">Adding favorite movies helps improve your match compatibility!</p>
+                <div id="favorite-movies-list" style="margin-bottom: 15px;">
+                    <em id="no-favorite-movies">No favorite movies added yet.</em>
+                </div>
+                <button id="add-favorite-movie-btn" class="btn btn-primary">+ Add Favorite Movie</button>
+            </section>
+
+            <!-- Preferences Section -->
+            <section id="preferences-section" class="card">
+                <h2>Viewing Preferences</h2>
+                <div id="preferences-display">
+                    <div class="form-group">
+                        <label><strong>Favorite Genres:</strong></label>
+                        <div id="genres-list">
+                            <em id="no-genres">No genres selected.</em>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><strong>Binge-Watch Count:</strong></label>
+                        <div id="binge-count-display">
+                            <em id="no-binge-count">Not set</em>
+                        </div>
+                    </div>
+                </div>
+                <button id="edit-preferences-btn" class="btn btn-primary" style="margin-top: 15px;">Edit Preferences</button>
+            </section>
+
+            <!-- Add Favorite Movie Modal -->
+            <div id="add-favorite-movie-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Add Favorite Movie</h2>
+                    <form id="add-favorite-movie-form">
+                        <div class="form-group">
+                            <label for="movie-search">Search for a Movie:</label>
+                            <input type="text" id="movie-search" placeholder="Start typing to search..." autocomplete="off">
+                            <div id="movie-search-results" class="search-results" style="display: none;"></div>
+                        </div>
+                        <div id="selected-movie-display" style="display: none; margin-top: 15px;">
+                            <h3>Selected Movie:</h3>
+                            <div id="selected-movie-details" style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
+                                <img id="selected-movie-poster" src="" alt="Movie poster" style="width: 100px; height: 150px; object-fit: cover; border-radius: 5px; float: left; margin-right: 15px;">
+                                <h4 id="selected-movie-title" style="margin-top: 0;"></h4>
+                                <p id="selected-movie-year" style="color: #666; margin: 5px 0;"></p>
+                                <p id="selected-movie-overview" style="font-size: 0.9em; margin-top: 10px;"></p>
+                                <div style="clear: both;"></div>
+                            </div>
+                        </div>
+                        <button type="submit" id="confirm-add-movie-btn" class="btn btn-primary" style="margin-top: 15px;" disabled>Add to Favorites</button>
+                        <button type="button" id="cancel-add-movie-btn" class="btn btn-secondary" style="margin-top: 15px;">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Add Watch History Modal -->
+            <div id="add-watch-history-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Add to Watch History</h2>
+                    <form id="add-watch-history-form">
+                        <div class="form-group">
+                            <label for="watch-history-search">Search for Movie/TV Show:</label>
+                            <input type="text" id="watch-history-search" placeholder="Start typing to search..." autocomplete="off">
+                            <div id="watch-history-search-results" class="search-results" style="display: none;"></div>
+                        </div>
+                        <div id="selected-watch-item-display" style="display: none; margin-top: 15px;">
+                            <h3>Selected Item:</h3>
+                            <div id="selected-watch-item-details" style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
+                                <img id="selected-watch-item-poster" src="" alt="Poster" style="width: 100px; height: 150px; object-fit: cover; border-radius: 5px; float: left; margin-right: 15px;">
+                                <h4 id="selected-watch-item-title" style="margin-top: 0;"></h4>
+                                <p id="selected-watch-item-type" style="color: #666; margin: 5px 0;"></p>
+                                <p id="selected-watch-item-overview" style="font-size: 0.9em; margin-top: 10px;"></p>
+                                <div style="clear: both;"></div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="watch-history-type-group" style="display: none;">
+                            <label for="watch-history-type">Type:</label>
+                            <select id="watch-history-type" required>
+                                <option value="">Select type...</option>
+                                <option value="movie">Movie</option>
+                                <option value="tvshow">TV Show</option>
+                                <option value="series">Series</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="watch-history-genre-group" style="display: none;">
+                            <label for="watch-history-genre">Genre (optional):</label>
+                            <input type="text" id="watch-history-genre" placeholder="e.g., Action, Comedy, Drama">
+                        </div>
+                        <div class="form-group" id="watch-history-service-group" style="display: none;">
+                            <label for="watch-history-service">Streaming Service (optional):</label>
+                            <select id="watch-history-service">
+                                <option value="">Select service...</option>
+                                <option value="Netflix">Netflix</option>
+                                <option value="Hulu">Hulu</option>
+                                <option value="Disney+">Disney+</option>
+                                <option value="Amazon Prime">Amazon Prime</option>
+                                <option value="HBO Max">HBO Max</option>
+                                <option value="Apple TV+">Apple TV+</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="watch-history-episodes-group" style="display: none;">
+                            <label for="watch-history-episodes">Episodes Watched (for TV shows):</label>
+                            <input type="number" id="watch-history-episodes" min="1" value="1">
+                        </div>
+                        <button type="submit" id="confirm-add-watch-history-btn" class="btn btn-primary" style="margin-top: 15px;" disabled>Add to Watch History</button>
+                        <button type="button" id="cancel-add-watch-history-btn" class="btn btn-secondary" style="margin-top: 15px;">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Preferences Modal -->
+            <div id="edit-preferences-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Edit Viewing Preferences</h2>
+                    <form id="edit-preferences-form">
+                        <div class="form-group">
+                            <label>Favorite Genres (select multiple):</label>
+                            <div class="genre-options">
+                                <label><input type="checkbox" name="genre" value="Action"> Action</label>
+                                <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                                <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                                <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                                <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
+                                <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+                                <label><input type="checkbox" name="genre" value="Documentary"> Documentary</label>
+                                <label><input type="checkbox" name="genre" value="Thriller"> Thriller</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-binge-count">How many episodes do you typically binge in one sitting?</label>
+                            <input type="number" id="edit-binge-count" name="bingeCount" min="1" value="3">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Preferences</button>
+                        <button type="button" id="cancel-edit-preferences-btn" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
 
             <!-- Edit Extended Profile Modal -->
             <div id="edit-extended-modal" class="modal" style="display: none;">
