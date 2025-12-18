@@ -1,4 +1,5 @@
 const config = require('../config/config');
+const { fallbackGenres, fallbackProviders } = require('./fallbackData');
 
 /**
  * Service for interacting with TMDB (The Movie Database) API
@@ -138,11 +139,21 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getAllGenres() {
+    // If no API key, return fallback data
+    if (!this.apiKey) {
+      return fallbackGenres;
+    }
+
     try {
       const [movieGenres, tvGenres] = await Promise.all([
         this.getGenres('movie'),
         this.getGenres('tv')
       ]);
+
+      // If both are empty, use fallback
+      if (movieGenres.length === 0 && tvGenres.length === 0) {
+        return fallbackGenres;
+      }
 
       // Merge and deduplicate genres by ID
       const genreMap = new Map();
@@ -162,7 +173,7 @@ class StreamingAPIService {
       return Array.from(genreMap.values()).sort((a, b) => a.name.localeCompare(b.name));
     } catch (error) {
       console.error('Error fetching all genres:', error);
-      return [];
+      return fallbackGenres;
     }
   }
 
@@ -172,9 +183,26 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getStreamingProviders(region = 'US') {
-    const endpoint = '/watch/providers/movie';
-    const data = await this.makeRequest(endpoint, { watch_region: region });
-    return data.results || [];
+    // If no API key, return fallback data
+    if (!this.apiKey) {
+      return fallbackProviders;
+    }
+
+    try {
+      const endpoint = '/watch/providers/movie';
+      const data = await this.makeRequest(endpoint, { watch_region: region });
+      const results = data.results || [];
+      
+      // If no results, use fallback
+      if (results.length === 0) {
+        return fallbackProviders;
+      }
+      
+      return results;
+    } catch (error) {
+      console.error('Error fetching streaming providers:', error);
+      return fallbackProviders;
+    }
   }
 
   /**

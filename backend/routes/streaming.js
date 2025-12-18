@@ -115,11 +115,11 @@ router.get('/providers', async (req, res) => {
     
     // Format the providers with logo URLs
     const formattedProviders = providers.map(provider => ({
-      id: provider.provider_id,
-      name: provider.provider_name,
-      logoPath: provider.logo_path,
-      logoUrl: streamingAPIService.getLogoUrl(provider.logo_path),
-      displayPriority: provider.display_priority
+      id: provider.provider_id || provider.id,
+      name: provider.provider_name || provider.name,
+      logoPath: provider.logo_path || provider.logoPath,
+      logoUrl: provider.logo_path ? streamingAPIService.getLogoUrl(provider.logo_path) : provider.logoUrl,
+      displayPriority: provider.display_priority || provider.displayPriority
     })).sort((a, b) => a.displayPriority - b.displayPriority);
     
     res.json({
