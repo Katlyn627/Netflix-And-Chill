@@ -649,7 +649,8 @@ class ProfileView {
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    const results = await api.searchMoviesAndShows(query, 'movie');
+                    const response = await api.searchMoviesAndShows(query, 'movie');
+                    const results = response.results || [];
                     this.displayMovieSearchResults(results, searchResults, (movie) => {
                         selectedMovie = movie;
                         this.displaySelectedMovie(movie);
@@ -805,7 +806,8 @@ class ProfileView {
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    const results = await api.searchMoviesAndShows(query, 'multi');
+                    const response = await api.searchMoviesAndShows(query, 'multi');
+                    const results = response.results || [];
                     this.displayWatchHistorySearchResults(results, searchResults, (item) => {
                         selectedItem = item;
                         this.displaySelectedWatchItem(item);
