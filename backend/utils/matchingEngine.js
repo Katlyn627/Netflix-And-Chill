@@ -259,12 +259,12 @@ class MatchingEngine {
     
     if (user1Genres.length === 0 || user2Genres.length === 0) return 0;
     
-    // Define emotional tone mappings
+    // Define emotional tone mappings (pre-lowercased for efficiency)
     const toneMappings = {
-      intense: ['Action', 'Thriller', 'Horror', 'Crime', 'War'],
-      lighthearted: ['Comedy', 'Romance', 'Family', 'Animation', 'Music'],
-      emotional: ['Drama', 'Documentary', 'Biography', 'History'],
-      adventurous: ['Adventure', 'Fantasy', 'Science Fiction', 'Sci-Fi', 'Mystery', 'Western']
+      intense: ['action', 'thriller', 'horror', 'crime', 'war'],
+      lighthearted: ['comedy', 'romance', 'family', 'animation', 'music'],
+      emotional: ['drama', 'documentary', 'biography', 'history'],
+      adventurous: ['adventure', 'fantasy', 'science fiction', 'sci-fi', 'mystery', 'western']
     };
     
     // Get emotional tone profile for each user
@@ -273,10 +273,11 @@ class MatchingEngine {
       
       genres.forEach(genre => {
         const genreName = typeof genre === 'string' ? genre : (genre.name || genre.id || '');
+        const lowerGenreName = genreName.toLowerCase();
         
         // Check which tone category this genre belongs to
         Object.keys(toneMappings).forEach(tone => {
-          if (toneMappings[tone].some(g => genreName.toLowerCase().includes(g.toLowerCase()) || g.toLowerCase().includes(genreName.toLowerCase()))) {
+          if (toneMappings[tone].some(g => lowerGenreName.includes(g) || g.includes(lowerGenreName))) {
             profile[tone]++;
           }
         });
@@ -347,10 +348,11 @@ class MatchingEngine {
         const genreName = typeof g === 'string' ? g : (g.name || g.id || g);
         // Make genre names lowercase for natural reading and handle pluralization
         const lowerName = genreName.toLowerCase();
-        // Special pluralization rules
-        if (lowerName.endsWith('y')) {
-          return lowerName.slice(0, -1) + 'ies'; // comedy -> comedies
-        } else if (lowerName.endsWith('s') || lowerName.endsWith('sh') || lowerName.endsWith('ch')) {
+        // Improved pluralization rules for common movie genres
+        if (lowerName.endsWith('y') && !['y', 'e', 'i', 'o', 'u'].includes(lowerName[lowerName.length - 2])) {
+          // consonant + y -> ies (comedy -> comedies, but not toy -> toies)
+          return lowerName.slice(0, -1) + 'ies';
+        } else if (lowerName.endsWith('s') || lowerName.endsWith('sh') || lowerName.endsWith('ch') || lowerName.endsWith('x') || lowerName.endsWith('z')) {
           return lowerName + 'es';
         } else {
           return lowerName + 's';
@@ -380,7 +382,7 @@ class MatchingEngine {
     const bingeDiff = Math.abs(
       (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
     );
-    if (bingeDiff <= 2 && user1.preferences.bingeWatchCount > 0) {
+    if (bingeDiff <= 2 && user1.preferences.bingeWatchCount > 0 && user2.preferences.bingeWatchCount > 0) {
       descriptions.push('are both binge-watchers');
     }
     
