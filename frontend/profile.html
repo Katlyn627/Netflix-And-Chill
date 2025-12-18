@@ -108,8 +108,17 @@
                 <h2>Add to Your Watch History</h2>
                 <form id="watch-history-form">
                     <div class="form-group">
-                        <label for="title">Title:</label>
-                        <input type="text" id="title" name="title" required>
+                        <label for="title">Search for Movie/TV Show:</label>
+                        <input type="text" id="title-search" name="titleSearch" placeholder="Start typing to search..." autocomplete="off">
+                        <div id="search-results" class="search-results" style="display: none;"></div>
+                        <input type="hidden" id="title" name="title" required>
+                        <input type="hidden" id="selected-tmdb-id" name="tmdbId">
+                    </div>
+                    <div id="selected-content-display" style="display: none; margin-bottom: 20px;">
+                        <div class="selected-content-card">
+                            <p><strong>Selected:</strong> <span id="selected-title"></span></p>
+                            <p><strong>Type:</strong> <span id="selected-type"></span></p>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="type">Type:</label>
