@@ -6,12 +6,18 @@ class User {
     this.bio = data.bio || '';
     this.age = data.age;
     this.location = data.location || '';
+    this.profilePicture = data.profilePicture || null;
+    this.photoGallery = data.photoGallery || [];
     this.streamingServices = data.streamingServices || [];
     this.watchHistory = data.watchHistory || [];
     this.preferences = data.preferences || {
       genres: [],
-      bingeWatchCount: 0
+      bingeWatchCount: 0,
+      ageRange: { min: 18, max: 100 },
+      locationRadius: 50 // in miles/km
     };
+    this.likes = data.likes || [];
+    this.superLikes = data.superLikes || [];
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -44,6 +50,31 @@ class User {
     this.bio = bio;
   }
 
+  addPhoto(photoUrl) {
+    if (this.photoGallery.length < 6) {
+      this.photoGallery.push({
+        url: photoUrl,
+        uploadedAt: new Date().toISOString()
+      });
+    }
+  }
+
+  removePhoto(photoUrl) {
+    this.photoGallery = this.photoGallery.filter(photo => photo.url !== photoUrl);
+  }
+
+  addLike(userId) {
+    if (!this.likes.includes(userId)) {
+      this.likes.push(userId);
+    }
+  }
+
+  addSuperLike(userId) {
+    if (!this.superLikes.includes(userId)) {
+      this.superLikes.push(userId);
+    }
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -52,9 +83,13 @@ class User {
       bio: this.bio,
       age: this.age,
       location: this.location,
+      profilePicture: this.profilePicture,
+      photoGallery: this.photoGallery,
       streamingServices: this.streamingServices,
       watchHistory: this.watchHistory,
       preferences: this.preferences,
+      likes: this.likes,
+      superLikes: this.superLikes,
       createdAt: this.createdAt
     };
   }

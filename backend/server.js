@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const userRoutes = require('./routes/users');
 const matchRoutes = require('./routes/matches');
+const recommendationRoutes = require('./routes/recommendations');
+const likeRoutes = require('./routes/likes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +20,8 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/likes', likeRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

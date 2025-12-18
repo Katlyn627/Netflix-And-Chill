@@ -6,6 +6,7 @@ class DataStore {
     this.dataDir = dataDir;
     this.usersFile = path.join(this.dataDir, 'users.json');
     this.matchesFile = path.join(this.dataDir, 'matches.json');
+    this.likesFile = path.join(this.dataDir, 'likes.json');
   }
 
   async ensureDataDir() {
@@ -88,6 +89,55 @@ class DataStore {
   async findMatchesForUser(userId) {
     const matches = await this.loadMatches();
     return matches.filter(m => m.user1Id === userId || m.user2Id === userId);
+  }
+
+  async loadLikes() {
+    try {
+      const data = await fs.readFile(this.likesFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async saveLikes(likes) {
+    await this.ensureDataDir();
+    await fs.writeFile(this.likesFile, JSON.stringify(likes, null, 2));
+  }
+
+  async addLike(like) {
+    const likes = await this.loadLikes();
+    likes.push(like.toJSON());
+    await this.saveLikes(likes);
+    return like;
+  }
+
+  async findLikesForUser(userId) {
+    const likes = await this.loadLikes();
+    return likes.filter(l => l.fromUserId === userId);
+  }
+
+  async findLikesToUser(userId) {
+    const likes = await this.loadLikes();
+    return likes.filter(l => l.toUserId === userId);
+  }
+
+  async findMutualLikes(userId) {
+    const likesFrom = await this.findLikesForUser(userId);
+    const likesTo = await this.findLikesToUser(userId);
+    
+    const mutual = [];
+    likesFrom.forEach(likeFrom => {
+      const mutualLike = likesTo.find(likeTo => likeTo.fromUserId === likeFrom.toUserId);
+      if (mutualLike) {
+        mutual.push({
+          userId: likeFrom.toUserId,
+          matched: true
+        });
+      }
+    });
+    
+    return mutual;
   }
 }
 

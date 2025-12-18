@@ -191,8 +191,11 @@ Find potential matches for a user based on streaming preferences.
 
 **Query Parameters:**
 - `limit` (optional): Number of matches to return (default: 10, max: 100)
+- `minAge` (optional): Minimum age filter
+- `maxAge` (optional): Maximum age filter
+- `locationRadius` (optional): Location radius in miles/km
 
-**Example:** `GET /matches/user_123?limit=5`
+**Example:** `GET /matches/user_123?limit=5&minAge=25&maxAge=35&locationRadius=50`
 
 **Response:**
 ```json
@@ -246,6 +249,141 @@ Retrieve all matches for a user.
       "matchScore": 85,
       "sharedContent": [...],
       "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+## Recommendation Endpoints
+
+### Get Recommendations
+Get personalized show/movie recommendations based on user's watch history and preferences.
+
+**Endpoint:** `GET /recommendations/:userId`
+
+**Query Parameters:**
+- `limit` (optional): Number of recommendations to return (default: 10, max: 50)
+
+**Example:** `GET /recommendations/user_123?limit=5`
+
+**Response:**
+```json
+{
+  "userId": "user_123",
+  "count": 5,
+  "recommendations": [
+    {
+      "id": 12345,
+      "title": "Stranger Things",
+      "overview": "When a young boy vanishes...",
+      "type": "tv",
+      "posterPath": "https://image.tmdb.org/t/p/w500/poster.jpg",
+      "backdropPath": "https://image.tmdb.org/t/p/w1280/backdrop.jpg",
+      "rating": 8.7,
+      "releaseDate": "2016-07-15",
+      "genres": [18, 10765]
+    }
+  ]
+}
+```
+
+## Like Endpoints
+
+### Send Like or Super Like
+Send a like or super like to another user.
+
+**Endpoint:** `POST /likes`
+
+**Request Body:**
+```json
+{
+  "fromUserId": "user_123",
+  "toUserId": "user_456",
+  "type": "like"
+}
+```
+
+**Type Options:**
+- `like` - Regular like
+- `superlike` - Super like
+
+**Response:**
+```json
+{
+  "message": "Like created successfully",
+  "like": {
+    "id": "like_xxx",
+    "fromUserId": "user_123",
+    "toUserId": "user_456",
+    "type": "like",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  "isMutual": false
+}
+```
+
+### Get Likes Sent
+Get all likes sent by a user.
+
+**Endpoint:** `GET /likes/:userId`
+
+**Response:**
+```json
+{
+  "userId": "user_123",
+  "count": 5,
+  "likes": [
+    {
+      "id": "like_xxx",
+      "fromUserId": "user_123",
+      "toUserId": "user_456",
+      "type": "like",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+### Get Likes Received
+Get all likes received by a user.
+
+**Endpoint:** `GET /likes/:userId/received`
+
+**Response:**
+```json
+{
+  "userId": "user_123",
+  "count": 8,
+  "likes": [
+    {
+      "id": "like_xxx",
+      "fromUserId": "user_789",
+      "toUserId": "user_123",
+      "type": "superlike",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+### Get Mutual Likes
+Get mutual likes (both users liked each other).
+
+**Endpoint:** `GET /likes/:userId/mutual`
+
+**Response:**
+```json
+{
+  "userId": "user_123",
+  "count": 2,
+  "mutualLikes": [
+    {
+      "userId": "user_456",
+      "matched": true
+    },
+    {
+      "userId": "user_789",
+      "matched": true
     }
   ]
 }

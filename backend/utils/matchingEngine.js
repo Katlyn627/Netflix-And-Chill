@@ -86,13 +86,19 @@ class MatchingEngine {
    * @param {User} user 
    * @param {Array<User>} userPool 
    * @param {number} limit 
+   * @param {Object} filters - Optional filters (ageRange, locationRadius)
    * @returns {Array<Match>}
    */
-  static findMatches(user, userPool, limit = 10) {
+  static findMatches(user, userPool, limit = 10, filters = {}) {
     const matches = [];
 
     userPool.forEach(otherUser => {
       if (otherUser.id !== user.id) {
+        // Apply filters
+        if (!this.passesFilters(user, otherUser, filters)) {
+          return;
+        }
+
         const matchResult = this.calculateMatch(user, otherUser);
         
         if (matchResult.score > 0) {
@@ -111,6 +117,48 @@ class MatchingEngine {
 
     // Return top matches
     return matches.slice(0, limit);
+  }
+
+  /**
+   * Check if a user passes the applied filters
+   * @param {User} user 
+   * @param {User} otherUser 
+   * @param {Object} filters 
+   * @returns {boolean}
+   */
+  static passesFilters(user, otherUser, filters) {
+    // Age range filter
+    if (filters.ageRange) {
+      const { min, max } = filters.ageRange;
+      if (otherUser.age < min || otherUser.age > max) {
+        return false;
+      }
+    } else if (user.preferences.ageRange) {
+      const { min, max } = user.preferences.ageRange;
+      if (otherUser.age < min || otherUser.age > max) {
+        return false;
+      }
+    }
+
+    // Location radius filter (simplified - would need proper geolocation in production)
+    if (filters.locationRadius !== undefined || user.preferences.locationRadius !== undefined) {
+      // In a real implementation, this would calculate actual distance
+      // For now, we just check if locations are similar (same city/area)
+      const radius = filters.locationRadius || user.preferences.locationRadius;
+      if (radius !== null && radius !== undefined) {
+        // Simplified: if locations don't match at all and radius is set, skip
+        // In production, use proper geocoding and distance calculation
+        if (user.location && otherUser.location && radius < 1000) {
+          const userLoc = user.location.toLowerCase();
+          const otherLoc = otherUser.location.toLowerCase();
+          if (!userLoc.includes(otherLoc.split(',')[0]) && !otherLoc.includes(userLoc.split(',')[0])) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 }
 
