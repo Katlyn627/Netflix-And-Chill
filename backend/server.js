@@ -5,6 +5,7 @@ const userRoutes = require('./routes/users');
 const matchRoutes = require('./routes/matches');
 const recommendationRoutes = require('./routes/recommendations');
 const likeRoutes = require('./routes/likes');
+const streamingRoutes = require('./routes/streaming');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/likes', likeRoutes);
+app.use('/api/streaming', streamingRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

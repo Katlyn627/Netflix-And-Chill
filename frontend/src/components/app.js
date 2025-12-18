@@ -1,4 +1,5 @@
 let currentUserId = null;
+let searchTimeout = null;
 
 // Show/hide sections
 function showSection(sectionId) {
@@ -27,6 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // Initialize movie search functionality
+    initializeMovieSearch();
+    
     showSection('create-profile');
 });
 
@@ -156,7 +161,11 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
         showMessage('Preferences saved!');
         // Save user ID to localStorage for match page
         localStorage.setItem('currentUserId', currentUserId);
-        showSection('find-matches');
+        
+        // Automatically redirect to profile view page
+        setTimeout(() => {
+            window.location.href = `profile-view.html?userId=${currentUserId}`;
+        }, 1000);
     } catch (error) {
         showMessage('Error saving preferences: ' + error.message, true);
     }
@@ -169,3 +178,102 @@ if (skipToPreferencesBtn) {
         showSection('preferences');
     });
 }
+
+// Initialize movie search functionality
+function initializeMovieSearch() {
+    const titleSearchInput = document.getElementById('title-search');
+    const searchResults = document.getElementById('search-results');
+    const titleInput = document.getElementById('title');
+    const typeSelect = document.getElementById('type');
+    const genreInput = document.getElementById('genre');
+    const selectedDisplay = document.getElementById('selected-content-display');
+    const selectedTitle = document.getElementById('selected-title');
+    const selectedType = document.getElementById('selected-type');
+    const selectedTmdbId = document.getElementById('selected-tmdb-id');
+
+    if (!titleSearchInput) return;
+
+    titleSearchInput.addEventListener('input', async (e) => {
+        const query = e.target.value.trim();
+        
+        // Clear any existing timeout
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+
+        // Debounce search
+        searchTimeout = setTimeout(async () => {
+            try {
+                searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+                searchResults.style.display = 'block';
+
+                const data = await api.searchMoviesAndShows(query);
+                
+                if (data.results && data.results.length > 0) {
+                    searchResults.innerHTML = data.results.slice(0, 10).map(item => `
+                        <div class="search-result-item" data-id="${item.id}" data-title="${item.title}" data-type="${item.type}">
+                            <div class="search-result-title">${item.title}</div>
+                            <div class="search-result-meta">${item.type === 'movie' ? 'Movie' : 'TV Show'} ${item.releaseDate ? '(' + item.releaseDate.split('-')[0] + ')' : ''}</div>
+                        </div>
+                    `).join('');
+
+                    // Add click handlers to results
+                    searchResults.querySelectorAll('.search-result-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const title = item.dataset.title;
+                            const type = item.dataset.type;
+                            const id = item.dataset.id;
+
+                            // Update form fields
+                            titleSearchInput.value = title;
+                            titleInput.value = title;
+                            selectedTmdbId.value = id;
+                            
+                            // Set type
+                            if (type === 'movie') {
+                                typeSelect.value = 'movie';
+                            } else {
+                                typeSelect.value = 'tvshow';
+                            }
+
+                            // Show selected content
+                            selectedTitle.textContent = title;
+                            selectedType.textContent = type === 'movie' ? 'Movie' : 'TV Show';
+                            selectedDisplay.style.display = 'block';
+
+                            // Hide search results
+                            searchResults.style.display = 'none';
+                        });
+                    });
+                } else {
+                    searchResults.innerHTML = '<div class="search-no-results">No results found. You can still type the title manually.</div>';
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                searchResults.innerHTML = '<div class="search-no-results">Search unavailable. Please type the title manually.</div>';
+            }
+        }, 300);
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!titleSearchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+
+    // Allow manual entry if user doesn't select from search
+    titleSearchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            if (titleInput.value === '') {
+                titleInput.value = titleSearchInput.value;
+            }
+        }, 200);
+    });
+}
+

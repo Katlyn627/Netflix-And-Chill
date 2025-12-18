@@ -81,6 +81,16 @@ class NetflixAndChillAPI {
         const response = await fetch(`${API_BASE_URL}/matches/${userId}/history`);
         return await response.json();
     }
+
+    async searchMoviesAndShows(query, type = 'multi') {
+        const response = await fetch(`${API_BASE_URL}/streaming/search?query=${encodeURIComponent(query)}&type=${type}`);
+        return await response.json();
+    }
+
+    async getPopularContent(type = 'movie') {
+        const response = await fetch(`${API_BASE_URL}/streaming/popular?type=${type}`);
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();
