@@ -212,5 +212,5 @@ For questions about logo usage or to request additional sizes/variations, please
 
 ---
 
-**Last Updated**: 2024
+**Last Updated**: December 2024
 **Version**: 1.0
