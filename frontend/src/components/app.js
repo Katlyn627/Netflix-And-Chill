@@ -324,7 +324,7 @@ if (moviePreferencesForm) {
         try {
             await api.updateProfileDetails(currentUserId, {
                 favoriteSnacks: favoriteSnacks,
-                videoChatPreference: videoChatPreference || null
+                videoChatPreference: videoChatPreference
             });
             showMessage('Movie preferences saved!');
             showSection('debate-topics');

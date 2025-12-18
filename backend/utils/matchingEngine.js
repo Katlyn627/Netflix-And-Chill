@@ -1,6 +1,9 @@
 const Match = require('../models/Match');
 
 class MatchingEngine {
+  // Scoring constants
+  static POINTS_PER_SHARED_SNACK = 3;
+  static POINTS_PER_SHARED_DEBATE = 2;
   /**
    * Calculate match score between two users based on shared content
    * @param {User} user1 
@@ -197,7 +200,7 @@ class MatchingEngine {
     const sharedSnacks = snacks1.filter(snack => snacks2.includes(snack));
     
     // Award up to 10 points for snack compatibility
-    const score = Math.min(10, sharedSnacks.length * 3);
+    const score = Math.min(10, sharedSnacks.length * this.POINTS_PER_SHARED_SNACK);
     return score;
   }
 
@@ -217,7 +220,7 @@ class MatchingEngine {
     const sharedDebates = debates1.filter(debate => debates2.includes(debate));
     
     // Award up to 10 points for debate compatibility
-    const score = Math.min(10, sharedDebates.length * 2);
+    const score = Math.min(10, sharedDebates.length * this.POINTS_PER_SHARED_DEBATE);
     return score;
   }
 
