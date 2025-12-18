@@ -74,6 +74,12 @@ class ProfileView {
 
         // Watch history
         this.renderWatchHistory();
+
+        // Favorite movies
+        this.renderFavoriteMovies();
+
+        // Preferences
+        this.renderPreferences();
     }
 
     renderPhotoGallery() {
@@ -298,6 +304,11 @@ class ProfileView {
                 }
             });
         });
+
+        // Setup new modals
+        this.setupFavoriteMoviesModal();
+        this.setupWatchHistoryModal();
+        this.setupPreferencesModal();
     }
 
     async addPhoto(photoUrl) {
@@ -533,6 +544,484 @@ class ProfileView {
             console.error('Error changing password:', error);
             alert('Failed to update password: ' + error.message);
         }
+    }
+
+    // Favorite Movies functionality
+    renderFavoriteMovies() {
+        const favoriteMovies = this.userData.favoriteMovies || [];
+        const favMoviesContainer = document.getElementById('favorite-movies-list');
+
+        if (favoriteMovies.length === 0) {
+            favMoviesContainer.innerHTML = '<em id="no-favorite-movies">No favorite movies added yet.</em>';
+        } else {
+            favMoviesContainer.innerHTML = '';
+            favoriteMovies.forEach(movie => {
+                const movieDiv = document.createElement('div');
+                movieDiv.className = 'favorite-movie-item';
+                movieDiv.style.cssText = 'background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 10px; position: relative;';
+                
+                const posterUrl = movie.posterPath 
+                    ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
+                    : 'https://via.placeholder.com/100x150?text=No+Poster';
+                
+                const truncatedOverview = movie.overview && movie.overview.length > 200 
+                    ? movie.overview.substring(0, 200) + '...' 
+                    : movie.overview || 'No description available.';
+                
+                movieDiv.innerHTML = `
+                    <img src="${posterUrl}" alt="${movie.title}" style="width: 100px; height: 150px; object-fit: cover; border-radius: 5px; float: left; margin-right: 15px;">
+                    <h4 style="margin-top: 0;">${movie.title}</h4>
+                    <p style="color: #666; margin: 5px 0;">${movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A'}</p>
+                    <p style="font-size: 0.9em; margin-top: 10px;">${truncatedOverview}</p>
+                    <button class="remove-favorite-movie-btn btn btn-secondary" data-movie-id="${movie.tmdbId}" style="position: absolute; top: 10px; right: 10px;">Remove</button>
+                    <div style="clear: both;"></div>
+                `;
+                favMoviesContainer.appendChild(movieDiv);
+            });
+
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-favorite-movie-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const movieId = e.target.getAttribute('data-movie-id');
+                    await this.removeFavoriteMovie(movieId);
+                });
+            });
+        }
+    }
+
+    async removeFavoriteMovie(movieId) {
+        if (!confirm('Are you sure you want to remove this movie from your favorites?')) {
+            return;
+        }
+
+        try {
+            const result = await api.removeFavoriteMovie(this.userId, movieId);
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Reload profile to show updated favorites
+            await this.loadProfile();
+            alert('Movie removed from favorites successfully!');
+        } catch (error) {
+            console.error('Error removing favorite movie:', error);
+            alert('Failed to remove favorite movie: ' + error.message);
+        }
+    }
+
+    setupFavoriteMoviesModal() {
+        const addBtn = document.getElementById('add-favorite-movie-btn');
+        const modal = document.getElementById('add-favorite-movie-modal');
+        const cancelBtn = document.getElementById('cancel-add-movie-btn');
+        const form = document.getElementById('add-favorite-movie-form');
+        const searchInput = document.getElementById('movie-search');
+        const searchResults = document.getElementById('movie-search-results');
+        const selectedMovieDisplay = document.getElementById('selected-movie-display');
+        const confirmBtn = document.getElementById('confirm-add-movie-btn');
+
+        let selectedMovie = null;
+        let searchTimeout = null;
+
+        addBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            selectedMovieDisplay.style.display = 'none';
+            selectedMovie = null;
+            confirmBtn.disabled = true;
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            form.reset();
+        });
+
+        // Movie search with debouncing
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await api.searchMoviesAndShows(query, 'movie');
+                    const results = response.results || [];
+                    this.displayMovieSearchResults(results, searchResults, (movie) => {
+                        selectedMovie = movie;
+                        this.displaySelectedMovie(movie);
+                        confirmBtn.disabled = false;
+                        searchResults.style.display = 'none';
+                    });
+                } catch (error) {
+                    console.error('Error searching movies:', error);
+                }
+            }, 300);
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedMovie) {
+                alert('Please select a movie first');
+                return;
+            }
+
+            try {
+                const movieData = {
+                    tmdbId: selectedMovie.id.toString(),
+                    title: selectedMovie.title,
+                    posterPath: selectedMovie.poster_path,
+                    overview: selectedMovie.overview,
+                    releaseDate: selectedMovie.release_date
+                };
+
+                const result = await api.addFavoriteMovie(this.userId, movieData);
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                modal.style.display = 'none';
+                form.reset();
+                await this.loadProfile();
+                alert('Movie added to favorites successfully!');
+            } catch (error) {
+                console.error('Error adding favorite movie:', error);
+                alert('Failed to add favorite movie: ' + error.message);
+            }
+        });
+    }
+
+    displayMovieSearchResults(results, container, onSelect) {
+        container.innerHTML = '';
+        
+        if (results.length === 0) {
+            container.innerHTML = '<div style="padding: 10px;">No movies found</div>';
+            container.style.display = 'block';
+            return;
+        }
+
+        results.slice(0, 5).forEach(movie => {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'search-result-item';
+            resultDiv.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #ddd;';
+            
+            const posterUrl = movie.poster_path 
+                ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`
+                : 'https://via.placeholder.com/46x69?text=No+Poster';
+            
+            resultDiv.innerHTML = `
+                <img src="${posterUrl}" alt="${movie.title}" style="width: 46px; height: 69px; object-fit: cover; border-radius: 3px; float: left; margin-right: 10px;">
+                <div style="overflow: hidden;">
+                    <strong>${movie.title}</strong><br>
+                    <small style="color: #666;">${movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}</small>
+                </div>
+                <div style="clear: both;"></div>
+            `;
+
+            resultDiv.addEventListener('click', () => onSelect(movie));
+            resultDiv.addEventListener('mouseenter', () => {
+                resultDiv.style.background = '#f0f0f0';
+            });
+            resultDiv.addEventListener('mouseleave', () => {
+                resultDiv.style.background = 'white';
+            });
+
+            container.appendChild(resultDiv);
+        });
+
+        container.style.display = 'block';
+    }
+
+    displaySelectedMovie(movie) {
+        const display = document.getElementById('selected-movie-display');
+        const poster = document.getElementById('selected-movie-poster');
+        const title = document.getElementById('selected-movie-title');
+        const year = document.getElementById('selected-movie-year');
+        const overview = document.getElementById('selected-movie-overview');
+
+        const posterUrl = movie.poster_path 
+            ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+            : 'https://via.placeholder.com/100x150?text=No+Poster';
+
+        poster.src = posterUrl;
+        title.textContent = movie.title;
+        year.textContent = movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A';
+        overview.textContent = movie.overview || 'No description available.';
+
+        display.style.display = 'block';
+    }
+
+    // Watch History functionality
+    setupWatchHistoryModal() {
+        const addBtn = document.getElementById('add-watch-history-btn');
+        const modal = document.getElementById('add-watch-history-modal');
+        const cancelBtn = document.getElementById('cancel-add-watch-history-btn');
+        const form = document.getElementById('add-watch-history-form');
+        const searchInput = document.getElementById('watch-history-search');
+        const searchResults = document.getElementById('watch-history-search-results');
+        const selectedItemDisplay = document.getElementById('selected-watch-item-display');
+        const confirmBtn = document.getElementById('confirm-add-watch-history-btn');
+        const typeGroup = document.getElementById('watch-history-type-group');
+        const genreGroup = document.getElementById('watch-history-genre-group');
+        const serviceGroup = document.getElementById('watch-history-service-group');
+        const episodesGroup = document.getElementById('watch-history-episodes-group');
+
+        let selectedItem = null;
+        let searchTimeout = null;
+
+        addBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            selectedItemDisplay.style.display = 'none';
+            typeGroup.style.display = 'none';
+            genreGroup.style.display = 'none';
+            serviceGroup.style.display = 'none';
+            episodesGroup.style.display = 'none';
+            selectedItem = null;
+            confirmBtn.disabled = true;
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            form.reset();
+        });
+
+        // Search with debouncing
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await api.searchMoviesAndShows(query, 'multi');
+                    const results = response.results || [];
+                    this.displayWatchHistorySearchResults(results, searchResults, (item) => {
+                        selectedItem = item;
+                        this.displaySelectedWatchItem(item);
+                        confirmBtn.disabled = false;
+                        searchResults.style.display = 'none';
+                        typeGroup.style.display = 'block';
+                        genreGroup.style.display = 'block';
+                        serviceGroup.style.display = 'block';
+                        
+                        // Show episodes field for TV shows
+                        const typeSelect = document.getElementById('watch-history-type');
+                        if (item.media_type === 'tv') {
+                            typeSelect.value = 'tvshow';
+                            episodesGroup.style.display = 'block';
+                        } else {
+                            typeSelect.value = 'movie';
+                            episodesGroup.style.display = 'none';
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error searching:', error);
+                }
+            }, 300);
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedItem) {
+                alert('Please select an item first');
+                return;
+            }
+
+            const type = document.getElementById('watch-history-type').value;
+            const genre = document.getElementById('watch-history-genre').value;
+            const service = document.getElementById('watch-history-service').value;
+            const episodesInput = document.getElementById('watch-history-episodes').value;
+            const episodes = parseInt(episodesInput) || 1;
+
+            if (!type) {
+                alert('Please select a type');
+                return;
+            }
+
+            try {
+                const watchData = {
+                    title: selectedItem.title || selectedItem.name,
+                    type: type,
+                    genre: genre || '',
+                    service: service || '',
+                    episodesWatched: type === 'tvshow' || type === 'series' ? episodes : 1
+                };
+
+                const result = await api.addWatchHistory(this.userId, watchData);
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                modal.style.display = 'none';
+                form.reset();
+                await this.loadProfile();
+                alert('Added to watch history successfully!');
+            } catch (error) {
+                console.error('Error adding to watch history:', error);
+                alert('Failed to add to watch history: ' + error.message);
+            }
+        });
+    }
+
+    displayWatchHistorySearchResults(results, container, onSelect) {
+        container.innerHTML = '';
+        
+        if (results.length === 0) {
+            container.innerHTML = '<div style="padding: 10px;">No results found</div>';
+            container.style.display = 'block';
+            return;
+        }
+
+        results.slice(0, 5).forEach(item => {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'search-result-item';
+            resultDiv.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #ddd;';
+            
+            const posterUrl = item.poster_path 
+                ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                : 'https://via.placeholder.com/46x69?text=No+Poster';
+            
+            const title = item.title || item.name;
+            const year = item.release_date || item.first_air_date;
+            const mediaType = item.media_type === 'movie' ? 'Movie' : 'TV Show';
+            
+            resultDiv.innerHTML = `
+                <img src="${posterUrl}" alt="${title}" style="width: 46px; height: 69px; object-fit: cover; border-radius: 3px; float: left; margin-right: 10px;">
+                <div style="overflow: hidden;">
+                    <strong>${title}</strong><br>
+                    <small style="color: #666;">${mediaType} ${year ? '(' + new Date(year).getFullYear() + ')' : ''}</small>
+                </div>
+                <div style="clear: both;"></div>
+            `;
+
+            resultDiv.addEventListener('click', () => onSelect(item));
+            resultDiv.addEventListener('mouseenter', () => {
+                resultDiv.style.background = '#f0f0f0';
+            });
+            resultDiv.addEventListener('mouseleave', () => {
+                resultDiv.style.background = 'white';
+            });
+
+            container.appendChild(resultDiv);
+        });
+
+        container.style.display = 'block';
+    }
+
+    displaySelectedWatchItem(item) {
+        const display = document.getElementById('selected-watch-item-display');
+        const poster = document.getElementById('selected-watch-item-poster');
+        const title = document.getElementById('selected-watch-item-title');
+        const type = document.getElementById('selected-watch-item-type');
+        const overview = document.getElementById('selected-watch-item-overview');
+
+        const posterUrl = item.poster_path 
+            ? `https://image.tmdb.org/t/p/w200${item.poster_path}`
+            : 'https://via.placeholder.com/100x150?text=No+Poster';
+
+        poster.src = posterUrl;
+        title.textContent = item.title || item.name;
+        const mediaType = item.media_type === 'movie' ? 'Movie' : 'TV Show';
+        const year = item.release_date || item.first_air_date;
+        type.textContent = `${mediaType} ${year ? '(' + new Date(year).getFullYear() + ')' : ''}`;
+        overview.textContent = item.overview || 'No description available.';
+
+        display.style.display = 'block';
+    }
+
+    // Preferences functionality
+    renderPreferences() {
+        const preferences = this.userData.preferences || {};
+        const genresList = document.getElementById('genres-list');
+        const bingeCountDisplay = document.getElementById('binge-count-display');
+
+        // Render genres
+        if (preferences.genres && preferences.genres.length > 0) {
+            genresList.innerHTML = preferences.genres.map(genre => 
+                `<span style="display: inline-block; background: #667eea; color: white; padding: 5px 10px; border-radius: 15px; margin: 5px;">${genre}</span>`
+            ).join('');
+        } else {
+            genresList.innerHTML = '<em id="no-genres">No genres selected.</em>';
+        }
+
+        // Render binge count
+        if (preferences.bingeWatchCount) {
+            bingeCountDisplay.innerHTML = `${preferences.bingeWatchCount} episodes per sitting`;
+        } else {
+            bingeCountDisplay.innerHTML = '<em id="no-binge-count">Not set</em>';
+        }
+    }
+
+    setupPreferencesModal() {
+        const editBtn = document.getElementById('edit-preferences-btn');
+        const modal = document.getElementById('edit-preferences-modal');
+        const cancelBtn = document.getElementById('cancel-edit-preferences-btn');
+        const form = document.getElementById('edit-preferences-form');
+
+        editBtn.addEventListener('click', () => {
+            // Pre-populate current preferences
+            const preferences = this.userData.preferences || {};
+            
+            // Set genres
+            if (preferences.genres) {
+                document.querySelectorAll('input[name="genre"]').forEach(checkbox => {
+                    checkbox.checked = preferences.genres.includes(checkbox.value);
+                });
+            }
+
+            // Set binge count
+            if (preferences.bingeWatchCount) {
+                document.getElementById('edit-binge-count').value = preferences.bingeWatchCount;
+            }
+
+            modal.style.display = 'block';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="genre"]:checked'))
+                .map(cb => cb.value);
+            const bingeCountInput = document.getElementById('edit-binge-count').value;
+            const bingeCount = parseInt(bingeCountInput) || 1;
+
+            try {
+                const result = await api.updatePreferences(this.userId, {
+                    genres: selectedGenres,
+                    bingeWatchCount: bingeCount
+                });
+
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                modal.style.display = 'none';
+                await this.loadProfile();
+                alert('Preferences updated successfully!');
+            } catch (error) {
+                console.error('Error updating preferences:', error);
+                alert('Failed to update preferences: ' + error.message);
+            }
+        });
     }
 }
 
