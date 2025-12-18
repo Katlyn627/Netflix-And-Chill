@@ -115,6 +115,11 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
+    async getContentDetails(id, type = 'movie') {
+        const response = await fetch(`${API_BASE_URL}/streaming/details/${id}?type=${type}`);
+        return await response.json();
+    }
+
     async uploadProfilePicture(userId, profilePicture) {
         const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-picture`, {
             method: 'POST',

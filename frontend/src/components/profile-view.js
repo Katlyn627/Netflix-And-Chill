@@ -676,9 +676,9 @@ class ProfileView {
                 const movieData = {
                     tmdbId: selectedMovie.id.toString(),
                     title: selectedMovie.title,
-                    posterPath: selectedMovie.poster_path,
+                    posterPath: selectedMovie.posterPath,
                     overview: selectedMovie.overview,
-                    releaseDate: selectedMovie.release_date
+                    releaseDate: selectedMovie.releaseDate
                 };
 
                 const result = await api.addFavoriteMovie(this.userId, movieData);
@@ -711,20 +711,31 @@ class ProfileView {
             resultDiv.className = 'search-result-item';
             resultDiv.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #ddd;';
             
-            const posterUrl = movie.poster_path 
-                ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`
+            const posterUrl = movie.posterPath 
+                ? `https://image.tmdb.org/t/p/w92${movie.posterPath}`
                 : 'https://via.placeholder.com/46x69?text=No+Poster';
             
             resultDiv.innerHTML = `
                 <img src="${posterUrl}" alt="${movie.title}" style="width: 46px; height: 69px; object-fit: cover; border-radius: 3px; float: left; margin-right: 10px;">
                 <div style="overflow: hidden;">
                     <strong>${movie.title}</strong><br>
-                    <small style="color: #666;">${movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}</small>
+                    <small style="color: #666;">${movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A'}</small>
                 </div>
                 <div style="clear: both;"></div>
             `;
 
-            resultDiv.addEventListener('click', () => onSelect(movie));
+            resultDiv.addEventListener('click', async () => {
+                // Fetch detailed information from TMDB to ensure accuracy
+                try {
+                    searchResults.innerHTML = '<div style="padding: 10px;">Loading details...</div>';
+                    const details = await api.getContentDetails(movie.id, 'movie');
+                    onSelect(details);
+                } catch (error) {
+                    console.error('Error fetching movie details:', error);
+                    // Fallback to search result data
+                    onSelect(movie);
+                }
+            });
             resultDiv.addEventListener('mouseenter', () => {
                 resultDiv.style.background = '#f0f0f0';
             });
@@ -745,13 +756,13 @@ class ProfileView {
         const year = document.getElementById('selected-movie-year');
         const overview = document.getElementById('selected-movie-overview');
 
-        const posterUrl = movie.poster_path 
-            ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+        const posterUrl = movie.posterPath 
+            ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
             : 'https://via.placeholder.com/100x150?text=No+Poster';
 
         poster.src = posterUrl;
         title.textContent = movie.title;
-        year.textContent = movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A';
+        year.textContent = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
         overview.textContent = movie.overview || 'No description available.';
 
         display.style.display = 'block';
@@ -821,7 +832,7 @@ class ProfileView {
                         
                         // Show episodes field for TV shows
                         const typeSelect = document.getElementById('watch-history-type');
-                        if (item.media_type === 'tv') {
+                        if (item.type === 'tv') {
                             typeSelect.value = 'tvshow';
                             episodesGroup.style.display = 'block';
                         } else {
@@ -892,13 +903,13 @@ class ProfileView {
             resultDiv.className = 'search-result-item';
             resultDiv.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #ddd;';
             
-            const posterUrl = item.poster_path 
-                ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+            const posterUrl = item.posterPath 
+                ? `https://image.tmdb.org/t/p/w92${item.posterPath}`
                 : 'https://via.placeholder.com/46x69?text=No+Poster';
             
-            const title = item.title || item.name;
-            const year = item.release_date || item.first_air_date;
-            const mediaType = item.media_type === 'movie' ? 'Movie' : 'TV Show';
+            const title = item.title;
+            const year = item.releaseDate;
+            const mediaType = item.type === 'movie' ? 'Movie' : 'TV Show';
             
             resultDiv.innerHTML = `
                 <img src="${posterUrl}" alt="${title}" style="width: 46px; height: 69px; object-fit: cover; border-radius: 3px; float: left; margin-right: 10px;">
@@ -909,7 +920,18 @@ class ProfileView {
                 <div style="clear: both;"></div>
             `;
 
-            resultDiv.addEventListener('click', () => onSelect(item));
+            resultDiv.addEventListener('click', async () => {
+                // Fetch detailed information from TMDB to ensure accuracy
+                try {
+                    searchResults.innerHTML = '<div style="padding: 10px;">Loading details...</div>';
+                    const details = await api.getContentDetails(item.id, item.type);
+                    onSelect(details);
+                } catch (error) {
+                    console.error('Error fetching content details:', error);
+                    // Fallback to search result data
+                    onSelect(item);
+                }
+            });
             resultDiv.addEventListener('mouseenter', () => {
                 resultDiv.style.background = '#f0f0f0';
             });
@@ -930,14 +952,14 @@ class ProfileView {
         const type = document.getElementById('selected-watch-item-type');
         const overview = document.getElementById('selected-watch-item-overview');
 
-        const posterUrl = item.poster_path 
-            ? `https://image.tmdb.org/t/p/w200${item.poster_path}`
+        const posterUrl = item.posterPath 
+            ? `https://image.tmdb.org/t/p/w200${item.posterPath}`
             : 'https://via.placeholder.com/100x150?text=No+Poster';
 
         poster.src = posterUrl;
-        title.textContent = item.title || item.name;
-        const mediaType = item.media_type === 'movie' ? 'Movie' : 'TV Show';
-        const year = item.release_date || item.first_air_date;
+        title.textContent = item.title;
+        const mediaType = item.type === 'movie' ? 'Movie' : 'TV Show';
+        const year = item.releaseDate;
         type.textContent = `${mediaType} ${year ? '(' + new Date(year).getFullYear() + ')' : ''}`;
         overview.textContent = item.overview || 'No description available.';
 

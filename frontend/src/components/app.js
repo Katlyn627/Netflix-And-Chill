@@ -224,30 +224,53 @@ function initializeMovieSearch() {
 
                     // Add click handlers to results
                     searchResults.querySelectorAll('.search-result-item').forEach(item => {
-                        item.addEventListener('click', () => {
+                        item.addEventListener('click', async () => {
                             const title = item.dataset.title;
                             const type = item.dataset.type;
                             const id = item.dataset.id;
 
-                            // Update form fields
-                            titleSearchInput.value = title;
-                            titleInput.value = title;
-                            selectedTmdbId.value = id;
-                            
-                            // Set type
-                            if (type === 'movie') {
-                                typeSelect.value = 'movie';
-                            } else {
-                                typeSelect.value = 'tvshow';
+                            // Fetch detailed information from TMDB to ensure accuracy
+                            try {
+                                searchResults.innerHTML = '<div class="search-loading">Loading details...</div>';
+                                const details = await api.getContentDetails(id, type);
+                                
+                                // Update form fields with detailed data
+                                titleSearchInput.value = details.title;
+                                titleInput.value = details.title;
+                                selectedTmdbId.value = details.id;
+                                
+                                // Set type
+                                if (details.type === 'movie') {
+                                    typeSelect.value = 'movie';
+                                } else {
+                                    typeSelect.value = 'tvshow';
+                                }
+
+                                // Show selected content
+                                selectedTitle.textContent = details.title;
+                                selectedType.textContent = details.type === 'movie' ? 'Movie' : 'TV Show';
+                                selectedDisplay.style.display = 'block';
+
+                                // Hide search results
+                                searchResults.style.display = 'none';
+                            } catch (error) {
+                                console.error('Error fetching details:', error);
+                                // Fallback to search result data
+                                titleSearchInput.value = title;
+                                titleInput.value = title;
+                                selectedTmdbId.value = id;
+                                
+                                if (type === 'movie') {
+                                    typeSelect.value = 'movie';
+                                } else {
+                                    typeSelect.value = 'tvshow';
+                                }
+
+                                selectedTitle.textContent = title;
+                                selectedType.textContent = type === 'movie' ? 'Movie' : 'TV Show';
+                                selectedDisplay.style.display = 'block';
+                                searchResults.style.display = 'none';
                             }
-
-                            // Show selected content
-                            selectedTitle.textContent = title;
-                            selectedType.textContent = type === 'movie' ? 'Movie' : 'TV Show';
-                            selectedDisplay.style.display = 'block';
-
-                            // Hide search results
-                            searchResults.style.display = 'none';
                         });
                     });
                 } else {

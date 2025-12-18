@@ -94,4 +94,43 @@ router.get('/genres', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/streaming/details/:id
+ * Get detailed information about a specific movie or TV show
+ */
+router.get('/details/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type = 'movie' } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'ID parameter is required' });
+    }
+
+    const details = await streamingAPIService.getDetails(id, type);
+    
+    res.json({
+      id: details.id,
+      title: details.title || details.name,
+      type,
+      releaseDate: details.release_date || details.first_air_date,
+      overview: details.overview,
+      posterPath: details.poster_path,
+      backdropPath: details.backdrop_path,
+      genres: details.genres,
+      popularity: details.popularity,
+      voteAverage: details.vote_average,
+      voteCount: details.vote_count,
+      runtime: details.runtime || details.episode_run_time?.[0],
+      status: details.status,
+      tagline: details.tagline,
+      originalLanguage: details.original_language,
+      originalTitle: details.original_title || details.original_name
+    });
+  } catch (error) {
+    console.error('Error getting details:', error);
+    res.status(500).json({ error: 'Failed to get content details' });
+  }
+});
+
 module.exports = router;
