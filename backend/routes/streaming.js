@@ -121,7 +121,7 @@ router.get('/details/:id', async (req, res) => {
       popularity: details.popularity,
       voteAverage: details.vote_average,
       voteCount: details.vote_count,
-      runtime: details.runtime || details.episode_run_time?.[0],
+      runtime: details.runtime || (details.episode_run_time && details.episode_run_time.length > 0 ? details.episode_run_time[0] : null),
       status: details.status,
       tagline: details.tagline,
       originalLanguage: details.original_language,

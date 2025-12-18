@@ -117,6 +117,9 @@ class NetflixAndChillAPI {
 
     async getContentDetails(id, type = 'movie') {
         const response = await fetch(`${API_BASE_URL}/streaming/details/${id}?type=${type}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch content details: ${response.status} ${response.statusText}`);
+        }
         return await response.json();
     }
 
