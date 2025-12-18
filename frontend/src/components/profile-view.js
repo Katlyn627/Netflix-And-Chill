@@ -198,25 +198,30 @@ class ProfileView {
         const historyContainer = document.getElementById('watch-history-list');
 
         if (history.length > 0) {
-            historyContainer.style.display = 'grid';
-            historyContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
-            historyContainer.style.gap = '15px';
+            historyContainer.className = 'watch-history-grid';
             
             historyContainer.innerHTML = history.map(item => {
                 const posterUrl = item.posterPath 
                     ? `https://image.tmdb.org/t/p/w200${item.posterPath}`
                     : 'https://via.placeholder.com/150x225?text=No+Poster';
                 
+                // Escape HTML to prevent XSS
+                const escapeHtml = (str) => {
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                };
+                
                 return `
-                    <div class="watch-history-item" style="text-align: center;">
-                        <img src="${posterUrl}" alt="${item.title}" 
-                             style="width: 100%; height: 225px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <div style="margin-top: 8px; font-size: 0.9em; font-weight: 500;">${item.title}</div>
+                    <div class="watch-history-item">
+                        <img src="${escapeHtml(posterUrl)}" alt="${escapeHtml(item.title)}" 
+                             class="watch-history-poster">
+                        <div class="watch-history-title">${escapeHtml(item.title)}</div>
                     </div>
                 `;
             }).join('');
         } else {
-            historyContainer.style.display = 'block';
+            historyContainer.className = '';
             historyContainer.innerHTML = '<em id="no-watch-history">No watch history yet.</em>';
         }
     }
