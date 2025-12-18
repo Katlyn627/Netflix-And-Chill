@@ -24,4 +24,19 @@ router.post('/:userId/watch-history', userController.addWatchHistory.bind(userCo
 // Update preferences
 router.put('/:userId/preferences', userController.updatePreferences.bind(userController));
 
+// Upload profile picture
+router.post('/:userId/profile-picture', userController.uploadProfilePicture.bind(userController));
+
+// Add photo to gallery
+router.post('/:userId/photos', userController.addPhotoToGallery.bind(userController));
+
+// Remove photo from gallery
+router.delete('/:userId/photos', userController.removePhotoFromGallery.bind(userController));
+
+// Update extended profile details
+router.put('/:userId/profile-details', userController.updateProfileDetails.bind(userController));
+
+// Submit quiz responses
+router.put('/:userId/quiz', userController.submitQuizResponses.bind(userController));
+
 module.exports = router;

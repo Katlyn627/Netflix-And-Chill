@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Netflix and Chill</h1>
+            <p class="tagline">Your Profile</p>
+            <div style="text-align: center; margin-top: 10px;">
+                <a href="homepage.html" style="color: white; text-decoration: underline;">← Back to Home</a> |
+                <a href="matches.html" style="color: white; text-decoration: underline;">View Matches</a>
+            </div>
+        </header>
+
+        <main>
+            <!-- Profile Header Section -->
+            <section id="profile-header" class="card">
+                <div style="display: flex; align-items: start; gap: 20px;">
+                    <div id="profile-photo-container" style="flex-shrink: 0;">
+                        <img id="profile-picture" src="" alt="Profile" style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover; display: none;">
+                        <div id="no-photo" style="width: 150px; height: 150px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">
+                            👤
+                        </div>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <h2 id="profile-username" style="margin-top: 0;">Username</h2>
+                        <p id="profile-details"><strong>Age:</strong> <span id="profile-age"></span> | <strong>Location:</strong> <span id="profile-location"></span></p>
+                        <p id="profile-bio" style="font-style: italic;"></p>
+                        <button id="edit-profile-btn" class="btn btn-primary" style="margin-top: 10px;">Edit Profile</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Photo Gallery Section -->
+            <section id="photo-gallery-section" class="card">
+                <h2>Photo Gallery <span id="photo-count">(0/6)</span></h2>
+                <div id="photo-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                    <!-- Photos will be inserted here -->
+                </div>
+                <div id="add-photo-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="photo-url">Photo URL:</label>
+                        <input type="text" id="photo-url" placeholder="Enter image URL">
+                    </div>
+                    <button id="add-photo-btn" class="btn btn-primary">Add Photo</button>
+                    <button id="cancel-add-photo-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+                <button id="show-add-photo-btn" class="btn btn-secondary">+ Add Photo</button>
+            </section>
+
+            <!-- Extended Profile Details Section -->
+            <section id="extended-details-section" class="card">
+                <h2>Extended Profile</h2>
+                
+                <div class="form-group">
+                    <label><strong>Least Favorite Movies:</strong></label>
+                    <div id="least-favorite-movies-list" style="margin-bottom: 10px;">
+                        <em id="no-least-favorites">No least favorite movies added yet.</em>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><strong>Movie Debate Topics:</strong></label>
+                    <div id="debate-topics-list" style="margin-bottom: 10px;">
+                        <em id="no-debate-topics">No debate topics added yet.</em>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><strong>Favorite Movie Snacks:</strong></label>
+                    <div id="favorite-snacks-list" style="margin-bottom: 10px;">
+                        <em id="no-snacks">No favorite snacks added yet.</em>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><strong>Video Chat Preference:</strong></label>
+                    <div id="video-chat-pref">
+                        <em id="no-video-pref">Not set</em>
+                    </div>
+                </div>
+
+                <button id="edit-extended-profile-btn" class="btn btn-primary" style="margin-top: 15px;">Edit Extended Profile</button>
+            </section>
+
+            <!-- Quiz/Survey Section -->
+            <section id="quiz-section" class="card">
+                <h2>Compatibility Quiz</h2>
+                <p>Answer these questions to improve your matches!</p>
+                
+                <div id="quiz-responses" style="margin-bottom: 15px;">
+                    <em id="no-quiz-responses">No quiz responses yet.</em>
+                </div>
+
+                <button id="take-quiz-btn" class="btn btn-primary">Take Quiz</button>
+            </section>
+
+            <!-- Streaming Services Section -->
+            <section id="streaming-section" class="card">
+                <h2>Connected Streaming Services</h2>
+                <div id="services-list">
+                    <em id="no-services">No streaming services connected yet.</em>
+                </div>
+            </section>
+
+            <!-- Watch History Section -->
+            <section id="watch-history-section" class="card">
+                <h2>Watch History</h2>
+                <div id="watch-history-list">
+                    <em id="no-watch-history">No watch history yet.</em>
+                </div>
+            </section>
+
+            <!-- Edit Extended Profile Modal -->
+            <div id="edit-extended-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Edit Extended Profile</h2>
+                    <form id="extended-profile-form">
+                        <div class="form-group">
+                            <label for="least-favorite-input">Least Favorite Movies (comma-separated):</label>
+                            <input type="text" id="least-favorite-input" placeholder="e.g., Movie 1, Movie 2, Movie 3">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="debate-topics-input">Movie Debate Topics (comma-separated):</label>
+                            <input type="text" id="debate-topics-input" placeholder="e.g., Best superhero movie, Overrated classics">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="snacks-input">Favorite Movie Snacks (comma-separated):</label>
+                            <input type="text" id="snacks-input" placeholder="e.g., Popcorn, Candy, Nachos">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="video-chat-select">Video Chat Preference:</label>
+                            <select id="video-chat-select">
+                                <option value="">Select preference...</option>
+                                <option value="facetime">FaceTime</option>
+                                <option value="zoom">Zoom</option>
+                                <option value="either">Either</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" id="cancel-extended-edit-btn" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quiz Modal -->
+            <div id="quiz-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Compatibility Quiz</h2>
+                    <p>Answer these questions to find better matches!</p>
+                    <form id="quiz-form">
+                        <div class="form-group">
+                            <label>Do you prefer subtitles or dubbing for foreign films?</label>
+                            <select name="q1">
+                                <option value="">Select...</option>
+                                <option value="subtitles">Subtitles</option>
+                                <option value="dubbing">Dubbing</option>
+                                <option value="no_preference">No preference</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>What's your ideal movie length?</label>
+                            <select name="q2">
+                                <option value="">Select...</option>
+                                <option value="under_90">Under 90 minutes</option>
+                                <option value="90_120">90-120 minutes</option>
+                                <option value="over_120">Over 2 hours - the longer the better!</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>How do you feel about movie spoilers?</label>
+                            <select name="q3">
+                                <option value="">Select...</option>
+                                <option value="hate">Absolutely hate them</option>
+                                <option value="dont_mind">Don't mind them</option>
+                                <option value="like">Actually prefer knowing what happens</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Would you rather watch a critically acclaimed film or a fun popcorn movie?</label>
+                            <select name="q4">
+                                <option value="">Select...</option>
+                                <option value="acclaimed">Critically acclaimed</option>
+                                <option value="popcorn">Fun popcorn movie</option>
+                                <option value="both">Both are great!</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Do you talk during movies?</label>
+                            <select name="q5">
+                                <option value="">Select...</option>
+                                <option value="never">Never - absolute silence</option>
+                                <option value="sometimes">Sometimes - for commentary</option>
+                                <option value="often">Often - I love discussing!</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>How many times will you rewatch your favorite movie?</label>
+                            <select name="q6">
+                                <option value="">Select...</option>
+                                <option value="once">Once is enough</option>
+                                <option value="few">A few times</option>
+                                <option value="infinite">Infinite times!</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit Answers</button>
+                        <button type="button" id="cancel-quiz-btn" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+
+    <script src="src/services/api.js"></script>
+    <script src="src/components/profile-view.js"></script>
+</body>
+</html>

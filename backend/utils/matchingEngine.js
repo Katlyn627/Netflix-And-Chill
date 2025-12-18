@@ -32,6 +32,19 @@ class MatchingEngine {
       score += 15;
     }
 
+    // Quiz response compatibility
+    const quizCompatibility = this.calculateQuizCompatibility(user1, user2);
+    score += quizCompatibility;
+
+    // Bonus for matching video chat preference
+    if (user1.videoChatPreference && user2.videoChatPreference) {
+      if (user1.videoChatPreference === user2.videoChatPreference || 
+          user1.videoChatPreference === 'either' || 
+          user2.videoChatPreference === 'either') {
+        score += 5;
+      }
+    }
+
     // Normalize score to 0-100 range
     const normalizedScore = Math.min(100, score);
 
@@ -79,6 +92,31 @@ class MatchingEngine {
     const user1Genres = user1.preferences.genres || [];
     const user2Genres = user2.preferences.genres || [];
     return user1Genres.filter(genre => user2Genres.includes(genre));
+  }
+
+  /**
+   * Calculate compatibility based on quiz responses
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score from quiz
+   */
+  static calculateQuizCompatibility(user1, user2) {
+    const quiz1 = user1.quizResponses || {};
+    const quiz2 = user2.quizResponses || {};
+    
+    const commonQuestions = Object.keys(quiz1).filter(q => quiz2.hasOwnProperty(q));
+    if (commonQuestions.length === 0) return 0;
+
+    let matches = 0;
+    commonQuestions.forEach(question => {
+      if (quiz1[question] === quiz2[question]) {
+        matches++;
+      }
+    });
+
+    // Award up to 20 points for quiz compatibility
+    const compatibilityScore = (matches / commonQuestions.length) * 20;
+    return compatibilityScore;
   }
 
   /**
