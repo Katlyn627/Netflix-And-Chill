@@ -45,4 +45,10 @@ router.put('/:userId/password', userController.updatePassword.bind(userControlle
 // Reset password (forgot password)
 router.post('/reset-password', userController.resetPassword.bind(userController));
 
+// Favorite Movies routes
+// Note: movieId in the route is the TMDB ID of the movie
+router.post('/:userId/favorite-movies', userController.addFavoriteMovie.bind(userController));
+router.get('/:userId/favorite-movies', userController.getFavoriteMovies.bind(userController));
+router.delete('/:userId/favorite-movies/:movieId', userController.removeFavoriteMovie.bind(userController));
+
 module.exports = router;

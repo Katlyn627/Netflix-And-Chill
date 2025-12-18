@@ -182,6 +182,75 @@ Update user's genre preferences and binge-watching habits.
 }
 ```
 
+### Add Favorite Movie
+Add a movie to user's favorite movies list.
+
+**Endpoint:** `POST /users/:userId/favorite-movies`
+
+**Request Body:**
+```json
+{
+  "tmdbId": "550",
+  "title": "Fight Club",
+  "posterPath": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+  "overview": "A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.",
+  "releaseDate": "1999-10-15"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Movie added to favorites successfully",
+  "favoriteMovies": [
+    {
+      "tmdbId": "550",
+      "title": "Fight Club",
+      "posterPath": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+      "overview": "A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.",
+      "releaseDate": "1999-10-15",
+      "addedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+### Get Favorite Movies
+Retrieve user's favorite movies.
+
+**Endpoint:** `GET /users/:userId/favorite-movies`
+
+**Response:**
+```json
+{
+  "userId": "user_123",
+  "count": 1,
+  "favoriteMovies": [
+    {
+      "tmdbId": "550",
+      "title": "Fight Club",
+      "posterPath": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+      "overview": "A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.",
+      "releaseDate": "1999-10-15",
+      "addedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+### Remove Favorite Movie
+Remove a movie from user's favorites.
+
+**Endpoint:** `DELETE /users/:userId/favorite-movies/:movieId`
+
+**Response:**
+```json
+{
+  "message": "Movie removed from favorites successfully",
+  "favoriteMovies": []
+}
+```
+
 ## Match Endpoints
 
 ### Find Matches
@@ -282,6 +351,107 @@ Get personalized show/movie recommendations based on user's watch history and pr
       "rating": 8.7,
       "releaseDate": "2016-07-15",
       "genres": [18, 10765]
+    }
+  ]
+}
+```
+
+## Streaming Endpoints
+
+### Search Movies and TV Shows
+Search for movies and TV shows using TMDB API.
+
+**Endpoint:** `GET /streaming/search`
+
+**Query Parameters:**
+- `query` (required): Search query string
+- `type` (optional): Search type - 'movie', 'tv', or 'multi' (default: 'multi')
+
+**Example:** `GET /streaming/search?query=inception&type=movie`
+
+**Response:**
+```json
+{
+  "query": "inception",
+  "count": 20,
+  "results": [
+    {
+      "id": 27205,
+      "title": "Inception",
+      "type": "movie",
+      "releaseDate": "2010-07-16",
+      "overview": "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets...",
+      "posterPath": "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
+      "genres": [28, 878, 53],
+      "popularity": 65.123,
+      "voteAverage": 8.4
+    }
+  ]
+}
+```
+
+**Note:** The `posterPath` can be used to construct full image URLs using TMDB's image service:
+- Small poster: `https://image.tmdb.org/t/p/w300{posterPath}`
+- Medium poster: `https://image.tmdb.org/t/p/w500{posterPath}`
+- Original poster: `https://image.tmdb.org/t/p/original{posterPath}`
+
+### Get Popular Content
+Get popular movies or TV shows.
+
+**Endpoint:** `GET /streaming/popular`
+
+**Query Parameters:**
+- `type` (optional): Content type - 'movie' or 'tv' (default: 'movie')
+
+**Example:** `GET /streaming/popular?type=movie`
+
+**Response:**
+```json
+{
+  "type": "movie",
+  "count": 20,
+  "results": [
+    {
+      "id": 550,
+      "title": "Fight Club",
+      "type": "movie",
+      "releaseDate": "1999-10-15",
+      "overview": "A ticking-time-bomb insomniac and a slippery soap salesman...",
+      "posterPath": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+      "genres": [18],
+      "popularity": 85.432,
+      "voteAverage": 8.4
+    }
+  ]
+}
+```
+
+### Get Genres
+Get list of movie or TV genres.
+
+**Endpoint:** `GET /streaming/genres`
+
+**Query Parameters:**
+- `type` (optional): Content type - 'movie' or 'tv' (default: 'movie')
+
+**Example:** `GET /streaming/genres?type=movie`
+
+**Response:**
+```json
+{
+  "type": "movie",
+  "genres": [
+    {
+      "id": 28,
+      "name": "Action"
+    },
+    {
+      "id": 12,
+      "name": "Adventure"
+    },
+    {
+      "id": 16,
+      "name": "Animation"
     }
   ]
 }

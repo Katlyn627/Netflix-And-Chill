@@ -432,6 +432,77 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Favorite Movies methods
+  async addFavoriteMovie(req, res) {
+    try {
+      const { userId } = req.params;
+      const { tmdbId, title, posterPath, overview, releaseDate } = req.body;
+
+      if (!tmdbId || !title) {
+        return res.status(400).json({ error: 'TMDB ID and title are required' });
+      }
+
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.addFavoriteMovie({ tmdbId, title, posterPath, overview, releaseDate });
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Movie added to favorites successfully',
+        favoriteMovies: user.favoriteMovies
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async removeFavoriteMovie(req, res) {
+    try {
+      const { userId, movieId } = req.params;
+
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.removeFavoriteMovie(movieId);
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Movie removed from favorites successfully',
+        favoriteMovies: user.favoriteMovies
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getFavoriteMovies(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json({
+        userId,
+        count: userData.favoriteMovies?.length || 0,
+        favoriteMovies: userData.favoriteMovies || []
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();
