@@ -91,6 +91,29 @@ class NetflixAndChillAPI {
         const response = await fetch(`${API_BASE_URL}/streaming/popular?type=${type}`);
         return await response.json();
     }
+
+    async addFavoriteMovie(userId, movieData) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/favorite-movies`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(movieData)
+        });
+        return await response.json();
+    }
+
+    async getFavoriteMovies(userId) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/favorite-movies`);
+        return await response.json();
+    }
+
+    async removeFavoriteMovie(userId, movieId) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/favorite-movies/${movieId}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();

@@ -26,6 +26,12 @@ class User {
     this.favoriteSnacks = data.favoriteSnacks || [];
     this.quizResponses = data.quizResponses || {};
     this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
+    // New fields for enhanced profile features
+    this.favoriteMovies = data.favoriteMovies || []; // Array of movie objects with TMDB data
+    this.favoriteTVShows = data.favoriteTVShows || []; // Array of TV show objects with TMDB data
+    this.movieRatings = data.movieRatings || []; // Array of {tmdbId, title, rating, ratedAt}
+    this.movieWatchlist = data.movieWatchlist || []; // Array of movie objects with TMDB data
+    this.tvWatchlist = data.tvWatchlist || []; // Array of TV show objects with TMDB data
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -83,6 +89,100 @@ class User {
     }
   }
 
+  // Methods for managing favorite movies
+  addFavoriteMovie(movieData) {
+    const exists = this.favoriteMovies.find(m => m.tmdbId === movieData.tmdbId);
+    if (!exists) {
+      this.favoriteMovies.push({
+        tmdbId: movieData.tmdbId,
+        title: movieData.title,
+        posterPath: movieData.posterPath,
+        overview: movieData.overview,
+        releaseDate: movieData.releaseDate,
+        addedAt: new Date().toISOString()
+      });
+    }
+  }
+
+  removeFavoriteMovie(tmdbId) {
+    this.favoriteMovies = this.favoriteMovies.filter(m => m.tmdbId !== tmdbId);
+  }
+
+  // Methods for managing favorite TV shows
+  addFavoriteTVShow(tvData) {
+    const exists = this.favoriteTVShows.find(tv => tv.tmdbId === tvData.tmdbId);
+    if (!exists) {
+      this.favoriteTVShows.push({
+        tmdbId: tvData.tmdbId,
+        title: tvData.title,
+        posterPath: tvData.posterPath,
+        overview: tvData.overview,
+        firstAirDate: tvData.firstAirDate,
+        addedAt: new Date().toISOString()
+      });
+    }
+  }
+
+  removeFavoriteTVShow(tmdbId) {
+    this.favoriteTVShows = this.favoriteTVShows.filter(tv => tv.tmdbId !== tmdbId);
+  }
+
+  // Methods for managing movie ratings
+  addOrUpdateMovieRating(ratingData) {
+    const existingIndex = this.movieRatings.findIndex(r => r.tmdbId === ratingData.tmdbId);
+    const ratingObj = {
+      tmdbId: ratingData.tmdbId,
+      title: ratingData.title,
+      rating: ratingData.rating,
+      posterPath: ratingData.posterPath,
+      ratedAt: new Date().toISOString()
+    };
+
+    if (existingIndex >= 0) {
+      this.movieRatings[existingIndex] = ratingObj;
+    } else {
+      this.movieRatings.push(ratingObj);
+    }
+  }
+
+  // Methods for managing movie watchlist
+  addToMovieWatchlist(movieData) {
+    const exists = this.movieWatchlist.find(m => m.tmdbId === movieData.tmdbId);
+    if (!exists) {
+      this.movieWatchlist.push({
+        tmdbId: movieData.tmdbId,
+        title: movieData.title,
+        posterPath: movieData.posterPath,
+        overview: movieData.overview,
+        releaseDate: movieData.releaseDate,
+        addedAt: new Date().toISOString()
+      });
+    }
+  }
+
+  removeFromMovieWatchlist(tmdbId) {
+    this.movieWatchlist = this.movieWatchlist.filter(m => m.tmdbId !== tmdbId);
+  }
+
+  // Methods for managing TV watchlist
+  addToTVWatchlist(tvData) {
+    const exists = this.tvWatchlist.find(tv => tv.tmdbId === tvData.tmdbId);
+    if (!exists) {
+      this.tvWatchlist.push({
+        tmdbId: tvData.tmdbId,
+        title: tvData.title,
+        posterPath: tvData.posterPath,
+        overview: tvData.overview,
+        firstAirDate: tvData.firstAirDate,
+        addedAt: new Date().toISOString()
+      });
+    }
+  }
+
+  removeFromTVWatchlist(tmdbId) {
+    this.tvWatchlist = this.tvWatchlist.filter(tv => tv.tmdbId !== tmdbId);
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -103,6 +203,11 @@ class User {
       favoriteSnacks: this.favoriteSnacks,
       quizResponses: this.quizResponses,
       videoChatPreference: this.videoChatPreference,
+      favoriteMovies: this.favoriteMovies,
+      favoriteTVShows: this.favoriteTVShows,
+      movieRatings: this.movieRatings,
+      movieWatchlist: this.movieWatchlist,
+      tvWatchlist: this.tvWatchlist,
       createdAt: this.createdAt
     };
   }
