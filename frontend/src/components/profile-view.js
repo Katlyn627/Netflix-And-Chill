@@ -424,8 +424,13 @@ class ProfileView {
             // Convert file to base64
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const base64Data = e.target.result;
-                await this.addPhoto(base64Data);
+                try {
+                    const base64Data = e.target.result;
+                    await this.addPhoto(base64Data);
+                } catch (error) {
+                    // Error is already handled and alerted in addPhoto(), just log for debugging
+                    console.error('Error in FileReader onload:', error);
+                }
             };
             reader.onerror = () => {
                 alert('Failed to read file. Please try again.');
@@ -434,10 +439,16 @@ class ProfileView {
         } else {
             // Use URL input
             const photoUrl = urlInput.value.trim();
-            if (photoUrl) {
-                await this.addPhoto(photoUrl);
-            } else {
+            if (!photoUrl) {
                 alert('Please enter a URL or select a file');
+                return;
+            }
+
+            try {
+                await this.addPhoto(photoUrl);
+            } catch (error) {
+                // Error is already handled and alerted in addPhoto(), just log for debugging
+                console.error('Error adding photo from URL:', error);
             }
         }
     }
