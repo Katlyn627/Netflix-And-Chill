@@ -403,47 +403,53 @@ class ProfileView {
         const fileInput = document.getElementById('photo-file');
         const urlInput = document.getElementById('photo-url');
 
-        // Check if a file is selected
-        if (fileInput.files && fileInput.files[0]) {
-            const file = fileInput.files[0];
-            
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
-                return;
-            }
-
-            // Validate file size (max 5MB)
-            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-            if (file.size > maxSize) {
-                alert('File size must be less than 5MB');
-                return;
-            }
-
-            // Convert file to base64
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const base64Data = e.target.result;
-                    await this.addPhoto(base64Data);
-                } catch (error) {
-                    // Error is already handled and alerted in addPhoto(), just log for debugging
-                    console.error('Error in FileReader onload:', error);
+        try {
+            // Check if a file is selected
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+                    return;
                 }
-            };
-            reader.onerror = () => {
-                alert('Failed to read file. Please try again.');
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // Use URL input
-            const photoUrl = urlInput.value.trim();
-            if (photoUrl) {
-                await this.addPhoto(photoUrl);
+
+                // Validate file size (max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                if (file.size > maxSize) {
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+
+                // Convert file to base64
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const base64Data = e.target.result;
+                        await this.addPhoto(base64Data);
+                    } catch (error) {
+                        // Error is already handled and alerted in addPhoto(), just log for debugging
+                        console.error('Error in FileReader onload:', error);
+                    }
+                };
+                reader.onerror = () => {
+                    alert('Failed to read file. Please try again.');
+                };
+                reader.readAsDataURL(file);
             } else {
-                alert('Please enter a URL or select a file');
+                // Use URL input
+                const photoUrl = urlInput.value.trim();
+                if (photoUrl) {
+                    await this.addPhoto(photoUrl);
+                } else {
+                    alert('Please enter a URL or select a file');
+                }
             }
+        } catch (error) {
+            // This catches any unexpected errors not handled elsewhere
+            console.error('Unexpected error in handlePhotoAdd:', error);
+            alert('An unexpected error occurred. Please try again.');
         }
     }
 
