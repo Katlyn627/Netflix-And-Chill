@@ -30,6 +30,14 @@
                         <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
+                        <label for="password">Password:</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+                            <button type="button" class="toggle-password" id="toggle-password">Show</button>
+                        </div>
+                        <p class="input-hint">Create a secure password (minimum 6 characters)</p>
+                    </div>
+                    <div class="form-group">
                         <label for="age">Age:</label>
                         <input type="number" id="age" name="age" min="18" required>
                     </div>
@@ -51,27 +59,45 @@
                 <div id="services-list">
                     <div class="service-option">
                         <input type="checkbox" id="netflix" value="Netflix">
-                        <label for="netflix">Netflix</label>
+                        <label for="netflix">
+                            <span class="service-logo netflix-logo">N</span>
+                            <span class="service-name">Netflix</span>
+                        </label>
                     </div>
                     <div class="service-option">
                         <input type="checkbox" id="hulu" value="Hulu">
-                        <label for="hulu">Hulu</label>
+                        <label for="hulu">
+                            <span class="service-logo hulu-logo">hulu</span>
+                            <span class="service-name">Hulu</span>
+                        </label>
                     </div>
                     <div class="service-option">
                         <input type="checkbox" id="disney" value="Disney+">
-                        <label for="disney">Disney+</label>
+                        <label for="disney">
+                            <span class="service-logo disney-logo">D+</span>
+                            <span class="service-name">Disney+</span>
+                        </label>
                     </div>
                     <div class="service-option">
                         <input type="checkbox" id="prime" value="Amazon Prime">
-                        <label for="prime">Amazon Prime</label>
+                        <label for="prime">
+                            <span class="service-logo prime-logo">prime</span>
+                            <span class="service-name">Amazon Prime</span>
+                        </label>
                     </div>
                     <div class="service-option">
                         <input type="checkbox" id="hbo" value="HBO Max">
-                        <label for="hbo">HBO Max</label>
+                        <label for="hbo">
+                            <span class="service-logo hbo-logo">HBO</span>
+                            <span class="service-name">HBO Max</span>
+                        </label>
                     </div>
                     <div class="service-option">
                         <input type="checkbox" id="apple" value="Apple TV+">
-                        <label for="apple">Apple TV+</label>
+                        <label for="apple">
+                            <span class="service-logo apple-logo"></span>
+                            <span class="service-name">Apple TV+</span>
+                        </label>
                     </div>
                 </div>
                 <button id="add-services-btn" class="btn btn-primary">Add Services</button>

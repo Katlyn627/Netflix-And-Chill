@@ -6,7 +6,7 @@ const dataStore = new DataStore();
 class UserController {
   async createUser(req, res) {
     try {
-      const { username, email, age, location, bio } = req.body;
+      const { username, email, age, location, bio, password } = req.body;
 
       // Check if user already exists
       const existingUser = await dataStore.findUserByEmail(email);
@@ -14,12 +14,40 @@ class UserController {
         return res.status(400).json({ error: 'User with this email already exists' });
       }
 
-      const user = new User({ username, email, age, location, bio });
+      // Validate password
+      if (!password || password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+      }
+
+      const user = new User({ username, email, age, location, bio, password });
       await dataStore.addUser(user);
 
       res.status(201).json({
         message: 'User created successfully',
         user: user.toJSON()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async loginUser(req, res) {
+    try {
+      const { userId, password } = req.body;
+
+      const user = await dataStore.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const userObj = new User(user);
+      if (!userObj.verifyPassword(password)) {
+        return res.status(401).json({ error: 'Invalid password' });
+      }
+
+      res.json({
+        message: 'Login successful',
+        user: userObj.toJSON()
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

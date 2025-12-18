@@ -37,7 +37,13 @@ class DataStore {
 
   async addUser(user) {
     const users = await this.loadUsers();
-    users.push(user.toJSON());
+    // Save the full user object including password
+    // NOTE: In production, password should be hashed before storing
+    const userData = {
+      ...user.toJSON(),
+      password: user.password // Include password for storage (plain text for demo only)
+    };
+    users.push(userData);
     await this.saveUsers(users);
     return user;
   }

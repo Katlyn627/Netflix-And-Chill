@@ -103,6 +103,14 @@ async function findMatches() {
 document.getElementById('find-matches-btn').addEventListener('click', findMatches);
 document.getElementById('refresh-matches-btn').addEventListener('click', findMatches);
 
+// Logout functionality
+document.getElementById('logout-btn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('currentUserId');
+        window.location.href = 'login.html';
+    }
+});
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     displayUserInfo();

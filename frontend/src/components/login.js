@@ -1,41 +1,68 @@
 // Login functionality
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const userId = document.getElementById('user-id').value.trim();
-    const errorDiv = document.getElementById('error-message');
-    
-    if (!userId) {
-        errorDiv.textContent = 'Please enter your user ID';
-        errorDiv.style.display = 'block';
-        return;
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        });
     }
-    
-    try {
-        // Verify user exists
-        const result = await api.getUser(userId);
+
+    // Login form submission
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        if (result && result.id) {
-            // Save user ID to localStorage
-            localStorage.setItem('currentUserId', userId);
+        const userId = document.getElementById('user-id').value.trim();
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-message');
+        
+        if (!userId) {
+            errorDiv.textContent = 'Please enter your user ID';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (!password) {
+            errorDiv.textContent = 'Please enter your password';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        try {
+            // Login with password
+            const result = await api.loginUser(userId, password);
             
-            // Show success and redirect
-            errorDiv.style.display = 'none';
-            
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message';
-            successDiv.textContent = 'Login successful! Redirecting to matches...';
-            document.querySelector('.login-container').insertBefore(successDiv, document.querySelector('.card'));
-            
-            setTimeout(() => {
-                window.location.href = 'matches.html';
-            }, 1500);
-        } else {
-            errorDiv.textContent = 'User not found. Please check your user ID or create a new profile.';
+            if (result && !result.error) {
+                // Save user ID to localStorage
+                localStorage.setItem('currentUserId', userId);
+                
+                // Show success and redirect
+                errorDiv.style.display = 'none';
+                
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success-message';
+                successDiv.textContent = 'Login successful! Redirecting to matches...';
+                document.querySelector('.login-container').insertBefore(successDiv, document.querySelector('.card'));
+                
+                setTimeout(() => {
+                    window.location.href = 'matches.html';
+                }, 1500);
+            } else {
+                errorDiv.textContent = result.error || 'Invalid credentials. Please check your user ID and password.';
+                errorDiv.style.display = 'block';
+            }
+        } catch (error) {
+            errorDiv.textContent = 'Error logging in: ' + error.message;
             errorDiv.style.display = 'block';
         }
-    } catch (error) {
-        errorDiv.textContent = 'Error logging in: ' + error.message;
-        errorDiv.style.display = 'block';
-    }
+    });
 });
