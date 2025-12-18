@@ -385,6 +385,7 @@ class ProfileView {
                 await this.setAsProfilePicture(photoUrl);
             }
             
+            // Render the gallery to show the updated photos
             this.renderPhotoGallery();
             
             document.getElementById('add-photo-form').style.display = 'none';
@@ -491,7 +492,7 @@ class ProfileView {
             const profilePictureImg = document.getElementById('profile-picture');
             const noPhotoDiv = document.getElementById('no-photo');
             if (profilePictureImg && noPhotoDiv) {
-                profilePictureImg.src = photoUrl;
+                profilePictureImg.src = this.userData.profilePicture;
                 profilePictureImg.style.display = 'block';
                 noPhotoDiv.style.display = 'none';
             }
