@@ -1,4 +1,163 @@
-async findUserByEmail(email) {
+const fs = require('fs').promises;
+const path = require('path');
+
+/**
+ * File-based data storage (default storage mechanism)
+ */
+class DataStore {
+  constructor() {
+    this.dataDir = path.join(__dirname, '../../data');
+    this.usersFile = path.join(this.dataDir, 'users.json');
+    this.matchesFile = path.join(this.dataDir, 'matches.json');
+    this.likesFile = path.join(this.dataDir, 'likes.json');
+  }
+
+  async ensureDataDir() {
+    try {
+      await fs.mkdir(this.dataDir, { recursive: true });
+    } catch (error) {
+      // Only ignore if directory already exists
+      if (error.code !== 'EEXIST') {
+        throw error;
+      }
+    }
+  }
+
+  async ensureFile(filePath, defaultContent = '[]') {
+    try {
+      await fs.access(filePath);
+    } catch {
+      await fs.writeFile(filePath, defaultContent);
+    }
+  }
+
+  // User operations
+  async addUser(user) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.usersFile);
+    
+    const users = await this.loadUsers();
+    users.push(user);
+    await fs.writeFile(this.usersFile, JSON.stringify(users, null, 2));
+    return user;
+  }
+
+  async findUserById(userId) {
+    const users = await this.loadUsers();
+    return users.find(u => u.id === userId);
+  }
+
+  async findUserByEmail(email) {
     const users = await this.loadUsers();
     return users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
   }
+
+  async updateUser(userId, updates) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.usersFile);
+    
+    const users = await this.loadUsers();
+    const index = users.findIndex(u => u.id === userId);
+    
+    if (index === -1) {
+      return null;
+    }
+    
+    users[index] = { ...users[index], ...updates };
+    await fs.writeFile(this.usersFile, JSON.stringify(users, null, 2));
+    return users[index];
+  }
+
+  async loadUsers() {
+    await this.ensureDataDir();
+    await this.ensureFile(this.usersFile);
+    
+    try {
+      const data = await fs.readFile(this.usersFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  // Match operations
+  async addMatch(match) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.matchesFile);
+    
+    const matches = await this.loadMatches();
+    matches.push(match);
+    await fs.writeFile(this.matchesFile, JSON.stringify(matches, null, 2));
+    return match;
+  }
+
+  async findMatchesForUser(userId) {
+    const matches = await this.loadMatches();
+    return matches.filter(m => m.user1Id === userId || m.user2Id === userId);
+  }
+
+  async loadMatches() {
+    await this.ensureDataDir();
+    await this.ensureFile(this.matchesFile);
+    
+    try {
+      const data = await fs.readFile(this.matchesFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  // Like operations
+  async addLike(like) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.likesFile);
+    
+    const likes = await this.loadLikes();
+    likes.push(like);
+    await fs.writeFile(this.likesFile, JSON.stringify(likes, null, 2));
+    return like;
+  }
+
+  async findLikesForUser(userId) {
+    const likes = await this.loadLikes();
+    return likes.filter(l => l.fromUserId === userId);
+  }
+
+  async findLikesToUser(userId) {
+    const likes = await this.loadLikes();
+    return likes.filter(l => l.toUserId === userId);
+  }
+
+  async findMutualLikes(userId) {
+    const likesFrom = await this.findLikesForUser(userId);
+    const likesTo = await this.findLikesToUser(userId);
+    
+    const mutual = [];
+    likesFrom.forEach(likeFrom => {
+      const mutualLike = likesTo.find(likeTo => likeTo.fromUserId === likeFrom.toUserId);
+      if (mutualLike) {
+        mutual.push({
+          userId: likeFrom.toUserId,
+          matched: true
+        });
+      }
+    });
+    
+    return mutual;
+  }
+
+  async loadLikes() {
+    await this.ensureDataDir();
+    await this.ensureFile(this.likesFile);
+    
+    try {
+      const data = await fs.readFile(this.likesFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
+    }
+  }
+}
+
+module.exports = DataStore;
