@@ -6,12 +6,16 @@ A modern dating application that matches users based on their streaming preferen
 
 - **User Profiles**: Create detailed profiles with bio, age, and location
 - **Profile Pictures & Photo Galleries**: Upload profile pictures and up to 6 photos
+- **Favorite Movies**: Search and add your favorite movies from TMDB to your profile
+- **Profile Watch History Management**: Add and update your watch history directly from your profile page
+- **Viewing Preferences**: Set your favorite genres and binge-watching count for better matches
 - **Streaming Service Integration**: Connect multiple streaming platforms (Netflix, Hulu, Disney+, Amazon Prime, HBO Max, Apple TV+)
 - **Real Streaming API Integration**: Get real movie/TV show data from TMDB API
 - **Watch History Tracking**: Track movies, TV shows, and series you've watched
 - **Smart Matching Algorithm**: Get matched with users based on:
   - Shared streaming services
   - Common shows and movies watched
+  - Shared favorite movies (25 points each)
   - Similar genre preferences
   - Compatible binge-watching patterns
 - **Advanced Filters**: Filter matches by age range and location radius

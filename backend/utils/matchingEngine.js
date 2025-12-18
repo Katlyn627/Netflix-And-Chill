@@ -24,6 +24,11 @@ class MatchingEngine {
     const sharedGenres = this.findSharedGenres(user1, user2);
     score += sharedGenres.length * 5;
 
+    // Check for shared favorite movies
+    const sharedFavoriteMovies = this.findSharedFavoriteMovies(user1, user2);
+    score += sharedFavoriteMovies.length * 25;
+    sharedContent.push(...sharedFavoriteMovies);
+
     // Bonus for similar binge-watching patterns
     const bingeDifference = Math.abs(
       (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
@@ -52,7 +57,8 @@ class MatchingEngine {
       score: normalizedScore,
       sharedContent: sharedContent,
       sharedServices: sharedServices,
-      sharedGenres: sharedGenres
+      sharedGenres: sharedGenres,
+      sharedFavoriteMovies: sharedFavoriteMovies
     };
   }
 
@@ -92,6 +98,33 @@ class MatchingEngine {
     const user1Genres = user1.preferences.genres || [];
     const user2Genres = user2.preferences.genres || [];
     return user1Genres.filter(genre => user2Genres.includes(genre));
+  }
+
+  static findSharedFavoriteMovies(user1, user2) {
+    const sharedMovies = [];
+    
+    // Get favorite movies for both users
+    const user1Movies = user1.favoriteMovies || [];
+    const user2Movies = user2.favoriteMovies || [];
+    
+    // Create a map of user2's favorite movies by TMDB ID for O(1) lookups
+    const user2MoviesMap = new Map();
+    user2Movies.forEach(movie => {
+      user2MoviesMap.set(movie.tmdbId, movie);
+    });
+    
+    // Check user1's favorite movies against user2's
+    user1Movies.forEach(movie1 => {
+      if (user2MoviesMap.has(movie1.tmdbId)) {
+        sharedMovies.push({
+          title: movie1.title,
+          type: 'favorite_movie',
+          tmdbId: movie1.tmdbId
+        });
+      }
+    });
+    
+    return sharedMovies;
   }
 
   /**
