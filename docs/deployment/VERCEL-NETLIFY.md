@@ -161,6 +161,13 @@ Create `netlify.toml` in root directory:
 
 Create serverless functions in `netlify/functions/`:
 
+**Note:** The server.js file needs to export the Express app instance. Update `backend/server.js` to export the app:
+
+```javascript
+// At the end of backend/server.js, ensure you have:
+module.exports = app;
+```
+
 **netlify/functions/api.js:**
 ```javascript
 const serverless = require('serverless-http');
@@ -172,6 +179,34 @@ module.exports.handler = serverless(app);
 Install dependency:
 ```bash
 npm install serverless-http
+```
+
+**Alternative:** If server.js doesn't export the app, create a separate serverless entry point:
+
+**netlify/functions/api.js:**
+```javascript
+const serverless = require('serverless-http');
+const express = require('express');
+const cors = require('cors');
+
+// Import routes
+const userRoutes = require('../../backend/routes/users');
+const matchRoutes = require('../../backend/routes/matches');
+const recommendationRoutes = require('../../backend/routes/recommendations');
+const likeRoutes = require('../../backend/routes/likes');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/users', userRoutes);
+app.use('/api/matches', matchRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/likes', likeRoutes);
+
+module.exports.handler = serverless(app);
 ```
 
 ### Set Environment Variables

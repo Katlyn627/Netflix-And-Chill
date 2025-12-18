@@ -14,7 +14,11 @@ This guide helps you create a React Native mobile app for Netflix and Chill.
 ### Install React Native CLI
 
 ```bash
-npm install -g react-native-cli
+# Using npx (recommended)
+npx react-native init NetflixAndChillMobile
+
+# Or install CLI globally (optional)
+npm install -g @react-native-community/cli
 ```
 
 ### Create New React Native Project

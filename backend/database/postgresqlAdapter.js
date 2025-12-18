@@ -59,7 +59,8 @@ class PostgreSQLAdapter {
         user2_id VARCHAR(255) REFERENCES users(id),
         match_score INTEGER,
         shared_content JSONB DEFAULT '[]'::jsonb,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user1_id, user2_id)
       )
     `;
 

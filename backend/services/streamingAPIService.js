@@ -18,6 +18,11 @@ class StreamingAPIService {
    * @returns {Promise<Object>}
    */
   async makeRequest(endpoint, params = {}) {
+    if (!this.apiKey) {
+      console.warn('TMDB API key not configured. Returning empty results.');
+      return { results: [] };
+    }
+
     const queryParams = new URLSearchParams({
       api_key: this.apiKey,
       ...params

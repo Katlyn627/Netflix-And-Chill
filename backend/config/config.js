@@ -3,7 +3,12 @@ module.exports = {
   // TMDB API configuration (The Movie Database)
   // Get your free API key at: https://www.themoviedb.org/settings/api
   tmdb: {
-    apiKey: process.env.TMDB_API_KEY || 'YOUR_TMDB_API_KEY_HERE',
+    apiKey: process.env.TMDB_API_KEY || (() => {
+      if (process.env.NODE_ENV === 'production') {
+        console.warn('WARNING: TMDB_API_KEY not set. Recommendation features will not work.');
+      }
+      return null;
+    })(),
     baseUrl: 'https://api.themoviedb.org/3',
     imageBaseUrl: 'https://image.tmdb.org/t/p'
   },

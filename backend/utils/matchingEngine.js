@@ -127,6 +127,19 @@ class MatchingEngine {
    * @returns {boolean}
    */
   static passesFilters(user, otherUser, filters) {
+    // Validate filters
+    if (filters.ageRange) {
+      if (typeof filters.ageRange.min !== 'number' || typeof filters.ageRange.max !== 'number') {
+        throw new Error('Invalid ageRange filter: min and max must be numbers');
+      }
+      if (filters.ageRange.min < 0 || filters.ageRange.max < 0 || filters.ageRange.min > filters.ageRange.max) {
+        throw new Error('Invalid ageRange filter: min must be less than max and both must be non-negative');
+      }
+    }
+    if (filters.locationRadius !== undefined && (typeof filters.locationRadius !== 'number' || filters.locationRadius < 0)) {
+      throw new Error('Invalid locationRadius filter: must be a non-negative number');
+    }
+
     // Age range filter
     if (filters.ageRange) {
       const { min, max } = filters.ageRange;
@@ -141,14 +154,16 @@ class MatchingEngine {
     }
 
     // Location radius filter (simplified - would need proper geolocation in production)
+    const MAX_GLOBAL_RADIUS = 1000; // Maximum radius to consider as "anywhere" (in miles/km)
+    
     if (filters.locationRadius !== undefined || user.preferences.locationRadius !== undefined) {
       // In a real implementation, this would calculate actual distance
       // For now, we just check if locations are similar (same city/area)
-      const radius = filters.locationRadius || user.preferences.locationRadius;
-      if (radius !== null && radius !== undefined) {
+      const radius = filters.locationRadius !== undefined ? filters.locationRadius : user.preferences.locationRadius;
+      if (radius !== null && radius !== undefined && radius < MAX_GLOBAL_RADIUS) {
         // Simplified: if locations don't match at all and radius is set, skip
         // In production, use proper geocoding and distance calculation
-        if (user.location && otherUser.location && radius < 1000) {
+        if (user.location && otherUser.location) {
           const userLoc = user.location.toLowerCase();
           const otherLoc = otherUser.location.toLowerCase();
           if (!userLoc.includes(otherLoc.split(',')[0]) && !otherLoc.includes(userLoc.split(',')[0])) {
