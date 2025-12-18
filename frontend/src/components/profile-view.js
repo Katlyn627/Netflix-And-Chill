@@ -185,9 +185,27 @@ class ProfileView {
         const servicesContainer = document.getElementById('services-list');
 
         if (services.length > 0) {
-            servicesContainer.innerHTML = services.map(service => 
-                `<span class="tag">${service.name}</span>`
-            ).join(' ');
+            servicesContainer.innerHTML = services.map(service => {
+                // Escape HTML to prevent XSS
+                const escapeHtml = (str) => {
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                };
+                
+                const serviceName = escapeHtml(service.name);
+                
+                // Check if service has logo URL
+                if (service.logoUrl) {
+                    return `
+                        <span class="tag" style="display: inline-flex; align-items: center; gap: 8px;">
+                            <img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;">
+                            ${serviceName}
+                        </span>
+                    `;
+                }
+                return `<span class="tag">${serviceName}</span>`;
+            }).join(' ');
         } else {
             servicesContainer.innerHTML = '<em id="no-services">No streaming services connected yet.</em>';
         }
@@ -1016,11 +1034,12 @@ class ProfileView {
         const genresList = document.getElementById('genres-list');
         const bingeCountDisplay = document.getElementById('binge-count-display');
 
-        // Render genres
+        // Render genres - handle both old format (string array) and new format (object array)
         if (preferences.genres && preferences.genres.length > 0) {
-            genresList.innerHTML = preferences.genres.map(genre => 
-                `<span style="display: inline-block; background: #667eea; color: white; padding: 5px 10px; border-radius: 15px; margin: 5px;">${genre}</span>`
-            ).join('');
+            genresList.innerHTML = preferences.genres.map(genre => {
+                const genreName = typeof genre === 'string' ? genre : genre.name;
+                return `<span style="display: inline-block; background: #667eea; color: white; padding: 5px 10px; border-radius: 15px; margin: 5px;">${genreName}</span>`;
+            }).join('');
         } else {
             genresList.innerHTML = '<em id="no-genres">No genres selected.</em>';
         }
@@ -1043,10 +1062,14 @@ class ProfileView {
             // Pre-populate current preferences
             const preferences = this.userData.preferences || {};
             
-            // Set genres
+            // Set genres - handle both old format (string array) and new format (object array)
             if (preferences.genres) {
                 document.querySelectorAll('input[name="genre"]').forEach(checkbox => {
-                    checkbox.checked = preferences.genres.includes(checkbox.value);
+                    const isChecked = preferences.genres.some(genre => {
+                        const genreName = typeof genre === 'string' ? genre : genre.name;
+                        return genreName === checkbox.value;
+                    });
+                    checkbox.checked = isChecked;
                 });
             }
 
@@ -1066,7 +1089,11 @@ class ProfileView {
             e.preventDefault();
 
             const selectedGenres = Array.from(document.querySelectorAll('input[name="genre"]:checked'))
-                .map(cb => cb.value);
+                .map(cb => ({
+                    id: parseInt(cb.dataset.genreId) || null,
+                    name: cb.value,
+                    types: cb.dataset.genreTypes ? JSON.parse(cb.dataset.genreTypes) : []
+                }));
             const bingeCountInput = document.getElementById('edit-binge-count').value;
             const bingeCount = parseInt(bingeCountInput) || 1;
 

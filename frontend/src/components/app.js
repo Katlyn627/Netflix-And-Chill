@@ -1,5 +1,7 @@
 let currentUserId = null;
 let searchTimeout = null;
+let availableGenres = [];
+let availableProviders = [];
 
 // Show/hide sections
 function showSection(sectionId) {
@@ -10,6 +12,13 @@ function showSection(sectionId) {
             section.style.display = id === sectionId ? 'block' : 'none';
         }
     });
+    
+    // Load dynamic data when showing relevant sections
+    if (sectionId === 'streaming-services') {
+        loadStreamingProviders();
+    } else if (sectionId === 'preferences') {
+        loadGenres();
+    }
 }
 
 // Toggle password visibility
@@ -45,6 +54,116 @@ function showMessage(message, isError = false) {
     main.insertBefore(messageDiv, main.firstChild);
     
     setTimeout(() => messageDiv.remove(), 5000);
+}
+
+// Load streaming providers from TMDB
+async function loadStreamingProviders() {
+    try {
+        const result = await api.getStreamingProviders('US');
+        if (result && result.providers) {
+            availableProviders = result.providers;
+            renderStreamingProviders(result.providers);
+        }
+    } catch (error) {
+        console.error('Error loading streaming providers:', error);
+        // Keep the hardcoded list as fallback
+    }
+}
+
+// Render streaming providers
+function renderStreamingProviders(providers) {
+    const servicesList = document.getElementById('services-list');
+    if (!servicesList) return;
+    
+    // Clear existing content
+    servicesList.innerHTML = '';
+    
+    // Validate logo URL is from a trusted source
+    const isValidLogoUrl = (url) => {
+        if (!url) return false;
+        try {
+            const urlObj = new URL(url);
+            // Only allow TMDB image URLs or empty/null
+            return urlObj.hostname === 'image.tmdb.org' || url === '';
+        } catch {
+            return false;
+        }
+    };
+    
+    // Render providers from TMDB
+    providers.forEach(provider => {
+        const serviceOption = document.createElement('div');
+        serviceOption.className = 'service-option';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `provider-${provider.id}`;
+        checkbox.value = provider.name;
+        checkbox.dataset.providerId = provider.id;
+        checkbox.dataset.logoPath = provider.logoPath || '';
+        checkbox.dataset.logoUrl = provider.logoUrl || '';
+        
+        const label = document.createElement('label');
+        label.setAttribute('for', `provider-${provider.id}`);
+        
+        // Add logo if available and from trusted source
+        if (provider.logoUrl && isValidLogoUrl(provider.logoUrl)) {
+            const logoImg = document.createElement('img');
+            logoImg.src = provider.logoUrl;
+            logoImg.alt = provider.name;
+            logoImg.className = 'service-logo-img';
+            logoImg.style.cssText = 'width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-right: 10px;';
+            label.appendChild(logoImg);
+        }
+        
+        const serviceName = document.createElement('span');
+        serviceName.className = 'service-name';
+        serviceName.textContent = provider.name;
+        label.appendChild(serviceName);
+        
+        serviceOption.appendChild(checkbox);
+        serviceOption.appendChild(label);
+        servicesList.appendChild(serviceOption);
+    });
+}
+
+// Load genres from TMDB
+async function loadGenres() {
+    try {
+        const result = await api.getGenres(); // Get all genres (movie + TV)
+        if (result && result.genres) {
+            availableGenres = result.genres;
+            renderGenres(result.genres);
+        }
+    } catch (error) {
+        console.error('Error loading genres:', error);
+        // Keep the hardcoded list as fallback
+    }
+}
+
+// Render genres
+function renderGenres(genres) {
+    const genreOptions = document.querySelector('.genre-options');
+    if (!genreOptions) return;
+    
+    // Clear existing content
+    genreOptions.innerHTML = '';
+    
+    // Render genres from TMDB
+    genres.forEach(genre => {
+        const label = document.createElement('label');
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'genre';
+        checkbox.value = genre.name;
+        checkbox.dataset.genreId = genre.id;
+        checkbox.dataset.genreTypes = JSON.stringify(genre.types);
+        
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${genre.name}`));
+        genreOptions.appendChild(label);
+    });
 }
 
 // Update user info display
@@ -95,18 +214,22 @@ document.getElementById('add-services-btn').addEventListener('click', async () =
     }
     
     const checkboxes = document.querySelectorAll('#services-list input[type="checkbox"]:checked');
-    const services = Array.from(checkboxes).map(cb => cb.value);
     
-    if (services.length === 0) {
+    if (checkboxes.length === 0) {
         showMessage('Please select at least one streaming service', true);
         return;
     }
     
     try {
-        for (const service of services) {
-            await api.addStreamingService(currentUserId, service);
+        for (const checkbox of checkboxes) {
+            const serviceName = checkbox.value;
+            const serviceId = checkbox.dataset.providerId || null;
+            const logoPath = checkbox.dataset.logoPath || null;
+            const logoUrl = checkbox.dataset.logoUrl || null;
+            
+            await api.addStreamingService(currentUserId, serviceName, serviceId, logoPath, logoUrl);
         }
-        showMessage(`Added ${services.length} streaming service(s)!`);
+        showMessage(`Added ${checkboxes.length} streaming service(s)!`);
         showSection('watch-history');
     } catch (error) {
         showMessage('Error adding streaming services: ' + error.message, true);
@@ -152,7 +275,11 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
     }
     
     const genreCheckboxes = document.querySelectorAll('input[name="genre"]:checked');
-    const genres = Array.from(genreCheckboxes).map(cb => cb.value);
+    const genres = Array.from(genreCheckboxes).map(cb => ({
+        id: parseInt(cb.dataset.genreId) || null,
+        name: cb.value,
+        types: cb.dataset.genreTypes ? JSON.parse(cb.dataset.genreTypes) : []
+    }));
     const bingeCount = parseInt(document.getElementById('binge-count').value);
     
     try {

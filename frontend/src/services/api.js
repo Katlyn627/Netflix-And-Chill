@@ -39,13 +39,13 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
-    async addStreamingService(userId, serviceName) {
+    async addStreamingService(userId, serviceName, serviceId, logoPath, logoUrl) {
         const response = await fetch(`${API_BASE_URL}/users/${userId}/streaming-services`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ serviceName })
+            body: JSON.stringify({ serviceName, serviceId, logoPath, logoUrl })
         });
         return await response.json();
     }
@@ -208,6 +208,17 @@ class NetflixAndChillAPI {
             },
             body: JSON.stringify({ email, newPassword })
         });
+        return await response.json();
+    }
+
+    async getGenres(type = null) {
+        const url = type ? `${API_BASE_URL}/streaming/genres?type=${type}` : `${API_BASE_URL}/streaming/genres`;
+        const response = await fetch(url);
+        return await response.json();
+    }
+
+    async getStreamingProviders(region = 'US') {
+        const response = await fetch(`${API_BASE_URL}/streaming/providers?region=${region}`);
         return await response.json();
     }
 }

@@ -97,7 +97,24 @@ class MatchingEngine {
   static findSharedGenres(user1, user2) {
     const user1Genres = user1.preferences.genres || [];
     const user2Genres = user2.preferences.genres || [];
-    return user1Genres.filter(genre => user2Genres.includes(genre));
+    
+    // Handle both old format (strings) and new format (objects with id/name)
+    const normalizeGenre = (genre) => {
+      if (typeof genre === 'string') return genre;
+      return genre.name || genre.id;
+    };
+    
+    const user1GenreSet = new Set(user1Genres.map(normalizeGenre));
+    const user2GenreSet = new Set(user2Genres.map(normalizeGenre));
+    
+    const shared = [];
+    user1GenreSet.forEach(genre => {
+      if (user2GenreSet.has(genre)) {
+        shared.push(genre);
+      }
+    });
+    
+    return shared;
   }
 
   static findSharedFavoriteMovies(user1, user2) {

@@ -14,7 +14,7 @@ class User {
     this.streamingServices = data.streamingServices || [];
     this.watchHistory = data.watchHistory || [];
     this.preferences = data.preferences || {
-      genres: [],
+      genres: [], // Array of genre objects with {id, name, types}
       bingeWatchCount: 0,
       ageRange: { min: 18, max: 100 },
       locationRadius: 50 // in miles/km
@@ -40,9 +40,12 @@ class User {
   }
 
   addStreamingService(service) {
-    if (!this.streamingServices.find(s => s.name === service.name)) {
+    if (!this.streamingServices.find(s => s.id === service.id || s.name === service.name)) {
       this.streamingServices.push({
+        id: service.id || null,
         name: service.name,
+        logoPath: service.logoPath || null,
+        logoUrl: service.logoUrl || null,
         connected: true,
         connectedAt: new Date().toISOString()
       });

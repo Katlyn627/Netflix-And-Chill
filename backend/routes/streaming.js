@@ -81,16 +81,55 @@ router.get('/popular', async (req, res) => {
  */
 router.get('/genres', async (req, res) => {
   try {
-    const { type = 'movie' } = req.query;
-    const genres = await streamingAPIService.getGenres(type);
+    const { type } = req.query;
     
-    res.json({
-      type,
-      genres
-    });
+    let genres;
+    if (type && (type === 'movie' || type === 'tv')) {
+      genres = await streamingAPIService.getGenres(type);
+      res.json({
+        type,
+        genres
+      });
+    } else {
+      // Get all genres (both movie and TV)
+      genres = await streamingAPIService.getAllGenres();
+      res.json({
+        type: 'all',
+        genres
+      });
+    }
   } catch (error) {
     console.error('Error getting genres:', error);
     res.status(500).json({ error: 'Failed to get genres' });
+  }
+});
+
+/**
+ * GET /api/streaming/providers
+ * Get list of available streaming providers
+ */
+router.get('/providers', async (req, res) => {
+  try {
+    const { region = 'US' } = req.query;
+    const providers = await streamingAPIService.getStreamingProviders(region);
+    
+    // Format the providers with logo URLs
+    const formattedProviders = providers.map(provider => ({
+      id: provider.provider_id || provider.id,
+      name: provider.provider_name || provider.name,
+      logoPath: provider.logo_path || provider.logoPath,
+      logoUrl: provider.logo_path ? streamingAPIService.getLogoUrl(provider.logo_path) : provider.logoUrl,
+      displayPriority: provider.display_priority || provider.displayPriority
+    })).sort((a, b) => a.displayPriority - b.displayPriority);
+    
+    res.json({
+      region,
+      count: formattedProviders.length,
+      providers: formattedProviders
+    });
+  } catch (error) {
+    console.error('Error getting streaming providers:', error);
+    res.status(500).json({ error: 'Failed to get streaming providers' });
   }
 });
 

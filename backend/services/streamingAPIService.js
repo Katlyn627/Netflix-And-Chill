@@ -1,4 +1,5 @@
 const config = require('../config/config');
+const { fallbackGenres, fallbackProviders } = require('./fallbackData');
 
 /**
  * Service for interacting with TMDB (The Movie Database) API
@@ -134,6 +135,89 @@ class StreamingAPIService {
   }
 
   /**
+   * Get all genres (combined movie and TV genres)
+   * @returns {Promise<Array>}
+   */
+  async getAllGenres() {
+    // If no API key, return fallback data
+    if (!this.apiKey) {
+      return fallbackGenres;
+    }
+
+    try {
+      const [movieGenres, tvGenres] = await Promise.all([
+        this.getGenres('movie'),
+        this.getGenres('tv')
+      ]);
+
+      // If both are empty, use fallback
+      if (movieGenres.length === 0 && tvGenres.length === 0) {
+        return fallbackGenres;
+      }
+
+      // Merge and deduplicate genres by ID
+      const genreMap = new Map();
+      
+      movieGenres.forEach(genre => {
+        genreMap.set(genre.id, { ...genre, types: ['movie'] });
+      });
+      
+      tvGenres.forEach(genre => {
+        if (genreMap.has(genre.id)) {
+          genreMap.get(genre.id).types.push('tv');
+        } else {
+          genreMap.set(genre.id, { ...genre, types: ['tv'] });
+        }
+      });
+
+      return Array.from(genreMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    } catch (error) {
+      console.error('Error fetching all genres:', error);
+      return fallbackGenres;
+    }
+  }
+
+  /**
+   * Get available streaming providers/watch providers
+   * @param {string} region - ISO 3166-1 country code (e.g., 'US')
+   * @returns {Promise<Array>}
+   */
+  async getStreamingProviders(region = 'US') {
+    // If no API key, return fallback data
+    if (!this.apiKey) {
+      return fallbackProviders;
+    }
+
+    try {
+      const endpoint = '/watch/providers/movie';
+      const data = await this.makeRequest(endpoint, { watch_region: region });
+      const results = data.results || [];
+      
+      // If no results, use fallback
+      if (results.length === 0) {
+        return fallbackProviders;
+      }
+      
+      return results;
+    } catch (error) {
+      console.error('Error fetching streaming providers:', error);
+      return fallbackProviders;
+    }
+  }
+
+  /**
+   * Get watch providers for a specific movie or TV show
+   * @param {number} id 
+   * @param {string} type - 'movie' or 'tv'
+   * @returns {Promise<Object>}
+   */
+  async getWatchProviders(id, type = 'movie') {
+    const endpoint = `/${type}/${id}/watch/providers`;
+    const data = await this.makeRequest(endpoint);
+    return data.results || {};
+  }
+
+  /**
    * Get image URL for a poster or backdrop
    * @param {string} path 
    * @param {string} size - 'w300', 'w500', 'original', etc.
@@ -142,6 +226,16 @@ class StreamingAPIService {
   getImageUrl(path, size = 'w500') {
     if (!path) return null;
     return `${this.imageBaseUrl}/${size}${path}`;
+  }
+
+  /**
+   * Get logo URL for a streaming provider
+   * @param {string} logoPath 
+   * @returns {string}
+   */
+  getLogoUrl(logoPath) {
+    if (!logoPath) return null;
+    return `${this.imageBaseUrl}/original${logoPath}`;
   }
 }
 

@@ -132,7 +132,7 @@ class UserController {
   async addStreamingService(req, res) {
     try {
       const { userId } = req.params;
-      const { serviceName } = req.body;
+      const { serviceName, serviceId, logoPath, logoUrl } = req.body;
 
       if (!serviceName) {
         return res.status(400).json({ error: 'Service name is required' });
@@ -144,7 +144,12 @@ class UserController {
       }
 
       const user = new User(userData);
-      user.addStreamingService({ name: serviceName });
+      user.addStreamingService({ 
+        id: serviceId, 
+        name: serviceName, 
+        logoPath, 
+        logoUrl 
+      });
 
       await this.saveUserData(userId, user);
 
