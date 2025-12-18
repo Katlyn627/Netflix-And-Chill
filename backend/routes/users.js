@@ -54,4 +54,7 @@ router.post('/:userId/favorite-movies', userController.addFavoriteMovie.bind(use
 router.get('/:userId/favorite-movies', userController.getFavoriteMovies.bind(userController));
 router.delete('/:userId/favorite-movies/:movieId', userController.removeFavoriteMovie.bind(userController));
 
+// Delete user profile
+router.delete('/:userId', userController.deleteUser.bind(userController));
+
 module.exports = router;
