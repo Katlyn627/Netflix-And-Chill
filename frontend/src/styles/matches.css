@@ -59,7 +59,7 @@
 .loading-text {
     text-align: center;
     font-size: 1.2em;
-    color: #667eea;
+    color: #E50914;
     padding: 40px;
 }
 
@@ -68,7 +68,7 @@
 }
 
 #matches-container h3 {
-    color: #667eea;
+    color: #E50914;
     margin-bottom: 20px;
     text-align: center;
 }

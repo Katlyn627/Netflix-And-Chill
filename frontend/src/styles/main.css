@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #141414 0%, #000000 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -21,6 +21,23 @@ header {
     color: white;
     margin-bottom: 40px;
     padding: 20px;
+}
+
+.logo-banner {
+    display: inline-block;
+    background: #E50914;
+    padding: 15px 30px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5);
+}
+
+.logo-banner h1 {
+    font-size: 3em;
+    margin: 0;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
 }
 
 header h1 {
@@ -43,7 +60,7 @@ header h1 {
 }
 
 .card h2 {
-    color: #667eea;
+    color: #E50914;
     margin-bottom: 20px;
     font-size: 1.8em;
 }
@@ -85,7 +102,7 @@ header h1 {
     position: absolute;
     right: 10px;
     padding: 5px 15px;
-    background: #667eea;
+    background: #E50914;
     color: white;
     border: none;
     border-radius: 5px;
@@ -95,7 +112,7 @@ header h1 {
 }
 
 .toggle-password:hover {
-    background: #5568d3;
+    background: #B20710;
 }
 
 .input-hint {
@@ -109,7 +126,7 @@ header h1 {
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #E50914;
 }
 
 .btn {
@@ -123,13 +140,14 @@ header h1 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #E50914;
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+    background: #B20710;
 }
 
 .btn-secondary {
@@ -262,16 +280,16 @@ header h1 {
 }
 
 .match-card {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%);
     padding: 20px;
     margin-bottom: 15px;
     border-radius: 10px;
-    border-left: 5px solid #667eea;
+    border-left: 5px solid #E50914;
 }
 
 .match-score {
     display: inline-block;
-    background: #667eea;
+    background: #E50914;
     color: white;
     padding: 5px 15px;
     border-radius: 20px;
@@ -297,7 +315,7 @@ header h1 {
 }
 
 .shared-content h4 {
-    color: #667eea;
+    color: #E50914;
     margin-bottom: 8px;
 }
 
@@ -325,7 +343,7 @@ header h1 {
 }
 
 .user-id {
-    color: #667eea;
+    color: #E50914;
     font-weight: 600;
     font-size: 0.9em;
 }
@@ -384,7 +402,7 @@ footer {
 /* Tag styles */
 .tag {
     display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #E50914;
     color: white;
     padding: 5px 12px;
     border-radius: 15px;
@@ -453,7 +471,7 @@ footer {
     left: 0;
     right: 0;
     background: white;
-    border: 2px solid #667eea;
+    border: 2px solid #E50914;
     border-top: none;
     border-radius: 0 0 8px 8px;
     max-height: 300px;
@@ -491,7 +509,7 @@ footer {
 .search-loading {
     padding: 15px;
     text-align: center;
-    color: #667eea;
+    color: #E50914;
 }
 
 .search-no-results {
@@ -501,10 +519,10 @@ footer {
 }
 
 .selected-content-card {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%);
     padding: 15px;
     border-radius: 8px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #E50914;
 }
 
 .selected-content-card p {
