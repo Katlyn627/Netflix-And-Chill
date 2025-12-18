@@ -550,10 +550,8 @@ class ProfileView {
     renderFavoriteMovies() {
         const favoriteMovies = this.userData.favoriteMovies || [];
         const favMoviesContainer = document.getElementById('favorite-movies-list');
-        const noFavorites = document.getElementById('no-favorite-movies');
 
         if (favoriteMovies.length === 0) {
-            noFavorites.style.display = 'block';
             favMoviesContainer.innerHTML = '<em id="no-favorite-movies">No favorite movies added yet.</em>';
         } else {
             favMoviesContainer.innerHTML = '';
@@ -566,11 +564,15 @@ class ProfileView {
                     ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
                     : 'https://via.placeholder.com/100x150?text=No+Poster';
                 
+                const truncatedOverview = movie.overview && movie.overview.length > 200 
+                    ? movie.overview.substring(0, 200) + '...' 
+                    : movie.overview || 'No description available.';
+                
                 movieDiv.innerHTML = `
                     <img src="${posterUrl}" alt="${movie.title}" style="width: 100px; height: 150px; object-fit: cover; border-radius: 5px; float: left; margin-right: 15px;">
                     <h4 style="margin-top: 0;">${movie.title}</h4>
                     <p style="color: #666; margin: 5px 0;">${movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A'}</p>
-                    <p style="font-size: 0.9em; margin-top: 10px;">${movie.overview ? movie.overview.substring(0, 200) + '...' : 'No description available.'}</p>
+                    <p style="font-size: 0.9em; margin-top: 10px;">${truncatedOverview}</p>
                     <button class="remove-favorite-movie-btn btn btn-secondary" data-movie-id="${movie.tmdbId}" style="position: absolute; top: 10px; right: 10px;">Remove</button>
                     <div style="clear: both;"></div>
                 `;
@@ -843,7 +845,8 @@ class ProfileView {
             const type = document.getElementById('watch-history-type').value;
             const genre = document.getElementById('watch-history-genre').value;
             const service = document.getElementById('watch-history-service').value;
-            const episodes = document.getElementById('watch-history-episodes').value;
+            const episodesInput = document.getElementById('watch-history-episodes').value;
+            const episodes = parseInt(episodesInput) || 1;
 
             if (!type) {
                 alert('Please select a type');
@@ -856,7 +859,7 @@ class ProfileView {
                     type: type,
                     genre: genre || '',
                     service: service || '',
-                    episodesWatched: type === 'tvshow' || type === 'series' ? parseInt(episodes) : 1
+                    episodesWatched: type === 'tvshow' || type === 'series' ? episodes : 1
                 };
 
                 const result = await api.addWatchHistory(this.userId, watchData);
@@ -998,7 +1001,8 @@ class ProfileView {
 
             const selectedGenres = Array.from(document.querySelectorAll('input[name="genre"]:checked'))
                 .map(cb => cb.value);
-            const bingeCount = parseInt(document.getElementById('edit-binge-count').value);
+            const bingeCountInput = document.getElementById('edit-binge-count').value;
+            const bingeCount = parseInt(bingeCountInput) || 1;
 
             try {
                 const result = await api.updatePreferences(this.userId, {
