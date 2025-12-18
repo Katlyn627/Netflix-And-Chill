@@ -295,11 +295,6 @@ class ProfileView {
             this.submitQuiz();
         });
 
-        // Edit profile button
-        document.getElementById('edit-profile-btn').addEventListener('click', () => {
-            window.location.href = `profile-view.html?userId=${this.userId}`;
-        });
-
         // Change password button
         document.getElementById('change-password-btn').addEventListener('click', () => {
             this.showChangePasswordModal();

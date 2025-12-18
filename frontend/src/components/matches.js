@@ -76,7 +76,6 @@ function displayMatches(matches) {
             <div class="empty-state">
                 <p>No matches found yet.</p>
                 <p>Try adding more shows to your watch history to find better matches!</p>
-                <a href="profile.html" class="btn btn-primary" style="display: inline-block; margin-top: 20px;">Update Your Profile</a>
             </div>
         `;
     }
