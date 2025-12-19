@@ -4,6 +4,10 @@ const dataStore = new DataStore();
 const fs = require('fs').promises;
 const path = require('path');
 
+// NOTE: This implementation uses file-based storage which has potential race conditions
+// during concurrent operations. For production use with high traffic, consider migrating
+// to a database with proper transaction support (MongoDB, PostgreSQL, etc.)
+
 // Create a new watch invitation
 async function createWatchInvitation(req, res) {
   try {

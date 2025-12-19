@@ -8,6 +8,9 @@ const {
   deleteInvitation
 } = require('../controllers/watchInvitationController');
 
+// TODO: Add rate limiting to all routes for production deployment
+// Consider using express-rate-limit middleware to prevent abuse
+
 // Create a new watch invitation
 router.post('/', createWatchInvitation);
 

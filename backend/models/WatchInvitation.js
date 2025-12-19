@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 class WatchInvitation {
   constructor(data) {
     this.id = data.id || this.generateId();
@@ -15,7 +17,8 @@ class WatchInvitation {
   }
 
   generateId() {
-    return 'watch_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // Use crypto.randomUUID for secure, unique ID generation
+    return 'watch_' + crypto.randomUUID();
   }
 
   generateInstructions() {

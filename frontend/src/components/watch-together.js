@@ -510,10 +510,12 @@
         if (movie) text += `Movie/Show: ${movie.title}\n`;
         text += `Date & Time: ${formatDateTime(scheduledDate, scheduledTime)}\n`;
         if (joinLink) text += `Join Link: ${joinLink}\n`;
-        text += `\nInstructions:\n`;
-        instructions.forEach((instr, i) => {
-            text += `${i + 1}. ${instr}\n`;
-        });
+        if (instructions && instructions.length > 0) {
+            text += `\nInstructions:\n`;
+            instructions.forEach((instr, i) => {
+                text += `${i + 1}. ${instr}\n`;
+            });
+        }
 
         // Copy to clipboard
         navigator.clipboard.writeText(text).then(() => {
