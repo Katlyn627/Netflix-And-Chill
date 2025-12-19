@@ -64,6 +64,8 @@ class MatchController {
               username: matchedUser.username,
               age: matchedUser.age,
               location: matchedUser.location,
+              gender: matchedUser.gender,
+              sexualOrientation: matchedUser.sexualOrientation,
               bio: matchedUser.bio,
               profilePicture: matchedUser.profilePicture,
               photoGallery: matchedUser.photoGallery,

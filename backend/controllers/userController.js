@@ -1,5 +1,11 @@
 const User = require('../models/User');
 const { getDatabase } = require('../utils/database');
+const {
+  VALID_GENDERS,
+  VALID_SEXUAL_ORIENTATIONS,
+  VALID_GENDER_PREFERENCES,
+  VALID_SEXUAL_ORIENTATION_PREFERENCES
+} = require('../constants/userConstants');
 
 // Constants
 const MAX_PHOTOS_IN_GALLERY = 6;
@@ -21,7 +27,7 @@ class UserController {
 
   async createUser(req, res) {
     try {
-      const { username, email, password, age, location, bio } = req.body;
+      const { username, email, password, age, location, bio, gender, sexualOrientation } = req.body;
 
       if (!username || !email || !password) {
         return res.status(400).json({ error: 'Username, email, and password are required' });
@@ -41,7 +47,9 @@ class UserController {
         password, // In production, this should be hashed
         age,
         location,
-        bio
+        bio,
+        gender,
+        sexualOrientation
       };
 
       const user = new User(userData);
@@ -228,7 +236,7 @@ class UserController {
   async updatePreferences(req, res) {
     try {
       const { userId } = req.params;
-      const { genres, bingeWatchCount, ageRange, locationRadius } = req.body;
+      const { genres, bingeWatchCount, ageRange, locationRadius, genderPreference, sexualOrientationPreference } = req.body;
 
       const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
@@ -249,6 +257,30 @@ class UserController {
       }
       if (locationRadius !== undefined) {
         user.preferences.locationRadius = locationRadius;
+      }
+      if (genderPreference !== undefined) {
+        // Validate genderPreference is an array
+        if (!Array.isArray(genderPreference)) {
+          return res.status(400).json({ error: 'Gender preference must be an array' });
+        }
+        // Validate gender values
+        const invalidGenders = genderPreference.filter(g => !VALID_GENDER_PREFERENCES.includes(g));
+        if (invalidGenders.length > 0) {
+          return res.status(400).json({ error: `Invalid gender preference values: ${invalidGenders.join(', ')}` });
+        }
+        user.preferences.genderPreference = genderPreference;
+      }
+      if (sexualOrientationPreference !== undefined) {
+        // Validate sexualOrientationPreference is an array
+        if (!Array.isArray(sexualOrientationPreference)) {
+          return res.status(400).json({ error: 'Sexual orientation preference must be an array' });
+        }
+        // Validate orientation values
+        const invalidOrientations = sexualOrientationPreference.filter(o => !VALID_SEXUAL_ORIENTATION_PREFERENCES.includes(o));
+        if (invalidOrientations.length > 0) {
+          return res.status(400).json({ error: `Invalid sexual orientation preference values: ${invalidOrientations.join(', ')}` });
+        }
+        user.preferences.sexualOrientationPreference = sexualOrientationPreference;
       }
 
       await this.saveUserData(userId, user);
@@ -367,12 +399,30 @@ class UserController {
 
       const user = new User(userData);
 
+      // Validate gender if provided
+      if (updates.gender !== undefined) {
+        if (!VALID_GENDERS.includes(updates.gender)) {
+          return res.status(400).json({ error: `Invalid gender value. Must be one of: ${VALID_GENDERS.join(', ')}` });
+        }
+      }
+
+      // Validate sexual orientation if provided
+      if (updates.sexualOrientation !== undefined) {
+        if (!VALID_SEXUAL_ORIENTATIONS.includes(updates.sexualOrientation)) {
+          return res.status(400).json({ error: `Invalid sexual orientation value. Must be one of: ${VALID_SEXUAL_ORIENTATIONS.join(', ')}` });
+        }
+      }
+
       // Update allowed fields
       const allowedFields = [
         'leastFavoriteMovies',
         'movieDebateTopics',
         'favoriteSnacks',
-        'videoChatPreference'
+        'videoChatPreference',
+        'gender',
+        'sexualOrientation',
+        'location',
+        'age'
       ];
 
       allowedFields.forEach(field => {
