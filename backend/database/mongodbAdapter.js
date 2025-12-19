@@ -11,24 +11,24 @@ class MongoDBAdapter {
   }
 
   async connect() {
+    const uri = config.database.mongodb.uri;
+    
     try {
       // Validate MongoDB URI is properly configured
-      const uri = config.database.mongodb.uri;
-      
       // Check for placeholder values or missing configuration
       // Common placeholders: <username>, <password>, <cluster-url>, example domains
       if (!uri || 
           uri.includes('<') || 
           uri.includes('>') || 
-          /cluster0\.([a-z]+\.)?mongodb\.net/.test(uri) && uri.includes('cluster0.abcde')) {
+          uri.includes('cluster0.abcde')) {
         throw new Error(
           'MongoDB connection string is not properly configured.\n\n' +
           'Please follow these steps:\n' +
           '1. Create a .env file in the project root (or update your existing one)\n' +
           '2. Add your MongoDB Atlas connection string:\n' +
           '   DB_TYPE=mongodb\n' +
-          '   MONGODB_URI=mongodb+srv://<username>:<password>@<your-cluster>.mongodb.net/netflix-and-chill?retryWrites=true&w=majority\n\n' +
-          '3. Replace <username>, <password>, and <your-cluster> with your actual MongoDB Atlas credentials\n\n' +
+          '   MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/netflix-and-chill?retryWrites=true&w=majority\n\n' +
+          '3. Replace YOUR_USERNAME, YOUR_PASSWORD, and YOUR_CLUSTER with your actual MongoDB Atlas credentials\n\n' +
           'See MONGODB_SETUP.md for detailed setup instructions.\n\n' +
           'Alternatively, you can use the file-based database by setting:\n' +
           '   DB_TYPE=file\n' +
@@ -48,7 +48,6 @@ class MongoDBAdapter {
         throw error;
       } else if (error.code === 'ENOTFOUND' || error.syscall === 'querySrv') {
         // Redact credentials from URI for security
-        const uri = config.database.mongodb.uri;
         const safeUri = this._redactCredentials(uri);
         throw new Error(
           'Unable to connect to MongoDB Atlas.\n\n' +
@@ -58,15 +57,14 @@ class MongoDBAdapter {
           '3. Your internet connection is not working\n\n' +
           'Current MONGODB_URI (credentials redacted): ' + safeUri + '\n\n' +
           'Please check your .env file and ensure:\n' +
-          '- You have replaced <username>, <password>, and <cluster-url> with real values\n' +
+          '- You have replaced placeholder values with real credentials\n' +
           '- Your MongoDB Atlas cluster is active\n' +
           '- You have internet connectivity\n\n' +
           'See MONGODB_SETUP.md for detailed setup instructions.\n\n' +
           'Original error: ' + error.message
         );
       } else if (error.message.includes('ECONNREFUSED')) {
-        const uri = config.database.mongodb.uri || '';
-        if (uri.includes('localhost') || uri.includes('127.0.0.1')) {
+        if (uri && (uri.includes('localhost') || uri.includes('127.0.0.1'))) {
           throw new Error(
             'Unable to connect to local MongoDB server.\n\n' +
             'This error means MongoDB is not running on localhost:27017.\n\n' +
