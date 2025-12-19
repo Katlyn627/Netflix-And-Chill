@@ -43,13 +43,15 @@ class MongoDBAdapter {
         // Re-throw our custom validation error as-is
         throw error;
       } else if (error.code === 'ENOTFOUND' || error.syscall === 'querySrv') {
+        // Redact credentials from URI for security
+        const safeUri = this._redactCredentials(config.database.mongodb.uri);
         throw new Error(
           'Unable to connect to MongoDB Atlas.\n\n' +
           'This error usually means:\n' +
           '1. Your MONGODB_URI connection string contains placeholder values\n' +
           '2. Your MongoDB cluster URL is incorrect\n' +
           '3. Your internet connection is not working\n\n' +
-          'Current MONGODB_URI: ' + config.database.mongodb.uri + '\n\n' +
+          'Current MONGODB_URI (credentials redacted): ' + safeUri + '\n\n' +
           'Please check your .env file and ensure:\n' +
           '- You have replaced <username>, <password>, and <cluster-url> with real values\n' +
           '- Your MongoDB Atlas cluster is active\n' +
@@ -78,6 +80,23 @@ class MongoDBAdapter {
         throw error;
       }
     }
+  }
+
+  /**
+   * Redact credentials from MongoDB URI for safe logging
+   * @private
+   */
+  _redactCredentials(uri) {
+    if (!uri) return '[not set]';
+    
+    // Match mongodb:// or mongodb+srv:// URIs and redact credentials
+    const match = uri.match(/^(mongodb(?:\+srv)?:\/\/)([^@]+)@(.+)$/);
+    if (match) {
+      return `${match[1]}***:***@${match[3]}`;
+    }
+    
+    // If no credentials in URI, return as-is (e.g., localhost)
+    return uri;
   }
 
   async disconnect() {
