@@ -226,27 +226,56 @@ class ProfileView {
         const servicesContainer = document.getElementById('services-list');
 
         if (services.length > 0) {
+            // Helper function to get logo class based on service name
+            const getLogoClass = (name) => {
+                const nameLower = name.toLowerCase();
+                if (nameLower.includes('netflix')) return 'netflix-logo';
+                if (nameLower.includes('amazon') || nameLower.includes('prime')) return 'prime-logo';
+                if (nameLower.includes('disney')) return 'disney-logo';
+                if (nameLower.includes('hulu')) return 'hulu-logo';
+                if (nameLower.includes('hbo')) return 'hbo-logo';
+                if (nameLower.includes('apple')) return 'apple-logo';
+                if (nameLower.includes('paramount')) return 'paramount-logo';
+                if (nameLower.includes('peacock')) return 'peacock-logo';
+                if (nameLower.includes('sling')) return 'sling-logo';
+                return 'other-logo';
+            };
+
+            // Helper function to get logo text
+            const getLogoText = (name) => {
+                const nameLower = name.toLowerCase();
+                if (nameLower.includes('netflix')) return 'N';
+                if (nameLower.includes('amazon') || nameLower.includes('prime')) return 'prime';
+                if (nameLower.includes('disney')) return 'D+';
+                if (nameLower.includes('hulu')) return 'hulu';
+                if (nameLower.includes('hbo')) return 'HBO';
+                if (nameLower.includes('apple')) return ''; // Uses ::before CSS
+                if (nameLower.includes('paramount')) return 'P+';
+                if (nameLower.includes('peacock')) return '🦚';
+                if (nameLower.includes('sling')) return 'S';
+                return name.charAt(0).toUpperCase();
+            };
+
+            // Escape HTML to prevent XSS
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+            
+            servicesContainer.className = 'services-display-grid';
             servicesContainer.innerHTML = services.map(service => {
-                // Escape HTML to prevent XSS
-                const escapeHtml = (str) => {
-                    const div = document.createElement('div');
-                    div.textContent = str;
-                    return div.innerHTML;
-                };
-                
                 const serviceName = escapeHtml(service.name);
+                const logoClass = getLogoClass(service.name);
+                const logoText = getLogoText(service.name);
                 
-                // Check if service has logo URL
-                if (service.logoUrl) {
-                    return `
-                        <span class="tag" style="display: inline-flex; align-items: center; gap: 8px;">
-                            <img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;">
-                            ${serviceName}
-                        </span>
-                    `;
-                }
-                return `<span class="tag">${serviceName}</span>`;
-            }).join(' ');
+                return `
+                    <div class="service-display-item">
+                        <span class="service-display-logo ${logoClass}">${logoText}</span>
+                        <span class="service-display-name">${serviceName}</span>
+                    </div>
+                `;
+            }).join('');
         } else {
             servicesContainer.innerHTML = '<em id="no-services">No streaming services connected yet.</em>';
         }

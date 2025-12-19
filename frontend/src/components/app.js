@@ -222,6 +222,17 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
     }
 });
 
+// Handle "Other" streaming service checkbox toggle
+document.getElementById('other-service').addEventListener('change', function() {
+    const otherServiceInput = document.getElementById('other-service-input');
+    if (this.checked) {
+        otherServiceInput.style.display = 'block';
+    } else {
+        otherServiceInput.style.display = 'none';
+        document.getElementById('custom-service-name').value = '';
+    }
+});
+
 // Handle streaming services
 document.getElementById('add-services-btn').addEventListener('click', async () => {
     if (!currentUserId) {
@@ -236,9 +247,24 @@ document.getElementById('add-services-btn').addEventListener('click', async () =
         return;
     }
     
+    // Check if "Other" is selected and validate custom input
+    const otherCheckbox = document.getElementById('other-service');
+    const customServiceName = document.getElementById('custom-service-name').value.trim();
+    
+    if (otherCheckbox.checked && !customServiceName) {
+        showMessage('Please enter a streaming service name for "Other"', true);
+        return;
+    }
+    
     try {
         for (const checkbox of checkboxes) {
-            const serviceName = checkbox.value;
+            let serviceName = checkbox.value;
+            
+            // If this is the "Other" checkbox, use the custom service name
+            if (checkbox.id === 'other-service' && customServiceName) {
+                serviceName = customServiceName;
+            }
+            
             const serviceId = checkbox.dataset.providerId || null;
             const logoPath = checkbox.dataset.logoPath || null;
             const logoUrl = checkbox.dataset.logoUrl || null;

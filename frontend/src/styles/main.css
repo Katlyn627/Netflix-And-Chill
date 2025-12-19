@@ -271,6 +271,27 @@ header h1 {
     font-size: 0.75em;
 }
 
+.paramount-logo {
+    background: #0064FF;
+    font-family: 'Arial', sans-serif;
+}
+
+.peacock-logo {
+    background: #000000;
+    font-size: 1.2em;
+}
+
+.sling-logo {
+    background: #0047BB;
+    font-family: 'Arial Black', sans-serif;
+}
+
+.other-logo {
+    background: #666666;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1.5em;
+}
+
 .service-name {
     font-weight: 600;
     color: #333;
@@ -452,6 +473,51 @@ footer {
     padding: 5px 12px;
     border-radius: 15px;
     margin: 5px;
+    font-size: 0.9em;
+}
+
+/* Services Display Grid for Profile View */
+.services-display-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.service-display-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.service-display-item:hover {
+    background: #e8e8e8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-display-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1em;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.service-display-name {
+    font-weight: 600;
+    color: #333;
     font-size: 0.9em;
 }
 
