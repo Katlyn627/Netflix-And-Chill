@@ -197,11 +197,27 @@ class ProfileView {
     renderQuizResponses() {
         const quiz = this.userData.quizResponses || {};
         const quizContainer = document.getElementById('quiz-responses');
+        const responseCount = Object.keys(quiz).length;
         
-        if (Object.keys(quiz).length > 0) {
-            quizContainer.innerHTML = '<p><strong>Quiz completed!</strong> Your responses help match you with compatible users.</p>';
+        if (responseCount > 0) {
+            const completionPercentage = Math.round((responseCount / 50) * 100);
+            const completionStatus = responseCount === 50 ? '✅ Fully completed!' : `📝 ${responseCount}/50 questions answered`;
+            
+            quizContainer.innerHTML = `
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <p style="margin: 0 0 10px 0;"><strong>${completionStatus}</strong></p>
+                    <div style="background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${completionPercentage}%;"></div>
+                    </div>
+                    <p style="margin: 10px 0 0 0; font-size: 0.9em; color: #666;">
+                        ${responseCount === 50 
+                            ? 'Your quiz responses are being used to find your best matches!' 
+                            : `Answer ${50 - responseCount} more questions to maximize your match quality.`}
+                    </p>
+                </div>
+            `;
         } else {
-            quizContainer.innerHTML = '<em id="no-quiz-responses">No quiz responses yet.</em>';
+            quizContainer.innerHTML = '<em id="no-quiz-responses">No quiz responses yet. Take the quiz to improve your matches!</em>';
         }
     }
 
@@ -336,6 +352,22 @@ class ProfileView {
         document.getElementById('quiz-form').addEventListener('submit', (e) => {
             e.preventDefault();
             this.submitQuiz();
+        });
+
+        // Edit basic info button
+        document.getElementById('edit-basic-info-btn').addEventListener('click', () => {
+            this.showBasicInfoEditModal();
+        });
+
+        // Cancel basic info edit
+        document.getElementById('cancel-basic-info-edit-btn').addEventListener('click', () => {
+            document.getElementById('edit-basic-info-modal').style.display = 'none';
+        });
+
+        // Submit basic info form
+        document.getElementById('edit-basic-info-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveBasicInfo();
         });
 
         // Change password button
@@ -588,6 +620,11 @@ class ProfileView {
     }
 
     showQuizModal() {
+        // Initialize quiz questions if not already done
+        if (typeof window.QuizModule !== 'undefined') {
+            window.QuizModule.initializeQuiz();
+        }
+        
         const quiz = this.userData.quizResponses || {};
         
         // Pre-fill existing responses
@@ -680,6 +717,58 @@ class ProfileView {
         } catch (error) {
             console.error('Error changing password:', error);
             alert('Failed to update password: ' + error.message);
+        }
+    }
+
+    showBasicInfoEditModal() {
+        const user = this.userData;
+        
+        document.getElementById('edit-age').value = user.age || '';
+        document.getElementById('edit-location').value = user.location || '';
+        document.getElementById('edit-gender').value = user.gender || '';
+        document.getElementById('edit-sexual-orientation').value = user.sexualOrientation || '';
+
+        document.getElementById('edit-basic-info-modal').style.display = 'flex';
+    }
+
+    async saveBasicInfo() {
+        const age = parseInt(document.getElementById('edit-age').value);
+        const location = document.getElementById('edit-location').value.trim();
+        const gender = document.getElementById('edit-gender').value;
+        const sexualOrientation = document.getElementById('edit-sexual-orientation').value;
+
+        if (!age || age < 18 || age > 120) {
+            alert('Please enter a valid age (18-120)');
+            return;
+        }
+
+        if (!location) {
+            alert('Please enter your location');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/profile-details`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    age,
+                    location,
+                    gender,
+                    sexualOrientation
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to save basic info');
+
+            this.userData = (await response.json()).user;
+            this.renderProfile();
+            
+            document.getElementById('edit-basic-info-modal').style.display = 'none';
+            alert('Basic information updated successfully!');
+        } catch (error) {
+            console.error('Error saving basic info:', error);
+            alert('Failed to save basic information. Please try again.');
         }
     }
 
