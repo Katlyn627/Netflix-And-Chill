@@ -803,3 +803,49 @@
         width: 100%;
     }
 }
+
+/* Quiz Compatibility Section */
+.quiz-compatibility-section {
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.1), rgba(255, 107, 107, 0.1));
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(229, 9, 20, 0.3);
+    margin: 20px 0;
+}
+
+.quiz-compatibility-section h4 {
+    margin-bottom: 15px;
+    color: #E50914;
+}
+
+.compatibility-bar-container {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    height: 30px;
+    margin: 15px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.compatibility-bar {
+    background: linear-gradient(90deg, #E50914, #FF6B6B);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+}
+
+.compatibility-score {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #E50914;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.compatibility-text {
+    text-align: center;
+    color: #ccc;
+    font-size: 0.95em;
+}
+

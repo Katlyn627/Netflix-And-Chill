@@ -261,6 +261,18 @@ function showMatchDetails(index) {
            </div>`
         : '';
     
+    // Add quiz compatibility section
+    const quizCompatibilityHtml = match.quizCompatibility && match.quizCompatibility > 0
+        ? `<div class="detail-section quiz-compatibility-section">
+            <h4>🎯 Quiz Compatibility</h4>
+            <div class="compatibility-bar-container">
+                <div class="compatibility-bar" style="width: ${(match.quizCompatibility / 50) * 100}%"></div>
+            </div>
+            <p class="compatibility-score">${Math.round((match.quizCompatibility / 50) * 100)}% quiz match</p>
+            <p class="compatibility-text">You both answered ${match.quizCompatibility > 40 ? 'most' : match.quizCompatibility > 25 ? 'many' : 'some'} questions similarly!</p>
+           </div>`
+        : '';
+    
     // Create or update modal
     let modal = document.getElementById('match-details-modal');
     if (!modal) {
@@ -292,6 +304,7 @@ function showMatchDetails(index) {
                         <p><strong>Location:</strong> ${location}</p>
                         <p><strong>Bio:</strong> ${bio}</p>
                     </div>
+                    ${quizCompatibilityHtml}
                     ${streamingServicesHtml}
                     ${sharedContentHtml}
                 </div>

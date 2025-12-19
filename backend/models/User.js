@@ -27,6 +27,8 @@ class User {
     this.superLikes = data.superLikes || [];
     this.leastFavoriteMovies = data.leastFavoriteMovies || [];
     this.movieDebateTopics = data.movieDebateTopics || [];
+    this.movieDebateResponses = data.movieDebateResponses || {}; // New: Debate responses
+    this.moviePromptResponses = data.moviePromptResponses || {}; // New: Prompt responses
     this.favoriteSnacks = data.favoriteSnacks || [];
     this.quizResponses = data.quizResponses || {};
     this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
@@ -215,6 +217,8 @@ class User {
       superLikes: this.superLikes,
       leastFavoriteMovies: this.leastFavoriteMovies,
       movieDebateTopics: this.movieDebateTopics,
+      movieDebateResponses: this.movieDebateResponses,
+      moviePromptResponses: this.moviePromptResponses,
       favoriteSnacks: this.favoriteSnacks,
       quizResponses: this.quizResponses,
       videoChatPreference: this.videoChatPreference,
