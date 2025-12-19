@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#141414"/>
+  
+  <!-- Main illustration - Chat & Watch Together -->
+  <circle cx="150" cy="150" r="60" fill="#E50914" opacity="0.2"/>
+  <circle cx="250" cy="150" r="60" fill="#E50914" opacity="0.2"/>
+  
+  <!-- TV screens -->
+  <rect x="110" y="120" width="80" height="60" rx="4" fill="#E50914"/>
+  <rect x="115" y="125" width="70" height="50" fill="#000000"/>
+  <rect x="210" y="120" width="80" height="60" rx="4" fill="#E50914"/>
+  <rect x="215" y="125" width="70" height="50" fill="#000000"/>
+  
+  <!-- Play buttons -->
+  <polygon points="145,145 145,160 158,152.5" fill="#FFFFFF"/>
+  <polygon points="245,145 245,160 258,152.5" fill="#FFFFFF"/>
+  
+  <!-- Chat bubbles -->
+  <ellipse cx="150" cy="220" rx="50" ry="30" fill="#FFFFFF" opacity="0.9"/>
+  <ellipse cx="250" cy="240" rx="50" ry="30" fill="#FFFFFF" opacity="0.9"/>
+  
+  <!-- Heart icon connecting them -->
+  <path d="M200 200 Q200 180 215 180 Q230 180 230 195 Q230 210 200 230 Q170 210 170 195 Q170 180 185 180 Q200 180 200 200 Z" fill="#E50914"/>
+  
+  <!-- Text -->
+  <text x="200" y="310" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Chat &amp; Watch</text>
+  <text x="200" y="345" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#E50914" text-anchor="middle">Together</text>
+</svg>
