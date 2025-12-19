@@ -30,7 +30,7 @@ class MongoDBAdapter {
           '   DB_TYPE=mongodb\n' +
           '   MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/netflix-and-chill?retryWrites=true&w=majority\n\n' +
           '3. Replace YOUR_USERNAME, YOUR_PASSWORD, and YOUR_CLUSTER with your actual MongoDB Atlas credentials\n\n' +
-          'See MONGODB_SETUP.md for detailed setup instructions.\n\n' +
+          'See MONGODB_CONNECTION_SETUP.md for detailed setup instructions.\n\n' +
           'Alternatively, you can use the file-based database by setting:\n' +
           '   DB_TYPE=file\n' +
           'or by not setting DB_TYPE at all (defaults to file).'
@@ -61,7 +61,7 @@ class MongoDBAdapter {
           '- You have replaced placeholder values with real credentials\n' +
           '- Your MongoDB Atlas cluster is active\n' +
           '- You have internet connectivity\n\n' +
-          'See MONGODB_SETUP.md for detailed setup instructions.\n\n' +
+          'See MONGODB_CONNECTION_SETUP.md for detailed setup instructions.\n\n' +
           'Original error: ' + error.message
         );
       } else if (error.message.includes('ECONNREFUSED')) {
@@ -71,7 +71,7 @@ class MongoDBAdapter {
             'This error means MongoDB is not running on localhost:27017.\n\n' +
             'To use MongoDB, you have two options:\n\n' +
             '1. Use MongoDB Atlas (cloud-hosted - recommended):\n' +
-            '   - Follow the setup guide in MONGODB_SETUP.md\n' +
+            '   - Follow the setup guide in MONGODB_CONNECTION_SETUP.md\n' +
             '   - Update your .env file with your Atlas connection string\n\n' +
             '2. Install and run MongoDB locally:\n' +
             '   - Install MongoDB Community Edition\n' +
