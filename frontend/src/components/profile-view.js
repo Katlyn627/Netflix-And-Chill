@@ -48,6 +48,8 @@ class ProfileView {
         document.getElementById('profile-username').textContent = user.username;
         document.getElementById('profile-age').textContent = user.age || 'N/A';
         document.getElementById('profile-location').textContent = user.location || 'N/A';
+        document.getElementById('profile-gender').textContent = user.gender || 'N/A';
+        document.getElementById('profile-sexual-orientation').textContent = user.sexualOrientation || 'N/A';
         document.getElementById('profile-bio').textContent = user.bio || 'No bio added yet.';
 
         // User email in account settings
@@ -856,7 +858,7 @@ class ProfileView {
             resultDiv.addEventListener('click', async () => {
                 // Fetch detailed information from TMDB to ensure accuracy
                 try {
-                    searchResults.innerHTML = '<div style="padding: 10px;">Loading details...</div>';
+                    container.innerHTML = '<div style="padding: 10px;">Loading details...</div>';
                     const details = await api.getContentDetails(movie.id, 'movie');
                     onSelect(details);
                 } catch (error) {
@@ -1054,7 +1056,7 @@ class ProfileView {
             resultDiv.addEventListener('click', async () => {
                 // Fetch detailed information from TMDB to ensure accuracy
                 try {
-                    searchResults.innerHTML = '<div style="padding: 10px;">Loading details...</div>';
+                    container.innerHTML = '<div style="padding: 10px;">Loading details...</div>';
                     const details = await api.getContentDetails(item.id, item.type);
                     onSelect(details);
                 } catch (error) {
