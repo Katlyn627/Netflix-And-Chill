@@ -11,4 +11,7 @@ build/
 # Ignore uploaded user images but keep the directory
 frontend/assets/uploads/*
 !frontend/assets/uploads/.gitkeep
+# Ignore test credentials files
+TEST_CREDENTIALS.md
+TEST_CREDENTIALS.json
 

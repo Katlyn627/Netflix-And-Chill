@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "node backend/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node backend/scripts/seedUsers.js",
+    "seed:count": "node backend/scripts/seedUsers.js --count",
+    "seed:mongodb": "DB_TYPE=mongodb node backend/scripts/seedUsers.js"
   },
   "keywords": [
     "dating",
