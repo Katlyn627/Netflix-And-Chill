@@ -1,14 +1,8 @@
 # MongoDB Connection Setup
 
-This project is now configured to connect to MongoDB Atlas cluster.
+This project can be configured to connect to MongoDB Atlas cluster.
 
 ## Quick Setup
-
-The MongoDB connection string has been configured:
-
-```
-mongodb+srv://katlynboches_db_user:rtZPzfsrDNMSQ4mQ@cluster0.ipameo2.mongodb.net/netflix-and-chill
-```
 
 ### Option 1: Automated Setup (Recommended)
 
@@ -19,33 +13,52 @@ Run the setup script:
 ```
 
 This will:
-1. Create the `.env` file with MongoDB configuration
-2. Test the connection
-3. Seed the database with 100 fake users
+1. Create the `.env` file with MongoDB configuration template
+2. Prompt you to enter your MongoDB connection string
+3. Test the connection
+4. Seed the database with 100 fake users
 
 ### Option 2: Manual Setup
 
-1. Copy the MongoDB configuration:
+1. Copy the MongoDB configuration template:
    ```bash
    cp .env.mongodb.example .env
    ```
 
-2. Seed the database:
+2. Edit `.env` and replace the placeholder values:
+   ```
+   MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/netflix-and-chill?retryWrites=true&w=majority
+   ```
+   
+   Replace:
+   - `YOUR_USERNAME` with your MongoDB Atlas username
+   - `YOUR_PASSWORD` with your MongoDB Atlas password  
+   - `YOUR_CLUSTER` with your cluster URL (e.g., `cluster0.xxxxx.mongodb.net`)
+
+3. Seed the database:
    ```bash
    npm run seed
    ```
 
-3. Start the server:
+4. Start the server:
    ```bash
    npm start
    ```
 
+## Getting MongoDB Atlas Credentials
+
+1. Log into [MongoDB Atlas](https://cloud.mongodb.com)
+2. Select your cluster
+3. Click **"Connect"**
+4. Choose **"Connect your application"**
+5. Copy the connection string
+6. Replace `<password>` with your database user password
+7. Add `/netflix-and-chill` after the cluster URL to specify the database name
+
 ## Connection Details
 
 - **Database Type**: MongoDB Atlas (Cloud)
-- **Cluster**: cluster0.ipameo2.mongodb.net
 - **Database Name**: netflix-and-chill
-- **Username**: katlynboches_db_user
 - **Collections**: users, matches, likes, chats
 
 ## Troubleshooting
