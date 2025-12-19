@@ -1,8 +1,6 @@
 # Onboarding Assets
 
-This directory contains documentation for the visual assets used in the Netflix & Chill app onboarding flow.
-
-**Note**: The actual image files are located in `frontend/assets/onboarding/` for web serving purposes. This directory contains the documentation and guidelines.
+This directory contains the visual assets used in the Netflix & Chill app onboarding flow.
 
 ## Brand Kit
 
