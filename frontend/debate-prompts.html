@@ -371,7 +371,13 @@
             const value = textarea.value.trim();
             
             if (!value) {
-                alert('Please enter a response before saving.');
+                // Show inline error instead of alert
+                textarea.style.borderColor = '#E50914';
+                textarea.placeholder = 'Please enter a response before saving.';
+                setTimeout(() => {
+                    textarea.style.borderColor = '';
+                    textarea.placeholder = 'Share your opinion on this debate...';
+                }, 3000);
                 return;
             }
             
@@ -397,7 +403,13 @@
             const value = textarea.value.trim();
             
             if (!value) {
-                alert('Please enter an answer before saving.');
+                // Show inline error instead of alert
+                textarea.style.borderColor = '#E50914';
+                textarea.placeholder = 'Please enter an answer before saving.';
+                setTimeout(() => {
+                    textarea.style.borderColor = '';
+                    textarea.placeholder = 'Your answer...';
+                }, 3000);
                 return;
             }
             
