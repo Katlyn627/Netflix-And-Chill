@@ -41,6 +41,7 @@
                         <p id="profile-details"><strong>Age:</strong> <span id="profile-age"></span> | <strong>Location:</strong> <span id="profile-location"></span></p>
                         <p id="profile-gender-orientation"><strong>Gender:</strong> <span id="profile-gender"></span> | <strong>Sexual Orientation:</strong> <span id="profile-sexual-orientation"></span></p>
                         <p id="profile-bio" style="font-style: italic;"></p>
+                        <button id="edit-basic-info-btn" class="btn btn-secondary" style="margin-top: 10px;">Edit Basic Info</button>
                     </div>
                 </div>
             </section>
@@ -131,7 +132,7 @@
                     <em id="no-quiz-responses">No quiz responses yet.</em>
                 </div>
 
-                <button id="take-quiz-btn" class="btn btn-primary">Take Quiz</button>
+                <button id="take-quiz-btn" class="btn btn-primary">Take/Update Quiz</button>
             </section>
 
             <!-- Streaming Services Section -->
@@ -334,71 +335,21 @@
 
             <!-- Quiz Modal -->
             <div id="quiz-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <h2>Compatibility Quiz</h2>
-                    <p>Answer these questions to find better matches!</p>
+                <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+                    <h2>Compatibility Quiz (50 Questions)</h2>
+                    <p>Answer all questions to find your best matches!</p>
+                    <div id="quiz-progress" style="margin: 15px 0;">
+                        <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden;">
+                            <div id="quiz-progress-bar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                        <p id="quiz-progress-text" style="text-align: center; margin-top: 5px; font-size: 0.9em; color: #666;">0 of 50 questions answered</p>
+                    </div>
                     <form id="quiz-form">
-                        <div class="form-group">
-                            <label>Do you prefer subtitles or dubbing for foreign films?</label>
-                            <select name="q1">
-                                <option value="">Select...</option>
-                                <option value="subtitles">Subtitles</option>
-                                <option value="dubbing">Dubbing</option>
-                                <option value="no_preference">No preference</option>
-                            </select>
+                        <div id="quiz-questions-container">
+                            <!-- Questions will be dynamically loaded here by quiz.js -->
                         </div>
 
-                        <div class="form-group">
-                            <label>What's your ideal movie length?</label>
-                            <select name="q2">
-                                <option value="">Select...</option>
-                                <option value="under_90">Under 90 minutes</option>
-                                <option value="90_120">90-120 minutes</option>
-                                <option value="over_120">Over 2 hours - the longer the better!</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>How do you feel about movie spoilers?</label>
-                            <select name="q3">
-                                <option value="">Select...</option>
-                                <option value="hate">Absolutely hate them</option>
-                                <option value="dont_mind">Don't mind them</option>
-                                <option value="like">Actually prefer knowing what happens</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Would you rather watch a critically acclaimed film or a fun popcorn movie?</label>
-                            <select name="q4">
-                                <option value="">Select...</option>
-                                <option value="acclaimed">Critically acclaimed</option>
-                                <option value="popcorn">Fun popcorn movie</option>
-                                <option value="both">Both are great!</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Do you talk during movies?</label>
-                            <select name="q5">
-                                <option value="">Select...</option>
-                                <option value="never">Never - absolute silence</option>
-                                <option value="sometimes">Sometimes - for commentary</option>
-                                <option value="often">Often - I love discussing!</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>How many times will you rewatch your favorite movie?</label>
-                            <select name="q6">
-                                <option value="">Select...</option>
-                                <option value="once">Once is enough</option>
-                                <option value="few">A few times</option>
-                                <option value="infinite">Infinite times!</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Submit Answers</button>
+                        <button type="submit" id="submit-quiz-btn" class="btn btn-primary" disabled>Complete Quiz (50 remaining)</button>
                         <button type="button" id="cancel-quiz-btn" class="btn btn-secondary">Cancel</button>
                     </form>
                 </div>
@@ -439,6 +390,52 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Edit Basic Info Modal -->
+            <div id="edit-basic-info-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Edit Basic Information</h2>
+                    <form id="edit-basic-info-form">
+                        <div class="form-group">
+                            <label for="edit-age">Age:</label>
+                            <input type="number" id="edit-age" min="18" max="120" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-location">Location:</label>
+                            <input type="text" id="edit-location" placeholder="City, State" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-gender">Gender:</label>
+                            <select id="edit-gender">
+                                <option value="">Select...</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-sexual-orientation">Sexual Orientation:</label>
+                            <select id="edit-sexual-orientation">
+                                <option value="">Select...</option>
+                                <option value="straight">Straight</option>
+                                <option value="gay">Gay</option>
+                                <option value="lesbian">Lesbian</option>
+                                <option value="bisexual">Bisexual</option>
+                                <option value="pansexual">Pansexual</option>
+                                <option value="asexual">Asexual</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" id="cancel-basic-info-edit-btn" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
         </main>
 
         <footer>
@@ -448,6 +445,7 @@
 
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
+    <script src="src/components/quiz.js"></script>
     <script src="src/components/profile-view.js"></script>
 </body>
 </html>

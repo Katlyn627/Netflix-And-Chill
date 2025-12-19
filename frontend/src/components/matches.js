@@ -273,6 +273,45 @@ function showMatchDetails(index) {
            </div>`
         : '';
     
+    // Add text prompts section (debate responses and movie prompts)
+    const debateResponses = match.user.movieDebateResponses || {};
+    const moviePrompts = match.user.moviePromptResponses || {};
+    const hasDebateResponses = Object.keys(debateResponses).length > 0;
+    const hasMoviePrompts = Object.keys(moviePrompts).length > 0;
+    
+    let textPromptsHtml = '';
+    if (hasDebateResponses || hasMoviePrompts) {
+        textPromptsHtml = '<div class="detail-section text-prompts-section">';
+        
+        if (hasDebateResponses) {
+            const debateEntries = Object.entries(debateResponses).slice(0, 3); // Show first 3
+            textPromptsHtml += `
+                <h4>💬 Movie Debates</h4>
+                ${debateEntries.map(([topic, response]) => `
+                    <div style="background: #f5f5f5; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                        <strong style="color: #667eea;">${escapeHtml(topic)}</strong>
+                        <p style="margin: 8px 0 0 0; font-size: 0.95em;">${escapeHtml(response)}</p>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        if (hasMoviePrompts) {
+            const promptEntries = Object.entries(moviePrompts).slice(0, 3); // Show first 3
+            textPromptsHtml += `
+                <h4 style="margin-top: ${hasDebateResponses ? '15px' : '0'};">🎬 Movie Prompts</h4>
+                ${promptEntries.map(([prompt, response]) => `
+                    <div style="background: #f5f5f5; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                        <strong style="color: #764ba2;">${escapeHtml(prompt)}</strong>
+                        <p style="margin: 8px 0 0 0; font-size: 0.95em;">${escapeHtml(response)}</p>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        textPromptsHtml += '</div>';
+    }
+    
     // Create or update modal
     let modal = document.getElementById('match-details-modal');
     if (!modal) {
@@ -305,6 +344,7 @@ function showMatchDetails(index) {
                         <p><strong>Bio:</strong> ${bio}</p>
                     </div>
                     ${quizCompatibilityHtml}
+                    ${textPromptsHtml}
                     ${streamingServicesHtml}
                     ${sharedContentHtml}
                 </div>
