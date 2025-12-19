@@ -1,6 +1,13 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
+// Helper function to escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Display matches
 function displayMatches(matches) {
     const matchesContainer = document.getElementById('matches-container');
@@ -22,25 +29,28 @@ function displayMatches(matches) {
             
             const matchDescription = match.matchDescription || `${match.matchScore}% Movie Match`;
             const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
+            const username = escapeHtml(match.user.username);
+            const bio = escapeHtml(match.user.bio || 'No bio yet');
+            const location = escapeHtml(match.user.location || 'Not specified');
             
             html += `
                 <div class="match-card">
                     <div class="match-header">
-                        <img src="${profilePhotoUrl}" alt="${match.user.username}" class="match-profile-photo" />
+                        <img src="${profilePhotoUrl}" alt="${username}" class="match-profile-photo" />
                         <div class="match-info">
                             <div class="match-score"><strong>${match.matchScore}%</strong> Match</div>
-                            <h3>${match.user.username}</h3>
+                            <h3>${username}</h3>
                         </div>
                     </div>
                     <div class="match-details">
                         <p><strong>Age:</strong> ${match.user.age}</p>
-                        <p><strong>Location:</strong> ${match.user.location || 'Not specified'}</p>
-                        <p><strong>Bio:</strong> ${match.user.bio || 'No bio yet'}</p>
-                        <p><strong>Streaming Services:</strong> ${match.user.streamingServices.map(s => s.name).join(', ')}</p>
+                        <p><strong>Location:</strong> ${location}</p>
+                        <p><strong>Bio:</strong> ${bio}</p>
+                        <p><strong>Streaming Services:</strong> ${match.user.streamingServices.map(s => escapeHtml(s.name)).join(', ')}</p>
                     </div>
                     ${sharedContentHtml}
                     <div class="match-actions">
-                        <button class="btn btn-chat" onclick="openChat('${match.user.id}', '${match.user.username}')">💬 Start Chat</button>
+                        <button class="btn btn-chat" onclick="openChat('${match.user.id}', '${username}')">💬 Start Chat</button>
                     </div>
                 </div>
             `;
@@ -107,6 +117,7 @@ function openChat(matchUserId, matchUsername) {
 }
 
 function showChatModal(matchUserId, matchUsername) {
+    const safeUsername = escapeHtml(matchUsername);
     // Create modal if it doesn't exist
     let modal = document.getElementById('chat-modal');
     if (!modal) {
@@ -116,12 +127,12 @@ function showChatModal(matchUserId, matchUsername) {
         modal.innerHTML = `
             <div class="modal-content chat-modal-content">
                 <div class="chat-header">
-                    <h3>Chat with ${matchUsername}</h3>
+                    <h3>Chat with ${safeUsername}</h3>
                     <button class="close-modal" onclick="closeChatModal()">&times;</button>
                 </div>
                 <div class="chat-messages" id="chat-messages">
                     <div class="chat-welcome">
-                        <p>Start chatting with ${matchUsername}!</p>
+                        <p>Start chatting with ${safeUsername}!</p>
                         <p class="chat-hint">Share your thoughts about movies and shows you both love! 🎬</p>
                     </div>
                 </div>
@@ -157,9 +168,10 @@ async function loadChatMessages(matchUserId) {
             let html = '';
             response.messages.forEach(msg => {
                 const isSent = msg.senderId === currentUserId;
+                const safeMessage = escapeHtml(msg.message);
                 html += `
                     <div class="chat-message ${isSent ? 'sent' : 'received'}">
-                        <div class="message-content">${msg.message}</div>
+                        <div class="message-content">${safeMessage}</div>
                         <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
                     </div>
                 `;
@@ -193,8 +205,9 @@ async function sendMessage(matchUserId) {
         
         const messageDiv = document.createElement('div');
         messageDiv.className = 'chat-message sent';
+        const safeMessage = escapeHtml(message);
         messageDiv.innerHTML = `
-            <div class="message-content">${message}</div>
+            <div class="message-content">${safeMessage}</div>
             <div class="message-time">${new Date().toLocaleTimeString()}</div>
         `;
         messagesContainer.appendChild(messageDiv);
