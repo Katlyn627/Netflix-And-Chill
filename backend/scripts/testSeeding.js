@@ -24,6 +24,8 @@ async function testSeeding() {
     console.log('👥 Creating 5 test users...');
     const users = [];
     for (let i = 0; i < 5; i++) {
+      // Note: Passing empty arrays for movies/tvShows means users will have empty watch history
+      // and favorites, which is intentional for this basic test focused on gender/filter fields
       const user = await createFakeUser(i, [], [], fallbackGenres, fallbackProviders);
       users.push(user);
       console.log(`  ✓ User ${i + 1}: ${user.username} (${user.gender}, ${user.sexualOrientation})`);

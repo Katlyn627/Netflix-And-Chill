@@ -253,9 +253,29 @@ class UserController {
         user.preferences.locationRadius = locationRadius;
       }
       if (genderPreference !== undefined) {
+        // Validate genderPreference is an array
+        if (!Array.isArray(genderPreference)) {
+          return res.status(400).json({ error: 'Gender preference must be an array' });
+        }
+        // Validate gender values
+        const validGenders = ['male', 'female', 'non-binary', 'other', 'any'];
+        const invalidGenders = genderPreference.filter(g => !validGenders.includes(g));
+        if (invalidGenders.length > 0) {
+          return res.status(400).json({ error: `Invalid gender preference values: ${invalidGenders.join(', ')}` });
+        }
         user.preferences.genderPreference = genderPreference;
       }
       if (sexualOrientationPreference !== undefined) {
+        // Validate sexualOrientationPreference is an array
+        if (!Array.isArray(sexualOrientationPreference)) {
+          return res.status(400).json({ error: 'Sexual orientation preference must be an array' });
+        }
+        // Validate orientation values
+        const validOrientations = ['straight', 'gay', 'lesbian', 'bisexual', 'pansexual', 'asexual', 'other', 'any'];
+        const invalidOrientations = sexualOrientationPreference.filter(o => !validOrientations.includes(o));
+        if (invalidOrientations.length > 0) {
+          return res.status(400).json({ error: `Invalid sexual orientation preference values: ${invalidOrientations.join(', ')}` });
+        }
         user.preferences.sexualOrientationPreference = sexualOrientationPreference;
       }
 
@@ -374,6 +394,22 @@ class UserController {
       }
 
       const user = new User(userData);
+
+      // Validate gender if provided
+      if (updates.gender !== undefined) {
+        const validGenders = ['male', 'female', 'non-binary', 'other', ''];
+        if (!validGenders.includes(updates.gender)) {
+          return res.status(400).json({ error: `Invalid gender value. Must be one of: ${validGenders.join(', ')}` });
+        }
+      }
+
+      // Validate sexual orientation if provided
+      if (updates.sexualOrientation !== undefined) {
+        const validOrientations = ['straight', 'gay', 'lesbian', 'bisexual', 'pansexual', 'asexual', 'other', ''];
+        if (!validOrientations.includes(updates.sexualOrientation)) {
+          return res.status(400).json({ error: `Invalid sexual orientation value. Must be one of: ${validOrientations.join(', ')}` });
+        }
+      }
 
       // Update allowed fields
       const allowedFields = [

@@ -104,7 +104,7 @@ async function testGenderFilters() {
     const updatedPreferences = {
       ...retrievedUser.preferences,
       genderPreference: ['female'],
-      sexualOrientationPreference: ['any'],
+      sexualOrientationPreference: ['straight', 'bisexual', 'pansexual'],
       locationRadius: 100
     };
     
