@@ -21,7 +21,7 @@ class UserController {
 
   async createUser(req, res) {
     try {
-      const { username, email, password, age, location, bio } = req.body;
+      const { username, email, password, age, location, bio, gender, sexualOrientation } = req.body;
 
       if (!username || !email || !password) {
         return res.status(400).json({ error: 'Username, email, and password are required' });
@@ -41,7 +41,9 @@ class UserController {
         password, // In production, this should be hashed
         age,
         location,
-        bio
+        bio,
+        gender,
+        sexualOrientation
       };
 
       const user = new User(userData);
@@ -228,7 +230,7 @@ class UserController {
   async updatePreferences(req, res) {
     try {
       const { userId } = req.params;
-      const { genres, bingeWatchCount, ageRange, locationRadius } = req.body;
+      const { genres, bingeWatchCount, ageRange, locationRadius, genderPreference, sexualOrientationPreference } = req.body;
 
       const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
@@ -249,6 +251,12 @@ class UserController {
       }
       if (locationRadius !== undefined) {
         user.preferences.locationRadius = locationRadius;
+      }
+      if (genderPreference !== undefined) {
+        user.preferences.genderPreference = genderPreference;
+      }
+      if (sexualOrientationPreference !== undefined) {
+        user.preferences.sexualOrientationPreference = sexualOrientationPreference;
       }
 
       await this.saveUserData(userId, user);
@@ -372,7 +380,11 @@ class UserController {
         'leastFavoriteMovies',
         'movieDebateTopics',
         'favoriteSnacks',
-        'videoChatPreference'
+        'videoChatPreference',
+        'gender',
+        'sexualOrientation',
+        'location',
+        'age'
       ];
 
       allowedFields.forEach(field => {
