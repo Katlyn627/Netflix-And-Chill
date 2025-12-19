@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Together - Netflix and Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E50914">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/watch-together.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-icons">
+                <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
+                <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
+                <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
+                    <span id="profile-nav-icon">👤</span>
+                </a>
+                <a href="debate-prompts.html" class="nav-icon-btn" title="Debate & Prompts">💬</a>
+                <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
+            </div>
+            <div class="logo-banner">
+                <h1>NETFLIX & CHILL</h1>
+            </div>
+            <p class="tagline">Watch Together Experience</p>
+        </header>
+
+        <main>
+            <!-- Create Invitation Section -->
+            <section id="create-invitation-section" class="card">
+                <h2>🎬 Invite Someone to Watch Together</h2>
+                <p style="color: #888; margin-bottom: 20px;">
+                    Schedule a watch party with your matches using third-party platforms. 
+                    The app will help you coordinate and provide instructions.
+                </p>
+
+                <form id="invitation-form">
+                    <div class="form-group">
+                        <label for="invite-match">Select Match:</label>
+                        <select id="invite-match" required>
+                            <option value="">Choose a match...</option>
+                        </select>
+                        <p class="input-hint">Select who you want to invite for a watch party</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watch-platform">Platform:</label>
+                        <select id="watch-platform" required>
+                            <option value="">Choose a platform...</option>
+                            <option value="teleparty">Teleparty (Netflix Party)</option>
+                            <option value="amazon-prime">Amazon Prime Watch Party</option>
+                            <option value="disney-plus">Disney+ GroupWatch</option>
+                            <option value="scener">Scener</option>
+                            <option value="zoom">Zoom (Screen Share)</option>
+                        </select>
+                        <p class="input-hint">Select the platform you'll use for watching together</p>
+                    </div>
+
+                    <div id="platform-info" class="platform-info" style="display: none;">
+                        <!-- Platform-specific information will be displayed here -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movie-selection">Movie/Show (Optional):</label>
+                        <select id="movie-selection">
+                            <option value="">Select from your favorites or watch history...</option>
+                        </select>
+                        <p class="input-hint">Choose what you want to watch together</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watch-date">Date:</label>
+                        <input type="date" id="watch-date" required>
+                        <p class="input-hint">When do you want to watch?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watch-time">Time:</label>
+                        <input type="time" id="watch-time" required>
+                        <p class="input-hint">What time should you start?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="join-link">Join Link (Optional):</label>
+                        <input type="url" id="join-link" placeholder="You can add this later after creating the party">
+                        <p class="input-hint">Add the party link if you've already created it on the platform</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Watch Invitation</button>
+                </form>
+            </section>
+
+            <!-- My Invitations Section -->
+            <section id="my-invitations-section" class="card">
+                <h2>📬 My Watch Invitations</h2>
+                
+                <div class="invitation-tabs">
+                    <button class="tab-btn active" data-tab="sent">Sent</button>
+                    <button class="tab-btn" data-tab="received">Received</button>
+                </div>
+
+                <div id="sent-invitations" class="invitation-list">
+                    <p class="empty-message">No invitations sent yet</p>
+                </div>
+
+                <div id="received-invitations" class="invitation-list" style="display: none;">
+                    <p class="empty-message">No invitations received yet</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Invitation Details Modal -->
+        <div id="invitation-modal" class="modal" style="display: none;">
+            <div class="modal-content invitation-modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Watch Invitation Details</h3>
+                    <button class="close-modal" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Invitation details will be displayed here -->
+                </div>
+                <div class="modal-footer">
+                    <button id="add-to-calendar-btn" class="btn btn-secondary">📅 Add to Calendar</button>
+                    <button id="copy-details-btn" class="btn btn-secondary">📋 Copy Details</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Watch together with your matches</p>
+        </footer>
+    </div>
+
+    <script src="src/services/api.js"></script>
+    <script src="src/utils/navigation.js"></script>
+    <script src="src/components/watch-together.js"></script>
+</body>
+</html>
