@@ -224,16 +224,19 @@ function generateVideoChatPreference() {
 }
 
 /**
- * Generate quiz responses
+ * Generate quiz responses for all 50 questions
  */
 function generateQuizResponses() {
-  return {
-    watchAlone: randomItem(['Always', 'Sometimes', 'Rarely', 'Never']),
-    pauseForSnacks: randomItem(['Yes', 'No', 'Depends']),
-    spoilerTolerance: randomItem(['Love them', 'Hate them', 'Neutral']),
-    criticalViewer: randomItem(['Very critical', 'Somewhat critical', 'Not critical']),
-    rewatch: randomItem(['Often', 'Sometimes', 'Rarely', 'Never'])
-  };
+  const { QUIZ_QUESTIONS } = require('../constants/quizQuestions');
+  const responses = {};
+  
+  QUIZ_QUESTIONS.forEach(question => {
+    // Randomly select an option value from the question's options
+    const selectedOption = randomItem(question.options);
+    responses[question.id] = selectedOption.value;
+  });
+  
+  return responses;
 }
 
 /**
