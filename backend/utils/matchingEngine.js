@@ -467,7 +467,13 @@ class MatchingEngine {
             otherUser.id,
             matchResult.score,
             matchResult.sharedContent,
-            matchResult.matchDescription
+            matchResult.matchDescription,
+            {
+              quizCompatibility: matchResult.quizCompatibility,
+              snackCompatibility: matchResult.snackCompatibility,
+              debateCompatibility: matchResult.debateCompatibility,
+              emotionalToneCompatibility: matchResult.emotionalToneCompatibility
+            }
           ));
         }
       }

@@ -59,6 +59,10 @@ class MatchController {
             matchScore: match.matchScore,
             matchDescription: match.matchDescription,
             sharedContent: match.sharedContent,
+            quizCompatibility: match.quizCompatibility,
+            snackCompatibility: match.snackCompatibility,
+            debateCompatibility: match.debateCompatibility,
+            emotionalToneCompatibility: match.emotionalToneCompatibility,
             user: {
               id: matchedUser.id,
               username: matchedUser.username,
@@ -69,7 +73,9 @@ class MatchController {
               bio: matchedUser.bio,
               profilePicture: matchedUser.profilePicture,
               photoGallery: matchedUser.photoGallery,
-              streamingServices: matchedUser.streamingServices
+              streamingServices: matchedUser.streamingServices,
+              movieDebateResponses: matchedUser.movieDebateResponses,
+              moviePromptResponses: matchedUser.moviePromptResponses
             }
           };
         })
