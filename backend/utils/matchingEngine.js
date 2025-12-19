@@ -178,6 +178,7 @@ class MatchingEngine {
 
   /**
    * Calculate compatibility based on quiz responses
+   * With the expanded 50-question quiz, this is a major compatibility factor
    * @param {User} user1 
    * @param {User} user2 
    * @returns {number} Compatibility score from quiz
@@ -196,9 +197,10 @@ class MatchingEngine {
       }
     });
 
-    // Award up to 30 points for quiz compatibility (increased from 20)
-    // Quiz is now more important as it reflects viewing style compatibility
-    const compatibilityScore = (matches / commonQuestions.length) * 30;
+    // Award up to 50 points for quiz compatibility (increased from 30)
+    // With 50 detailed questions, quiz is now the most important compatibility factor
+    // This rewards users who take the time to complete the full quiz
+    const compatibilityScore = (matches / commonQuestions.length) * 50;
     return compatibilityScore;
   }
 

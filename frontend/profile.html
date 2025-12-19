@@ -349,73 +349,24 @@
 
             <!-- Compatibility Quiz Section -->
             <section id="compatibility-quiz" class="card" style="display: none;">
-                <h2>Compatibility Quiz</h2>
-                <p>Answer these questions to help us find your perfect match!</p>
+                <h2>🎬 Movie Compatibility Quiz</h2>
+                <p>Answer 50 questions to help us find your perfect binge-watching partner!</p>
+                <div id="quiz-progress" style="margin: 20px 0;">
+                    <div style="background: #333; border-radius: 10px; overflow: hidden; height: 20px;">
+                        <div id="quiz-progress-bar" style="background: linear-gradient(90deg, #E50914, #FF6B6B); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 5px; color: #888;">
+                        <span id="quiz-progress-text">0 of 50 questions answered</span>
+                    </p>
+                </div>
                 <form id="compatibility-quiz-form">
-                    <div class="form-group">
-                        <label>Do you prefer subtitles or dubbing for foreign films?</label>
-                        <select name="q1">
-                            <option value="">Select...</option>
-                            <option value="subtitles">Subtitles</option>
-                            <option value="dubbing">Dubbing</option>
-                            <option value="no_preference">No preference</option>
-                        </select>
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be dynamically loaded here -->
                     </div>
-
-                    <div class="form-group">
-                        <label>What's your ideal movie length?</label>
-                        <select name="q2">
-                            <option value="">Select...</option>
-                            <option value="under_90">Under 90 minutes</option>
-                            <option value="90_120">90-120 minutes</option>
-                            <option value="over_120">Over 2 hours - the longer the better!</option>
-                        </select>
+                    <div style="margin-top: 30px; text-align: center;">
+                        <button type="submit" class="btn btn-primary" id="submit-quiz-btn" disabled>Complete Quiz</button>
+                        <button type="button" id="skip-quiz-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip Quiz</button>
                     </div>
-
-                    <div class="form-group">
-                        <label>How do you feel about movie spoilers?</label>
-                        <select name="q3">
-                            <option value="">Select...</option>
-                            <option value="hate">Absolutely hate them</option>
-                            <option value="dont_mind">Don't mind them</option>
-                            <option value="like">Actually prefer knowing what happens</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>What's your preferred movie-watching time?</label>
-                        <select name="q4">
-                            <option value="">Select...</option>
-                            <option value="morning">Morning person</option>
-                            <option value="afternoon">Afternoon</option>
-                            <option value="evening">Evening</option>
-                            <option value="late_night">Late night owl</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>When watching with someone, do you prefer to:</label>
-                        <select name="q5">
-                            <option value="">Select...</option>
-                            <option value="silent">Watch in silence</option>
-                            <option value="occasional_comments">Make occasional comments</option>
-                            <option value="full_discussion">Have a full running commentary</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>How do you choose what to watch?</label>
-                        <select name="q6">
-                            <option value="">Select...</option>
-                            <option value="plan_ahead">Plan ahead</option>
-                            <option value="browse">Browse until something clicks</option>
-                            <option value="rewatch">Rewatch favorites</option>
-                            <option value="recommendations">Follow recommendations</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Complete Setup</button>
-                    <button type="button" id="skip-quiz-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip</button>
                 </form>
             </section>
 
@@ -439,6 +390,7 @@
     </div>
 
     <script src="src/services/api.js"></script>
+    <script src="src/components/quiz.js"></script>
     <script src="src/components/app.js"></script>
 </body>
 </html>

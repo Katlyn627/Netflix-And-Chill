@@ -18,6 +18,11 @@ function showSection(sectionId) {
         loadStreamingProviders();
     } else if (sectionId === 'preferences') {
         loadGenres();
+    } else if (sectionId === 'compatibility-quiz') {
+        // Initialize the quiz when showing the quiz section
+        if (window.QuizModule && typeof window.QuizModule.initializeQuiz === 'function') {
+            window.QuizModule.initializeQuiz();
+        }
     }
 }
 
