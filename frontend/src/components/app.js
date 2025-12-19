@@ -92,39 +92,40 @@ function renderStreamingProviders(providers) {
     // Don't clear the existing content - keep the hardcoded top 10 list from HTML
     // This ensures we always show only the top 10 services as specified
     
-    // Define the top 10 services we want to support
-    const top10Services = [
-        'Amazon Prime',
-        'Netflix', 
-        'Hulu',
-        'Disney+',
-        'Paramount+',
-        'Apple TV',
-        'HBO',
-        'Peacock',
-        'Sling'
-    ];
+    // Define the exact top 10 services mapping for precise matching
+    const top10ServicesMap = {
+        'Amazon Prime': ['amazon prime video', 'amazon prime', 'prime video'],
+        'Netflix': ['netflix'],
+        'Hulu': ['hulu'],
+        'Disney+': ['disney plus', 'disney+'],
+        'Paramount+': ['paramount plus', 'paramount+'],
+        'Apple TV': ['apple tv+', 'apple tv plus', 'apple tv'],
+        'HBO': ['hbo max', 'hbo'],
+        'Peacock': ['peacock premium', 'peacock'],
+        'Sling': ['sling tv', 'sling']
+    };
     
     // Update checkboxes with data from API for matching services
     providers.forEach(provider => {
-        // Check if this provider matches one of our top 10
-        const matchingService = top10Services.find(service => 
-            provider.name.toLowerCase().includes(service.toLowerCase()) ||
-            service.toLowerCase().includes(provider.name.toLowerCase())
-        );
+        const providerNameLower = provider.name.toLowerCase().trim();
         
-        if (matchingService) {
-            // Find the corresponding checkbox in the HTML
-            const checkboxes = servicesList.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                if (checkbox.value.toLowerCase().includes(matchingService.toLowerCase()) ||
-                    matchingService.toLowerCase().includes(checkbox.value.toLowerCase())) {
-                    // Update with API data
-                    checkbox.dataset.providerId = provider.id;
-                    checkbox.dataset.logoPath = provider.logoPath || '';
-                    checkbox.dataset.logoUrl = provider.logoUrl || '';
-                }
-            });
+        // Check if this provider matches one of our top 10
+        for (const [serviceKey, aliases] of Object.entries(top10ServicesMap)) {
+            if (aliases.some(alias => alias === providerNameLower)) {
+                // Find the corresponding checkbox in the HTML
+                const checkboxes = servicesList.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    const checkboxValue = checkbox.value.toLowerCase().trim();
+                    if (checkboxValue === serviceKey.toLowerCase() || 
+                        aliases.some(alias => alias === checkboxValue)) {
+                        // Update with API data
+                        checkbox.dataset.providerId = provider.id;
+                        checkbox.dataset.logoPath = provider.logoPath || '';
+                        checkbox.dataset.logoUrl = provider.logoUrl || '';
+                    }
+                });
+                break; // Found a match, no need to continue checking aliases
+            }
         }
     });
 }

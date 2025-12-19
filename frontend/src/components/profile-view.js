@@ -267,7 +267,7 @@ class ProfileView {
             servicesContainer.innerHTML = services.map(service => {
                 const serviceName = escapeHtml(service.name);
                 const logoClass = getLogoClass(service.name);
-                const logoText = getLogoText(service.name);
+                const logoText = escapeHtml(getLogoText(service.name));
                 
                 return `
                     <div class="service-display-item">
