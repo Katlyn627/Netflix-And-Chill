@@ -10,17 +10,18 @@ class MongoDBAdapter {
     this.db = null;
   }
 
+  // Placeholder patterns to detect unconfigured MongoDB URIs
+  static PLACEHOLDER_PATTERNS = ['<', '>', 'cluster0.abcde'];
+
   async connect() {
     const uri = config.database.mongodb.uri;
     
     try {
       // Validate MongoDB URI is properly configured
       // Check for placeholder values or missing configuration
-      // Common placeholders: <username>, <password>, <cluster-url>, example domains
-      if (!uri || 
-          uri.includes('<') || 
-          uri.includes('>') || 
-          uri.includes('cluster0.abcde')) {
+      const hasPlaceholder = !uri || MongoDBAdapter.PLACEHOLDER_PATTERNS.some(pattern => uri.includes(pattern));
+      
+      if (hasPlaceholder) {
         throw new Error(
           'MongoDB connection string is not properly configured.\n\n' +
           'Please follow these steps:\n' +
@@ -93,13 +94,24 @@ class MongoDBAdapter {
   /**
    * Redact credentials from MongoDB URI for safe logging
    * @private
+   * @param {string} uri - The MongoDB connection URI
+   * @returns {string} The URI with credentials redacted as ***:***
    */
   _redactCredentials(uri) {
     if (!uri) return '[not set]';
     
     // Match mongodb:// or mongodb+srv:// URIs with credentials
     // Format: mongodb[+srv]://username:password@host/...
-    const match = uri.match(/^(mongodb(?:\+srv)?:\/\/)([^:]+):([^@]+)@(.+)$/);
+    // Regex pattern breakdown:
+    // - ^(mongodb(?:\+srv)?:\/\/) - Capture protocol (group 1)
+    // - ([^:]+) - Capture username until colon (group 2)
+    // - : - Literal colon separator
+    // - ([^@]+) - Capture password until @ (group 3)
+    // - @ - Literal @ separator
+    // - (.+)$ - Capture rest of URI (group 4)
+    const credentialPattern = /^(mongodb(?:\+srv)?:\/\/)([^:]+):([^@]+)@(.+)$/;
+    const match = uri.match(credentialPattern);
+    
     if (match) {
       // match[1] = protocol (mongodb:// or mongodb+srv://)
       // match[2] = username
