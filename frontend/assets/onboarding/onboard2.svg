@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#141414"/>
+  
+  <!-- Main illustration - Build Real Connections -->
+  <circle cx="200" cy="160" r="80" fill="#E50914" opacity="0.2"/>
+  
+  <!-- Two people silhouettes -->
+  <circle cx="160" cy="140" r="25" fill="#FFFFFF"/>
+  <ellipse cx="160" cy="190" rx="35" ry="45" fill="#FFFFFF"/>
+  <circle cx="240" cy="140" r="25" fill="#FFFFFF"/>
+  <ellipse cx="240" cy="190" rx="35" ry="45" fill="#FFFFFF"/>
+  
+  <!-- Connection lines/hearts -->
+  <path d="M200 160 Q200 145 210 145 Q220 145 220 155 Q220 165 200 180 Q180 165 180 155 Q180 145 190 145 Q200 145 200 160 Z" fill="#E50914"/>
+  <circle cx="170" cy="210" r="8" fill="#E50914"/>
+  <circle cx="200" cy="220" r="8" fill="#E50914"/>
+  <circle cx="230" cy="210" r="8" fill="#E50914"/>
+  
+  <!-- Text -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Build Real</text>
+  <text x="200" y="325" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#E50914" text-anchor="middle">Connections</text>
+</svg>
