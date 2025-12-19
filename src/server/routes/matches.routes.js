@@ -13,7 +13,9 @@ router.get("/candidates/:userId", async (req, res) => {
     if (!me) return res.status(404).json({ error: "User not found" });
 
     const [lng, lat] = me.location?.geo?.coordinates || [];
-    if (lng == null || lat == null) return res.status(400).json({ error: "Missing user geo" });
+    if (lng === null || lat === null || lng === undefined || lat === undefined) {
+      return res.status(400).json({ error: "Missing user geo" });
+    }
 
     const maxMiles = me.datingPrefs?.distanceMiles ?? 25;
     const blocked = me.safety?.blockedUserIds || [];

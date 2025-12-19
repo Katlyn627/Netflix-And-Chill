@@ -18,7 +18,9 @@ export default function DebateRoomPage() {
   const pollIntervalRef = useRef(null);
 
   useEffect(() => {
-    // Get or create userId
+    // TODO: Replace with proper authentication system
+    // This is a demo implementation - in production, get userId from secure session/JWT
+    // Security Note: localStorage is used here for demo purposes only
     let uid = localStorage.getItem('userId');
     if (!uid) {
       uid = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -31,6 +33,8 @@ export default function DebateRoomPage() {
     joinRoom(uid);
 
     // Poll for new messages every 3 seconds
+    // TODO: Consider implementing WebSocket/Socket.IO for true real-time messaging
+    // This polling approach is simple but creates server load at scale
     pollIntervalRef.current = setInterval(() => {
       fetchMessages();
     }, 3000);

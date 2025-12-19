@@ -75,7 +75,8 @@ export default function DebateTopicsPage() {
     e.preventDefault();
     const formData = new FormData(e.target);
     
-    // In a real app, get userId from auth context
+    // TODO: Replace with proper authentication system
+    // This is a demo implementation - in production, get userId from secure session/JWT
     const userId = localStorage.getItem('userId') || 'demo-user-id';
     
     try {

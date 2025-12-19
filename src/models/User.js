@@ -488,6 +488,8 @@ UserSchema.index({ "datingPrefs.relationshipIntent": 1 });
 UserSchema.index({ "identity.birthdate": 1 });
 
 // Virtual for age calculation
+// Note: This creates a new Date object on each access. For better performance,
+// consider caching the age or computing it during user updates in production apps.
 UserSchema.virtual("age").get(function () {
   if (!this.identity?.birthdate) return null;
   const today = new Date();
