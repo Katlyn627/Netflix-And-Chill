@@ -48,7 +48,30 @@
                     </div>
                     <div class="form-group">
                         <label for="location">Location:</label>
-                        <input type="text" id="location" name="location">
+                        <input type="text" id="location" name="location" placeholder="City, State">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender">
+                            <option value="">Prefer not to say</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sexual-orientation">Sexual Orientation:</label>
+                        <select id="sexual-orientation" name="sexualOrientation">
+                            <option value="">Prefer not to say</option>
+                            <option value="straight">Straight</option>
+                            <option value="gay">Gay</option>
+                            <option value="lesbian">Lesbian</option>
+                            <option value="bisexual">Bisexual</option>
+                            <option value="pansexual">Pansexual</option>
+                            <option value="asexual">Asexual</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="bio">Bio:</label>
@@ -180,6 +203,42 @@
                     <div class="form-group">
                         <label for="binge-count">How many episodes do you typically binge in one sitting?</label>
                         <input type="number" id="binge-count" name="bingeCount" min="1" value="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="age-min">Preferred Age Range:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="age-min" name="ageMin" min="18" max="100" value="18" style="width: 80px;">
+                            <span>to</span>
+                            <input type="number" id="age-max" name="ageMax" min="18" max="100" value="100" style="width: 80px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="location-radius">Distance (miles):</label>
+                        <input type="range" id="location-radius" name="locationRadius" min="1" max="500" value="50">
+                        <span id="radius-value">50 miles</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender Preference (select all that apply):</label>
+                        <div class="preference-options">
+                            <label><input type="checkbox" name="genderPref" value="male"> Male</label>
+                            <label><input type="checkbox" name="genderPref" value="female"> Female</label>
+                            <label><input type="checkbox" name="genderPref" value="non-binary"> Non-binary</label>
+                            <label><input type="checkbox" name="genderPref" value="other"> Other</label>
+                            <label><input type="checkbox" name="genderPref" value="any"> Any</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sexual Orientation Preference (select all that apply):</label>
+                        <div class="preference-options">
+                            <label><input type="checkbox" name="orientationPref" value="straight"> Straight</label>
+                            <label><input type="checkbox" name="orientationPref" value="gay"> Gay</label>
+                            <label><input type="checkbox" name="orientationPref" value="lesbian"> Lesbian</label>
+                            <label><input type="checkbox" name="orientationPref" value="bisexual"> Bisexual</label>
+                            <label><input type="checkbox" name="orientationPref" value="pansexual"> Pansexual</label>
+                            <label><input type="checkbox" name="orientationPref" value="asexual"> Asexual</label>
+                            <label><input type="checkbox" name="orientationPref" value="other"> Other</label>
+                            <label><input type="checkbox" name="orientationPref" value="any"> Any</label>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Continue</button>
                 </form>

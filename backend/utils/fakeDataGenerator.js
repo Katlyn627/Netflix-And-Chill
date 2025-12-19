@@ -236,6 +236,98 @@ function generateQuizResponses() {
   };
 }
 
+/**
+ * Generate gender
+ */
+function generateGender() {
+  const genders = ['male', 'female', 'non-binary', 'other', ''];
+  const weights = [45, 45, 5, 3, 2]; // Weighted distribution
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  const rand = Math.random() * total;
+  let sum = 0;
+  for (let i = 0; i < genders.length; i++) {
+    sum += weights[i];
+    if (rand < sum) {
+      return genders[i];
+    }
+  }
+  return genders[0];
+}
+
+/**
+ * Generate sexual orientation
+ */
+function generateSexualOrientation() {
+  const orientations = ['straight', 'gay', 'lesbian', 'bisexual', 'pansexual', 'asexual', 'other', ''];
+  const weights = [60, 15, 10, 8, 3, 2, 1, 1]; // Weighted distribution
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  const rand = Math.random() * total;
+  let sum = 0;
+  for (let i = 0; i < orientations.length; i++) {
+    sum += weights[i];
+    if (rand < sum) {
+      return orientations[i];
+    }
+  }
+  return orientations[0];
+}
+
+/**
+ * Generate gender preferences based on sexual orientation
+ */
+function generateGenderPreference(gender, sexualOrientation) {
+  // If no orientation specified, return any
+  if (!sexualOrientation) {
+    return ['any'];
+  }
+  
+  // Generate preferences based on orientation
+  switch (sexualOrientation) {
+    case 'straight':
+      if (gender === 'male') return ['female'];
+      if (gender === 'female') return ['male'];
+      return ['any'];
+    case 'gay':
+      return ['male'];
+    case 'lesbian':
+      return ['female'];
+    case 'bisexual':
+    case 'pansexual':
+      return ['male', 'female', 'non-binary', 'other'];
+    case 'asexual':
+      // Asexual people can still have romantic preferences
+      return Math.random() > 0.5 ? ['any'] : randomItems(['male', 'female', 'non-binary'], randomInt(1, 3));
+    default:
+      return ['any'];
+  }
+}
+
+/**
+ * Generate sexual orientation preferences
+ */
+function generateSexualOrientationPreference() {
+  // Most people are open to any orientation
+  const options = [
+    ['any'],
+    ['straight', 'bisexual', 'pansexual'],
+    ['gay', 'bisexual', 'pansexual'],
+    ['lesbian', 'bisexual', 'pansexual'],
+    ['bisexual', 'pansexual'],
+    ['any']
+  ];
+  const weights = [70, 10, 8, 8, 2, 2];
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  const rand = Math.random() * total;
+  let sum = 0;
+  for (let i = 0; i < options.length; i++) {
+    sum += weights[i];
+    if (rand < sum) {
+      return options[i];
+    }
+  }
+  return ['any'];
+}
+
 module.exports = {
   firstNames,
   lastNames,
@@ -253,5 +345,9 @@ module.exports = {
   generateFavoriteSnacks,
   generateMovieDebateTopics,
   generateVideoChatPreference,
-  generateQuizResponses
+  generateQuizResponses,
+  generateGender,
+  generateSexualOrientation,
+  generateGenderPreference,
+  generateSexualOrientationPreference
 };

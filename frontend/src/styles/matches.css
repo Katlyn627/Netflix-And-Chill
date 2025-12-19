@@ -258,6 +258,90 @@
     padding: 12px 25px;
 }
 
+/* Filters modal styles */
+.filters-modal-content {
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.filters-header h3 {
+    color: #E50914;
+    margin: 0;
+}
+
+.filters-body {
+    padding: 10px 0;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+}
+
+.filter-group label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.filter-group input[type="range"] {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.filter-group span {
+    color: #E50914;
+    font-weight: 600;
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.filter-options label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: normal;
+    cursor: pointer;
+    padding: 5px 10px;
+    background: #f5f5f5;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+.filter-options label:hover {
+    background: #e0e0e0;
+}
+
+.filter-options input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0;
+}
+
+.filters-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 2px solid #e0e0e0;
+    margin-top: 20px;
+}
+
 @media (max-width: 768px) {
     .matches-header {
         flex-direction: column;
@@ -291,5 +375,17 @@
 
     .message-content {
         max-width: 85%;
+    }
+    
+    .filters-modal-content {
+        width: 95%;
+    }
+    
+    .filters-footer {
+        flex-direction: column;
+    }
+    
+    .filters-footer button {
+        width: 100%;
     }
 }

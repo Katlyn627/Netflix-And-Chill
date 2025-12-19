@@ -32,6 +32,7 @@
                     <div class="matches-header">
                         <h2>Find Your Perfect Streaming Partner</h2>
                         <div class="matches-actions">
+                            <button id="filters-btn" class="btn btn-secondary">🔍 Filters</button>
                             <button id="find-matches-btn" class="btn btn-primary">Find Matches</button>
                             <button id="refresh-matches-btn" class="btn btn-secondary" style="margin-left: 10px;">Refresh</button>
                             <button id="logout-btn" class="btn btn-logout" style="margin-left: 10px;">Logout</button>
@@ -46,6 +47,67 @@
                 </div>
             </div>
         </main>
+
+        <!-- Filters Modal -->
+        <div id="filters-modal" class="modal" style="display: none;">
+            <div class="modal-content filters-modal-content">
+                <div class="filters-header">
+                    <h3>Filter Matches</h3>
+                    <button class="close-modal" id="close-filters">&times;</button>
+                </div>
+                <div class="filters-body">
+                    <div class="filter-group">
+                        <label for="match-score-filter">Match Score (minimum):</label>
+                        <input type="range" id="match-score-filter" min="0" max="100" value="0" step="5">
+                        <span id="match-score-value">0%</span>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="age-range-min-filter">Age Range:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="age-range-min-filter" min="18" max="100" value="18" style="width: 80px;">
+                            <span>to</span>
+                            <input type="number" id="age-range-max-filter" min="18" max="100" value="100" style="width: 80px;">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="distance-filter">Distance (miles):</label>
+                        <input type="range" id="distance-filter" min="1" max="500" value="50" step="5">
+                        <span id="distance-value">50 miles</span>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Gender Preference:</label>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="genderFilter" value="male"> Male</label>
+                            <label><input type="checkbox" name="genderFilter" value="female"> Female</label>
+                            <label><input type="checkbox" name="genderFilter" value="non-binary"> Non-binary</label>
+                            <label><input type="checkbox" name="genderFilter" value="other"> Other</label>
+                            <label><input type="checkbox" name="genderFilter" value="any" checked> Any</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Sexual Orientation Preference:</label>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="orientationFilter" value="straight"> Straight</label>
+                            <label><input type="checkbox" name="orientationFilter" value="gay"> Gay</label>
+                            <label><input type="checkbox" name="orientationFilter" value="lesbian"> Lesbian</label>
+                            <label><input type="checkbox" name="orientationFilter" value="bisexual"> Bisexual</label>
+                            <label><input type="checkbox" name="orientationFilter" value="pansexual"> Pansexual</label>
+                            <label><input type="checkbox" name="orientationFilter" value="asexual"> Asexual</label>
+                            <label><input type="checkbox" name="orientationFilter" value="other"> Other</label>
+                            <label><input type="checkbox" name="orientationFilter" value="any" checked> Any</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filters-footer">
+                    <button id="reset-filters-btn" class="btn btn-secondary">Reset Filters</button>
+                    <button id="apply-filters-btn" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+        </div>
 
         <footer>
             <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>

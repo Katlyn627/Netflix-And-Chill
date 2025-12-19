@@ -32,7 +32,11 @@ const {
   generateFavoriteSnacks,
   generateMovieDebateTopics,
   generateVideoChatPreference,
-  generateQuizResponses
+  generateQuizResponses,
+  generateGender,
+  generateSexualOrientation,
+  generateGenderPreference,
+  generateSexualOrientationPreference
 } = require('../utils/fakeDataGenerator');
 
 // Configuration
@@ -251,12 +255,19 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
   const streamingServices = generateStreamingServices(providers);
   const genrePreferences = generateGenrePreferences(genres);
   
+  const gender = generateGender();
+  const sexualOrientation = generateSexualOrientation();
+  const genderPreference = generateGenderPreference(gender, sexualOrientation);
+  const sexualOrientationPreference = generateSexualOrientationPreference();
+  
   const userData = {
     username,
     email,
     password: DEFAULT_PASSWORD,
     age: randomInt(21, 55),
     location: randomItem(cities),
+    gender,
+    sexualOrientation,
     bio: generateBio(),
     profilePicture: generateProfilePicture(`${firstName} ${lastName}`),
     photoGallery: generatePhotoGallery(`${firstName} ${lastName}`, randomInt(2, 6)),
@@ -269,7 +280,9 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
         min: randomInt(18, 30),
         max: randomInt(40, 65)
       },
-      locationRadius: randomItem([10, 25, 50, 100, 250])
+      locationRadius: randomItem([10, 25, 50, 100, 250]),
+      genderPreference,
+      sexualOrientationPreference
     },
     favoriteMovies: generateFavoriteMovies(movies),
     favoriteTVShows: generateFavoriteTVShows(tvShows),

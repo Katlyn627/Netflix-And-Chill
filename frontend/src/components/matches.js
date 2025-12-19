@@ -1,6 +1,16 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
+// Filter state
+let currentFilters = {
+    minMatchScore: 0,
+    minAge: 18,
+    maxAge: 100,
+    locationRadius: 50,
+    genderPreference: [],
+    sexualOrientationPreference: []
+};
+
 // Helper function to escape HTML to prevent XSS
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -81,7 +91,7 @@ async function findMatches() {
     matchesContainer.innerHTML = '';
     
     try {
-        const result = await api.findMatches(currentUserId);
+        const result = await api.findMatches(currentUserId, currentFilters);
         loadingDiv.style.display = 'none';
         displayMatches(result.matches);
     } catch (error) {
@@ -94,9 +104,113 @@ async function findMatches() {
     }
 }
 
+// Show filters modal
+function showFiltersModal() {
+    const modal = document.getElementById('filters-modal');
+    modal.style.display = 'flex';
+    
+    // Set current filter values
+    document.getElementById('match-score-filter').value = currentFilters.minMatchScore;
+    document.getElementById('match-score-value').textContent = `${currentFilters.minMatchScore}%`;
+    document.getElementById('age-range-min-filter').value = currentFilters.minAge;
+    document.getElementById('age-range-max-filter').value = currentFilters.maxAge;
+    document.getElementById('distance-filter').value = currentFilters.locationRadius;
+    document.getElementById('distance-value').textContent = `${currentFilters.locationRadius} miles`;
+    
+    // Set gender checkboxes
+    document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
+        cb.checked = currentFilters.genderPreference.length === 0 
+            ? cb.value === 'any'
+            : currentFilters.genderPreference.includes(cb.value);
+    });
+    
+    // Set orientation checkboxes
+    document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
+        cb.checked = currentFilters.sexualOrientationPreference.length === 0 
+            ? cb.value === 'any'
+            : currentFilters.sexualOrientationPreference.includes(cb.value);
+    });
+}
+
+// Hide filters modal
+function hideFiltersModal() {
+    const modal = document.getElementById('filters-modal');
+    modal.style.display = 'none';
+}
+
+// Apply filters
+function applyFilters() {
+    currentFilters.minMatchScore = parseInt(document.getElementById('match-score-filter').value);
+    currentFilters.minAge = parseInt(document.getElementById('age-range-min-filter').value);
+    currentFilters.maxAge = parseInt(document.getElementById('age-range-max-filter').value);
+    currentFilters.locationRadius = parseInt(document.getElementById('distance-filter').value);
+    
+    // Get gender preferences
+    const genderCheckboxes = document.querySelectorAll('input[name="genderFilter"]:checked');
+    let genderPrefs = Array.from(genderCheckboxes).map(cb => cb.value);
+    // Remove 'any' if specific options are selected
+    if (genderPrefs.length > 1 && genderPrefs.includes('any')) {
+        genderPrefs = genderPrefs.filter(p => p !== 'any');
+    }
+    currentFilters.genderPreference = genderPrefs;
+    
+    // Get orientation preferences
+    const orientationCheckboxes = document.querySelectorAll('input[name="orientationFilter"]:checked');
+    let orientationPrefs = Array.from(orientationCheckboxes).map(cb => cb.value);
+    // Remove 'any' if specific options are selected
+    if (orientationPrefs.length > 1 && orientationPrefs.includes('any')) {
+        orientationPrefs = orientationPrefs.filter(p => p !== 'any');
+    }
+    currentFilters.sexualOrientationPreference = orientationPrefs;
+    
+    hideFiltersModal();
+    findMatches();
+}
+
+// Reset filters
+function resetFilters() {
+    currentFilters = {
+        minMatchScore: 0,
+        minAge: 18,
+        maxAge: 100,
+        locationRadius: 50,
+        genderPreference: [],
+        sexualOrientationPreference: []
+    };
+    
+    // Update UI
+    document.getElementById('match-score-filter').value = 0;
+    document.getElementById('match-score-value').textContent = '0%';
+    document.getElementById('age-range-min-filter').value = 18;
+    document.getElementById('age-range-max-filter').value = 100;
+    document.getElementById('distance-filter').value = 50;
+    document.getElementById('distance-value').textContent = '50 miles';
+    
+    // Reset checkboxes
+    document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
+        cb.checked = cb.value === 'any';
+    });
+    document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
+        cb.checked = cb.value === 'any';
+    });
+}
+
 // Event listeners
 document.getElementById('find-matches-btn').addEventListener('click', findMatches);
 document.getElementById('refresh-matches-btn').addEventListener('click', findMatches);
+document.getElementById('filters-btn').addEventListener('click', showFiltersModal);
+document.getElementById('close-filters').addEventListener('click', hideFiltersModal);
+document.getElementById('apply-filters-btn').addEventListener('click', applyFilters);
+document.getElementById('reset-filters-btn').addEventListener('click', resetFilters);
+
+// Update slider values in real-time
+document.getElementById('match-score-filter').addEventListener('input', function() {
+    document.getElementById('match-score-value').textContent = `${this.value}%`;
+});
+
+document.getElementById('distance-filter').addEventListener('input', function() {
+    document.getElementById('distance-value').textContent = `${this.value} miles`;
+});
 
 // Logout functionality
 document.getElementById('logout-btn').addEventListener('click', () => {
@@ -229,9 +343,14 @@ document.addEventListener('keypress', (e) => {
 
 // Close modal when clicking outside
 window.addEventListener('click', (e) => {
-    const modal = document.getElementById('chat-modal');
-    if (e.target === modal) {
+    const chatModal = document.getElementById('chat-modal');
+    const filtersModal = document.getElementById('filters-modal');
+    
+    if (e.target === chatModal) {
         closeChatModal();
+    }
+    if (e.target === filtersModal) {
+        hideFiltersModal();
     }
 });
 

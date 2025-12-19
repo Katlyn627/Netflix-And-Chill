@@ -442,7 +442,7 @@ class MatchingEngine {
    * @param {User} user 
    * @param {Array<User>} userPool 
    * @param {number} limit 
-   * @param {Object} filters - Optional filters (ageRange, locationRadius)
+   * @param {Object} filters - Optional filters (ageRange, locationRadius, genderPreference, sexualOrientationPreference, minMatchScore)
    * @returns {Array<Match>}
    */
   static findMatches(user, userPool, limit = 10, filters = {}) {
@@ -457,7 +457,9 @@ class MatchingEngine {
 
         const matchResult = this.calculateMatch(user, otherUser);
         
-        if (matchResult.score > 0) {
+        // Apply minimum match score filter
+        const minMatchScore = filters.minMatchScore || 0;
+        if (matchResult.score >= minMatchScore) {
           matches.push(new Match(
             user.id,
             otherUser.id,
@@ -506,6 +508,24 @@ class MatchingEngine {
     } else if (user.preferences.ageRange) {
       const { min, max } = user.preferences.ageRange;
       if (otherUser.age < min || otherUser.age > max) {
+        return false;
+      }
+    }
+
+    // Gender preference filter
+    const genderPref = filters.genderPreference || user.preferences.genderPreference || [];
+    if (genderPref.length > 0 && !genderPref.includes('any')) {
+      // Only filter if user has specified gender AND it's not in preferences
+      if (otherUser.gender && !genderPref.includes(otherUser.gender)) {
+        return false;
+      }
+    }
+
+    // Sexual orientation preference filter
+    const orientationPref = filters.sexualOrientationPreference || user.preferences.sexualOrientationPreference || [];
+    if (orientationPref.length > 0 && !orientationPref.includes('any')) {
+      // Only filter if user has specified orientation AND it's not in preferences
+      if (otherUser.sexualOrientation && !orientationPref.includes(otherUser.sexualOrientation)) {
         return false;
       }
     }

@@ -9,6 +9,8 @@ class User {
     this.bio = data.bio || '';
     this.age = data.age;
     this.location = data.location || '';
+    this.gender = data.gender || '';
+    this.sexualOrientation = data.sexualOrientation || '';
     this.profilePicture = data.profilePicture || null;
     this.photoGallery = data.photoGallery || [];
     this.streamingServices = data.streamingServices || [];
@@ -17,7 +19,9 @@ class User {
       genres: [], // Array of genre objects with {id, name, types}
       bingeWatchCount: 0,
       ageRange: { min: 18, max: 100 },
-      locationRadius: 50 // in miles/km
+      locationRadius: 50, // in miles/km
+      genderPreference: data.preferences?.genderPreference || [], // Array of preferred genders
+      sexualOrientationPreference: data.preferences?.sexualOrientationPreference || [] // Array of preferred orientations
     };
     this.likes = data.likes || [];
     this.superLikes = data.superLikes || [];
@@ -200,6 +204,8 @@ class User {
       bio: this.bio,
       age: this.age,
       location: this.location,
+      gender: this.gender,
+      sexualOrientation: this.sexualOrientation,
       profilePicture: this.profilePicture,
       photoGallery: this.photoGallery,
       streamingServices: this.streamingServices,
