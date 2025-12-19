@@ -352,6 +352,14 @@ class ProfileView {
             this.deleteProfile();
         });
 
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUserId');
+                window.location.href = 'login.html';
+            }
+        });
+
         // Toggle password visibility for all password fields
         document.querySelectorAll('.toggle-password').forEach(btn => {
             btn.addEventListener('click', (e) => {

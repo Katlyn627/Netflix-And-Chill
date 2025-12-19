@@ -601,6 +601,16 @@ footer {
     overflow: hidden;
 }
 
+.nav-icon-btn.logout {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    font-size: 20px;
+    color: white;
+}
+
+.nav-icon-btn.logout:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%);
+}
+
 @media (max-width: 768px) {
     .nav-icons {
         position: fixed;
