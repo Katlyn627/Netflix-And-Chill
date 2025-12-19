@@ -1,6 +1,9 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
+// Constants
+const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
+
 // Filter state
 let currentFilters = {
     minMatchScore: 0,
@@ -183,7 +186,7 @@ function addSwipeSupport() {
         isDragging = false;
         
         const diff = startX - currentX;
-        if (Math.abs(diff) > 50) { // Minimum swipe distance
+        if (Math.abs(diff) > SWIPE_THRESHOLD) { // Minimum swipe distance
             if (diff > 0) {
                 showNextMatch();
             } else {
@@ -210,7 +213,7 @@ function addSwipeSupport() {
         track.style.cursor = 'grab';
         
         const diff = startX - currentX;
-        if (Math.abs(diff) > 50) {
+        if (Math.abs(diff) > SWIPE_THRESHOLD) {
             if (diff > 0) {
                 showNextMatch();
             } else {
