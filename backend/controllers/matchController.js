@@ -19,6 +19,19 @@ class MatchController {
       if (req.query.locationRadius !== undefined) {
         filters.locationRadius = parseInt(req.query.locationRadius);
       }
+      if (req.query.genderPreference) {
+        filters.genderPreference = Array.isArray(req.query.genderPreference) 
+          ? req.query.genderPreference 
+          : req.query.genderPreference.split(',');
+      }
+      if (req.query.sexualOrientationPreference) {
+        filters.sexualOrientationPreference = Array.isArray(req.query.sexualOrientationPreference) 
+          ? req.query.sexualOrientationPreference 
+          : req.query.sexualOrientationPreference.split(',');
+      }
+      if (req.query.minMatchScore !== undefined) {
+        filters.minMatchScore = parseInt(req.query.minMatchScore) || 0;
+      }
 
       const dataStore = await getDatabase();
       const user = await dataStore.findUserById(userId);

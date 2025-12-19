@@ -38,6 +38,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Initialize location radius slider
+    const locationRadiusSlider = document.getElementById('location-radius');
+    const radiusValueSpan = document.getElementById('radius-value');
+    if (locationRadiusSlider && radiusValueSpan) {
+        locationRadiusSlider.addEventListener('input', function() {
+            radiusValueSpan.textContent = `${this.value} miles`;
+        });
+    }
+    
     // Initialize movie search functionality
     initializeMovieSearch();
     
@@ -186,6 +195,8 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         password: formData.get('password'),
         age: parseInt(formData.get('age')),
         location: formData.get('location'),
+        gender: formData.get('gender'),
+        sexualOrientation: formData.get('sexualOrientation'),
         bio: formData.get('bio')
     };
     
@@ -282,10 +293,24 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
     }));
     const bingeCount = parseInt(document.getElementById('binge-count').value);
     
+    const ageMin = parseInt(document.getElementById('age-min')?.value) || 18;
+    const ageMax = parseInt(document.getElementById('age-max')?.value) || 100;
+    const locationRadius = parseInt(document.getElementById('location-radius')?.value) || 50;
+    
+    const genderPrefCheckboxes = document.querySelectorAll('input[name="genderPref"]:checked');
+    const genderPreference = Array.from(genderPrefCheckboxes).map(cb => cb.value);
+    
+    const orientationPrefCheckboxes = document.querySelectorAll('input[name="orientationPref"]:checked');
+    const sexualOrientationPreference = Array.from(orientationPrefCheckboxes).map(cb => cb.value);
+    
     try {
         await api.updatePreferences(currentUserId, {
             genres: genres,
-            bingeWatchCount: bingeCount
+            bingeWatchCount: bingeCount,
+            ageRange: { min: ageMin, max: ageMax },
+            locationRadius: locationRadius,
+            genderPreference: genderPreference,
+            sexualOrientationPreference: sexualOrientationPreference
         });
         showMessage('Preferences saved!');
         // Save user ID to localStorage for match page
