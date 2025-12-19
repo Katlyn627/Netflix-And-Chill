@@ -1,5 +1,11 @@
 const User = require('../models/User');
 const { getDatabase } = require('../utils/database');
+const {
+  VALID_GENDERS,
+  VALID_SEXUAL_ORIENTATIONS,
+  VALID_GENDER_PREFERENCES,
+  VALID_SEXUAL_ORIENTATION_PREFERENCES
+} = require('../constants/userConstants');
 
 // Constants
 const MAX_PHOTOS_IN_GALLERY = 6;
@@ -258,8 +264,7 @@ class UserController {
           return res.status(400).json({ error: 'Gender preference must be an array' });
         }
         // Validate gender values
-        const validGenders = ['male', 'female', 'non-binary', 'other', 'any'];
-        const invalidGenders = genderPreference.filter(g => !validGenders.includes(g));
+        const invalidGenders = genderPreference.filter(g => !VALID_GENDER_PREFERENCES.includes(g));
         if (invalidGenders.length > 0) {
           return res.status(400).json({ error: `Invalid gender preference values: ${invalidGenders.join(', ')}` });
         }
@@ -271,8 +276,7 @@ class UserController {
           return res.status(400).json({ error: 'Sexual orientation preference must be an array' });
         }
         // Validate orientation values
-        const validOrientations = ['straight', 'gay', 'lesbian', 'bisexual', 'pansexual', 'asexual', 'other', 'any'];
-        const invalidOrientations = sexualOrientationPreference.filter(o => !validOrientations.includes(o));
+        const invalidOrientations = sexualOrientationPreference.filter(o => !VALID_SEXUAL_ORIENTATION_PREFERENCES.includes(o));
         if (invalidOrientations.length > 0) {
           return res.status(400).json({ error: `Invalid sexual orientation preference values: ${invalidOrientations.join(', ')}` });
         }
@@ -397,17 +401,15 @@ class UserController {
 
       // Validate gender if provided
       if (updates.gender !== undefined) {
-        const validGenders = ['male', 'female', 'non-binary', 'other', ''];
-        if (!validGenders.includes(updates.gender)) {
-          return res.status(400).json({ error: `Invalid gender value. Must be one of: ${validGenders.join(', ')}` });
+        if (!VALID_GENDERS.includes(updates.gender)) {
+          return res.status(400).json({ error: `Invalid gender value. Must be one of: ${VALID_GENDERS.join(', ')}` });
         }
       }
 
       // Validate sexual orientation if provided
       if (updates.sexualOrientation !== undefined) {
-        const validOrientations = ['straight', 'gay', 'lesbian', 'bisexual', 'pansexual', 'asexual', 'other', ''];
-        if (!validOrientations.includes(updates.sexualOrientation)) {
-          return res.status(400).json({ error: `Invalid sexual orientation value. Must be one of: ${validOrientations.join(', ')}` });
+        if (!VALID_SEXUAL_ORIENTATIONS.includes(updates.sexualOrientation)) {
+          return res.status(400).json({ error: `Invalid sexual orientation value. Must be one of: ${VALID_SEXUAL_ORIENTATIONS.join(', ')}` });
         }
       }
 
