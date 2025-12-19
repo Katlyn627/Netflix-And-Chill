@@ -24,7 +24,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["active", "inactive", "banned", "suspended"],
       default: "active",
-      index: true,
     },
 
     // Detailed Identity Information
@@ -32,7 +31,6 @@ const UserSchema = new mongoose.Schema(
       birthdate: {
         type: Date,
         required: true,
-        index: true,
       },
       gender: {
         type: String,
@@ -88,7 +86,6 @@ const UserSchema = new mongoose.Schema(
       relationshipIntent: {
         type: String,
         enum: ["casual", "serious", "friendship", "unsure"],
-        index: true,
       },
       ageRange: {
         min: { type: Number, default: 18, min: 18 },
@@ -489,7 +486,6 @@ UserSchema.index({ "location.geo": "2dsphere" });
 UserSchema.index({ status: 1, "engagement.lastActive": -1 });
 UserSchema.index({ "datingPrefs.relationshipIntent": 1 });
 UserSchema.index({ "identity.birthdate": 1 });
-UserSchema.index({ email: 1 }, { unique: true });
 
 // Virtual for age calculation
 UserSchema.virtual("age").get(function () {
