@@ -238,6 +238,7 @@ function showMatchDetails(index) {
     const location = escapeHtml(match.user.location || 'Not specified');
     const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
     const matchScore = Math.round(match.matchScore);
+    const MAX_DISPLAYED_RESPONSES = 3;
     
     const sharedContentHtml = match.sharedContent && match.sharedContent.length > 0
         ? `<div class="detail-section">
@@ -284,7 +285,7 @@ function showMatchDetails(index) {
         textPromptsHtml = '<div class="detail-section text-prompts-section">';
         
         if (hasDebateResponses) {
-            const debateEntries = Object.entries(debateResponses).slice(0, 3); // Show first 3
+            const debateEntries = Object.entries(debateResponses).slice(0, MAX_DISPLAYED_RESPONSES);
             textPromptsHtml += `
                 <h4>💬 Movie Debates</h4>
                 ${debateEntries.map(([topic, response]) => `
@@ -297,7 +298,7 @@ function showMatchDetails(index) {
         }
         
         if (hasMoviePrompts) {
-            const promptEntries = Object.entries(moviePrompts).slice(0, 3); // Show first 3
+            const promptEntries = Object.entries(moviePrompts).slice(0, MAX_DISPLAYED_RESPONSES);
             textPromptsHtml += `
                 <h4 style="margin-top: ${hasDebateResponses ? '15px' : '0'};">🎬 Movie Prompts</h4>
                 ${promptEntries.map(([prompt, response]) => `
