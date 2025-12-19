@@ -514,16 +514,18 @@ class MatchingEngine {
 
     // Gender preference filter
     const genderPref = filters.genderPreference || user.preferences.genderPreference || [];
-    if (genderPref.length > 0 && !genderPref.includes('any') && otherUser.gender) {
-      if (!genderPref.includes(otherUser.gender)) {
+    if (genderPref.length > 0 && !genderPref.includes('any')) {
+      // Only filter if user has specified gender AND it's not in preferences
+      if (otherUser.gender && !genderPref.includes(otherUser.gender)) {
         return false;
       }
     }
 
     // Sexual orientation preference filter
     const orientationPref = filters.sexualOrientationPreference || user.preferences.sexualOrientationPreference || [];
-    if (orientationPref.length > 0 && !orientationPref.includes('any') && otherUser.sexualOrientation) {
-      if (!orientationPref.includes(otherUser.sexualOrientation)) {
+    if (orientationPref.length > 0 && !orientationPref.includes('any')) {
+      // Only filter if user has specified orientation AND it's not in preferences
+      if (otherUser.sexualOrientation && !orientationPref.includes(otherUser.sexualOrientation)) {
         return false;
       }
     }

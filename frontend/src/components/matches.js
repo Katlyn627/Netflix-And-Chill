@@ -147,11 +147,21 @@ function applyFilters() {
     
     // Get gender preferences
     const genderCheckboxes = document.querySelectorAll('input[name="genderFilter"]:checked');
-    currentFilters.genderPreference = Array.from(genderCheckboxes).map(cb => cb.value);
+    let genderPrefs = Array.from(genderCheckboxes).map(cb => cb.value);
+    // Remove 'any' if specific options are selected
+    if (genderPrefs.length > 1 && genderPrefs.includes('any')) {
+        genderPrefs = genderPrefs.filter(p => p !== 'any');
+    }
+    currentFilters.genderPreference = genderPrefs;
     
     // Get orientation preferences
     const orientationCheckboxes = document.querySelectorAll('input[name="orientationFilter"]:checked');
-    currentFilters.sexualOrientationPreference = Array.from(orientationCheckboxes).map(cb => cb.value);
+    let orientationPrefs = Array.from(orientationCheckboxes).map(cb => cb.value);
+    // Remove 'any' if specific options are selected
+    if (orientationPrefs.length > 1 && orientationPrefs.includes('any')) {
+        orientationPrefs = orientationPrefs.filter(p => p !== 'any');
+    }
+    currentFilters.sexualOrientationPreference = orientationPrefs;
     
     hideFiltersModal();
     findMatches();
