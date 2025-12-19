@@ -93,6 +93,9 @@ function randomInt(min, max) {
  * Get random item from an array
  */
 function randomItem(array) {
+  if (array.length === 0) {
+    return null;
+  }
   return array[randomInt(0, array.length - 1)];
 }
 
@@ -100,6 +103,9 @@ function randomItem(array) {
  * Get random items from an array using Fisher-Yates shuffle
  */
 function randomItems(array, count) {
+  if (array.length === 0) {
+    return [];
+  }
   const shuffled = [...array];
   // Fisher-Yates shuffle
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -144,7 +150,11 @@ function generateBio() {
  */
 function generateProfilePicture(seed) {
   // Using UI Avatars as a placeholder service
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(seed)}&size=200&background=random`;
+  // Using a hash-based background for consistency
+  const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const colors = ['007bff', 'dc3545', '28a745', 'ffc107', '17a2b8', '6f42c1', 'e83e8c', 'fd7e14'];
+  const bgColor = colors[hash % colors.length];
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(seed)}&size=200&background=${bgColor}&color=fff`;
 }
 
 /**
@@ -152,9 +162,12 @@ function generateProfilePicture(seed) {
  */
 function generatePhotoGallery(seed, count = 3) {
   const photos = [];
+  const colors = ['007bff', 'dc3545', '28a745', 'ffc107', '17a2b8', '6f42c1', 'e83e8c', 'fd7e14'];
   for (let i = 0; i < count; i++) {
+    const hash = (seed + i).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const bgColor = colors[hash % colors.length];
     photos.push({
-      url: `https://ui-avatars.com/api/?name=${encodeURIComponent(seed + i)}&size=400&background=random`,
+      url: `https://ui-avatars.com/api/?name=${encodeURIComponent(seed + i)}&size=400&background=${bgColor}&color=fff`,
       uploadedAt: new Date(Date.now() - randomInt(1, 365) * 24 * 60 * 60 * 1000).toISOString()
     });
   }

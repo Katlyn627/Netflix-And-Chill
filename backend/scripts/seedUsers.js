@@ -361,7 +361,12 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     const args = process.argv.slice(2);
     const countArg = args.find(arg => arg.startsWith('--count='));
     if (countArg) {
-      const parsedCount = parseInt(countArg.split('=')[1], 10);
+      const countValue = countArg.split('=')[1];
+      if (!countValue || countValue.trim() === '') {
+        console.error('❌ Invalid count value. Please provide a count like: --count=50');
+        process.exit(1);
+      }
+      const parsedCount = parseInt(countValue, 10);
       if (isNaN(parsedCount) || parsedCount < 1) {
         console.error('❌ Invalid count value. Please provide a positive integer.');
         process.exit(1);
