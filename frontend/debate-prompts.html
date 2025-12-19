@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate & Prompts - Netflix and Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E50914">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        .debate-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .debate-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .debate-card {
+            background: linear-gradient(135deg, rgba(229, 9, 20, 0.1), rgba(255, 107, 107, 0.1));
+            border: 2px solid rgba(229, 9, 20, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .debate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(229, 9, 20, 0.3);
+        }
+
+        .debate-topic {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #E50914;
+            margin-bottom: 15px;
+        }
+
+        .debate-description {
+            color: #ccc;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .response-section {
+            margin-top: 20px;
+        }
+
+        .response-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .response-textarea:focus {
+            outline: none;
+            border-color: #E50914;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+        }
+
+        .response-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+
+        .saved-response {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #E50914;
+            margin-top: 15px;
+        }
+
+        .response-author {
+            font-weight: bold;
+            color: #E50914;
+            margin-bottom: 5px;
+        }
+
+        .response-text {
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .prompt-card {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(229, 9, 20, 0.1));
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-text {
+            font-size: 1.2em;
+            color: #FF6B6B;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(229, 9, 20, 0.3);
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #E50914;
+            border-bottom-color: #E50914;
+        }
+
+        .tab:hover {
+            color: #FF6B6B;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-icons">
+                <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
+                <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
+                <a href="profile-view.html" class="nav-icon-btn profile" title="My Profile">👤</a>
+                <a href="debate-prompts.html" class="nav-icon-btn active" title="Debate & Prompts">💬</a>
+                <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout">🚪➡️</button>
+            </div>
+            <div class="logo-banner">
+                <h1>NETFLIX & CHILL</h1>
+            </div>
+            <p class="tagline">Movie Debates & Conversation Starters</p>
+        </header>
+
+        <main>
+            <div class="debate-container">
+                <div class="debate-header">
+                    <h2>🎬 Share Your Movie Opinions</h2>
+                    <p style="color: #999;">Answer debate topics and fill out prompts to showcase your personality and find better matches!</p>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="debates">🎭 Debate Topics</button>
+                    <button class="tab" data-tab="prompts">💭 Movie Prompts</button>
+                </div>
+
+                <!-- Debate Topics Tab -->
+                <div class="tab-content active" id="debates-content">
+                    <div id="debates-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Movie Prompts Tab -->
+                <div class="tab-content" id="prompts-content">
+                    <div id="prompts-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+
+    <script src="src/services/api.js"></script>
+    <script>
+        const currentUserId = localStorage.getItem('currentUserId');
+
+        // Debate topics
+        const DEBATE_TOPICS = [
+            {
+                id: 'debate1',
+                topic: 'Best Star Wars Trilogy',
+                description: 'Which Star Wars trilogy is superior: Original, Prequels, or Sequels?'
+            },
+            {
+                id: 'debate2',
+                topic: 'Marvel vs DC',
+                description: 'Which cinematic universe reigns supreme?'
+            },
+            {
+                id: 'debate3',
+                topic: 'Book vs Movie Adaptations',
+                description: 'Can movies ever be better than the books they\'re based on?'
+            },
+            {
+                id: 'debate4',
+                topic: 'Remakes and Reboots',
+                description: 'Are remakes/reboots necessary or should classics be left alone?'
+            },
+            {
+                id: 'debate5',
+                topic: 'Horror Movie Rankings',
+                description: 'What makes a great horror movie? Jump scares vs psychological horror?'
+            },
+            {
+                id: 'debate6',
+                topic: 'Best Decade for Movies',
+                description: 'Which decade produced the best films?'
+            },
+            {
+                id: 'debate7',
+                topic: 'Director Styles',
+                description: 'Auteur theory - Should directors have complete creative control?'
+            },
+            {
+                id: 'debate8',
+                topic: 'Ending Interpretations',
+                description: 'Do ambiguous endings enhance or frustrate the viewing experience?'
+            },
+            {
+                id: 'debate9',
+                topic: 'Streaming vs Theatrical',
+                description: 'Is the theatrical experience still worth it in the streaming age?'
+            },
+            {
+                id: 'debate10',
+                topic: 'CGI vs Practical Effects',
+                description: 'Which creates more immersive cinema?'
+            }
+        ];
+
+        // Movie prompts
+        const MOVIE_PROMPTS = [
+            { id: 'prompt1', text: 'A movie that made me cry:' },
+            { id: 'prompt2', text: 'My guilty pleasure movie:' },
+            { id: 'prompt3', text: 'The movie I\'ve watched the most times:' },
+            { id: 'prompt4', text: 'A movie everyone loves but I don\'t:' },
+            { id: 'prompt5', text: 'An underrated gem I recommend:' },
+            { id: 'prompt6', text: 'My favorite movie quote:' },
+            { id: 'prompt7', text: 'A movie that changed my perspective:' },
+            { id: 'prompt8', text: 'My ideal movie marathon would include:' },
+            { id: 'prompt9', text: 'A movie I wish I could watch again for the first time:' },
+            { id: 'prompt10', text: 'My comfort movie for a bad day:' },
+            { id: 'prompt11', text: 'A character I relate to most:' },
+            { id: 'prompt12', text: 'The scariest movie I\'ve ever seen:' },
+            { id: 'prompt13', text: 'A movie soundtrack I listen to regularly:' },
+            { id: 'prompt14', text: 'My dream movie casting:' },
+            { id: 'prompt15', text: 'A movie scene I can\'t forget:' }
+        ];
+
+        // Load saved responses
+        let userResponses = JSON.parse(localStorage.getItem('debateResponses') || '{}');
+        let userPrompts = JSON.parse(localStorage.getItem('promptResponses') || '{}');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDebates();
+            renderPrompts();
+            setupTabs();
+            setupLogout();
+        });
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    // Update tab active state
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update content active state
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(`${tabName}-content`).classList.add('active');
+                });
+            });
+        }
+
+        function renderDebates() {
+            const container = document.getElementById('debates-container');
+            container.innerHTML = DEBATE_TOPICS.map(debate => `
+                <div class="debate-card">
+                    <div class="debate-topic">${escapeHtml(debate.topic)}</div>
+                    <div class="debate-description">${escapeHtml(debate.description)}</div>
+                    <div class="response-section">
+                        ${userResponses[debate.id] ? `
+                            <div class="saved-response">
+                                <div class="response-author">Your Take:</div>
+                                <div class="response-text">${escapeHtml(userResponses[debate.id])}</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="editResponse('${debate.id}')">Edit Response</button>
+                        ` : `
+                            <textarea 
+                                class="response-textarea" 
+                                id="response-${debate.id}"
+                                placeholder="Share your opinion on this debate..."
+                            ></textarea>
+                            <div class="response-actions">
+                                <button class="btn btn-primary" onclick="saveResponse('${debate.id}')">Save Response</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPrompts() {
+            const container = document.getElementById('prompts-container');
+            container.innerHTML = MOVIE_PROMPTS.map(prompt => `
+                <div class="prompt-card">
+                    <div class="prompt-text">${escapeHtml(prompt.text)}</div>
+                    ${userPrompts[prompt.id] ? `
+                        <div class="saved-response">
+                            <div class="response-text">${escapeHtml(userPrompts[prompt.id])}</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="editPrompt('${prompt.id}')">Edit</button>
+                    ` : `
+                        <textarea 
+                            class="response-textarea" 
+                            id="prompt-${prompt.id}"
+                            placeholder="Your answer..."
+                            style="min-height: 80px;"
+                        ></textarea>
+                        <div class="response-actions">
+                            <button class="btn btn-primary" onclick="savePrompt('${prompt.id}')">Save</button>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function saveResponse(debateId) {
+            const textarea = document.getElementById(`response-${debateId}`);
+            const value = textarea.value.trim();
+            
+            if (!value) {
+                alert('Please enter a response before saving.');
+                return;
+            }
+            
+            userResponses[debateId] = value;
+            localStorage.setItem('debateResponses', JSON.stringify(userResponses));
+            
+            // Update user profile via API
+            if (currentUserId) {
+                updateUserDebates();
+            }
+            
+            renderDebates();
+        }
+
+        function editResponse(debateId) {
+            delete userResponses[debateId];
+            localStorage.setItem('debateResponses', JSON.stringify(userResponses));
+            renderDebates();
+        }
+
+        function savePrompt(promptId) {
+            const textarea = document.getElementById(`prompt-${promptId}`);
+            const value = textarea.value.trim();
+            
+            if (!value) {
+                alert('Please enter an answer before saving.');
+                return;
+            }
+            
+            userPrompts[promptId] = value;
+            localStorage.setItem('promptResponses', JSON.stringify(userPrompts));
+            
+            // Update user profile via API
+            if (currentUserId) {
+                updateUserPrompts();
+            }
+            
+            renderPrompts();
+        }
+
+        function editPrompt(promptId) {
+            delete userPrompts[promptId];
+            localStorage.setItem('promptResponses', JSON.stringify(userPrompts));
+            renderPrompts();
+        }
+
+        async function updateUserDebates() {
+            try {
+                await api.updateProfileDetails(currentUserId, {
+                    movieDebateResponses: userResponses
+                });
+            } catch (error) {
+                console.error('Error updating debates:', error);
+            }
+        }
+
+        async function updateUserPrompts() {
+            try {
+                await api.updateProfileDetails(currentUserId, {
+                    moviePromptResponses: userPrompts
+                });
+            } catch (error) {
+                console.error('Error updating prompts:', error);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function setupLogout() {
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('currentUserId');
+                    window.location.href = 'homepage.html';
+                });
+            }
+        }
+    </script>
+</body>
+</html>
