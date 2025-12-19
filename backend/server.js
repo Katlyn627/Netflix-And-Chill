@@ -12,6 +12,7 @@ const streamingRoutes = require('./routes/streaming');
 const uploadRoutes = require('./routes/uploads');
 const chatRoutes = require('./routes/chat');
 const quizRoutes = require('./routes/quiz');
+const watchInvitationRoutes = require('./routes/watchInvitations');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ app.use('/api/streaming', streamingRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/quiz', quizRoutes);
+app.use('/api/watch-invitations', watchInvitationRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
