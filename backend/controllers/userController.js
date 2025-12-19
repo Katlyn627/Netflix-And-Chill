@@ -1,7 +1,5 @@
 const User = require('../models/User');
-const DataStore = require('../utils/dataStore');
-
-const dataStore = new DataStore();
+const { getDatabase } = require('../utils/database');
 
 // Constants
 const MAX_PHOTOS_IN_GALLERY = 6;
@@ -16,6 +14,7 @@ class UserController {
 
   // Helper method to save user data with password preserved
   async saveUserData(userId, user) {
+    const dataStore = await getDatabase();
     const userDataToStore = { ...user.toJSON(), password: user.password };
     return await dataStore.updateUser(userId, userDataToStore);
   }
@@ -27,6 +26,8 @@ class UserController {
       if (!username || !email || !password) {
         return res.status(400).json({ error: 'Username, email, and password are required' });
       }
+
+      const dataStore = await getDatabase();
 
       // Check if user already exists
       const existingUser = await dataStore.findUserByEmail(email);
@@ -66,6 +67,7 @@ class UserController {
         return res.status(400).json({ error: 'Email and password are required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserByEmail(email);
       if (!userData) {
         return res.status(401).json({ error: 'Invalid email or password' });
@@ -90,6 +92,7 @@ class UserController {
     try {
       const { userId } = req.params;
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -110,6 +113,7 @@ class UserController {
         return res.status(400).json({ error: 'Bio is required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -138,6 +142,7 @@ class UserController {
         return res.status(400).json({ error: 'Service name is required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -171,6 +176,7 @@ class UserController {
         return res.status(400).json({ error: 'Title and type are required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -199,6 +205,7 @@ class UserController {
         return res.status(400).json({ error: 'watchedAt timestamp is required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -223,6 +230,7 @@ class UserController {
       const { userId } = req.params;
       const { genres, bingeWatchCount, ageRange, locationRadius } = req.body;
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -263,6 +271,7 @@ class UserController {
         return res.status(400).json({ error: 'Profile picture URL is required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -291,6 +300,7 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -324,6 +334,7 @@ class UserController {
         return res.status(400).json({ error: 'Photo URL is required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -348,6 +359,7 @@ class UserController {
       const { userId } = req.params;
       const updates = req.body;
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -389,6 +401,7 @@ class UserController {
         return res.status(400).json({ error: 'Quiz responses are required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -417,6 +430,7 @@ class UserController {
         return res.status(400).json({ error: 'Current password and new password are required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -448,6 +462,7 @@ class UserController {
         return res.status(400).json({ error: 'Email and new password are required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserByEmail(email);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -476,6 +491,7 @@ class UserController {
         return res.status(400).json({ error: 'TMDB ID and title are required' });
       }
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -499,6 +515,7 @@ class UserController {
     try {
       const { userId, movieId } = req.params;
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -522,6 +539,7 @@ class UserController {
     try {
       const { userId } = req.params;
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -541,6 +559,7 @@ class UserController {
     try {
       const { userId } = req.params;
 
+      const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });

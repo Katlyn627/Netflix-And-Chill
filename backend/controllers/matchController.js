@@ -1,8 +1,6 @@
 const User = require('../models/User');
-const DataStore = require('../utils/dataStore');
+const { getDatabase } = require('../utils/database');
 const MatchingEngine = require('../utils/matchingEngine');
-
-const dataStore = new DataStore();
 
 class MatchController {
   async findMatches(req, res) {
@@ -22,6 +20,7 @@ class MatchController {
         filters.locationRadius = parseInt(req.query.locationRadius);
       }
 
+      const dataStore = await getDatabase();
       const user = await dataStore.findUserById(userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -74,6 +73,7 @@ class MatchController {
     try {
       const { userId } = req.params;
 
+      const dataStore = await getDatabase();
       const user = await dataStore.findUserById(userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });

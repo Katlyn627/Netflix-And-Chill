@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Like = require('../models/Like');
-const DataStore = require('../utils/dataStore');
-
-const dataStore = new DataStore();
+const { getDatabase } = require('../utils/database');
 
 /**
  * POST /api/likes
@@ -21,6 +19,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'type must be "like" or "superlike"' });
     }
 
+    const dataStore = await getDatabase();
     const fromUser = await dataStore.findUserById(fromUserId);
     const toUser = await dataStore.findUserById(toUserId);
 
@@ -54,6 +53,7 @@ router.get('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 
+    const dataStore = await getDatabase();
     const user = await dataStore.findUserById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -80,6 +80,7 @@ router.get('/:userId/received', async (req, res) => {
   try {
     const { userId } = req.params;
 
+    const dataStore = await getDatabase();
     const user = await dataStore.findUserById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -106,6 +107,7 @@ router.get('/:userId/mutual', async (req, res) => {
   try {
     const { userId } = req.params;
 
+    const dataStore = await getDatabase();
     const user = await dataStore.findUserById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });

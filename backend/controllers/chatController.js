@@ -1,7 +1,5 @@
 const Chat = require('../models/Chat');
-const DataStore = require('../utils/dataStore');
-
-const dataStore = new DataStore();
+const { getDatabase } = require('../utils/database');
 
 class ChatController {
   async sendMessage(req, res) {
@@ -11,6 +9,8 @@ class ChatController {
       if (!senderId || !receiverId || !message) {
         return res.status(400).json({ error: 'senderId, receiverId, and message are required' });
       }
+
+      const dataStore = await getDatabase();
 
       // Verify both users exist
       const sender = await dataStore.findUserById(senderId);
@@ -46,6 +46,7 @@ class ChatController {
         return res.status(400).json({ error: 'Both user IDs are required' });
       }
 
+      const dataStore = await getDatabase();
       const messages = await dataStore.getChatMessages(userId1, userId2);
 
       res.json({
