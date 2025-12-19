@@ -80,11 +80,34 @@ The server will run on `http://localhost:3000`
 
 ## Usage
 
+### Test Data Generation
+
+To quickly populate the database with 100 fake users for testing:
+
+```bash
+# Generate 100 users (default)
+npm run seed
+
+# Generate custom number of users
+node backend/scripts/seedUsers.js --count=50
+
+# With MongoDB
+npm run seed:mongodb
+```
+
+After running the seeder:
+- Check `TEST_CREDENTIALS.md` for all user login credentials
+- All users have the same password: `password123`
+- Each user has complete profile data including streaming services, preferences, and more
+
+See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder documentation.
+
 ### Opening the App
 
 1. Start the backend server (see Installation step 3)
 2. Open `frontend/index.html` in your web browser
 3. Follow the on-screen steps to create your profile and find matches
+   - Or login with any user from `TEST_CREDENTIALS.md` if you've run the seeder
 
 ### API Endpoints
 
