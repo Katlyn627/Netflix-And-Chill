@@ -1,6 +1,9 @@
 // Get current user ID from localStorage
 let currentUserId = localStorage.getItem('currentUserId');
 
+// Constants
+const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
+
 // Filter state
 let currentFilters = {
     minMatchScore: 0,
@@ -18,55 +21,58 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Display matches
+// Store matches globally for carousel navigation
+let allMatches = [];
+let currentMatchIndex = 0;
+
+// Display matches in carousel format
 function displayMatches(matches) {
     const matchesContainer = document.getElementById('matches-container');
     
     if (matches && matches.length > 0) {
-        let html = `<h3>Found ${matches.length} match(es)!</h3>`;
+        allMatches = matches;
+        currentMatchIndex = 0;
         
-        matches.forEach(match => {
-            const sharedContentHtml = match.sharedContent && match.sharedContent.length > 0
-                ? `<div class="shared-content">
-                    <h4>Shared Content:</h4>
-                    <ul>
-                        ${match.sharedContent.map(content => 
-                            `<li>${content.title} (${content.type})</li>`
-                        ).join('')}
-                    </ul>
-                   </div>`
-                : '';
-            
-            const matchDescription = match.matchDescription || `${match.matchScore}% Movie Match`;
-            const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
-            const username = escapeHtml(match.user.username);
-            const bio = escapeHtml(match.user.bio || 'No bio yet');
-            const location = escapeHtml(match.user.location || 'Not specified');
-            
-            html += `
-                <div class="match-card">
-                    <div class="match-header">
-                        <img src="${profilePhotoUrl}" alt="${username}" class="match-profile-photo" />
-                        <div class="match-info">
-                            <div class="match-score"><strong>${match.matchScore}%</strong> Match</div>
-                            <h3>${username}</h3>
-                        </div>
-                    </div>
-                    <div class="match-details">
-                        <p><strong>Age:</strong> ${match.user.age}</p>
-                        <p><strong>Location:</strong> ${location}</p>
-                        <p><strong>Bio:</strong> ${bio}</p>
-                        <p><strong>Streaming Services:</strong> ${match.user.streamingServices.map(s => escapeHtml(s.name)).join(', ')}</p>
-                    </div>
-                    ${sharedContentHtml}
-                    <div class="match-actions">
-                        <button class="btn btn-chat" onclick="openChat('${match.user.id}', '${username}')">💬 Start Chat</button>
+        let html = `
+            <div class="carousel-header">
+                <h3>Found ${matches.length} match(es)!</h3>
+            </div>
+            <div class="carousel-container">
+                <button class="carousel-nav carousel-prev" id="carousel-prev" ${matches.length <= 1 ? 'style="display:none;"' : ''}>
+                    <span>❮</span>
+                </button>
+                <div class="carousel-wrapper">
+                    <div class="carousel-track" id="carousel-track">
+                        ${matches.map((match, index) => createMatchCard(match, index)).join('')}
                     </div>
                 </div>
-            `;
-        });
+                <button class="carousel-nav carousel-next" id="carousel-next" ${matches.length <= 1 ? 'style="display:none;"' : ''}>
+                    <span>❯</span>
+                </button>
+            </div>
+            <div class="carousel-indicators" id="carousel-indicators">
+                ${matches.map((_, index) => `<span class="indicator ${index === 0 ? 'active' : ''}" data-index="${index}"></span>`).join('')}
+            </div>
+        `;
         
         matchesContainer.innerHTML = html;
+        
+        // Add event listeners for carousel navigation
+        if (matches.length > 1) {
+            document.getElementById('carousel-prev').addEventListener('click', showPreviousMatch);
+            document.getElementById('carousel-next').addEventListener('click', showNextMatch);
+            
+            // Add click listeners to indicators
+            document.querySelectorAll('.indicator').forEach(indicator => {
+                indicator.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    goToMatch(index);
+                });
+            });
+            
+            // Add swipe support
+            addSwipeSupport();
+        }
     } else {
         matchesContainer.innerHTML = `
             <div class="empty-state">
@@ -74,6 +80,236 @@ function displayMatches(matches) {
                 <p>Try adding more shows to your watch history to find better matches!</p>
             </div>
         `;
+    }
+}
+
+// Create individual match card for carousel
+function createMatchCard(match, index) {
+    const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
+    const username = escapeHtml(match.user.username);
+    const bio = escapeHtml(match.user.bio || 'No bio yet');
+    const location = escapeHtml(match.user.location || 'Not specified');
+    const age = match.user.age || 'N/A';
+    const matchScore = Math.round(match.matchScore);
+    
+    return `
+        <div class="carousel-card ${index === 0 ? 'active' : ''}" data-index="${index}">
+            <div class="match-image-container" onclick="showMatchDetails(${index})">
+                <img src="${profilePhotoUrl}" alt="${username}" class="match-main-photo" />
+                <div class="movie-ticket-overlay">
+                    <div class="ticket-content">
+                        <div class="ticket-score">${matchScore}%</div>
+                        <div class="ticket-label">MATCH</div>
+                    </div>
+                </div>
+            </div>
+            <div class="match-basic-info">
+                <h3 class="match-username">${username}, ${age}</h3>
+                <p class="match-location">📍 ${location}</p>
+                <p class="match-bio">${bio.length > 100 ? bio.substring(0, 100) + '...' : bio}</p>
+                <div class="match-stats-preview">
+                    <div class="stat-item">
+                        <span class="stat-icon">🎬</span>
+                        <span class="stat-value">${match.sharedContent ? match.sharedContent.length : 0}</span>
+                        <span class="stat-label">Shared</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">📺</span>
+                        <span class="stat-value">${match.user.streamingServices ? match.user.streamingServices.length : 0}</span>
+                        <span class="stat-label">Services</span>
+                    </div>
+                </div>
+                <div class="match-quick-actions">
+                    <button class="btn btn-primary btn-view-details" onclick="showMatchDetails(${index})">View Details</button>
+                    <button class="btn btn-chat" onclick="openChat('${match.user.id}', '${username}')">💬 Chat</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Carousel navigation functions
+function showPreviousMatch() {
+    if (currentMatchIndex > 0) {
+        goToMatch(currentMatchIndex - 1);
+    }
+}
+
+function showNextMatch() {
+    if (currentMatchIndex < allMatches.length - 1) {
+        goToMatch(currentMatchIndex + 1);
+    }
+}
+
+function goToMatch(index) {
+    if (index < 0 || index >= allMatches.length) return;
+    
+    currentMatchIndex = index;
+    const track = document.getElementById('carousel-track');
+    const cards = document.querySelectorAll('.carousel-card');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    // Update active card
+    cards.forEach((card, i) => {
+        card.classList.toggle('active', i === index);
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+    });
+    
+    // Slide the carousel
+    const offset = -index * 100;
+    track.style.transform = `translateX(${offset}%)`;
+}
+
+// Add swipe support for touch devices
+function addSwipeSupport() {
+    const track = document.getElementById('carousel-track');
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    
+    track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+    });
+    
+    track.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+    });
+    
+    track.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const diff = startX - currentX;
+        if (Math.abs(diff) > SWIPE_THRESHOLD) { // Minimum swipe distance
+            if (diff > 0) {
+                showNextMatch();
+            } else {
+                showPreviousMatch();
+            }
+        }
+    });
+    
+    // Mouse drag support for desktop
+    track.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+        track.style.cursor = 'grabbing';
+    });
+    
+    track.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX;
+    });
+    
+    track.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        track.style.cursor = 'grab';
+        
+        const diff = startX - currentX;
+        if (Math.abs(diff) > SWIPE_THRESHOLD) {
+            if (diff > 0) {
+                showNextMatch();
+            } else {
+                showPreviousMatch();
+            }
+        }
+    });
+    
+    track.addEventListener('mouseleave', () => {
+        if (isDragging) {
+            isDragging = false;
+            track.style.cursor = 'grab';
+        }
+    });
+}
+
+// Show detailed match information in modal
+function showMatchDetails(index) {
+    const match = allMatches[index];
+    const username = escapeHtml(match.user.username);
+    const bio = escapeHtml(match.user.bio || 'No bio yet');
+    const location = escapeHtml(match.user.location || 'Not specified');
+    const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
+    const matchScore = Math.round(match.matchScore);
+    
+    const sharedContentHtml = match.sharedContent && match.sharedContent.length > 0
+        ? `<div class="detail-section">
+            <h4>🎬 Shared Content (${match.sharedContent.length})</h4>
+            <ul class="shared-content-list">
+                ${match.sharedContent.map(content => 
+                    `<li>${escapeHtml(content.title)} <span class="content-type">(${content.type})</span></li>`
+                ).join('')}
+            </ul>
+           </div>`
+        : '<p class="no-shared-content">No shared content yet</p>';
+    
+    const streamingServicesHtml = match.user.streamingServices && match.user.streamingServices.length > 0
+        ? `<div class="detail-section">
+            <h4>📺 Streaming Services</h4>
+            <div class="services-list">
+                ${match.user.streamingServices.map(s => 
+                    `<span class="service-tag">${escapeHtml(s.name)}</span>`
+                ).join('')}
+            </div>
+           </div>`
+        : '';
+    
+    // Create or update modal
+    let modal = document.getElementById('match-details-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'match-details-modal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+    }
+    
+    modal.innerHTML = `
+        <div class="modal-content match-details-content">
+            <div class="match-details-header">
+                <h3>${username}'s Profile</h3>
+                <button class="close-modal" onclick="closeMatchDetailsModal()">&times;</button>
+            </div>
+            <div class="match-details-body">
+                <div class="details-photo-section">
+                    <img src="${profilePhotoUrl}" alt="${username}" class="details-main-photo" />
+                    <div class="details-score-badge">
+                        <div class="score-number">${matchScore}%</div>
+                        <div class="score-label">Match Score</div>
+                    </div>
+                </div>
+                <div class="details-info-section">
+                    <div class="detail-section">
+                        <h4>📋 Basic Information</h4>
+                        <p><strong>Age:</strong> ${match.user.age || 'N/A'}</p>
+                        <p><strong>Gender:</strong> ${escapeHtml(match.user.gender || 'Not specified')}</p>
+                        <p><strong>Location:</strong> ${location}</p>
+                        <p><strong>Bio:</strong> ${bio}</p>
+                    </div>
+                    ${streamingServicesHtml}
+                    ${sharedContentHtml}
+                </div>
+            </div>
+            <div class="match-details-footer">
+                <button class="btn btn-chat" onclick="openChat('${match.user.id}', '${username}'); closeMatchDetailsModal();">💬 Start Chat</button>
+                <button class="btn btn-secondary" onclick="closeMatchDetailsModal()">Close</button>
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'flex';
+}
+
+function closeMatchDetailsModal() {
+    const modal = document.getElementById('match-details-modal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 }
 
@@ -345,12 +581,16 @@ document.addEventListener('keypress', (e) => {
 window.addEventListener('click', (e) => {
     const chatModal = document.getElementById('chat-modal');
     const filtersModal = document.getElementById('filters-modal');
+    const detailsModal = document.getElementById('match-details-modal');
     
     if (e.target === chatModal) {
         closeChatModal();
     }
     if (e.target === filtersModal) {
         hideFiltersModal();
+    }
+    if (e.target === detailsModal) {
+        closeMatchDetailsModal();
     }
 });
 
