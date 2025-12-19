@@ -6,15 +6,26 @@
 const DatabaseFactory = require('../database/databaseFactory');
 
 let databaseInstance = null;
+let databasePromise = null;
 
 /**
  * Get the shared database instance
  * Creates a new instance on first call, then returns the same instance
+ * Uses a promise-based approach to prevent race conditions
  */
 async function getDatabase() {
-  if (!databaseInstance) {
-    databaseInstance = await DatabaseFactory.createDatabase();
+  if (databaseInstance) {
+    return databaseInstance;
   }
+  
+  if (databasePromise) {
+    return databasePromise;
+  }
+  
+  databasePromise = DatabaseFactory.createDatabase();
+  databaseInstance = await databasePromise;
+  databasePromise = null;
+  
   return databaseInstance;
 }
 
@@ -23,6 +34,7 @@ async function getDatabase() {
  */
 function resetDatabase() {
   databaseInstance = null;
+  databasePromise = null;
 }
 
 module.exports = {
