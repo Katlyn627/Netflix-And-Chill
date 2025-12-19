@@ -146,18 +146,18 @@
 /* Movie Ticket Overlay */
 .movie-ticket-overlay {
     position: absolute;
-    top: 50%;
+    bottom: 10px;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: 200px;
-    height: 120px;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 70px;
     background: linear-gradient(135deg, rgba(229, 9, 20, 0.95) 0%, rgba(178, 7, 16, 0.95) 100%);
-    border-radius: 15px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     /* Create ticket stub corners with clip-path */
     clip-path: polygon(
         0% var(--ticket-corner-radius), var(--ticket-corner-radius) var(--ticket-corner-radius), var(--ticket-corner-radius) 0%, 
@@ -191,20 +191,20 @@
 }
 
 .ticket-score {
-    font-size: 3em;
+    font-size: 1.8em;
     font-weight: 900;
     color: white;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     line-height: 1;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .ticket-label {
-    font-size: 1em;
+    font-size: 0.7em;
     font-weight: 700;
     color: white;
-    letter-spacing: 3px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 /* Match Basic Info */
@@ -741,12 +741,16 @@
     }
 
     .movie-ticket-overlay {
-        width: 160px;
-        height: 100px;
+        width: 100px;
+        height: 60px;
     }
 
     .ticket-score {
-        font-size: 2.5em;
+        font-size: 1.5em;
+    }
+    
+    .ticket-label {
+        font-size: 0.6em;
     }
 
     .carousel-nav {

@@ -183,7 +183,7 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getStreamingProviders(region = 'US') {
-    // If no API key, return fallback data
+    // If no API key, return fallback data (already limited to top 20)
     if (!this.apiKey) {
       return fallbackProviders;
     }
@@ -198,7 +198,8 @@ class StreamingAPIService {
         return fallbackProviders;
       }
       
-      return results;
+      // Limit to top 20 providers by display priority
+      return results.slice(0, 20);
     } catch (error) {
       console.error('Error fetching streaming providers:', error);
       return fallbackProviders;

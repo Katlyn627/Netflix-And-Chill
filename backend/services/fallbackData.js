@@ -39,6 +39,7 @@ const fallbackGenres = [
 
 // Comprehensive list of popular streaming providers
 // Based on major streaming services available in the US
+// Limited to top 20 most popular streaming services in USA
 const fallbackProviders = [
   { id: 8, name: 'Netflix', logoPath: null, logoUrl: null, displayPriority: 1 },
   { id: 9, name: 'Amazon Prime Video', logoPath: null, logoUrl: null, displayPriority: 2 },
@@ -48,28 +49,18 @@ const fallbackProviders = [
   { id: 350, name: 'Apple TV+', logoPath: null, logoUrl: null, displayPriority: 6 },
   { id: 387, name: 'Peacock', logoPath: null, logoUrl: null, displayPriority: 7 },
   { id: 531, name: 'Paramount+', logoPath: null, logoUrl: null, displayPriority: 8 },
-  { id: 2, name: 'Apple iTunes', logoPath: null, logoUrl: null, displayPriority: 9 },
-  { id: 3, name: 'Google Play Movies', logoPath: null, logoUrl: null, displayPriority: 10 },
-  { id: 10, name: 'Amazon Video', logoPath: null, logoUrl: null, displayPriority: 11 },
-  { id: 68, name: 'Microsoft Store', logoPath: null, logoUrl: null, displayPriority: 12 },
-  { id: 7, name: 'Vudu', logoPath: null, logoUrl: null, displayPriority: 13 },
-  { id: 192, name: 'YouTube', logoPath: null, logoUrl: null, displayPriority: 14 },
-  { id: 1899, name: 'Max', logoPath: null, logoUrl: null, displayPriority: 15 },
-  { id: 386, name: 'Peacock Premium', logoPath: null, logoUrl: null, displayPriority: 16 },
+  { id: 1899, name: 'Max', logoPath: null, logoUrl: null, displayPriority: 9 },
+  { id: 386, name: 'Peacock Premium', logoPath: null, logoUrl: null, displayPriority: 10 },
+  { id: 2, name: 'Apple iTunes', logoPath: null, logoUrl: null, displayPriority: 11 },
+  { id: 3, name: 'Google Play Movies', logoPath: null, logoUrl: null, displayPriority: 12 },
+  { id: 10, name: 'Amazon Video', logoPath: null, logoUrl: null, displayPriority: 13 },
+  { id: 68, name: 'Microsoft Store', logoPath: null, logoUrl: null, displayPriority: 14 },
+  { id: 7, name: 'Vudu', logoPath: null, logoUrl: null, displayPriority: 15 },
+  { id: 192, name: 'YouTube', logoPath: null, logoUrl: null, displayPriority: 16 },
   { id: 257, name: 'fuboTV', logoPath: null, logoUrl: null, displayPriority: 17 },
   { id: 582, name: 'Crunchyroll', logoPath: null, logoUrl: null, displayPriority: 18 },
-  { id: 283, name: 'Crackle', logoPath: null, logoUrl: null, displayPriority: 19 },
-  { id: 1796, name: 'Netflix Kids', logoPath: null, logoUrl: null, displayPriority: 20 },
-  { id: 11, name: 'Mubi', logoPath: null, logoUrl: null, displayPriority: 21 },
-  { id: 43, name: 'Shudder', logoPath: null, logoUrl: null, displayPriority: 22 },
-  { id: 613, name: 'Tubi TV', logoPath: null, logoUrl: null, displayPriority: 23 },
-  { id: 1771, name: 'AMC+', logoPath: null, logoUrl: null, displayPriority: 24 },
-  { id: 1773, name: 'The Roku Channel', logoPath: null, logoUrl: null, displayPriority: 25 },
-  { id: 269, name: 'Plex', logoPath: null, logoUrl: null, displayPriority: 26 },
-  { id: 444, name: 'Showtime', logoPath: null, logoUrl: null, displayPriority: 27 },
-  { id: 1825, name: 'Starz', logoPath: null, logoUrl: null, displayPriority: 28 },
-  { id: 634, name: 'BritBox', logoPath: null, logoUrl: null, displayPriority: 29 },
-  { id: 1876, name: 'Pluto TV', logoPath: null, logoUrl: null, displayPriority: 30 }
+  { id: 444, name: 'Showtime', logoPath: null, logoUrl: null, displayPriority: 19 },
+  { id: 1825, name: 'Starz', logoPath: null, logoUrl: null, displayPriority: 20 }
 ];
 
 module.exports = {
