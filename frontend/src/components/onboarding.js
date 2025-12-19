@@ -27,6 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add keyboard navigation
     document.addEventListener('keydown', handleKeyboardNavigation);
+    
+    // Allow clicking on progress dots to navigate
+    const dots = document.querySelectorAll('.progress-dot');
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            goToScreen(index);
+        });
+    });
+    
+    // Preload images for smooth transitions
+    preloadImages();
 });
 
 // Navigate to next screen
@@ -174,16 +185,6 @@ function handleKeyboardNavigation(e) {
     }
 }
 
-// Allow clicking on progress dots to navigate
-document.addEventListener('DOMContentLoaded', () => {
-    const dots = document.querySelectorAll('.progress-dot');
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            goToScreen(index);
-        });
-    });
-});
-
 // Announce screen change for screen readers (accessibility)
 function announceScreenChange(screenIndex) {
     const titles = [
@@ -225,9 +226,6 @@ function preloadImages() {
         img.src = src;
     });
 }
-
-// Preload images when page loads
-document.addEventListener('DOMContentLoaded', preloadImages);
 
 // Reset onboarding (for testing/development)
 function resetOnboarding() {
