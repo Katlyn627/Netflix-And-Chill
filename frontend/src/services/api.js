@@ -83,8 +83,29 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
-    async findMatches(userId, limit = 10) {
-        const response = await fetch(`${API_BASE_URL}/matches/${userId}?limit=${limit}`);
+    async findMatches(userId, filters = {}) {
+        let url = `${API_BASE_URL}/matches/${userId}?limit=10`;
+        
+        if (filters.minMatchScore) {
+            url += `&minMatchScore=${filters.minMatchScore}`;
+        }
+        if (filters.minAge) {
+            url += `&minAge=${filters.minAge}`;
+        }
+        if (filters.maxAge) {
+            url += `&maxAge=${filters.maxAge}`;
+        }
+        if (filters.locationRadius) {
+            url += `&locationRadius=${filters.locationRadius}`;
+        }
+        if (filters.genderPreference && filters.genderPreference.length > 0) {
+            url += `&genderPreference=${filters.genderPreference.join(',')}`;
+        }
+        if (filters.sexualOrientationPreference && filters.sexualOrientationPreference.length > 0) {
+            url += `&sexualOrientationPreference=${filters.sexualOrientationPreference.join(',')}`;
+        }
+        
+        const response = await fetch(url);
         return await response.json();
     }
 
