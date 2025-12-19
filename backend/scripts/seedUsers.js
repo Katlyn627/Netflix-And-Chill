@@ -361,7 +361,12 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     const args = process.argv.slice(2);
     const countArg = args.find(arg => arg.startsWith('--count='));
     if (countArg) {
-      count = parseInt(countArg.split('=')[1], 10);
+      const parsedCount = parseInt(countArg.split('=')[1], 10);
+      if (isNaN(parsedCount) || parsedCount < 1) {
+        console.error('❌ Invalid count value. Please provide a positive integer.');
+        process.exit(1);
+      }
+      count = parsedCount;
     }
     
     console.log(`📊 Generating ${count} fake users...\n`);
@@ -414,15 +419,15 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     // Generate credentials file
     console.log('\n📄 Generating test credentials file...');
     const credentialsPath = path.join(__dirname, '../../TEST_CREDENTIALS.md');
-    const { markdown: mdPath, json: jsonPath } = await generateCredentialsFile(users, credentialsPath);
-    console.log(`  ✓ Markdown file: ${path.relative(process.cwd(), mdPath)}`);
+    const { markdown: markdownPath, json: jsonPath } = await generateCredentialsFile(users, credentialsPath);
+    console.log(`  ✓ Markdown file: ${path.relative(process.cwd(), markdownPath)}`);
     console.log(`  ✓ JSON file: ${path.relative(process.cwd(), jsonPath)}`);
     
     console.log(`\n📝 Summary:`);
     console.log(`   - Total users: ${count}`);
     console.log(`   - Default password: ${DEFAULT_PASSWORD}`);
     console.log(`   - Database type: ${process.env.DB_TYPE || 'file'}`);
-    console.log(`   - Credentials file: ${path.relative(process.cwd(), mdPath)}`);
+    console.log(`   - Credentials file: ${path.relative(process.cwd(), markdownPath)}`);
     console.log(`\n💡 You can now login with any user's email and password: ${DEFAULT_PASSWORD}`);
     
   } catch (error) {

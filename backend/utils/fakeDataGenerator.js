@@ -10,7 +10,7 @@ const firstNames = [
   'Sam', 'Pat', 'Chris', 'Jesse', 'Kai', 'Ellis', 'Peyton', 'Logan',
   'Dylan', 'Ryan', 'Adrian', 'Andy', 'Robin', 'Ash', 'Kendall', 'Micah',
   'Spencer', 'Remy', 'Oakley', 'Lennon', 'Ari', 'Bailey', 'Blair', 'Brooks',
-  'Carson', 'Dakota', 'Eden', 'Eliot', 'Gray', 'Harper', 'Indigo', 'Jules'
+  'Carson', 'Eden', 'Eliot', 'Gray', 'Harper', 'Indigo', 'Jules'
 ];
 
 const lastNames = [
@@ -97,10 +97,15 @@ function randomItem(array) {
 }
 
 /**
- * Get random items from an array
+ * Get random items from an array using Fisher-Yates shuffle
  */
 function randomItems(array, count) {
-  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  const shuffled = [...array];
+  // Fisher-Yates shuffle
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   return shuffled.slice(0, Math.min(count, array.length));
 }
 
