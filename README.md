@@ -262,7 +262,8 @@ Choose the database that best fits your needs:
 - NoSQL database
 - Great for flexible schema
 - Free tier available on MongoDB Atlas
-- See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
+- **Quick Setup:** See [MONGODB_SETUP.md](MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
+- **Migration Guide:** See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
 
 ### PostgreSQL
 - SQL database
