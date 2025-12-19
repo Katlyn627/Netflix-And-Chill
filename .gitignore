@@ -16,3 +16,12 @@ TEST_CREDENTIALS.md
 TEST_CREDENTIALS.json
 
 test-*.js
+
+# Next.js
+.next/
+out/
+*.next
+
+# Dependencies
+package-lock.json
+yarn.lock
