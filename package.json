@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "A dating app that will match you solely based on the movies, TV shows, and how many episodes you binge in one setting.",
   "main": "backend/server.js",
+  "type": "module",
   "scripts": {
     "start": "node backend/server.js",
     "dev": "node backend/server.js",
+    "dev:express": "node src/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "node backend/scripts/seedUsers.js",
     "seed:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/seedUsers.js"
@@ -24,8 +26,12 @@
     "dotenv": "^17.2.3",
     "express": "^4.18.2",
     "mongodb": "^7.0.0",
+    "mongoose": "^8.0.0",
     "multer": "^2.0.2",
-    "node-fetch": "^2.7.0"
+    "next": "^14.0.0",
+    "node-fetch": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "cross-env": "^10.1.0"
