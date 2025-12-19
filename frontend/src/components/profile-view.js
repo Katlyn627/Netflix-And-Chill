@@ -355,8 +355,8 @@ class ProfileView {
         // Logout button
         document.getElementById('logout-btn').addEventListener('click', () => {
             if (confirm('Are you sure you want to logout?')) {
-                localStorage.clear();
-                window.location.replace('login.html');
+                localStorage.removeItem('currentUserId');
+                window.location.href = 'login.html';
             }
         });
 
