@@ -44,12 +44,18 @@ class ProfileView {
     renderProfile() {
         const user = this.userData;
 
+        // Helper function to capitalize first letter
+        const capitalize = (str) => {
+            if (!str) return 'N/A';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        };
+
         // Profile header
         document.getElementById('profile-username').textContent = user.username;
         document.getElementById('profile-age').textContent = user.age || 'N/A';
         document.getElementById('profile-location').textContent = user.location || 'N/A';
-        document.getElementById('profile-gender').textContent = user.gender || 'N/A';
-        document.getElementById('profile-sexual-orientation').textContent = user.sexualOrientation || 'N/A';
+        document.getElementById('profile-gender').textContent = capitalize(user.gender);
+        document.getElementById('profile-sexual-orientation').textContent = capitalize(user.sexualOrientation);
         document.getElementById('profile-bio').textContent = user.bio || 'No bio added yet.';
 
         // User email in account settings
