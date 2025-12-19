@@ -1,0 +1,356 @@
+/* Onboarding Screen Styles */
+/* Brand Kit Colors: Cinematic Red (#E50914), Black (#000000), White (#FFFFFF) */
+
+.onboarding-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #000000 0%, #141414 100%);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Progress Indicators */
+.progress-indicators {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+}
+
+.progress-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.progress-dot.active {
+    background: #E50914;
+    width: 32px;
+    border-radius: 6px;
+}
+
+.progress-dot:hover {
+    background: rgba(229, 9, 20, 0.6);
+}
+
+/* Onboarding Screens Container */
+.onboarding-screens {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Individual Screen */
+.onboarding-screen {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(100%);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 600px;
+    padding: 60px 20px 40px;
+}
+
+.onboarding-screen.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    position: relative;
+}
+
+.onboarding-screen.prev {
+    transform: translateX(-100%);
+}
+
+/* Screen Content */
+.screen-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+.image-container {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 40px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.onboarding-image {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(229, 9, 20, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.onboarding-image:hover {
+    transform: scale(1.05);
+}
+
+/* Screen Text */
+.screen-title {
+    font-size: 2.5em;
+    font-weight: 900;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.screen-description {
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    max-width: 450px;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+/* Button Container */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.btn-large {
+    padding: 16px 32px;
+    font-size: 1.1em;
+    width: 100%;
+}
+
+.btn-text {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: none;
+    padding: 12px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.btn-text:hover {
+    color: #FFFFFF;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Navigation Arrows */
+.navigation-arrows {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.nav-arrow {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: all;
+    backdrop-filter: blur(10px);
+}
+
+.nav-arrow:hover {
+    background: rgba(229, 9, 20, 0.8);
+    border-color: #E50914;
+    transform: scale(1.1);
+}
+
+.nav-arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.nav-prev {
+    margin-left: -25px;
+}
+
+.nav-next {
+    margin-right: -25px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .onboarding-container {
+        padding: 15px;
+    }
+
+    .progress-indicators {
+        top: 20px;
+    }
+
+    .onboarding-screen {
+        min-height: 500px;
+        padding: 50px 15px 30px;
+    }
+
+    .screen-title {
+        font-size: 2em;
+    }
+
+    .screen-description {
+        font-size: 1em;
+    }
+
+    .image-container {
+        max-width: 300px;
+        margin-bottom: 30px;
+    }
+
+    .navigation-arrows {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .nav-arrow {
+        width: 45px;
+        height: 45px;
+    }
+
+    .nav-prev {
+        margin-left: 0;
+    }
+
+    .nav-next {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .screen-title {
+        font-size: 1.75em;
+    }
+
+    .screen-description {
+        font-size: 0.95em;
+    }
+
+    .image-container {
+        max-width: 250px;
+    }
+
+    .btn-large {
+        padding: 14px 24px;
+        font-size: 1em;
+    }
+}
+
+/* Loading Animation for Images */
+.onboarding-image {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Accessibility */
+.nav-arrow:focus {
+    outline: 2px solid #E50914;
+    outline-offset: 2px;
+}
+
+.btn:focus {
+    outline: 2px solid #E50914;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .progress-dot {
+        border: 2px solid #FFFFFF;
+    }
+
+    .nav-arrow {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .onboarding-screen,
+    .onboarding-image,
+    .screen-title,
+    .screen-description,
+    .button-container {
+        animation: none;
+        transition: none;
+    }
+
+    .onboarding-image:hover {
+        transform: none;
+    }
+
+    .nav-arrow:hover {
+        transform: none;
+    }
+}

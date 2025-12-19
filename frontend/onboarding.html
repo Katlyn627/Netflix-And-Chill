@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Netflix & Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E50914">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/onboarding.css">
+</head>
+<body>
+    <div class="onboarding-container">
+        <!-- Progress Indicators -->
+        <div class="progress-indicators">
+            <span class="progress-dot active" data-screen="0"></span>
+            <span class="progress-dot" data-screen="1"></span>
+            <span class="progress-dot" data-screen="2"></span>
+            <span class="progress-dot" data-screen="3"></span>
+        </div>
+
+        <!-- Onboarding Screens -->
+        <div class="onboarding-screens">
+            <!-- Screen 0: Logo/Welcome -->
+            <div class="onboarding-screen active" data-screen="0">
+                <div class="screen-content">
+                    <div class="image-container">
+                        <img src="../assets/onboarding/logo.svg" alt="Netflix & Chill Logo" class="onboarding-image">
+                    </div>
+                    <h1 class="screen-title">Welcome to Netflix & Chill</h1>
+                    <p class="screen-description">Find your perfect binge-watching partner. Match with people who share your streaming preferences and watch history.</p>
+                </div>
+                <div class="button-container">
+                    <button class="btn btn-primary btn-large" onclick="nextScreen()">Get Started</button>
+                    <button class="btn btn-text" onclick="skipOnboarding()">Skip</button>
+                </div>
+            </div>
+
+            <!-- Screen 1: Chat & Watch Together -->
+            <div class="onboarding-screen" data-screen="1">
+                <div class="screen-content">
+                    <div class="image-container">
+                        <img src="../assets/onboarding/onboard1.svg" alt="Chat and watch together" class="onboarding-image">
+                    </div>
+                    <h2 class="screen-title">Chat & Watch Together</h2>
+                    <p class="screen-description">Connect with your matches and enjoy streaming content together. Share reactions, discuss plot twists, and build genuine connections through shared viewing experiences.</p>
+                </div>
+                <div class="button-container">
+                    <button class="btn btn-primary btn-large" onclick="nextScreen()">Continue</button>
+                    <button class="btn btn-text" onclick="skipOnboarding()">Skip</button>
+                </div>
+            </div>
+
+            <!-- Screen 2: Build Real Connections -->
+            <div class="onboarding-screen" data-screen="2">
+                <div class="screen-content">
+                    <div class="image-container">
+                        <img src="../assets/onboarding/onboard2.svg" alt="Build real connections" class="onboarding-image">
+                    </div>
+                    <h2 class="screen-title">Build Real Connections</h2>
+                    <p class="screen-description">Form meaningful relationships based on shared interests, not just looks. Our community values authentic connections built on common passions for movies and shows.</p>
+                </div>
+                <div class="button-container">
+                    <button class="btn btn-primary btn-large" onclick="nextScreen()">Continue</button>
+                    <button class="btn btn-text" onclick="skipOnboarding()">Skip</button>
+                </div>
+            </div>
+
+            <!-- Screen 3: Discover Matches Through Movies -->
+            <div class="onboarding-screen" data-screen="3">
+                <div class="screen-content">
+                    <div class="image-container">
+                        <img src="../assets/onboarding/onboard3.svg" alt="Discover matches through movies" class="onboarding-image">
+                    </div>
+                    <h2 class="screen-title">Discover Matches Through Movies</h2>
+                    <p class="screen-description">Get matched based on your streaming services, watch history, and binge-watching habits. Our smart algorithm finds people who truly share your entertainment preferences.</p>
+                </div>
+                <div class="button-container">
+                    <button class="btn btn-primary btn-large" onclick="completeOnboarding()">Start Matching</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation-arrows">
+            <button class="nav-arrow nav-prev" onclick="prevScreen()" aria-label="Previous screen">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <button class="nav-arrow nav-next" onclick="nextScreen()" aria-label="Next screen">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="src/components/onboarding.js"></script>
+</body>
+</html>

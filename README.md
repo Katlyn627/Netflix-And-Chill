@@ -4,6 +4,7 @@ A modern dating application that matches users based on their streaming preferen
 
 ## Features
 
+- **Onboarding Experience**: Beautiful onboarding flow introducing users to the app's core features
 - **User Profiles**: Create detailed profiles with bio, age, and location
 - **Profile Pictures & Photo Galleries**: Upload profile pictures and up to 6 photos
 - **Favorite Movies**: Search and add your favorite movies from TMDB to your profile
@@ -145,6 +146,13 @@ See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder d
 
 ```
 Netflix-And-Chill/
+├── assets/
+│   └── onboarding/              # Onboarding assets
+│       ├── logo.svg             # App logo and branding
+│       ├── onboard1.svg         # "Chat & Watch Together"
+│       ├── onboard2.svg         # "Build Real Connections"
+│       ├── onboard3.svg         # "Discover Matches Through Movies"
+│       └── README.md            # Asset documentation
 ├── backend/
 │   ├── config/
 │   │   └── config.js           # Configuration settings
@@ -172,13 +180,18 @@ Netflix-And-Chill/
 │   │   └── matchingEngine.js   # Matching algorithm
 │   └── server.js               # Express server
 ├── frontend/
+│   ├── onboarding.html         # Onboarding flow
 │   ├── index.html              # Main HTML page
+│   ├── assets/
+│   │   └── images/             # App icons and images
 │   └── src/
 │       ├── components/
+│       │   ├── onboarding.js   # Onboarding component
 │       │   └── app.js          # Frontend application logic
 │       ├── services/
 │       │   └── api.js          # API service layer
 │       └── styles/
+│           ├── onboarding.css  # Onboarding styles
 │           └── main.css        # Styling
 ├── docs/
 │   ├── deployment/
@@ -195,6 +208,45 @@ Netflix-And-Chill/
 ├── .gitignore
 └── README.md
 ```
+
+## Onboarding & Brand Assets
+
+### Brand Kit
+The Netflix & Chill app uses a consistent brand identity across all user touchpoints:
+
+**Colors:**
+- **Cinematic Red**: `#E50914` - Primary brand color for CTAs and highlights
+- **Black**: `#000000` - Primary background and text
+- **White**: `#FFFFFF` - Secondary text and contrast elements
+- **Dark Gray**: `#141414` - Secondary background for depth
+
+**Logo Variants:**
+- Full Logo: Complete branding with text and icon
+- Text-free Icon: Standalone icon for app icons
+- Dark Mode: Optimized for dark backgrounds  
+- Rounded Icon: Circular variant for profiles
+
+### Onboarding Flow
+New users are welcomed with an engaging 4-screen onboarding experience:
+
+1. **Welcome Screen** - Introduces the Netflix & Chill brand and value proposition
+2. **Chat & Watch Together** - Explains the social viewing experience
+3. **Build Real Connections** - Emphasizes meaningful relationships over superficial matching
+4. **Discover Matches Through Movies** - Showcases the smart matching algorithm
+
+**Features:**
+- Smooth screen transitions with swipe gestures (mobile) and keyboard navigation
+- Progress indicators showing current position in the flow
+- Skip option for returning users
+- Accessible design with screen reader support
+- Responsive across all device sizes
+
+**Access the onboarding:**
+- First-time users: Automatically shown on first app launch
+- Returning users: Can access via settings or by clearing localStorage
+- Development: Use `resetOnboarding()` in browser console
+
+For detailed asset documentation, see [assets/onboarding/README.md](assets/onboarding/README.md)
 
 ## Matching Algorithm
 
