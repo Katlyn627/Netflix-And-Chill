@@ -16,7 +16,11 @@ class MongoDBAdapter {
       const uri = config.database.mongodb.uri;
       
       // Check for placeholder values or missing configuration
-      if (!uri || uri.includes('<username>') || uri.includes('<password>') || uri.includes('<cluster-url>') || uri.includes('cluster0.abcde')) {
+      // Common placeholders: <username>, <password>, <cluster-url>, example domains
+      if (!uri || 
+          uri.includes('<') || 
+          uri.includes('>') || 
+          /cluster0\.([a-z]+\.)?mongodb\.net/.test(uri) && uri.includes('cluster0.abcde')) {
         throw new Error(
           'MongoDB connection string is not properly configured.\n\n' +
           'Please follow these steps:\n' +
@@ -44,7 +48,8 @@ class MongoDBAdapter {
         throw error;
       } else if (error.code === 'ENOTFOUND' || error.syscall === 'querySrv') {
         // Redact credentials from URI for security
-        const safeUri = this._redactCredentials(config.database.mongodb.uri);
+        const uri = config.database.mongodb.uri;
+        const safeUri = this._redactCredentials(uri);
         throw new Error(
           'Unable to connect to MongoDB Atlas.\n\n' +
           'This error usually means:\n' +
@@ -59,22 +64,27 @@ class MongoDBAdapter {
           'See MONGODB_SETUP.md for detailed setup instructions.\n\n' +
           'Original error: ' + error.message
         );
-      } else if (error.message.includes('ECONNREFUSED') && config.database.mongodb.uri.includes('localhost')) {
-        throw new Error(
-          'Unable to connect to local MongoDB server.\n\n' +
-          'This error means MongoDB is not running on localhost:27017.\n\n' +
-          'To use MongoDB, you have two options:\n\n' +
-          '1. Use MongoDB Atlas (cloud-hosted - recommended):\n' +
-          '   - Follow the setup guide in MONGODB_SETUP.md\n' +
-          '   - Update your .env file with your Atlas connection string\n\n' +
-          '2. Install and run MongoDB locally:\n' +
-          '   - Install MongoDB Community Edition\n' +
-          '   - Start the MongoDB service: mongod\n\n' +
-          'Alternatively, use the file-based database:\n' +
-          '   - Set DB_TYPE=file in your .env file, OR\n' +
-          '   - Run the seeder without DB_TYPE: npm run seed\n\n' +
-          'Original error: ' + error.message
-        );
+      } else if (error.message.includes('ECONNREFUSED')) {
+        const uri = config.database.mongodb.uri || '';
+        if (uri.includes('localhost') || uri.includes('127.0.0.1')) {
+          throw new Error(
+            'Unable to connect to local MongoDB server.\n\n' +
+            'This error means MongoDB is not running on localhost:27017.\n\n' +
+            'To use MongoDB, you have two options:\n\n' +
+            '1. Use MongoDB Atlas (cloud-hosted - recommended):\n' +
+            '   - Follow the setup guide in MONGODB_SETUP.md\n' +
+            '   - Update your .env file with your Atlas connection string\n\n' +
+            '2. Install and run MongoDB locally:\n' +
+            '   - Install MongoDB Community Edition\n' +
+            '   - Start the MongoDB service: mongod\n\n' +
+            'Alternatively, use the file-based database:\n' +
+            '   - Set DB_TYPE=file in your .env file, OR\n' +
+            '   - Run the seeder without DB_TYPE: npm run seed\n\n' +
+            'Original error: ' + error.message
+          );
+        }
+        // If not localhost, re-throw the original error
+        throw error;
       } else {
         console.error('MongoDB connection error:', error);
         throw error;
@@ -89,13 +99,18 @@ class MongoDBAdapter {
   _redactCredentials(uri) {
     if (!uri) return '[not set]';
     
-    // Match mongodb:// or mongodb+srv:// URIs and redact credentials
-    const match = uri.match(/^(mongodb(?:\+srv)?:\/\/)([^@]+)@(.+)$/);
+    // Match mongodb:// or mongodb+srv:// URIs with credentials
+    // Format: mongodb[+srv]://username:password@host/...
+    const match = uri.match(/^(mongodb(?:\+srv)?:\/\/)([^:]+):([^@]+)@(.+)$/);
     if (match) {
-      return `${match[1]}***:***@${match[3]}`;
+      // match[1] = protocol (mongodb:// or mongodb+srv://)
+      // match[2] = username
+      // match[3] = password
+      // match[4] = rest of URI (host, database, params)
+      return `${match[1]}***:***@${match[4]}`;
     }
     
-    // If no credentials in URI, return as-is (e.g., localhost)
+    // If no credentials in URI (e.g., localhost without auth), return as-is
     return uri;
   }
 
