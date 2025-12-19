@@ -89,55 +89,43 @@ function renderStreamingProviders(providers) {
     const servicesList = document.getElementById('services-list');
     if (!servicesList) return;
     
-    // Clear existing content
-    servicesList.innerHTML = '';
+    // Don't clear the existing content - keep the hardcoded top 10 list from HTML
+    // This ensures we always show only the top 10 services as specified
     
-    // Validate logo URL is from a trusted source
-    const isValidLogoUrl = (url) => {
-        if (!url) return false;
-        try {
-            const urlObj = new URL(url);
-            // Only allow TMDB image URLs or empty/null
-            return urlObj.hostname === 'image.tmdb.org' || url === '';
-        } catch {
-            return false;
-        }
-    };
+    // Define the top 10 services we want to support
+    const top10Services = [
+        'Amazon Prime',
+        'Netflix', 
+        'Hulu',
+        'Disney+',
+        'Paramount+',
+        'Apple TV',
+        'HBO',
+        'Peacock',
+        'Sling'
+    ];
     
-    // Render providers from TMDB
+    // Update checkboxes with data from API for matching services
     providers.forEach(provider => {
-        const serviceOption = document.createElement('div');
-        serviceOption.className = 'service-option';
+        // Check if this provider matches one of our top 10
+        const matchingService = top10Services.find(service => 
+            provider.name.toLowerCase().includes(service.toLowerCase()) ||
+            service.toLowerCase().includes(provider.name.toLowerCase())
+        );
         
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `provider-${provider.id}`;
-        checkbox.value = provider.name;
-        checkbox.dataset.providerId = provider.id;
-        checkbox.dataset.logoPath = provider.logoPath || '';
-        checkbox.dataset.logoUrl = provider.logoUrl || '';
-        
-        const label = document.createElement('label');
-        label.setAttribute('for', `provider-${provider.id}`);
-        
-        // Add logo if available and from trusted source
-        if (provider.logoUrl && isValidLogoUrl(provider.logoUrl)) {
-            const logoImg = document.createElement('img');
-            logoImg.src = provider.logoUrl;
-            logoImg.alt = provider.name;
-            logoImg.className = 'service-logo-img';
-            logoImg.style.cssText = 'width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-right: 10px;';
-            label.appendChild(logoImg);
+        if (matchingService) {
+            // Find the corresponding checkbox in the HTML
+            const checkboxes = servicesList.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value.toLowerCase().includes(matchingService.toLowerCase()) ||
+                    matchingService.toLowerCase().includes(checkbox.value.toLowerCase())) {
+                    // Update with API data
+                    checkbox.dataset.providerId = provider.id;
+                    checkbox.dataset.logoPath = provider.logoPath || '';
+                    checkbox.dataset.logoUrl = provider.logoUrl || '';
+                }
+            });
         }
-        
-        const serviceName = document.createElement('span');
-        serviceName.className = 'service-name';
-        serviceName.textContent = provider.name;
-        label.appendChild(serviceName);
-        
-        serviceOption.appendChild(checkbox);
-        serviceOption.appendChild(label);
-        servicesList.appendChild(serviceOption);
     });
 }
 
