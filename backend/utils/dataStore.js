@@ -10,6 +10,7 @@ class DataStore {
     this.usersFile = path.join(this.dataDir, 'users.json');
     this.matchesFile = path.join(this.dataDir, 'matches.json');
     this.likesFile = path.join(this.dataDir, 'likes.json');
+    this.chatsFile = path.join(this.dataDir, 'chats.json');
   }
 
   async ensureDataDir() {
@@ -197,6 +198,38 @@ class DataStore {
     
     try {
       const data = await fs.readFile(this.likesFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  // Chat operations
+  async addChatMessage(chatMessage) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.chatsFile);
+    
+    const chats = await this.loadChats();
+    chats.push(chatMessage);
+    await fs.writeFile(this.chatsFile, JSON.stringify(chats, null, 2));
+    return chatMessage;
+  }
+
+  async getChatMessages(userId1, userId2) {
+    const chats = await this.loadChats();
+    // Get all messages between the two users (both directions)
+    return chats.filter(c => 
+      (c.senderId === userId1 && c.receiverId === userId2) ||
+      (c.senderId === userId2 && c.receiverId === userId1)
+    ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  }
+
+  async loadChats() {
+    await this.ensureDataDir();
+    await this.ensureFile(this.chatsFile);
+    
+    try {
+      const data = await fs.readFile(this.chatsFile, 'utf8');
       return JSON.parse(data);
     } catch (error) {
       return [];

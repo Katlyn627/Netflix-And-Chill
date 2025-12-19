@@ -237,6 +237,22 @@ class NetflixAndChillAPI {
         const response = await fetch(`${API_BASE_URL}/streaming/providers?region=${region}`);
         return await response.json();
     }
+
+    async sendChatMessage(senderId, receiverId, message) {
+        const response = await fetch(`${API_BASE_URL}/chat/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ senderId, receiverId, message })
+        });
+        return await response.json();
+    }
+
+    async getChatMessages(userId1, userId2) {
+        const response = await fetch(`${API_BASE_URL}/chat/${userId1}/${userId2}`);
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();
