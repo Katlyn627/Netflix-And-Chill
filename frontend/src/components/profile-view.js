@@ -222,6 +222,7 @@ class ProfileView {
         if (services.length > 0) {
             // Helper function to get logo class based on service name
             const getLogoClass = (name) => {
+                if (!name) return 'other-logo';
                 const nameLower = name.toLowerCase();
                 if (nameLower.includes('netflix')) return 'netflix-logo';
                 if (nameLower.includes('amazon') || nameLower.includes('prime')) return 'prime-logo';
@@ -237,6 +238,7 @@ class ProfileView {
 
             // Helper function to get logo text
             const getLogoText = (name) => {
+                if (!name) return '?';
                 const nameLower = name.toLowerCase();
                 if (nameLower.includes('netflix')) return 'N';
                 if (nameLower.includes('amazon') || nameLower.includes('prime')) return 'prime';

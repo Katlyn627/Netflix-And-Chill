@@ -127,13 +127,15 @@ class StreamingAPIService {
    * Filter fallback movies by genre IDs
    * @private
    * @param {Array<number>} genreIds - Array of TMDB genre IDs
-   * @returns {Array} Filtered movies
+   * @returns {Array} Filtered movies (returns all fallback movies if no matches found)
    */
   _filterFallbackByGenres(genreIds) {
     const { fallbackMovies } = require('./fallbackData');
-    return fallbackMovies.filter(movie => 
+    const filtered = fallbackMovies.filter(movie => 
       movie.genre_ids && movie.genre_ids.some(gid => genreIds.includes(gid))
     );
+    // If no movies match the genres, return all fallback movies instead of empty array
+    return filtered.length > 0 ? filtered : fallbackMovies;
   }
 
   /**
