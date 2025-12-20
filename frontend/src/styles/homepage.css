@@ -5,6 +5,15 @@
     margin-bottom: 40px;
 }
 
+.hero-logo-image {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+    display: block;
+    filter: drop-shadow(0 0 20px rgba(229, 9, 20, 0.5));
+    animation: fadeInDown 1s ease-in;
+}
+
 .hero-header h1 {
     font-size: 4em;
     margin-bottom: 20px;
@@ -168,6 +177,11 @@
 }
 
 @media (max-width: 768px) {
+    .hero-logo-image {
+        width: 150px;
+        height: 150px;
+    }
+
     .hero-header h1 {
         font-size: 2.5em;
     }

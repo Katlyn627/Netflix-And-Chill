@@ -395,10 +395,10 @@ if (skipMoviePrefsBtn) {
 const skipSwipeBtn = document.getElementById('skip-swipe-btn');
 if (skipSwipeBtn) {
     skipSwipeBtn.addEventListener('click', () => {
-        // Mark profile as created and navigate to matches
+        // Mark profile as created and navigate to homepage
         localStorage.setItem('profileCreated', 'true');
         localStorage.setItem('initialSwipeComplete', 'true');
-        window.location.href = 'matches.html';
+        window.location.href = 'homepage.html';
     });
 }
 
