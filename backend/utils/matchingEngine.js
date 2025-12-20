@@ -38,6 +38,11 @@ class MatchingEngine {
     score += sharedLikedMovies.length * 30; // High weight for movies liked through swiping
     sharedContent.push(...sharedLikedMovies);
 
+    // Check for shared watchlist movies
+    const sharedWatchlistMovies = this.findSharedWatchlistMovies(user1, user2);
+    score += sharedWatchlistMovies.length * 15; // Medium weight for watchlist overlap
+    sharedContent.push(...sharedWatchlistMovies);
+
     // Bonus for similar binge-watching patterns
     const bingeDifference = Math.abs(
       (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
@@ -70,6 +75,7 @@ class MatchingEngine {
     const matchDescription = this.generateMatchDescription(normalizedScore, {
       sharedFavoriteMovies,
       sharedLikedMovies,
+      sharedWatchlistMovies,
       sharedGenres,
       sharedShows,
       emotionalToneCompatibility,
@@ -84,6 +90,7 @@ class MatchingEngine {
       sharedGenres: sharedGenres,
       sharedFavoriteMovies: sharedFavoriteMovies,
       sharedLikedMovies: sharedLikedMovies,
+      sharedWatchlistMovies: sharedWatchlistMovies,
       snackCompatibility: snackCompatibility,
       emotionalToneCompatibility: emotionalToneCompatibility,
       matchDescription: matchDescription
@@ -213,6 +220,46 @@ class MatchingEngine {
   }
 
   /**
+   * Find shared movies in watchlists
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {Array}
+   */
+  static findSharedWatchlistMovies(user1, user2) {
+    const sharedMovies = [];
+    
+    // Get watchlist movies for both users
+    const user1Watchlist = user1.movieWatchlist || [];
+    const user2Watchlist = user2.movieWatchlist || [];
+    
+    // Early return if either user has no watchlist movies
+    if (user1Watchlist.length === 0 || user2Watchlist.length === 0) {
+      return sharedMovies;
+    }
+    
+    // Create a map of user2's watchlist movies by TMDB ID for O(1) lookups
+    const user2WatchlistMap = new Map();
+    user2Watchlist.forEach(movie => {
+      if (movie && movie.tmdbId) {
+        user2WatchlistMap.set(movie.tmdbId, movie);
+      }
+    });
+    
+    // Check user1's watchlist movies against user2's
+    user1Watchlist.forEach(movie1 => {
+      if (movie1 && movie1.tmdbId && user2WatchlistMap.has(movie1.tmdbId)) {
+        sharedMovies.push({
+          title: movie1.title,
+          type: 'watchlist_movie',
+          tmdbId: movie1.tmdbId
+        });
+      }
+    });
+    
+    return sharedMovies;
+  }
+
+  /**
    * Calculate compatibility based on quiz responses (DEPRECATED - kept for backward compatibility)
    * @param {User} user1 
    * @param {User} user2 
@@ -332,6 +379,7 @@ class MatchingEngine {
     const {
       sharedFavoriteMovies = [],
       sharedLikedMovies = [],
+      sharedWatchlistMovies = [],
       sharedGenres = [],
       sharedShows = [],
       emotionalToneCompatibility = 0,
@@ -360,6 +408,15 @@ class MatchingEngine {
         descriptions.push(`Both liked "${sharedLikedMovies[0].title}" and "${sharedLikedMovies[1].title}"`);
       } else {
         descriptions.push(`Liked ${sharedLikedMovies.length} of the same movies`);
+      }
+    }
+    
+    // Check for shared watchlist movies
+    if (sharedWatchlistMovies.length > 0) {
+      if (sharedWatchlistMovies.length === 1) {
+        descriptions.push(`Both want to watch "${sharedWatchlistMovies[0].title}"`);
+      } else if (sharedWatchlistMovies.length >= 2) {
+        descriptions.push(`Have ${sharedWatchlistMovies.length} movies on both watchlists`);
       }
     }
     
@@ -457,7 +514,8 @@ class MatchingEngine {
             {
               snackCompatibility: matchResult.snackCompatibility,
               emotionalToneCompatibility: matchResult.emotionalToneCompatibility,
-              sharedLikedMovies: matchResult.sharedLikedMovies
+              sharedLikedMovies: matchResult.sharedLikedMovies,
+              sharedWatchlistMovies: matchResult.sharedWatchlistMovies
             }
           ));
         }

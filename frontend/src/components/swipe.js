@@ -86,12 +86,6 @@ function renderCurrentMovie() {
       <div class="swipe-overlay swipe-dislike">NOPE</div>
     </div>
   `;
-
-  // Update counter
-  const counter = document.getElementById('swipe-counter');
-  if (counter) {
-    counter.textContent = `${currentMovieIndex + 1} / ${movieStack.length}`;
-  }
 }
 
 /**
