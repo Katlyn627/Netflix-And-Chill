@@ -274,6 +274,83 @@ class NetflixAndChillAPI {
         const response = await fetch(`${API_BASE_URL}/chat/${userId1}/${userId2}`);
         return await response.json();
     }
+
+    async getUserLikes(userId) {
+        const response = await fetch(`${API_BASE_URL}/likes/${userId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch user likes');
+        }
+        const data = await response.json();
+        
+        // Fetch mutual likes
+        const mutualResponse = await fetch(`${API_BASE_URL}/likes/${userId}/mutual`);
+        if (!mutualResponse.ok) {
+            throw new Error('Failed to fetch mutual likes');
+        }
+        const mutualData = await mutualResponse.json();
+        
+        return {
+            likes: data.likes || [],
+            mutual: mutualData.mutualLikes || []
+        };
+    }
+
+    async createWatchInvitation(invitationData) {
+        const response = await fetch(`${API_BASE_URL}/watch-invitations`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(invitationData)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to create watch invitation');
+        }
+        return await response.json();
+    }
+
+    async getUserInvitations(userId) {
+        const response = await fetch(`${API_BASE_URL}/watch-invitations/user/${userId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch user invitations');
+        }
+        return await response.json();
+    }
+
+    async getWatchInvitation(invitationId) {
+        const response = await fetch(`${API_BASE_URL}/watch-invitations/${invitationId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch invitation');
+        }
+        return await response.json();
+    }
+
+    async updateWatchInvitation(invitationId, updates) {
+        const response = await fetch(`${API_BASE_URL}/watch-invitations/${invitationId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updates)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update invitation');
+        }
+        return await response.json();
+    }
+
+    async deleteWatchInvitation(invitationId) {
+        const response = await fetch(`${API_BASE_URL}/watch-invitations/${invitationId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            throw new Error('Failed to delete invitation');
+        }
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();
+
+// Export as global API for use in other scripts
+const API = api;
