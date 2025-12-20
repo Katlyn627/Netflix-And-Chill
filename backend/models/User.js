@@ -218,6 +218,32 @@ class User {
     return this.swipedMovies.filter(m => m.action === 'like');
   }
 
+  // Get swipe count for today based on swipedAt timestamps (using UTC dates)
+  getDailySwipeCount() {
+    const today = new Date();
+    const todayUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+    
+    const todaySwipes = this.swipedMovies.filter(movie => {
+      const swipedDate = new Date(movie.swipedAt);
+      const swipedUTC = Date.UTC(swipedDate.getUTCFullYear(), swipedDate.getUTCMonth(), swipedDate.getUTCDate());
+      return swipedUTC === todayUTC;
+    });
+    
+    return todaySwipes.length;
+  }
+
+  // Get swipes made today (using UTC dates)
+  getTodaySwipes() {
+    const today = new Date();
+    const todayUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+    
+    return this.swipedMovies.filter(movie => {
+      const swipedDate = new Date(movie.swipedAt);
+      const swipedUTC = Date.UTC(swipedDate.getUTCFullYear(), swipedDate.getUTCMonth(), swipedDate.getUTCDate());
+      return swipedUTC === todayUTC;
+    });
+  }
+
   toJSON() {
     return {
       id: this.id,
