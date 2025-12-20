@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handler Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        h1 {
+            color: #e50914;
+        }
+        .test-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #f40612;
+        }
+        .info {
+            background-color: #1e3a5f;
+            padding: 10px;
+            border-left: 4px solid #4a90e2;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #1e4d2b;
+            padding: 10px;
+            border-left: 4px solid #4caf50;
+            margin: 10px 0;
+        }
+        code {
+            background-color: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Error Handler Test Page</h1>
+    
+    <div class="info">
+        <strong>ℹ️ Instructions:</strong> Open your browser's Developer Console (F12) to see the results of these tests.
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1: Extension Errors (Should be Suppressed)</h2>
+        <p>These errors simulate browser extension errors and should NOT appear in the console:</p>
+        <button onclick="testExtensionErrors()">Trigger Extension Errors</button>
+        <div class="success" style="margin-top: 10px; display: none;" id="test1-result">
+            ✅ Extension errors triggered. Check console - they should be suppressed.
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Normal Errors (Should NOT be Suppressed)</h2>
+        <p>These are normal application errors and SHOULD appear in the console:</p>
+        <button onclick="testNormalErrors()">Trigger Normal Errors</button>
+        <div class="success" style="margin-top: 10px; display: none;" id="test2-result">
+            ✅ Normal errors triggered. Check console - they should be visible.
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Debug Mode</h2>
+        <p>Enable debug mode to see suppressed errors with a prefix:</p>
+        <button onclick="enableDebugMode()">Enable Debug Mode</button>
+        <button onclick="disableDebugMode()">Disable Debug Mode</button>
+        <button onclick="testExtensionErrors()">Test with Debug Mode</button>
+        <div class="info" style="margin-top: 10px;" id="debug-status">
+            Debug Mode: <strong id="debug-mode-status">OFF</strong>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Host Detection</h2>
+        <p>Check the current hostname and detect if on localhost:</p>
+        <button onclick="checkHostInfo()">Check Host Info</button>
+        <div class="info" style="margin-top: 10px; display: none;" id="host-info">
+            <!-- Host info will be displayed here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Results</h2>
+        <ul>
+            <li><strong>Test 1:</strong> No errors should appear in console (they're suppressed)</li>
+            <li><strong>Test 2:</strong> Errors should appear normally in console</li>
+            <li><strong>Test 3:</strong> With debug mode ON, suppressed errors appear with [Suppressed Extension Error] prefix</li>
+            <li><strong>Test 4:</strong> Shows current hostname and localhost detection</li>
+        </ul>
+    </div>
+
+    <!-- Load the error handler first -->
+    <script src="src/utils/errorHandler.js"></script>
+
+    <script>
+        // Test Functions
+        function testExtensionErrors() {
+            console.log('--- Testing Extension Errors (Should be Suppressed) ---');
+            
+            // Simulate common extension errors
+            console.error('READ - Host validation failed: {hostName: \'\', hostType: undefined}');
+            console.error('Host is not supported');
+            console.error('Host is not valid or supported');
+            console.error('content.js:2524 Host validation error');
+            console.warn('Host validation failed for streaming service');
+            
+            console.log('--- Extension error tests completed ---');
+            document.getElementById('test1-result').style.display = 'block';
+        }
+
+        function testNormalErrors() {
+            console.log('--- Testing Normal Errors (Should be Visible) ---');
+            
+            // Normal application errors that should NOT be suppressed
+            console.error('Application error: Failed to fetch user data');
+            console.warn('Warning: API rate limit approaching');
+            console.error('Error: Invalid user ID provided');
+            
+            console.log('--- Normal error tests completed ---');
+            document.getElementById('test2-result').style.display = 'block';
+        }
+
+        function enableDebugMode() {
+            window.debugMode = true;
+            document.getElementById('debug-mode-status').textContent = 'ON';
+            console.log('✓ Debug mode enabled - suppressed errors will now be visible with prefix');
+        }
+
+        function disableDebugMode() {
+            window.debugMode = false;
+            document.getElementById('debug-mode-status').textContent = 'OFF';
+            console.log('✓ Debug mode disabled - extension errors will be suppressed');
+        }
+
+        function checkHostInfo() {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            const port = window.location.port;
+            const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+            
+            const infoDiv = document.getElementById('host-info');
+            infoDiv.innerHTML = `
+                <strong>Current Host Information:</strong><br>
+                • Protocol: <code>${protocol}</code><br>
+                • Hostname: <code>${hostname || '(empty)'}</code><br>
+                • Port: <code>${port || '(default)'}</code><br>
+                • Is Localhost: <code>${isLocalhost ? 'YES' : 'NO'}</code><br>
+                • Full URL: <code>${window.location.href}</code>
+            `;
+            infoDiv.style.display = 'block';
+            
+            console.log('Host Info:', {
+                protocol,
+                hostname,
+                port,
+                isLocalhost,
+                fullURL: window.location.href
+            });
+        }
+
+        // Auto-check host info on load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('✓ Error Handler Test Page Loaded');
+            console.log('✓ Error handler is active');
+            checkHostInfo();
+        });
+    </script>
+</body>
+</html>
