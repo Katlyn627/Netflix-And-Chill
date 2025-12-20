@@ -106,8 +106,10 @@
                 return;
             }
 
-            for (const matchUserId of mutualLikes) {
+            for (const match of mutualLikes) {
                 try {
+                    // Extract userId from the match object
+                    const matchUserId = match.userId || match;
                     const user = await API.getUser(matchUserId);
                     matchSelect.innerHTML += `<option value="${user.id}">${user.username}</option>`;
                     matches.push(user);
