@@ -4,8 +4,8 @@ let currentUserId = localStorage.getItem('currentUserId');
 // Constants
 const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
 
-// Filter state
-let currentFilters = {
+// Load filter state from shared filters utility
+let currentFilters = window.SharedFilters ? window.SharedFilters.loadFilters() : {
     minMatchScore: 0,
     minAge: 18,
     maxAge: 100,
@@ -430,28 +430,36 @@ function hideFiltersModal() {
 
 // Apply filters
 function applyFilters() {
-    currentFilters.minMatchScore = parseInt(document.getElementById('match-score-filter').value);
-    currentFilters.minAge = parseInt(document.getElementById('age-range-min-filter').value);
-    currentFilters.maxAge = parseInt(document.getElementById('age-range-max-filter').value);
-    currentFilters.locationRadius = parseInt(document.getElementById('distance-filter').value);
-    
-    // Get gender preferences
-    const genderCheckboxes = document.querySelectorAll('input[name="genderFilter"]:checked');
-    let genderPrefs = Array.from(genderCheckboxes).map(cb => cb.value);
-    // Remove 'any' if specific options are selected
-    if (genderPrefs.length > 1 && genderPrefs.includes('any')) {
-        genderPrefs = genderPrefs.filter(p => p !== 'any');
+    // Use shared filters utility to extract and save filters
+    if (window.SharedFilters) {
+        currentFilters = window.SharedFilters.extractFiltersFromForm('');
+        window.SharedFilters.saveFilters(currentFilters);
+        console.log('[Matches] Applied and saved filters:', currentFilters);
+    } else {
+        // Fallback to original implementation
+        currentFilters.minMatchScore = parseInt(document.getElementById('match-score-filter').value);
+        currentFilters.minAge = parseInt(document.getElementById('age-range-min-filter').value);
+        currentFilters.maxAge = parseInt(document.getElementById('age-range-max-filter').value);
+        currentFilters.locationRadius = parseInt(document.getElementById('distance-filter').value);
+        
+        // Get gender preferences
+        const genderCheckboxes = document.querySelectorAll('input[name="genderFilter"]:checked');
+        let genderPrefs = Array.from(genderCheckboxes).map(cb => cb.value);
+        // Remove 'any' if specific options are selected
+        if (genderPrefs.length > 1 && genderPrefs.includes('any')) {
+            genderPrefs = genderPrefs.filter(p => p !== 'any');
+        }
+        currentFilters.genderPreference = genderPrefs;
+        
+        // Get orientation preferences
+        const orientationCheckboxes = document.querySelectorAll('input[name="orientationFilter"]:checked');
+        let orientationPrefs = Array.from(orientationCheckboxes).map(cb => cb.value);
+        // Remove 'any' if specific options are selected
+        if (orientationPrefs.length > 1 && orientationPrefs.includes('any')) {
+            orientationPrefs = orientationPrefs.filter(p => p !== 'any');
+        }
+        currentFilters.sexualOrientationPreference = orientationPrefs;
     }
-    currentFilters.genderPreference = genderPrefs;
-    
-    // Get orientation preferences
-    const orientationCheckboxes = document.querySelectorAll('input[name="orientationFilter"]:checked');
-    let orientationPrefs = Array.from(orientationCheckboxes).map(cb => cb.value);
-    // Remove 'any' if specific options are selected
-    if (orientationPrefs.length > 1 && orientationPrefs.includes('any')) {
-        orientationPrefs = orientationPrefs.filter(p => p !== 'any');
-    }
-    currentFilters.sexualOrientationPreference = orientationPrefs;
     
     hideFiltersModal();
     findMatches();
@@ -459,30 +467,38 @@ function applyFilters() {
 
 // Reset filters
 function resetFilters() {
-    currentFilters = {
-        minMatchScore: 0,
-        minAge: 18,
-        maxAge: 100,
-        locationRadius: 50,
-        genderPreference: [],
-        sexualOrientationPreference: []
-    };
-    
-    // Update UI
-    document.getElementById('match-score-filter').value = 0;
-    document.getElementById('match-score-value').textContent = '0%';
-    document.getElementById('age-range-min-filter').value = 18;
-    document.getElementById('age-range-max-filter').value = 100;
-    document.getElementById('distance-filter').value = 50;
-    document.getElementById('distance-value').textContent = '50 miles';
-    
-    // Reset checkboxes
-    document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
-        cb.checked = cb.value === 'any';
-    });
-    document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
-        cb.checked = cb.value === 'any';
-    });
+    // Use shared filters utility to reset
+    if (window.SharedFilters) {
+        currentFilters = window.SharedFilters.resetFilters();
+        console.log('[Matches] Reset filters to defaults');
+        window.SharedFilters.applyFiltersToForm(currentFilters, '');
+    } else {
+        // Fallback to original implementation
+        currentFilters = {
+            minMatchScore: 0,
+            minAge: 18,
+            maxAge: 100,
+            locationRadius: 50,
+            genderPreference: [],
+            sexualOrientationPreference: []
+        };
+        
+        // Update UI
+        document.getElementById('match-score-filter').value = 0;
+        document.getElementById('match-score-value').textContent = '0%';
+        document.getElementById('age-range-min-filter').value = 18;
+        document.getElementById('age-range-max-filter').value = 100;
+        document.getElementById('distance-filter').value = 50;
+        document.getElementById('distance-value').textContent = '50 miles';
+        
+        // Reset checkboxes
+        document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
+            cb.checked = cb.value === 'any';
+        });
+        document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
+            cb.checked = cb.value === 'any';
+        });
+    }
 }
 
 // Event listeners
