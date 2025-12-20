@@ -8,6 +8,8 @@ const streamingAPIService = require('../services/streamingAPIService');
 const TMDB_PAGE_SIZE = 20; // TMDB API returns approximately 20 results per page
 const MAX_PAGES_TO_FETCH = 5; // Maximum number of pages to fetch from TMDB
 const MAX_TMDB_PAGE = 500; // TMDB API has 500 pages max
+const YEARS_FOR_RECENT_MOVIES = 3; // Number of years to consider for recent movies
+const THREE_YEARS_IN_MS = 365 * 24 * 60 * 60 * 1000 * 3; // 3 years in milliseconds
 
 // Different sorting strategies for movie diversity
 const SORT_STRATEGIES = [
@@ -17,6 +19,9 @@ const SORT_STRATEGIES = [
   'revenue.desc',
   'vote_count.desc'
 ];
+
+// Time windows for trending movies
+const TRENDING_TIME_WINDOWS = ['week', 'day'];
 
 /**
  * Get a random sorting strategy
@@ -74,7 +79,7 @@ async function fetchDiverseMovies(genreIds, limit) {
   );
   
   // Source 2: Trending movies (different time windows)
-  const timeWindow = Math.random() > 0.5 ? 'week' : 'day';
+  const timeWindow = TRENDING_TIME_WINDOWS[Math.floor(Math.random() * TRENDING_TIME_WINDOWS.length)];
   movieSources.push(
     streamingAPIService.getTrending('movie', timeWindow)
       .then(movies => movies.slice(0, targetPerSource))
@@ -100,12 +105,13 @@ async function fetchDiverseMovies(genreIds, limit) {
   );
   
   // Source 4: Popular movies with different criteria
+  const threeYearsAgo = new Date(Date.now() - THREE_YEARS_IN_MS).toISOString().split('T')[0];
   movieSources.push(
     streamingAPIService.discover('movie', {
       with_genres: genreIds.length > 0 ? genreIds.slice(0, 2).join(',') : undefined,
       sort_by: 'popularity.desc',
       page: getRandomPageNumber(20),
-      'primary_release_date.gte': new Date(Date.now() - 365 * 24 * 60 * 60 * 1000 * 3).toISOString().split('T')[0] // Last 3 years
+      'primary_release_date.gte': threeYearsAgo
     })
       .then(movies => movies.slice(0, targetPerSource))
       .catch(err => {
@@ -118,10 +124,14 @@ async function fetchDiverseMovies(genreIds, limit) {
   const allMovieSets = await Promise.all(movieSources);
   
   // Combine and deduplicate by movie ID
+  // TMDB API consistently returns movies with an 'id' property across all endpoints
   const movieMap = new Map();
   allMovieSets.flat().forEach(movie => {
-    if (movie && movie.id && !movieMap.has(movie.id)) {
-      movieMap.set(movie.id, movie);
+    // Validate that movie object has required properties
+    if (movie && typeof movie === 'object' && movie.id && typeof movie.id === 'number') {
+      if (!movieMap.has(movie.id)) {
+        movieMap.set(movie.id, movie);
+      }
     }
   });
   
