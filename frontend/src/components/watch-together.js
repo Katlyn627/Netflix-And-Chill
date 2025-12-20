@@ -7,6 +7,8 @@
     let matches = [];
     let invitations = { sent: [], received: [] };
     let selectedInvitation = null;
+    let urlMatchId = null;
+    let urlInvitationId = null;
 
     // Platform information
     const platformInfo = {
@@ -90,27 +92,9 @@
 
     function handleURLParameters() {
         const urlParams = new URLSearchParams(window.location.search);
-        const matchId = urlParams.get('matchId');
-        const invitationId = urlParams.get('invitationId');
-        
-        // If matchId is provided, pre-select it in the form
-        if (matchId) {
-            setTimeout(() => {
-                const matchSelect = document.getElementById('invite-match');
-                if (matchSelect) {
-                    matchSelect.value = matchId;
-                    // Trigger change event to load movie options
-                    matchSelect.dispatchEvent(new Event('change'));
-                }
-            }, 1000); // Wait for matches to load
-        }
-        
-        // If invitationId is provided, show the invitation details
-        if (invitationId) {
-            setTimeout(() => {
-                showInvitationDetails(invitationId);
-            }, 1000); // Wait for invitations to load
-        }
+        urlMatchId = urlParams.get('matchId');
+        urlInvitationId = urlParams.get('invitationId');
+        // The actual handling is done after data loads in the respective functions
     }
 
     function checkForConflictingExtensions() {
@@ -167,6 +151,13 @@
                     console.error('Error loading match:', error);
                 }
             }
+            
+            // Handle URL parameter after matches are loaded
+            if (urlMatchId && matchSelect) {
+                matchSelect.value = urlMatchId;
+                // Trigger change event to load movie options
+                matchSelect.dispatchEvent(new Event('change'));
+            }
         } catch (error) {
             console.error('Error loading matches:', error);
             // Don't redirect on error, show a message instead
@@ -183,6 +174,11 @@
             invitations = data;
             
             displayInvitations('sent');
+            
+            // Handle URL parameter after invitations are loaded
+            if (urlInvitationId) {
+                showInvitationDetails(urlInvitationId);
+            }
         } catch (error) {
             console.error('Error loading invitations:', error);
             // Don't redirect on error, show a message instead
