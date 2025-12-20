@@ -516,12 +516,24 @@ function openChat(matchUserId, matchUsername) {
     localStorage.setItem('selectedMatchId', matchUserId);
     localStorage.setItem('chatWithUsername', matchUsername);
     
+    console.log('Opening chat with:', { matchUserId, matchUsername });
+    console.log('Saved match info to localStorage');
+    
     // Navigate to chat page
     window.location.href = 'chat.html';
 }
 
 function showChatModal(matchUserId, matchUsername) {
     const safeUsername = escapeHtml(matchUsername);
+    
+    // Save selected match to localStorage
+    localStorage.setItem('selectedMatchId', matchUserId);
+    localStorage.setItem('chatWithUsername', matchUsername);
+    localStorage.setItem('chatWithUserId', matchUserId);
+    
+    console.log('Opening chat modal with:', { matchUserId, matchUsername });
+    console.log('Saved match info to localStorage');
+    
     // Create modal if it doesn't exist
     let modal = document.getElementById('chat-modal');
     if (!modal) {
