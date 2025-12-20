@@ -51,24 +51,44 @@ class RecommendationService {
 
   /**
    * Get recommendations based on user's favorite genres
-   * @param {Array<string>} genres 
+   * @param {Array<string|Object>} genres - Array of genre names (strings) or genre objects with id/name
    * @returns {Promise<Array>}
    */
   async getRecommendationsByGenres(genres) {
     try {
-      // Get genre IDs from TMDB
-      const movieGenres = await streamingAPIService.getGenres('movie');
-      const tvGenres = await streamingAPIService.getGenres('tv');
+      // Handle both genre formats: strings and objects with id/name
+      let genreIds = [];
       
-      const genreMap = {};
-      [...movieGenres, ...tvGenres].forEach(g => {
-        genreMap[g.name.toLowerCase()] = g.id;
-      });
+      // Check if genres are already objects with IDs
+      const hasGenreObjects = genres.some(g => typeof g === 'object' && g.id);
+      
+      if (hasGenreObjects) {
+        // Extract IDs directly from genre objects
+        genreIds = genres
+          .filter(g => typeof g === 'object' && g.id)
+          .map(g => g.id);
+      } else {
+        // Get genre IDs from TMDB (legacy format with genre names as strings)
+        const movieGenres = await streamingAPIService.getGenres('movie');
+        const tvGenres = await streamingAPIService.getGenres('tv');
+        
+        const genreMap = {};
+        [...movieGenres, ...tvGenres].forEach(g => {
+          genreMap[g.name.toLowerCase()] = g.id;
+        });
 
-      // Convert user genre preferences to TMDB genre IDs
-      const genreIds = genres
-        .map(g => genreMap[g.toLowerCase()])
-        .filter(id => id !== undefined);
+        // Convert user genre preferences to TMDB genre IDs
+        genreIds = genres
+          .map(g => {
+            const genreName = typeof g === 'string' ? g : (g.name || '');
+            // Skip empty genre names
+            if (!genreName || !genreName.trim()) {
+              return undefined;
+            }
+            return genreMap[genreName.toLowerCase()];
+          })
+          .filter(id => id !== undefined);
+      }
 
       if (genreIds.length === 0) {
         return [];
