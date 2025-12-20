@@ -131,6 +131,12 @@ class StreamingAPIService {
    */
   _filterFallbackByGenres(genreIds) {
     const { fallbackMovies } = require('./fallbackData');
+    
+    // Handle invalid input - return all fallback movies
+    if (!genreIds || !Array.isArray(genreIds) || genreIds.length === 0) {
+      return fallbackMovies;
+    }
+    
     const filtered = fallbackMovies.filter(movie => 
       movie.genre_ids && movie.genre_ids.some(gid => genreIds.includes(gid))
     );
