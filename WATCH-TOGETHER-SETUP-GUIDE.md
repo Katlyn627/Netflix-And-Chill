@@ -183,6 +183,13 @@ The watch-together feature **provides instructions and links** for these platfor
 - Provides setup instructions
 - Stores join links that users manually create
 
+**Why no direct API integration?**
+- These platforms either don't offer public APIs or have limited/restricted access
+- Each platform has different integration requirements and costs
+- Users already have accounts and access to these platforms
+- The coordination and scheduling features provide value without API complexity
+- This approach keeps the app simple, free, and easy to maintain
+
 ---
 
 ## 🔌 API Endpoints Available
@@ -377,6 +384,10 @@ The app should create this automatically, but if not, create it manually.
 6. **Sanitize and escape user data** to prevent XSS
 7. **Implement proper session management**
 8. **Add CSRF protection**
+9. **Encrypt sensitive data at rest** (invitation details, user data)
+10. **Implement proper access controls** (users can only view their own invitations)
+11. **Add audit logging** for security monitoring
+12. **Use environment-specific secrets** (different keys for dev/staging/prod)
 
 ---
 
@@ -410,10 +421,11 @@ The app should create this automatically, but if not, create it manually.
 
 ## 💡 Pro Tips
 
-1. **Use Seeder Script** to create test data:
+1. **Use Seeder Script** to create test users (this helps create test data for the app):
    ```bash
    npm run seed
    ```
+   This creates sample users that you can use to test matches and watch-together invitations.
 
 2. **Check Backend Health:**
    ```bash

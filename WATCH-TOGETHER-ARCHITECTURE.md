@@ -261,7 +261,10 @@ The app only provides:
 │  │  data/watchInvitations.json                          │ │
 │  │  - Stored on server                                  │ │
 │  │  - Not publicly accessible                           │ │
-│  │  - No encryption (development)                       │ │
+│  │  - No encryption in development                      │ │
+│  │  - PRODUCTION: Encrypt sensitive data at rest        │ │
+│  │  - PRODUCTION: Implement access controls             │ │
+│  │  - PRODUCTION: Add audit logging                     │ │
 │  └──────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────┘
 ```
