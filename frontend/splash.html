@@ -169,17 +169,22 @@
         // Splash screen display duration (in milliseconds)
         const SPLASH_DURATION = 2500;
 
-        // Check if user has seen onboarding
+        // Check if user has seen onboarding and created profile
         function checkAppStatus() {
             const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
+            const hasCreatedProfile = localStorage.getItem('profileCreated');
+            const currentUserId = localStorage.getItem('currentUserId');
             
             setTimeout(() => {
-                if (hasCompletedOnboarding === 'true') {
-                    // User has completed onboarding, go to homepage
-                    window.location.href = 'homepage.html';
-                } else {
+                if (hasCompletedOnboarding !== 'true') {
                     // First time user, show onboarding
                     window.location.href = 'onboarding.html';
+                } else if (!currentUserId || hasCreatedProfile !== 'true') {
+                    // User has seen onboarding but hasn't created profile
+                    window.location.href = 'profile.html';
+                } else {
+                    // User has completed everything, go to swipe page
+                    window.location.href = 'swipe.html';
                 }
             }, SPLASH_DURATION);
         }

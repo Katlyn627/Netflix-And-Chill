@@ -101,26 +101,30 @@ function updateNavigationButtons() {
     }
 }
 
-// Skip onboarding and go directly to app
+// Skip onboarding and go directly to profile creation
 function skipOnboarding() {
     // Mark onboarding as completed
     localStorage.setItem('onboardingCompleted', 'true');
+    // Mark that profile needs to be created
+    localStorage.setItem('profileCreated', 'false');
     
-    // Redirect to homepage
-    window.location.href = 'homepage.html';
+    // Redirect to profile creation
+    window.location.href = 'profile.html';
 }
 
-// Complete onboarding and proceed to app
+// Complete onboarding and proceed to profile creation
 function completeOnboarding() {
     // Mark onboarding as completed
     localStorage.setItem('onboardingCompleted', 'true');
+    // Mark that profile needs to be created
+    localStorage.setItem('profileCreated', 'false');
     
     // Add a nice completion animation
     const screens = document.querySelectorAll('.onboarding-screen');
     screens[currentScreen].style.transform = 'scale(0.95)';
     screens[currentScreen].style.opacity = '0';
     
-    // Redirect after animation
+    // Redirect to profile creation after animation
     setTimeout(() => {
         window.location.href = 'profile.html';
     }, 500);

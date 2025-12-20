@@ -28,13 +28,26 @@ router.get('/movies/:userId', async (req, res) => {
     // Get movies based on user preferences
     const genreIds = user.preferences?.genres?.map(g => g.id).filter(Boolean) || [];
     const swipedMovieIds = (user.swipedMovies || []).map(m => m.tmdbId);
+    
+    // Get genre IDs from user's watch history to enhance recommendations
+    const watchHistoryGenres = [];
+    if (user.watchHistory && user.watchHistory.length > 0) {
+      user.watchHistory.forEach(item => {
+        if (item.genre && !watchHistoryGenres.includes(item.genre)) {
+          watchHistoryGenres.push(item.genre);
+        }
+      });
+    }
 
     let movies = [];
 
-    if (genreIds.length > 0) {
+    if (genreIds.length > 0 || watchHistoryGenres.length > 0) {
+      // Combine genre IDs from preferences and watch history
+      const allGenreIds = [...new Set([...genreIds])];
+      
       // Discover movies with user's preferred genres
       movies = await streamingAPIService.discover('movie', {
-        with_genres: genreIds.join(','),
+        with_genres: allGenreIds.join(','),
         sort_by: 'popularity.desc',
         page: 1
       });

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Movies - Netflix and Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E50914">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/swipe.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-icons">
+                <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
+                <a href="swipe.html" class="nav-icon-btn swipe active" title="Discover">🎬</a>
+                <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
+                <button type="button" class="nav-icon-btn discover-btn" id="discover-btn" title="Find Matches" aria-label="Find Matches">
+                    🔍
+                </button>
+                <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
+                    <span id="profile-nav-icon">👤</span>
+                </a>
+            </div>
+            <div class="logo-banner">
+                <h1>NETFLIX & CHILL</h1>
+            </div>
+            <p class="tagline">Discover Your Next Favorite Movie</p>
+        </header>
+
+        <main>
+            <!-- Swipe Feature Section -->
+            <section id="swipe-movies" class="card">
+                <div id="swipe-container">
+                    <div class="swipe-header">
+                        <h2>🎬 Discover Movies</h2>
+                        <p>Swipe right to like, left to pass. We'll use your preferences to find great matches!</p>
+                        <div class="swipe-stats">
+                            <p id="swipe-counter">0 / 0</p>
+                            <p>Movies liked: <span id="total-likes-counter">0</span></p>
+                            <p>Swipes remaining: <span id="swipes-remaining">50</span></p>
+                        </div>
+                    </div>
+                    
+                    <div id="swipe-card-container">
+                        <!-- Swipe cards will be rendered here -->
+                    </div>
+                    
+                    <div class="swipe-actions">
+                        <button type="button" class="swipe-btn dislike-btn" onclick="window.SwipeModule.handleDislikeButton()" aria-label="Dislike">
+                            ✕
+                        </button>
+                        <button type="button" class="swipe-btn like-btn" onclick="window.SwipeModule.handleLikeButton()" aria-label="Like">
+                            ♥
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center;">
+                        <button type="button" id="done-swiping-btn" class="btn btn-primary">Done Swiping - Find Matches</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+
+    <script src="src/services/api.js"></script>
+    <script src="src/components/swipe.js"></script>
+    <script>
+        // Initialize swipe feature when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) {
+                window.location.href = 'profile.html';
+                return;
+            }
+            
+            if (window.SwipeModule && typeof window.SwipeModule.initializeSwipe === 'function') {
+                window.SwipeModule.initializeSwipe(userId);
+            }
+            
+            // Handle discover button click
+            const discoverBtn = document.getElementById('discover-btn');
+            if (discoverBtn) {
+                discoverBtn.addEventListener('click', () => {
+                    window.location.href = 'matches.html';
+                });
+            }
+            
+            // Handle done swiping button
+            const doneSwipingBtn = document.getElementById('done-swiping-btn');
+            if (doneSwipingBtn) {
+                doneSwipingBtn.addEventListener('click', () => {
+                    // Mark that initial profile setup is complete
+                    localStorage.setItem('profileCreated', 'true');
+                    localStorage.setItem('initialSwipeComplete', 'true');
+                    window.location.href = 'matches.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

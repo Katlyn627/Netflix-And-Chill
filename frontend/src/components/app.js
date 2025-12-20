@@ -372,7 +372,10 @@ if (moviePreferencesForm) {
                 videoChatPreference: videoChatPreference
             });
             showMessage('Movie preferences saved!');
-            showSection('swipe-movies');
+            // Navigate to dedicated swipe page
+            setTimeout(() => {
+                window.location.href = 'swipe.html';
+            }, 1000);
         } catch (error) {
             showMessage('Error saving movie preferences: ' + error.message, true);
         }
@@ -383,18 +386,19 @@ if (moviePreferencesForm) {
 const skipMoviePrefsBtn = document.getElementById('skip-movie-prefs-btn');
 if (skipMoviePrefsBtn) {
     skipMoviePrefsBtn.addEventListener('click', () => {
-        showSection('swipe-movies');
+        // Navigate to dedicated swipe page
+        window.location.href = 'swipe.html';
     });
 }
 
-// Skip swipe button - continue to profile completion
+// Skip swipe button - continue to matches
 const skipSwipeBtn = document.getElementById('skip-swipe-btn');
 if (skipSwipeBtn) {
     skipSwipeBtn.addEventListener('click', () => {
-        // Navigate to profile view page
-        setTimeout(() => {
-            window.location.href = `profile-view.html?userId=${currentUserId}`;
-        }, 500);
+        // Mark profile as created and navigate to matches
+        localStorage.setItem('profileCreated', 'true');
+        localStorage.setItem('initialSwipeComplete', 'true');
+        window.location.href = 'matches.html';
     });
 }
 
