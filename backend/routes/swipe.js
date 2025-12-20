@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const dataStore = require('../utils/dataStore');
+const { getDatabase } = require('../utils/database');
+const User = require('../models/User');
 const streamingAPIService = require('../services/streamingAPIService');
 
 /**
@@ -13,13 +14,16 @@ router.get('/movies/:userId', async (req, res) => {
     const { limit = 20 } = req.query;
     
     // Get user profile
-    const user = await dataStore.findUserById(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
+    
+    const user = new User(userData);
 
     // Get movies based on user preferences
     const genreIds = user.preferences?.genres?.map(g => g.id).filter(Boolean) || [];
@@ -84,13 +88,16 @@ router.post('/action/:userId', async (req, res) => {
     }
 
     // Get user
-    const user = await dataStore.findUserById(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
+    
+    const user = new User(userData);
 
     // Add swiped movie
     user.addSwipedMovie({ tmdbId, title, posterPath }, action);
@@ -118,14 +125,16 @@ router.get('/liked/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     
-    const user = await dataStore.findUserById(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
-
+    
+    const user = new User(userData);
     const likedMovies = user.getLikedMovies();
 
     res.json({
