@@ -652,14 +652,17 @@ footer {
     top: 20px;
     right: 20px;
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 12px;
     align-items: center;
+    justify-content: flex-end;
+    max-width: 400px;
     z-index: 100;
 }
 
 .nav-icon-btn {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -667,8 +670,9 @@ footer {
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    font-size: 22px;
 }
 
 .nav-icon-btn:hover {
@@ -678,32 +682,26 @@ footer {
 
 .nav-icon-btn.home {
     background: linear-gradient(135deg, #E50914 0%, #000000 100%);
-    font-size: 24px;
 }
 
 .nav-icon-btn.swipe {
     background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-    font-size: 24px;
 }
 
 .nav-icon-btn.matches {
     background: linear-gradient(135deg, #ff1744 0%, #E50914 100%);
-    font-size: 24px;
 }
 
 .nav-icon-btn.chat {
     background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    font-size: 24px;
 }
 
 .nav-icon-btn.watch {
     background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-    font-size: 24px;
 }
 
 .nav-icon-btn.discover-btn {
     background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    font-size: 24px;
     animation: pulse 2s infinite;
 }
 
@@ -732,7 +730,6 @@ footer {
 
 .nav-icon-btn.profile {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-size: 24px;
     color: white;
     padding: 0;
     overflow: hidden;
@@ -740,9 +737,9 @@ footer {
 
 .nav-icon-btn.logout {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    font-size: 24px;
     color: white;
     padding: 0;
+    font-size: 18px;
 }
 
 .nav-icon-btn.logout:hover {
@@ -826,11 +823,47 @@ footer {
         position: fixed;
         top: 10px;
         right: 10px;
+        gap: 8px;
+        max-width: 280px;
+    }
+    
+    .nav-icon-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+    
+    .nav-icon-btn.logout {
+        font-size: 16px;
     }
     
     #quiz-questions-container {
         max-height: 500px;
         padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-icons {
+        top: 5px;
+        right: 5px;
+        gap: 6px;
+        max-width: 220px;
+    }
+    
+    .nav-icon-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        border-width: 2px;
+    }
+    
+    .nav-icon-btn.logout {
+        font-size: 14px;
+    }
+    
+    .logo-banner h1 {
+        font-size: 2em;
     }
 }
 

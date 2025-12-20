@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Demo - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        .demo-container {
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .demo-content {
+            max-width: 1200px;
+            margin: 150px auto 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .demo-content h1 {
+            color: #E50914;
+            margin-bottom: 20px;
+        }
+        .demo-content p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .demo-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        .demo-section h2 {
+            color: #E50914;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .demo-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .demo-section li {
+            padding: 8px 0;
+            color: #555;
+        }
+        .demo-section li strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <header>
+            <div class="nav-icons">
+                <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
+                <a href="swipe.html" class="nav-icon-btn swipe" title="Discover">🎬</a>
+                <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
+                <a href="chat.html" class="nav-icon-btn chat" title="Chat">💬</a>
+                <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
+                <a href="profile-view.html" class="nav-icon-btn profile" title="My Profile">
+                    <span>👤</span>
+                </a>
+                <button type="button" class="nav-icon-btn discover-btn" title="Discover More Movies" aria-label="Discover">
+                    🔍
+                </button>
+                <button type="button" class="nav-icon-btn logout" title="Logout" aria-label="Logout">🚪➡️</button>
+            </div>
+            <div class="logo-banner">
+                <h1>NETFLIX & CHILL</h1>
+            </div>
+            <p class="tagline">Improved Navigation UI/UX Demo</p>
+        </header>
+
+        <main class="demo-content">
+            <h1>✅ Navigation UI/UX Improvements Implemented</h1>
+            
+            <p>The top-right navigation buttons have been optimized for better UI/UX and mobile compatibility:</p>
+
+            <div class="demo-section">
+                <h2>🎨 UI Improvements</h2>
+                <ul>
+                    <li><strong>Responsive Layout:</strong> Buttons now wrap automatically on smaller screens</li>
+                    <li><strong>Consistent Sizing:</strong> Reduced from 50px to 48px for better balance</li>
+                    <li><strong>Improved Spacing:</strong> Gap reduced from 15px to 12px with proper wrapping</li>
+                    <li><strong>Border Optimization:</strong> Reduced from 3px to 2px for cleaner appearance</li>
+                    <li><strong>Font Size:</strong> Standardized at 22px across all buttons</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h2>📱 Mobile Responsive</h2>
+                <ul>
+                    <li><strong>Tablet (≤768px):</strong> Buttons resize to 42px, gap to 8px</li>
+                    <li><strong>Mobile (≤480px):</strong> Buttons resize to 38px, gap to 6px</li>
+                    <li><strong>Max Width:</strong> Container limited to 400px on desktop, 280px on tablet, 220px on mobile</li>
+                    <li><strong>Flex Wrap:</strong> Buttons wrap to multiple rows when needed</li>
+                    <li><strong>Fixed Position:</strong> Navigation stays in place on mobile scroll</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h2>🔧 Technical Stack Alignment</h2>
+                <ul>
+                    <li><strong>Frontend:</strong> HTML5/CSS3 with flexbox layout (Mobile-first design)</li>
+                    <li><strong>Backend:</strong> Node.js + Express.js (Ready for React Native integration)</li>
+                    <li><strong>Database:</strong> MongoDB/PostgreSQL/File-based support</li>
+                    <li><strong>APIs:</strong> TMDB integration for movie data</li>
+                    <li><strong>Authentication:</strong> Ready for Firebase/Auth0 integration</li>
+                    <li><strong>Chat:</strong> Ready for Twilio/SendBird/Stream integration</li>
+                    <li><strong>Cloud:</strong> AWS/Google Cloud compatible</li>
+                    <li><strong>Analytics:</strong> Google Analytics/Mixpanel ready</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h2>📚 Documentation Updates</h2>
+                <ul>
+                    <li><strong>.env.example:</strong> Comprehensive environment variables template with 200+ lines</li>
+                    <li><strong>API_KEYS_GUIDE.md:</strong> Step-by-step guide for setting up all external services</li>
+                    <li><strong>README.md:</strong> Updated with API keys table and setup instructions</li>
+                    <li><strong>All Services Covered:</strong> TMDB, Firebase, Auth0, SendBird, Twilio, AWS S3, GCP, Analytics, Email services</li>
+                </ul>
+            </div>
+
+            <div class="demo-section" style="background: #e8f5e9; border-left: 4px solid #4caf50;">
+                <h2>✨ Try It Yourself</h2>
+                <p><strong>Resize your browser window</strong> to see the responsive navigation in action!</p>
+                <p>The buttons will automatically adjust their size and wrap to fit smaller screens.</p>
+            </div>
+        </main>
+
+        <footer style="text-align: center; color: white; padding: 20px;">
+            <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
+        </footer>
+    </div>
+</body>
+</html>

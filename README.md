@@ -63,14 +63,22 @@ cd Netflix-And-Chill
 npm install
 ```
 
-3. Configure environment (optional):
+3. Configure environment:
 ```bash
 # Copy example env file
 cp .env.example .env
 
-# Edit .env and add your TMDB API key (optional, for recommendations)
-# Get free API key at: https://www.themoviedb.org/settings/api
+# Edit .env and add your API keys
+# See API_KEYS_GUIDE.md for detailed setup instructions
 ```
+
+**Required API Keys:**
+- **TMDB API Key** (Required): Get free API key at https://www.themoviedb.org/settings/api
+- **Database** (Optional): MongoDB, PostgreSQL, or use file-based storage (default)
+- **Authentication** (Optional): Firebase or Auth0 for user authentication
+- **Chat Service** (Optional): SendBird, Twilio, or Stream for real-time messaging
+
+📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)**
 
 4. Start the backend server:
 ```bash
@@ -265,6 +273,72 @@ The matching algorithm considers multiple factors:
    - Users with similar binge-watching habits get a bonus
 
 Match scores are normalized to a 0-100 scale, with higher scores indicating better matches.
+
+## API Keys & External Services
+
+Netflix and Chill integrates with various external APIs and services to provide full functionality. Below is a summary of the services and their purposes:
+
+### Essential Services
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **TMDB** | Movie/TV data, posters, details | ✅ Yes | FREE | [Get Key](https://www.themoviedb.org/settings/api) |
+| **Database** | User data storage | ⚠️ Recommended | FREE tier | MongoDB, PostgreSQL, or file-based |
+
+### Authentication (Choose One)
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **Firebase Auth** | User authentication, social login | 🟡 Optional | FREE | [Get Key](https://console.firebase.google.com/) |
+| **Auth0** | Secure authentication platform | 🟡 Optional | FREE tier | [Get Key](https://auth0.com/) |
+
+### Chat & Messaging (Choose One)
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **SendBird** | Real-time in-app chat | 🟡 Optional | FREE tier | [Get Key](https://dashboard.sendbird.com/) |
+| **Twilio** | SMS notifications, voice calls | 🟡 Optional | Pay-as-you-go | [Get Key](https://www.twilio.com/console) |
+| **Stream Chat** | Scalable chat infrastructure | 🟡 Optional | FREE tier | [Get Key](https://getstream.io/) |
+
+### Cloud Storage (Choose One)
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **AWS S3** | Profile pictures, media storage | 🟡 Optional | FREE tier | [Get Key](https://console.aws.amazon.com/) |
+| **Google Cloud Storage** | File storage | 🟡 Optional | FREE tier | [Get Key](https://console.cloud.google.com/) |
+
+### Analytics & Monitoring
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **Google Analytics** | User behavior tracking | 🟡 Optional | FREE | [Get Key](https://analytics.google.com/) |
+| **Mixpanel** | Product analytics | 🟡 Optional | FREE tier | [Get Key](https://mixpanel.com/) |
+| **Sentry** | Error tracking | 🟡 Optional | FREE tier | [Get Key](https://sentry.io/) |
+
+### Email Services
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **SendGrid** | Email notifications | 🟡 Optional | FREE tier | [Get Key](https://app.sendgrid.com/) |
+| **Mailgun** | Email delivery | 🟡 Optional | FREE tier | [Get Key](https://www.mailgun.com/) |
+
+### Setup Guide
+
+For detailed step-by-step instructions on setting up each API key and service, see:
+- 📖 **[API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)** - Comprehensive setup guide
+- 📝 **[.env.example](.env.example)** - Environment variables template
+
+**Quick Start:**
+```bash
+# 1. Copy environment template
+cp .env.example .env
+
+# 2. Add your TMDB API key (minimum required)
+# Edit .env and add: TMDB_API_KEY=your_key_here
+
+# 3. Start the server
+npm start
+```
 
 ## Future Enhancements
 
