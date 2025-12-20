@@ -164,4 +164,49 @@ router.get('/liked/:userId', async (req, res) => {
   }
 });
 
+/**
+ * Get user's daily swipe statistics
+ * Returns current swipe count for today based on user data timestamps
+ */
+router.get('/stats/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { limit = 50 } = req.query;
+    
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    const user = new User(userData);
+    const dailySwipeCount = user.getDailySwipeCount();
+    const todaySwipes = user.getTodaySwipes();
+    const swipeLimit = parseInt(limit);
+
+    res.json({
+      success: true,
+      dailySwipeCount,
+      swipeLimit,
+      swipesRemaining: Math.max(0, swipeLimit - dailySwipeCount),
+      todaySwipes: todaySwipes.map(s => ({
+        tmdbId: s.tmdbId,
+        title: s.title,
+        action: s.action,
+        swipedAt: s.swipedAt
+      })),
+      totalLikes: user.getLikedMovies().length
+    });
+  } catch (error) {
+    console.error('Error getting swipe stats:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

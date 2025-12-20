@@ -20,14 +20,30 @@ async function initializeSwipe(userId) {
     return;
   }
 
-  // Get swipe count from localStorage
-  const savedSwipeCount = localStorage.getItem(`swipeCount_${userId}`);
-  swipeCount = savedSwipeCount ? parseInt(savedSwipeCount) : 0;
-  
-  // Update swipes remaining display
-  updateSwipeStats();
-
   try {
+    // Get swipe stats from backend (uses user data with timestamps)
+    const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=50`);
+    const statsData = await statsResponse.json();
+    
+    if (statsData.success) {
+      swipeCount = statsData.dailySwipeCount;
+      swipeLimit = statsData.swipeLimit;
+      
+      // Update display with backend data
+      updateSwipeStats();
+      
+      // Update likes counter if available
+      const likesCounter = document.getElementById('total-likes-counter');
+      if (likesCounter && statsData.totalLikes !== undefined) {
+        likesCounter.textContent = statsData.totalLikes;
+      }
+    } else {
+      // Fallback to localStorage if backend fails
+      const savedSwipeCount = localStorage.getItem(`swipeCount_${userId}`);
+      swipeCount = savedSwipeCount ? parseInt(savedSwipeCount) : 0;
+      updateSwipeStats();
+    }
+
     // Fetch movies for swiping - limit increased to 50
     const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=50`);
     const data = await response.json();
@@ -246,12 +262,8 @@ async function handleSwipeRight(card) {
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('like', movie);
   
-  // Increment swipe count
-  swipeCount++;
-  const userId = window.currentUserId || localStorage.getItem('currentUserId');
-  if (userId) {
-    localStorage.setItem(`swipeCount_${userId}`, swipeCount.toString());
-  }
+  // Refresh swipe count from backend (uses user data with timestamps)
+  await refreshSwipeCount();
   
   setTimeout(() => {
     currentMovieIndex++;
@@ -269,12 +281,8 @@ async function handleSwipeLeft(card) {
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('dislike', movie);
   
-  // Increment swipe count
-  swipeCount++;
-  const userId = window.currentUserId || localStorage.getItem('currentUserId');
-  if (userId) {
-    localStorage.setItem(`swipeCount_${userId}`, swipeCount.toString());
-  }
+  // Refresh swipe count from backend (uses user data with timestamps)
+  await refreshSwipeCount();
   
   setTimeout(() => {
     currentMovieIndex++;
@@ -376,6 +384,34 @@ function updateSwipeStats() {
     } else {
       swipesRemaining.style.color = '#00FF00'; // Green
     }
+  }
+}
+
+/**
+ * Refresh swipe count from backend user data
+ * This uses the swipedAt timestamps to calculate today's swipe count
+ */
+async function refreshSwipeCount() {
+  const userId = window.currentUserId || localStorage.getItem('currentUserId');
+  if (!userId) return;
+
+  try {
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=50`);
+    const data = await response.json();
+    
+    if (data.success) {
+      swipeCount = data.dailySwipeCount;
+      swipeLimit = data.swipeLimit;
+      updateSwipeStats();
+      
+      // Update likes counter if available
+      const likesCounter = document.getElementById('total-likes-counter');
+      if (likesCounter && data.totalLikes !== undefined) {
+        likesCounter.textContent = data.totalLikes;
+      }
+    }
+  } catch (error) {
+    console.error('Error refreshing swipe count:', error);
   }
 }
 
