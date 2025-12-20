@@ -681,9 +681,46 @@ footer {
     font-size: 24px;
 }
 
+.nav-icon-btn.swipe {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    font-size: 24px;
+}
+
 .nav-icon-btn.matches {
     background: linear-gradient(135deg, #ff1744 0%, #E50914 100%);
     font-size: 24px;
+}
+
+.nav-icon-btn.chat {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    font-size: 24px;
+}
+
+.nav-icon-btn.watch {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    font-size: 24px;
+}
+
+.nav-icon-btn.discover-btn {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    font-size: 24px;
+    animation: pulse 2s infinite;
+}
+
+.nav-icon-btn.active {
+    border-color: #fff;
+    box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
+    }
 }
 
 .nav-icon-btn.profile img {
