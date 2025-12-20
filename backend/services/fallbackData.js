@@ -217,8 +217,163 @@ const fallbackMovies = [
   }
 ];
 
+// Sample TV shows for demo/testing when TMDB API is not available
+const fallbackTVShows = [
+  {
+    id: 1396,
+    name: 'Breaking Bad',
+    overview: 'A high school chemistry teacher turned methamphetamine manufacturer partners with a former student.',
+    poster_path: '/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',
+    backdrop_path: '/9faGSFi5jam6pDWGNd0p8JcJgXQ.jpg',
+    first_air_date: '2008-01-20',
+    vote_average: 8.9,
+    genre_ids: [18, 80]
+  },
+  {
+    id: 1399,
+    name: 'Game of Thrones',
+    overview: 'Nine noble families fight for control over the lands of Westeros.',
+    poster_path: '/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg',
+    backdrop_path: '/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg',
+    first_air_date: '2011-04-17',
+    vote_average: 8.4,
+    genre_ids: [10759, 10765, 18]
+  },
+  {
+    id: 60735,
+    name: 'The Flash',
+    overview: 'After being struck by lightning, Barry Allen wakes up from a coma to discover he has superpowers.',
+    poster_path: '/lJA2RCMfsWoskqlQhXPSLFQGXEJ.jpg',
+    backdrop_path: '/9Jmd1OumCjaXDkpllbSGi2EpJvl.jpg',
+    first_air_date: '2014-10-07',
+    vote_average: 7.8,
+    genre_ids: [18, 10765]
+  },
+  {
+    id: 1668,
+    name: 'Friends',
+    overview: 'Six friends navigate their way through life and love in New York City.',
+    poster_path: '/f496cm9enuEsZkSPzCwnTESEK5s.jpg',
+    backdrop_path: '/l0qVZIpXtIo7km9u5Yqh0nKPOr5.jpg',
+    first_air_date: '1994-09-22',
+    vote_average: 8.4,
+    genre_ids: [35]
+  },
+  {
+    id: 1434,
+    name: 'Family Guy',
+    overview: 'The adventures of an eccentric family in the fictional city of Quahog, Rhode Island.',
+    poster_path: '/hw2vi8agaJZ7oeSZcpLbpNEZz7m.jpg',
+    backdrop_path: '/pH38r4TWTqq7Mcs6XAlwgzNUuml.jpg',
+    first_air_date: '1999-01-31',
+    vote_average: 7.3,
+    genre_ids: [16, 35]
+  },
+  {
+    id: 1408,
+    name: 'House',
+    overview: 'An antisocial maverick doctor specializes in diagnostic medicine.',
+    poster_path: '/3Cz7ySOQJmqiuTdrc6CY0r65yDI.jpg',
+    backdrop_path: '/2O5jeHvZEL9hMWPuU8RRsMGxLDB.jpg',
+    first_air_date: '2004-11-16',
+    vote_average: 8.6,
+    genre_ids: [18, 9648]
+  },
+  {
+    id: 46952,
+    name: 'The Mandalorian',
+    overview: 'A lone gunfighter makes his way through the outer reaches of the galaxy.',
+    poster_path: '/eU1i6eHXlzMOlEq0ku1Rzq7Y4wA.jpg',
+    backdrop_path: '/9ijMGlJKqcslswWUzTEwScm82Gs.jpg',
+    first_air_date: '2019-11-12',
+    vote_average: 8.5,
+    genre_ids: [10765, 10759, 37]
+  },
+  {
+    id: 1416,
+    name: 'Grey\'s Anatomy',
+    overview: 'Follows the personal and professional lives of surgical interns and residents.',
+    poster_path: '/daSFbrt8QCXV2hSwB0hqYjbj681.jpg',
+    backdrop_path: '/edmk8xjGBsYVIf4QtLY9WMaMcXZ.jpg',
+    first_air_date: '2005-03-27',
+    vote_average: 8.2,
+    genre_ids: [18]
+  },
+  {
+    id: 66732,
+    name: 'Stranger Things',
+    overview: 'When a young boy vanishes, a small town uncovers a mystery involving secret experiments.',
+    poster_path: '/x2LSRK2Cm7MZhjluni1msVJ3wDF.jpg',
+    backdrop_path: '/56v2KjBlU4XaOv9rVYEQypROD7P.jpg',
+    first_air_date: '2016-07-15',
+    vote_average: 8.6,
+    genre_ids: [18, 10765, 9648]
+  },
+  {
+    id: 60059,
+    name: 'Better Call Saul',
+    overview: 'The trials and tribulations of criminal lawyer Jimmy McGill in the years before Breaking Bad.',
+    poster_path: '/fC2HDm5t0kHl7mTm7jxMR31b7by.jpg',
+    backdrop_path: '/9faGSFi5jam6pDWGNd0p8JcJgXQ.jpg',
+    first_air_date: '2015-02-08',
+    vote_average: 8.7,
+    genre_ids: [80, 18]
+  },
+  {
+    id: 1402,
+    name: 'The Walking Dead',
+    overview: 'Sheriff Deputy Rick Grimes wakes up from a coma to learn the world is in ruins.',
+    poster_path: '/xf9wuDcqlUPWABZNeDKPbZUjWx0.jpg',
+    backdrop_path: '/wvdWb5kTQipdMDqCclC6Y3zr4j3.jpg',
+    first_air_date: '2010-10-31',
+    vote_average: 8.1,
+    genre_ids: [10759, 18, 10765]
+  },
+  {
+    id: 1622,
+    name: 'Supernatural',
+    overview: 'Two brothers follow their father\'s footsteps as hunters, fighting evil supernatural beings.',
+    poster_path: '/KoYWXbnYuS3b0GyQPkbuexlVK9.jpg',
+    backdrop_path: '/o9OKe3M06QMLOzTl3l6GStYtnE9.jpg',
+    first_air_date: '2005-09-13',
+    vote_average: 8.3,
+    genre_ids: [18, 9648, 10765]
+  },
+  {
+    id: 31910,
+    name: 'Narcos',
+    overview: 'A chronicled look at the criminal exploits of Colombian drug lord Pablo Escobar.',
+    poster_path: '/rTmal9fDbwh5F0waol2hq35U4ah.jpg',
+    backdrop_path: '/rQBRHAl9xMT3PjqO7SRJBh1qT0M.jpg',
+    first_air_date: '2015-08-28',
+    vote_average: 8.2,
+    genre_ids: [80, 18]
+  },
+  {
+    id: 4194,
+    name: 'The Big Bang Theory',
+    overview: 'Five friends living in Pasadena, California, explore the world through their geeky lens.',
+    poster_path: '/ooBGRQBdbGzBxAVfExiO8r7kloA.jpg',
+    backdrop_path: '/f5uNbUC76oowt5mt5J9QlqrIYQ6.jpg',
+    first_air_date: '2007-09-24',
+    vote_average: 7.9,
+    genre_ids: [35]
+  },
+  {
+    id: 63174,
+    name: 'Lucifer',
+    overview: 'Bored with being the Lord of Hell, the devil relocates to Los Angeles.',
+    poster_path: '/ekZobS8isE6mA53RAiGDG93hBxL.jpg',
+    backdrop_path: '/ta5oblpMlEcIPIS33xbpZy1MH83.jpg',
+    first_air_date: '2016-01-25',
+    vote_average: 8.5,
+    genre_ids: [80, 10765]
+  }
+];
+
 module.exports = {
   fallbackGenres,
   fallbackProviders,
-  fallbackMovies
+  fallbackMovies,
+  fallbackTVShows
 };
