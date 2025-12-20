@@ -14,7 +14,7 @@ const path = require('path');
 const User = require('../models/User');
 const DatabaseFactory = require('../database/databaseFactory');
 const streamingAPIService = require('../services/streamingAPIService');
-const { fallbackGenres, fallbackProviders, fallbackMovies } = require('../services/fallbackData');
+const { fallbackGenres, fallbackProviders, fallbackMovies, fallbackTVShows } = require('../services/fallbackData');
 const {
   firstNames,
   lastNames,
@@ -62,7 +62,7 @@ async function fetchPopularMovies() {
 
 /**
  * Fetch popular TV shows from TMDB API with retry logic
- * Falls back to sample TV shows derived from movies if API is unavailable
+ * Falls back to sample TV shows if API is unavailable
  */
 async function fetchPopularTVShows() {
   try {
@@ -73,12 +73,8 @@ async function fetchPopularTVShows() {
   } catch (error) {
     console.warn('Could not fetch popular TV shows from TMDB:', error.message);
   }
-  // Return fallback TV shows (converted from movies for demo purposes)
-  return fallbackMovies.map(movie => ({
-    ...movie,
-    name: movie.title, // TV shows use 'name' instead of 'title'
-    first_air_date: movie.release_date
-  }));
+  // Return fallback TV shows when API is unavailable
+  return fallbackTVShows;
 }
 
 /**
