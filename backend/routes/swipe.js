@@ -4,14 +4,51 @@ const { getDatabase } = require('../utils/database');
 const User = require('../models/User');
 const streamingAPIService = require('../services/streamingAPIService');
 
+// Constants
+const TMDB_PAGE_SIZE = 20; // TMDB API returns approximately 20 results per page
+const MAX_PAGES_TO_FETCH = 5; // Maximum number of pages to fetch from TMDB
+
+/**
+ * Calculate how many pages to fetch based on requested limit
+ * @param {number} limit - Number of movies requested
+ * @returns {number} Number of pages to fetch
+ */
+function calculatePagesToFetch(limit) {
+  return Math.min(MAX_PAGES_TO_FETCH, Math.ceil(limit / TMDB_PAGE_SIZE));
+}
+
+/**
+ * Fetch multiple pages of movies from TMDB
+ * @param {Object} params - Parameters for TMDB discover endpoint
+ * @param {number} startPage - Starting page number
+ * @param {number} numPages - Number of pages to fetch
+ * @returns {Promise<Array>} Array of movies
+ */
+async function fetchMultiplePages(params, startPage, numPages) {
+  const pagePromises = [];
+  
+  for (let i = 0; i < numPages; i++) {
+    pagePromises.push(
+      streamingAPIService.discover('movie', {
+        ...params,
+        page: startPage + i
+      })
+    );
+  }
+  
+  const pageResults = await Promise.all(pagePromises);
+  return pageResults.flat();
+}
+
 /**
  * Get movies for swiping based on user preferences
  * Returns a batch of movies from TMDB filtered by user's genre preferences
+ * Supports unlimited swiping with diverse movie recommendations
  */
 router.get('/movies/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { limit = 20 } = req.query;
+    const { limit = 50, page = 1 } = req.query;
     
     // Get user profile
     const dataStore = await getDatabase();
@@ -46,19 +83,30 @@ router.get('/movies/:userId', async (req, res) => {
     let movies = [];
 
     try {
+      const numPages = calculatePagesToFetch(parseInt(limit));
+      
       if (genreIds.length > 0 || watchHistoryGenres.length > 0) {
         // Combine genre IDs from preferences and watch history
         const allGenreIds = [...new Set([...genreIds])];
         
-        // Discover movies with user's preferred genres
-        movies = await streamingAPIService.discover('movie', {
-          with_genres: allGenreIds.join(','),
-          sort_by: 'popularity.desc',
-          page: 1
-        });
+        // Fetch multiple pages for more diverse recommendations
+        movies = await fetchMultiplePages(
+          {
+            with_genres: allGenreIds.join(','),
+            sort_by: 'popularity.desc'
+          },
+          parseInt(page),
+          numPages
+        );
       } else {
-        // If no genre preferences, get popular movies
-        movies = await streamingAPIService.getPopularMovies();
+        // If no genre preferences, get popular movies from multiple pages
+        movies = await fetchMultiplePages(
+          {
+            sort_by: 'popularity.desc'
+          },
+          parseInt(page),
+          numPages
+        );
       }
       
       // If no movies returned from API, fallback to popular movies
@@ -98,7 +146,8 @@ router.get('/movies/:userId', async (req, res) => {
     res.json({
       success: true,
       movies: formattedMovies,
-      totalReturned: formattedMovies.length
+      totalReturned: formattedMovies.length,
+      hasMore: unseenMovies.length > formattedMovies.length
     });
   } catch (error) {
     console.error('Error getting swipe movies:', error);
@@ -111,6 +160,7 @@ router.get('/movies/:userId', async (req, res) => {
 
 /**
  * Record a swipe action (like or dislike)
+ * Unlimited swipes enabled - no daily limits
  */
 router.post('/action/:userId', async (req, res) => {
   try {
@@ -136,7 +186,7 @@ router.post('/action/:userId', async (req, res) => {
     
     const user = new User(userData);
 
-    // Add swiped movie
+    // Add swiped movie - unlimited swipes
     user.addSwipedMovie({ tmdbId, title, posterPath }, action);
     await dataStore.updateUser(userId, user);
 
@@ -144,7 +194,8 @@ router.post('/action/:userId', async (req, res) => {
       success: true,
       message: `Movie ${action}d successfully`,
       totalLikes: user.getLikedMovies().length,
-      totalSwipes: user.swipedMovies.length
+      totalSwipes: user.swipedMovies.length,
+      unlimited: true
     });
   } catch (error) {
     console.error('Error recording swipe action:', error);
@@ -189,13 +240,12 @@ router.get('/liked/:userId', async (req, res) => {
 });
 
 /**
- * Get user's daily swipe statistics
- * Returns current swipe count for today based on user data timestamps
+ * Get user's swipe statistics
+ * Returns unlimited swipe stats - no daily limits
  */
 router.get('/stats/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { limit = 50 } = req.query;
     
     const dataStore = await getDatabase();
     const userData = await dataStore.findUserById(userId);
@@ -207,22 +257,15 @@ router.get('/stats/:userId', async (req, res) => {
     }
     
     const user = new User(userData);
-    const dailySwipeCount = user.getDailySwipeCount();
-    const todaySwipes = user.getTodaySwipes();
-    const swipeLimit = parseInt(limit);
+    const totalSwipes = user.swipedMovies.length;
+    const totalLikes = user.getLikedMovies().length;
 
     res.json({
       success: true,
-      dailySwipeCount,
-      swipeLimit,
-      swipesRemaining: Math.max(0, swipeLimit - dailySwipeCount),
-      todaySwipes: todaySwipes.map(s => ({
-        tmdbId: s.tmdbId,
-        title: s.title,
-        action: s.action,
-        swipedAt: s.swipedAt
-      })),
-      totalLikes: user.getLikedMovies().length
+      totalSwipes,
+      totalLikes,
+      unlimited: true, // Indicate that swipes are unlimited
+      message: 'Unlimited swipes enabled'
     });
   } catch (error) {
     console.error('Error getting swipe stats:', error);
