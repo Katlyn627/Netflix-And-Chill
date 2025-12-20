@@ -50,11 +50,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const successDiv = document.createElement('div');
                 successDiv.className = 'success-message';
-                successDiv.textContent = 'Login successful! Redirecting to homepage...';
+                successDiv.textContent = 'Login successful! Redirecting to your profile...';
                 document.querySelector('.login-container').insertBefore(successDiv, document.querySelector('.card'));
                 
                 setTimeout(() => {
-                    window.location.href = 'homepage.html';
+                    window.location.href = 'profile-view.html';
                 }, 1500);
             } else {
                 errorDiv.textContent = result.error || 'Invalid credentials. Please check your email and password.';
