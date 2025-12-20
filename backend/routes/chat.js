@@ -3,6 +3,9 @@ const chatController = require('../controllers/chatController');
 
 const router = express.Router();
 
+// Get Stream Chat token for a user
+router.get('/token/:userId', chatController.getStreamToken.bind(chatController));
+
 // Send a message
 router.post('/send', chatController.sendMessage.bind(chatController));
 

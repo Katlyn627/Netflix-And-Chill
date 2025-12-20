@@ -82,6 +82,7 @@ class MatchController {
       );
 
       res.json({
+        success: true,
         userId: userId,
         matches: matchesWithDetails
       });
@@ -102,10 +103,52 @@ class MatchController {
 
       const matches = await dataStore.findMatchesForUser(userId);
 
+      // Populate match details with user information
+      const matchesWithDetails = await Promise.all(
+        matches.map(async (match) => {
+          const otherUserId = match.user1Id === userId ? match.user2Id : match.user1Id;
+          const matchedUser = await dataStore.findUserById(otherUserId);
+          
+          if (!matchedUser) {
+            return null;
+          }
+
+          return {
+            matchId: match.id,
+            matchScore: match.matchScore,
+            matchDescription: match.matchDescription,
+            sharedContent: match.sharedContent,
+            quizCompatibility: match.quizCompatibility,
+            snackCompatibility: match.snackCompatibility,
+            debateCompatibility: match.debateCompatibility,
+            emotionalToneCompatibility: match.emotionalToneCompatibility,
+            createdAt: match.createdAt,
+            user: {
+              id: matchedUser.id,
+              username: matchedUser.username,
+              age: matchedUser.age,
+              location: matchedUser.location,
+              gender: matchedUser.gender,
+              sexualOrientation: matchedUser.sexualOrientation,
+              bio: matchedUser.bio,
+              profilePicture: matchedUser.profilePicture,
+              photoGallery: matchedUser.photoGallery,
+              streamingServices: matchedUser.streamingServices,
+              movieDebateResponses: matchedUser.movieDebateResponses,
+              moviePromptResponses: matchedUser.moviePromptResponses
+            }
+          };
+        })
+      );
+
+      // Filter out null entries (users that no longer exist)
+      const validMatches = matchesWithDetails.filter(m => m !== null);
+
       res.json({
+        success: true,
         userId: userId,
-        matchCount: matches.length,
-        matches: matches
+        matchCount: validMatches.length,
+        matches: validMatches
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
