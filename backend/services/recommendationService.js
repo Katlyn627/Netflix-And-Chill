@@ -81,6 +81,10 @@ class RecommendationService {
         genreIds = genres
           .map(g => {
             const genreName = typeof g === 'string' ? g : (g.name || '');
+            // Skip empty genre names
+            if (!genreName || !genreName.trim()) {
+              return undefined;
+            }
             return genreMap[genreName.toLowerCase()];
           })
           .filter(id => id !== undefined);
