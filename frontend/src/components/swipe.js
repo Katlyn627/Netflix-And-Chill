@@ -3,12 +3,15 @@
  * Allows users to swipe through movies and like/dislike them
  */
 
+// Constants
+const DEFAULT_SWIPE_LIMIT = 50; // Daily swipe limit per user
+
 let currentMovieIndex = 0;
 let movieStack = [];
 let isDragging = false;
 let startX = 0;
 let currentX = 0;
-let swipeLimit = 50; // Default swipe limit
+let swipeLimit = DEFAULT_SWIPE_LIMIT; // Current swipe limit (can be updated from server)
 let swipeCount = 0;
 
 /**
@@ -22,7 +25,7 @@ async function initializeSwipe(userId) {
 
   try {
     // Get swipe stats from backend (uses user data with timestamps)
-    const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=50`);
+    const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=${DEFAULT_SWIPE_LIMIT}`);
     const statsData = await statsResponse.json();
     
     if (statsData.success) {
@@ -44,8 +47,8 @@ async function initializeSwipe(userId) {
       updateSwipeStats();
     }
 
-    // Fetch movies for swiping - limit increased to 50
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=50`);
+    // Fetch movies for swiping
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${DEFAULT_SWIPE_LIMIT}`);
     const data = await response.json();
 
     if (data.success && data.movies) {
@@ -396,7 +399,7 @@ async function refreshSwipeCount() {
   if (!userId) return;
 
   try {
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=50`);
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=${DEFAULT_SWIPE_LIMIT}`);
     const data = await response.json();
     
     if (data.success) {
