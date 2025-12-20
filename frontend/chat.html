@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
     <link rel="stylesheet" href="src/styles/chat.css">
+    <link rel="stylesheet" href="src/styles/matches.css">
 </head>
 <body>
     <div class="container">
@@ -32,7 +33,10 @@
         <main>
             <div class="chat-container">
                 <div class="chat-sidebar">
-                    <h3>Your Matches</h3>
+                    <div class="sidebar-header">
+                        <h3>Your Matches</h3>
+                        <button id="chat-filters-btn" class="btn btn-secondary btn-small">🔍</button>
+                    </div>
                     <div id="matches-list" class="matches-list">
                         <!-- Matches will be loaded here -->
                     </div>
@@ -72,6 +76,67 @@
             </div>
         </main>
 
+        <!-- Filters Modal -->
+        <div id="chat-filters-modal" class="modal" style="display: none;">
+            <div class="modal-content filters-modal-content">
+                <div class="filters-header">
+                    <h3>Filter Matches</h3>
+                    <button class="close-modal" id="close-chat-filters">&times;</button>
+                </div>
+                <div class="filters-body">
+                    <div class="filter-group">
+                        <label for="chat-match-score-filter">Match Score (minimum):</label>
+                        <input type="range" id="chat-match-score-filter" min="0" max="100" value="0" step="5">
+                        <span id="chat-match-score-value">0%</span>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="chat-age-range-min-filter">Age Range:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="chat-age-range-min-filter" min="18" max="100" value="18" style="width: 80px;">
+                            <span>to</span>
+                            <input type="number" id="chat-age-range-max-filter" min="18" max="100" value="100" style="width: 80px;">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="chat-distance-filter">Distance (miles):</label>
+                        <input type="range" id="chat-distance-filter" min="1" max="500" value="50" step="5">
+                        <span id="chat-distance-value">50 miles</span>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Gender Preference:</label>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="chatGenderFilter" value="male"> Male</label>
+                            <label><input type="checkbox" name="chatGenderFilter" value="female"> Female</label>
+                            <label><input type="checkbox" name="chatGenderFilter" value="non-binary"> Non-binary</label>
+                            <label><input type="checkbox" name="chatGenderFilter" value="other"> Other</label>
+                            <label><input type="checkbox" name="chatGenderFilter" value="any" checked> Any</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Sexual Orientation Preference:</label>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="chatOrientationFilter" value="straight"> Straight</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="gay"> Gay</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="lesbian"> Lesbian</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="bisexual"> Bisexual</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="pansexual"> Pansexual</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="asexual"> Asexual</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="other"> Other</label>
+                            <label><input type="checkbox" name="chatOrientationFilter" value="any" checked> Any</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filters-footer">
+                    <button id="reset-chat-filters-btn" class="btn btn-secondary">Reset Filters</button>
+                    <button id="apply-chat-filters-btn" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
         <footer>
             <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
         </footer>
@@ -79,6 +144,7 @@
 
     <script src="src/utils/errorHandler.js"></script>
     <script src="src/services/api.js"></script>
+    <script src="src/utils/sharedFilters.js"></script>
     <script src="src/components/chat.js"></script>
     <script>
         // Initialize chat when page loads
@@ -89,8 +155,24 @@
                 return;
             }
             
-            // Load matches for chat
-            loadMatchesForChat(userId);
+            // Load saved filters from shared utility
+            const chatFilters = window.SharedFilters.loadFilters();
+            
+            // Load matches for chat with filters
+            loadMatchesForChat(userId, chatFilters);
+            
+            // Check if there's a pre-selected match from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const preSelectedMatchId = urlParams.get('matchId') || localStorage.getItem('selectedMatchId');
+            const preSelectedUsername = localStorage.getItem('chatWithUsername');
+            
+            if (preSelectedMatchId && preSelectedUsername) {
+                console.log('Pre-selecting match:', preSelectedMatchId, preSelectedUsername);
+                // Small delay to ensure matches are loaded first
+                setTimeout(() => {
+                    selectMatch(preSelectedMatchId, preSelectedUsername);
+                }, 100);
+            }
             
             // Set up watch together button
             const watchTogetherBtn = document.getElementById('watch-together-btn');
@@ -102,18 +184,40 @@
                     }
                 });
             }
+
+            // Set up filter button
+            const chatFiltersBtn = document.getElementById('chat-filters-btn');
+            if (chatFiltersBtn) {
+                chatFiltersBtn.addEventListener('click', showChatFiltersModal);
+            }
+
+            // Set up filter modal controls
+            document.getElementById('close-chat-filters')?.addEventListener('click', hideChatFiltersModal);
+            document.getElementById('apply-chat-filters-btn')?.addEventListener('click', applyChatFilters);
+            document.getElementById('reset-chat-filters-btn')?.addEventListener('click', resetChatFilters);
+
+            // Update slider values in real-time
+            document.getElementById('chat-match-score-filter')?.addEventListener('input', function() {
+                document.getElementById('chat-match-score-value').textContent = `${this.value}%`;
+            });
+
+            document.getElementById('chat-distance-filter')?.addEventListener('input', function() {
+                document.getElementById('chat-distance-value').textContent = `${this.value} miles`;
+            });
         });
 
-        async function loadMatchesForChat(userId) {
+        async function loadMatchesForChat(userId, chatFilters) {
             try {
-                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/matches/find/${userId}`);
-                const data = await response.json();
+                console.log('[Chat] Loading matches with filters:', chatFilters);
                 
-                if (data.success && data.matches) {
-                    displayMatchesList(data.matches);
-                }
+                // Use shared filters utility to load matches
+                const matches = await window.SharedFilters.loadFilteredMatches(userId, chatFilters);
+                
+                console.log(`[Chat] Loaded ${matches.length} matches`);
+                displayMatchesList(matches);
             } catch (error) {
-                console.error('Error loading matches:', error);
+                console.error('[Chat] Error loading matches:', error);
+                displayMatchesList([]);
             }
         }
 
@@ -124,6 +228,7 @@
                 return;
             }
             
+            console.log('Displaying matches list:', matches);
             matchesList.innerHTML = matches.map(match => `
                 <div class="match-item" data-match-id="${match.user.id}" onclick="selectMatch('${match.user.id}', '${match.user.username}')">
                     <img src="${match.user.profilePicture || 'assets/images/default-profile.svg'}" alt="${match.user.username}">
@@ -136,7 +241,12 @@
         }
 
         function selectMatch(matchId, username) {
+            // Save selected match to localStorage
             localStorage.setItem('selectedMatchId', matchId);
+            localStorage.setItem('chatWithUsername', username);
+            
+            console.log('Selected match:', { matchId, username });
+            console.log('Saved to localStorage');
             
             // Update chat header
             document.getElementById('chat-username').textContent = username;
@@ -152,6 +262,63 @@
             });
             document.querySelector(`[data-match-id="${matchId}"]`)?.classList.add('active');
         }
+
+        // Show filters modal
+        function showChatFiltersModal() {
+            const modal = document.getElementById('chat-filters-modal');
+            modal.style.display = 'flex';
+            
+            // Load current filters from shared utility
+            const chatFilters = window.SharedFilters.loadFilters();
+            console.log('[Chat] Opening filters modal with current filters:', chatFilters);
+            
+            // Use shared utility to apply filters to form
+            window.SharedFilters.applyFiltersToForm(chatFilters, 'chat-');
+        }
+
+        // Hide filters modal
+        function hideChatFiltersModal() {
+            const modal = document.getElementById('chat-filters-modal');
+            modal.style.display = 'none';
+        }
+
+        // Apply filters
+        function applyChatFilters() {
+            // Extract filters from form using shared utility
+            const chatFilters = window.SharedFilters.extractFiltersFromForm('chat');
+            
+            console.log('[Chat] Applied chat filters:', chatFilters);
+            
+            // Save filters using shared utility
+            window.SharedFilters.saveFilters(chatFilters);
+            
+            hideChatFiltersModal();
+            
+            // Reload matches with new filters
+            const userId = localStorage.getItem('currentUserId');
+            if (userId) {
+                loadMatchesForChat(userId, chatFilters);
+            }
+        }
+
+        // Reset filters
+        function resetChatFilters() {
+            // Reset filters using shared utility
+            const chatFilters = window.SharedFilters.resetFilters();
+            
+            console.log('[Chat] Reset chat filters to defaults');
+            
+            // Update UI with reset filters
+            window.SharedFilters.applyFiltersToForm(chatFilters, 'chat-');
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const chatFiltersModal = document.getElementById('chat-filters-modal');
+            if (e.target === chatFiltersModal) {
+                hideChatFiltersModal();
+            }
+        });
 
         async function loadMessages(userId1, userId2) {
             try {

@@ -128,28 +128,30 @@
 
     async function loadMatches() {
         try {
-            // Get user's likes to find mutual matches
-            const likesResponse = await API.getUserLikes(currentUserId);
-            const mutualLikes = likesResponse.mutual || [];
+            // Load filters from shared filter utility
+            const filters = window.SharedFilters.loadFilters();
+            console.log('[WatchTogether] Loading matches with filters:', filters);
+            
+            // Load filtered matches using the shared utility
+            const filteredMatches = await window.SharedFilters.loadFilteredMatches(currentUserId, filters);
             
             const matchSelect = document.getElementById('invite-match');
             matchSelect.innerHTML = '<option value="">Choose a match...</option>';
             
-            if (mutualLikes.length === 0) {
-                matchSelect.innerHTML += '<option value="" disabled>No matches yet. Go to Matches page to find someone!</option>';
+            if (filteredMatches.length === 0) {
+                matchSelect.innerHTML += '<option value="" disabled>No matches found with current filters. Try adjusting filters on the Matches page.</option>';
+                console.log('[WatchTogether] No matches found with current filters');
                 return;
             }
 
-            for (const match of mutualLikes) {
-                try {
-                    // Extract userId from the match object
-                    const matchUserId = match.userId || match;
-                    const user = await API.getUser(matchUserId);
-                    matchSelect.innerHTML += `<option value="${user.id}">${user.username}</option>`;
-                    matches.push(user);
-                } catch (error) {
-                    console.error('Error loading match:', error);
-                }
+            // Populate the dropdown with filtered matches
+            console.log(`[WatchTogether] Populating dropdown with ${filteredMatches.length} matches`);
+            matches = []; // Reset matches array
+            
+            for (const match of filteredMatches) {
+                const user = match.user;
+                matchSelect.innerHTML += `<option value="${user.id}">${user.username} (${Math.round(match.matchScore)}% match)</option>`;
+                matches.push(user);
             }
             
             // Handle URL parameter after matches are loaded
@@ -158,8 +160,10 @@
                 // Trigger change event to load movie options
                 matchSelect.dispatchEvent(new Event('change'));
             }
+            
+            console.log('[WatchTogether] Successfully loaded and populated matches');
         } catch (error) {
-            console.error('Error loading matches:', error);
+            console.error('[WatchTogether] Error loading matches:', error);
             // Don't redirect on error, show a message instead
             const matchSelect = document.getElementById('invite-match');
             if (matchSelect) {
