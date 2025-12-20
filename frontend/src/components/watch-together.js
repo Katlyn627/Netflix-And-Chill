@@ -7,6 +7,8 @@
     let matches = [];
     let invitations = { sent: [], received: [] };
     let selectedInvitation = null;
+    let urlMatchId = null;
+    let urlInvitationId = null;
 
     // Platform information
     const platformInfo = {
@@ -64,7 +66,7 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
-        currentUserId = localStorage.getItem('userId');
+        currentUserId = localStorage.getItem('currentUserId');
         
         if (!currentUserId) {
             window.location.href = 'login.html';
@@ -77,12 +79,22 @@
         setupEventListeners();
         setMinDate();
         checkForConflictingExtensions();
+        
+        // Handle URL parameters for direct links
+        handleURLParameters();
     });
 
     function setMinDate() {
         const dateInput = document.getElementById('watch-date');
         const today = new Date().toISOString().split('T')[0];
         dateInput.min = today;
+    }
+
+    function handleURLParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlMatchId = urlParams.get('matchId');
+        urlInvitationId = urlParams.get('invitationId');
+        // The actual handling is done after data loads in the respective functions
     }
 
     function checkForConflictingExtensions() {
@@ -109,6 +121,8 @@
             currentUser = await API.getUser(currentUserId);
         } catch (error) {
             console.error('Error loading user:', error);
+            // Don't redirect on error, just log it
+            // The user can still use the page with limited functionality
         }
     }
 
@@ -137,8 +151,20 @@
                     console.error('Error loading match:', error);
                 }
             }
+            
+            // Handle URL parameter after matches are loaded
+            if (urlMatchId && matchSelect) {
+                matchSelect.value = urlMatchId;
+                // Trigger change event to load movie options
+                matchSelect.dispatchEvent(new Event('change'));
+            }
         } catch (error) {
             console.error('Error loading matches:', error);
+            // Don't redirect on error, show a message instead
+            const matchSelect = document.getElementById('invite-match');
+            if (matchSelect) {
+                matchSelect.innerHTML = '<option value="">Error loading matches. Please refresh.</option>';
+            }
         }
     }
 
@@ -148,8 +174,22 @@
             invitations = data;
             
             displayInvitations('sent');
+            
+            // Handle URL parameter after invitations are loaded
+            if (urlInvitationId) {
+                showInvitationDetails(urlInvitationId);
+            }
         } catch (error) {
             console.error('Error loading invitations:', error);
+            // Don't redirect on error, show a message instead
+            const sentContainer = document.getElementById('sent-invitations');
+            const receivedContainer = document.getElementById('received-invitations');
+            if (sentContainer) {
+                sentContainer.innerHTML = '<p class="empty-message">Error loading invitations. Please refresh.</p>';
+            }
+            if (receivedContainer) {
+                receivedContainer.innerHTML = '<p class="empty-message">Error loading invitations. Please refresh.</p>';
+            }
         }
     }
 
