@@ -25,9 +25,13 @@ router.get('/movies/:userId', async (req, res) => {
     
     const user = new User(userData);
 
-    // Get movies based on user preferences
+    // Get movies based on user preferences, favorite genres, and watchlist
     const genreIds = user.preferences?.genres?.map(g => g.id).filter(Boolean) || [];
     const swipedMovieIds = (user.swipedMovies || []).map(m => m.tmdbId);
+    
+    // Get genre IDs from favorite movies and watchlist to enhance recommendations
+    const favoriteMovieIds = (user.favoriteMovies || []).map(m => m.tmdbId);
+    const watchlistMovieIds = (user.movieWatchlist || []).map(m => m.tmdbId);
     
     // Get genre IDs from user's watch history to enhance recommendations
     const watchHistoryGenres = [];
@@ -74,8 +78,10 @@ router.get('/movies/:userId', async (req, res) => {
       }
     }
 
-    // Filter out already swiped movies
-    const unseenMovies = movies.filter(movie => !swipedMovieIds.includes(movie.id));
+    // Filter out already swiped movies, favorite movies, and watchlist movies
+    // This ensures fresh content based on what user hasn't explicitly added
+    const excludedMovieIds = new Set([...swipedMovieIds, ...favoriteMovieIds, ...watchlistMovieIds]);
+    const unseenMovies = movies.filter(movie => !excludedMovieIds.has(movie.id));
 
     // Format movies for swipe UI
     const formattedMovies = unseenMovies.slice(0, parseInt(limit)).map(movie => ({
