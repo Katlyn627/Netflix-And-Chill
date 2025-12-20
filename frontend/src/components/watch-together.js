@@ -76,12 +76,32 @@
         loadInvitations();
         setupEventListeners();
         setMinDate();
+        checkForConflictingExtensions();
     });
 
     function setMinDate() {
         const dateInput = document.getElementById('watch-date');
         const today = new Date().toISOString().split('T')[0];
         dateInput.min = today;
+    }
+
+    function checkForConflictingExtensions() {
+        // Check if this is running on localhost or a non-streaming domain
+        const hostname = window.location.hostname;
+        const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+        
+        // Common streaming extension detection
+        const hasStreamingExtension = !!(
+            window.netflix || 
+            window.teleparty || 
+            window.scener ||
+            document.querySelector('[data-extension-type="streaming"]')
+        );
+
+        // If on localhost and likely has streaming extensions, show a subtle info message
+        if (isLocalhost && hasStreamingExtension) {
+            console.info('ℹ️ Note: Streaming browser extensions (like Teleparty) may show warnings when running on localhost. These can be safely ignored.');
+        }
     }
 
     async function loadCurrentUser() {

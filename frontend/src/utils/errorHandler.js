@@ -1,0 +1,75 @@
+// Error Handler Utility
+// Handles and suppresses known third-party browser extension errors
+
+(function() {
+    'use strict';
+
+    // Store original console methods
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleLog = console.log;
+
+    // Known error patterns from browser extensions that should be suppressed
+    const knownExtensionErrors = [
+        /Host validation failed/i,
+        /Host is not supported/i,
+        /Host is not valid or supported/i,
+        /hostName.*hostType/i,
+        /content\.js:\d+/i  // Common pattern for browser extension content scripts
+    ];
+
+    /**
+     * Checks if an error message matches known extension error patterns
+     * @param {string} message - The error message to check
+     * @returns {boolean} - True if the error is from a known extension
+     */
+    function isKnownExtensionError(message) {
+        const messageStr = String(message);
+        return knownExtensionErrors.some(pattern => pattern.test(messageStr));
+    }
+
+    /**
+     * Enhanced console.error that filters known extension errors
+     */
+    console.error = function(...args) {
+        const errorMessage = args.map(arg => String(arg)).join(' ');
+        
+        if (isKnownExtensionError(errorMessage)) {
+            // Optionally log to a debug console if needed
+            if (window.debugMode) {
+                originalConsoleLog('[Suppressed Extension Error]:', ...args);
+            }
+            return;
+        }
+        
+        originalConsoleError.apply(console, args);
+    };
+
+    /**
+     * Enhanced console.warn that filters known extension warnings
+     */
+    console.warn = function(...args) {
+        const warnMessage = args.map(arg => String(arg)).join(' ');
+        
+        if (isKnownExtensionError(warnMessage)) {
+            if (window.debugMode) {
+                originalConsoleLog('[Suppressed Extension Warning]:', ...args);
+            }
+            return;
+        }
+        
+        originalConsoleWarn.apply(console, args);
+    };
+
+    // Store original methods globally for debugging if needed
+    window._originalConsole = {
+        error: originalConsoleError,
+        warn: originalConsoleWarn,
+        log: originalConsoleLog
+    };
+
+    // Set debugMode to true to see suppressed errors
+    window.debugMode = false;
+
+    console.log('✓ Error handler initialized - browser extension errors will be suppressed');
+})();
