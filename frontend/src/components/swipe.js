@@ -8,6 +8,8 @@ let movieStack = [];
 let isDragging = false;
 let startX = 0;
 let currentX = 0;
+let swipeLimit = 50; // Default swipe limit
+let swipeCount = 0;
 
 /**
  * Initialize the swipe feature
@@ -18,9 +20,16 @@ async function initializeSwipe(userId) {
     return;
   }
 
+  // Get swipe count from localStorage
+  const savedSwipeCount = localStorage.getItem(`swipeCount_${userId}`);
+  swipeCount = savedSwipeCount ? parseInt(savedSwipeCount) : 0;
+  
+  // Update swipes remaining display
+  updateSwipeStats();
+
   try {
-    // Fetch movies for swiping
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=20`);
+    // Fetch movies for swiping - limit increased to 50
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=50`);
     const data = await response.json();
 
     if (data.success && data.movies) {
@@ -43,6 +52,19 @@ async function initializeSwipe(userId) {
 function renderCurrentMovie() {
   const container = document.getElementById('swipe-card-container');
   if (!container) return;
+
+  // Check if swipe limit reached
+  if (swipeCount >= swipeLimit) {
+    container.innerHTML = `
+      <div class="no-more-cards">
+        <h3>Daily Swipe Limit Reached!</h3>
+        <p>You've reached your daily limit of ${swipeLimit} swipes.</p>
+        <p>Come back tomorrow for more or find your matches now!</p>
+        <button onclick="window.location.href='matches.html'" class="btn btn-primary">Find Matches</button>
+      </div>
+    `;
+    return;
+  }
 
   if (currentMovieIndex >= movieStack.length) {
     container.innerHTML = `
@@ -78,6 +100,8 @@ function renderCurrentMovie() {
   if (counter) {
     counter.textContent = `${currentMovieIndex + 1} / ${movieStack.length}`;
   }
+  
+  updateSwipeStats();
 }
 
 /**
@@ -222,6 +246,13 @@ async function handleSwipeRight(card) {
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('like', movie);
   
+  // Increment swipe count
+  swipeCount++;
+  const userId = window.currentUserId || localStorage.getItem('currentUserId');
+  if (userId) {
+    localStorage.setItem(`swipeCount_${userId}`, swipeCount.toString());
+  }
+  
   setTimeout(() => {
     currentMovieIndex++;
     renderCurrentMovie();
@@ -237,6 +268,13 @@ async function handleSwipeLeft(card) {
   
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('dislike', movie);
+  
+  // Increment swipe count
+  swipeCount++;
+  const userId = window.currentUserId || localStorage.getItem('currentUserId');
+  if (userId) {
+    localStorage.setItem(`swipeCount_${userId}`, swipeCount.toString());
+  }
   
   setTimeout(() => {
     currentMovieIndex++;
@@ -319,6 +357,26 @@ function showSwipeMessage(message, isError = false) {
       <p>${message}</p>
     </div>
   `;
+}
+
+/**
+ * Update swipe statistics display
+ */
+function updateSwipeStats() {
+  const swipesRemaining = document.getElementById('swipes-remaining');
+  if (swipesRemaining) {
+    const remaining = Math.max(0, swipeLimit - swipeCount);
+    swipesRemaining.textContent = remaining;
+    
+    // Change color if running low
+    if (remaining <= 10) {
+      swipesRemaining.style.color = '#E50914'; // Red
+    } else if (remaining <= 20) {
+      swipesRemaining.style.color = '#FFA500'; // Orange
+    } else {
+      swipesRemaining.style.color = '#00FF00'; // Green
+    }
+  }
 }
 
 // Export functions for use in other files

@@ -195,29 +195,23 @@ class ProfileView {
     }
 
     renderQuizResponses() {
-        const quiz = this.userData.quizResponses || {};
-        const quizContainer = document.getElementById('quiz-responses');
-        const responseCount = Object.keys(quiz).length;
-        
-        if (responseCount > 0) {
-            const completionPercentage = Math.round((responseCount / 50) * 100);
-            const completionStatus = responseCount === 50 ? '✅ Fully completed!' : `📝 ${responseCount}/50 questions answered`;
+        // Quiz feature removed - display movie preferences instead
+        const moviePrefsContainer = document.getElementById('quiz-responses');
+        if (moviePrefsContainer) {
+            const snacks = this.userData.favoriteSnacks || [];
+            const videoChat = this.userData.videoChatPreference || 'Not specified';
             
-            quizContainer.innerHTML = `
-                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                    <p style="margin: 0 0 10px 0;"><strong>${completionStatus}</strong></p>
-                    <div style="background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${completionPercentage}%;"></div>
+            if (snacks.length > 0 || videoChat !== 'Not specified') {
+                moviePrefsContainer.innerHTML = `
+                    <div class="profile-section">
+                        <h3>🍿 Movie Preferences</h3>
+                        ${snacks.length > 0 ? `<p><strong>Favorite Snacks:</strong> ${snacks.join(', ')}</p>` : ''}
+                        <p><strong>Video Chat Preference:</strong> ${videoChat}</p>
                     </div>
-                    <p style="margin: 10px 0 0 0; font-size: 0.9em; color: #666;">
-                        ${responseCount === 50 
-                            ? 'Your quiz responses are being used to find your best matches!' 
-                            : `Answer ${50 - responseCount} more questions to maximize your match quality.`}
-                    </p>
-                </div>
-            `;
-        } else {
-            quizContainer.innerHTML = '<em id="no-quiz-responses">No quiz responses yet. Take the quiz to improve your matches!</em>';
+                `;
+            } else {
+                moviePrefsContainer.innerHTML = '<em>No movie preferences set yet. Swipe on movies to improve your matches!</em>';
+            }
         }
     }
 
@@ -648,52 +642,7 @@ class ProfileView {
         }
     }
 
-    showQuizModal() {
-        // Initialize quiz questions if not already done
-        if (typeof window.QuizModule !== 'undefined') {
-            window.QuizModule.initializeQuiz();
-        }
-        
-        const quiz = this.userData.quizResponses || {};
-        
-        // Pre-fill existing responses
-        Object.keys(quiz).forEach(question => {
-            const select = document.querySelector(`[name="${question}"]`);
-            if (select) select.value = quiz[question];
-        });
-
-        document.getElementById('quiz-modal').style.display = 'flex';
-    }
-
-    async submitQuiz() {
-        const form = document.getElementById('quiz-form');
-        const formData = new FormData(form);
-        const quizResponses = {};
-
-        for (let [key, value] of formData.entries()) {
-            if (value) {
-                quizResponses[key] = value;
-            }
-        }
-
-        if (Object.keys(quizResponses).length === 0) {
-            alert('Please answer at least one question!');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/quiz`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quizResponses })
-            });
-
-            if (!response.ok) throw new Error('Failed to submit quiz');
-
-            this.userData = (await response.json()).user;
-            this.renderQuizResponses();
-            
-            document.getElementById('quiz-modal').style.display = 'none';
+    // Removed quiz modal functions - quiz feature has been replaced with movie swiping
             alert('Quiz submitted successfully! Your matches will be updated.');
         } catch (error) {
             console.error('Error submitting quiz:', error);

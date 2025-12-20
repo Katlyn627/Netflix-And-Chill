@@ -510,14 +510,14 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     }
 });
 
-// Chat functionality
+// Chat functionality - navigate to chat page
 function openChat(matchUserId, matchUsername) {
     // Store chat info in localStorage for the chat page
-    localStorage.setItem('chatWithUserId', matchUserId);
+    localStorage.setItem('selectedMatchId', matchUserId);
     localStorage.setItem('chatWithUsername', matchUsername);
     
-    // Open chat modal or navigate to chat page
-    showChatModal(matchUserId, matchUsername);
+    // Navigate to chat page
+    window.location.href = 'chat.html';
 }
 
 function showChatModal(matchUserId, matchUsername) {
@@ -654,3 +654,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNavProfileIcon(currentUserId);
     }
 });
+
+// Discover button functionality - routes to swipe page
+const discoverBtn = document.getElementById('discover-btn');
+if (discoverBtn) {
+    discoverBtn.addEventListener('click', () => {
+        window.location.href = 'swipe.html';
+    });
+}
