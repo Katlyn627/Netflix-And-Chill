@@ -25,11 +25,17 @@
             <!-- Screen 0: Logo/Welcome -->
             <div class="onboarding-screen active" data-screen="0">
                 <div class="screen-content">
-                    <div class="image-container">
-                        <img src="assets/onboarding/logo.svg" alt="Netflix & Chill Logo" class="onboarding-image">
+                    <div class="logo-header">
+                        <div class="logo-container">
+                            <img src="assets/onboarding/logo.svg" alt="Netflix & Chill Logo" class="logo-image">
+                        </div>
+                        <div class="brand-tagline">
+                            <span class="tagline-accent">NETFLIX</span>
+                            <span class="tagline-main">& CHILL</span>
+                        </div>
                     </div>
-                    <h1 class="screen-title">Welcome to Netflix & Chill</h1>
-                    <p class="screen-description">Find your perfect binge-watching partner. Match with people who share your streaming preferences and watch history.</p>
+                    <h1 class="screen-title hero-title">Find Your Perfect<br>Binge-Watching Partner</h1>
+                    <p class="screen-description">Match with people who share your streaming preferences and watch history. Start meaningful connections through shared entertainment experiences.</p>
                 </div>
                 <div class="button-container">
                     <button class="btn btn-primary btn-large" onclick="nextScreen()">Get Started</button>
@@ -41,7 +47,23 @@
             <div class="onboarding-screen" data-screen="1">
                 <div class="screen-content">
                     <div class="image-container">
-                        <img src="assets/onboarding/onboard1.svg" alt="Chat and watch together" class="onboarding-image">
+                        <!-- Device Frame with Match Card Preview -->
+                        <div class="device-frame">
+                            <div class="device-notch"></div>
+                            <div class="device-screen">
+                                <div class="match-card-preview">
+                                    <div class="match-card-image"></div>
+                                    <div class="match-card-info">
+                                        <h3>Sarah, 26</h3>
+                                        <p>🎬 Breaking Bad • Stranger Things</p>
+                                    </div>
+                                </div>
+                                <div class="card-actions">
+                                    <div class="action-button dislike">✕</div>
+                                    <div class="action-button like">♥</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <h2 class="screen-title">Chat & Watch Together</h2>
                     <p class="screen-description">Connect with your matches and enjoy streaming content together. Share reactions, discuss plot twists, and build genuine connections through shared viewing experiences.</p>
@@ -56,7 +78,29 @@
             <div class="onboarding-screen" data-screen="2">
                 <div class="screen-content">
                     <div class="image-container">
-                        <img src="assets/onboarding/onboard2.svg" alt="Build real connections" class="onboarding-image">
+                        <!-- Device Frame with Chat Preview -->
+                        <div class="device-frame">
+                            <div class="device-notch"></div>
+                            <div class="device-screen">
+                                <div class="chat-preview">
+                                    <div class="chat-header">
+                                        <div class="chat-avatar"></div>
+                                        <div class="chat-name">
+                                            <strong>Alex</strong>
+                                            <span>Watching: Stranger Things</span>
+                                        </div>
+                                    </div>
+                                    <div class="chat-messages">
+                                        <div class="message received">
+                                            <p>Just started S4! 🎬</p>
+                                        </div>
+                                        <div class="message sent">
+                                            <p>Me too! No spoilers! 😄</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <h2 class="screen-title">Build Real Connections</h2>
                     <p class="screen-description">Form meaningful relationships based on shared interests, not just looks. Our community values authentic connections built on common passions for movies and shows.</p>
@@ -71,7 +115,30 @@
             <div class="onboarding-screen" data-screen="3">
                 <div class="screen-content">
                     <div class="image-container">
-                        <img src="assets/onboarding/onboard3.svg" alt="Discover matches through movies" class="onboarding-image">
+                        <!-- Device Frame with Discovery Preview -->
+                        <div class="device-frame">
+                            <div class="device-notch"></div>
+                            <div class="device-screen">
+                                <div class="discovery-preview">
+                                    <div class="discovery-header">
+                                        <h3>Your Matches</h3>
+                                        <span class="match-badge">3 New</span>
+                                    </div>
+                                    <div class="movie-interests">
+                                        <div class="interest-tag">🎬 Breaking Bad</div>
+                                        <div class="interest-tag">🎭 The Crown</div>
+                                        <div class="interest-tag">👽 Stranger Things</div>
+                                    </div>
+                                    <div class="compatibility-meter">
+                                        <div class="meter-label">Compatibility</div>
+                                        <div class="meter-bar">
+                                            <div class="meter-fill"></div>
+                                        </div>
+                                        <div class="meter-value">94%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <h2 class="screen-title">Discover Matches Through Movies</h2>
                     <p class="screen-description">Get matched based on your streaming services, watch history, and binge-watching habits. Our smart algorithm finds people who truly share your entertainment preferences.</p>
