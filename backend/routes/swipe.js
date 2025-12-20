@@ -59,7 +59,6 @@ router.get('/movies/:userId', async (req, res) => {
       
       // If no movies returned from API, fallback to popular movies
       if (!movies || movies.length === 0) {
-        console.log('No movies from discover/genres, falling back to popular movies');
         movies = await streamingAPIService.getPopularMovies();
       }
     } catch (apiError) {
