@@ -14,7 +14,7 @@ const path = require('path');
 const User = require('../models/User');
 const DatabaseFactory = require('../database/databaseFactory');
 const streamingAPIService = require('../services/streamingAPIService');
-const { fallbackGenres, fallbackProviders } = require('../services/fallbackData');
+const { fallbackGenres, fallbackProviders, fallbackMovies, fallbackTVShows } = require('../services/fallbackData');
 const {
   firstNames,
   lastNames,
@@ -45,6 +45,7 @@ const DEFAULT_PASSWORD = 'password123'; // Simple password for testing
 
 /**
  * Fetch popular movies from TMDB API with retry logic
+ * Falls back to sample movies if API is unavailable
  */
 async function fetchPopularMovies() {
   try {
@@ -55,11 +56,13 @@ async function fetchPopularMovies() {
   } catch (error) {
     console.warn('Could not fetch popular movies from TMDB:', error.message);
   }
-  return [];
+  // Return fallback movies when API is unavailable
+  return fallbackMovies;
 }
 
 /**
  * Fetch popular TV shows from TMDB API with retry logic
+ * Falls back to sample TV shows if API is unavailable
  */
 async function fetchPopularTVShows() {
   try {
@@ -70,7 +73,8 @@ async function fetchPopularTVShows() {
   } catch (error) {
     console.warn('Could not fetch popular TV shows from TMDB:', error.message);
   }
-  return [];
+  // Return fallback TV shows when API is unavailable
+  return fallbackTVShows;
 }
 
 /**

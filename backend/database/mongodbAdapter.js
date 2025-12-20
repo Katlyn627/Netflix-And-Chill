@@ -11,7 +11,12 @@ class MongoDBAdapter {
   }
 
   // Placeholder patterns to detect unconfigured MongoDB URIs
-  static PLACEHOLDER_PATTERNS = ['<', '>', 'cluster0.abcde'];
+  // Includes angle brackets, example cluster names, and template placeholders
+  static PLACEHOLDER_PATTERNS = [
+    '<', '>', // Angle brackets from template syntax
+    'cluster0.abcde', // Example cluster name in documentation
+    'YOUR_USERNAME', 'YOUR_PASSWORD', 'YOUR_CLUSTER' // Common placeholder text
+  ];
 
   async connect() {
     const uri = config.database.mongodb.uri;
