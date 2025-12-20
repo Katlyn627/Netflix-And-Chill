@@ -642,7 +642,69 @@ class ProfileView {
         }
     }
 
-    // Removed quiz modal functions - quiz feature has been replaced with movie swiping
+    showQuizModal() {
+        const modal = document.getElementById('quiz-modal');
+        if (!modal) {
+            console.warn('Quiz modal not found in HTML');
+            alert('Quiz feature is being updated. Please check back later!');
+            return;
+        }
+        
+        // Populate quiz questions if available
+        if (typeof QUIZ_QUESTIONS !== 'undefined') {
+            this.renderQuizQuestions();
+        }
+        
+        modal.style.display = 'flex';
+    }
+    
+    renderQuizQuestions() {
+        const container = document.getElementById('quiz-questions-container');
+        if (!container || typeof QUIZ_QUESTIONS === 'undefined') return;
+        
+        container.innerHTML = '';
+        QUIZ_QUESTIONS.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'quiz-question';
+            questionDiv.style.marginBottom = '20px';
+            
+            questionDiv.innerHTML = `
+                <p><strong>Question ${index + 1}:</strong> ${q.question}</p>
+                ${q.options.map(opt => `
+                    <label style="display: block; margin: 5px 0;">
+                        <input type="radio" name="${q.id}" value="${opt.value}" required>
+                        ${opt.label}
+                    </label>
+                `).join('')}
+            `;
+            container.appendChild(questionDiv);
+        });
+    }
+    
+    async submitQuiz() {
+        try {
+            const quizForm = document.getElementById('quiz-form');
+            if (!quizForm) return;
+            
+            const formData = new FormData(quizForm);
+            const quizResponses = {};
+            
+            for (let [key, value] of formData.entries()) {
+                quizResponses[key] = value;
+            }
+            
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/quiz`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quizResponses })
+            });
+            
+            if (!response.ok) throw new Error('Failed to submit quiz');
+            
+            this.userData = (await response.json()).user;
+            this.renderQuizResponses();
+            
+            document.getElementById('quiz-modal').style.display = 'none';
             alert('Quiz submitted successfully! Your matches will be updated.');
         } catch (error) {
             console.error('Error submitting quiz:', error);
