@@ -181,19 +181,26 @@ class MatchingEngine {
   static findSharedLikedMovies(user1, user2) {
     const sharedMovies = [];
     
-    // Get liked movies for both users
+    // Get liked movies for both users - handle multiple data formats
     const user1LikedMovies = user1.getLikedMovies ? user1.getLikedMovies() : (user1.swipedMovies || []).filter(m => m.action === 'like');
     const user2LikedMovies = user2.getLikedMovies ? user2.getLikedMovies() : (user2.swipedMovies || []).filter(m => m.action === 'like');
+    
+    // Early return if either user has no liked movies
+    if (!user1LikedMovies || user1LikedMovies.length === 0 || !user2LikedMovies || user2LikedMovies.length === 0) {
+      return sharedMovies;
+    }
     
     // Create a map of user2's liked movies by TMDB ID for O(1) lookups
     const user2MoviesMap = new Map();
     user2LikedMovies.forEach(movie => {
-      user2MoviesMap.set(movie.tmdbId, movie);
+      if (movie && movie.tmdbId) {
+        user2MoviesMap.set(movie.tmdbId, movie);
+      }
     });
     
     // Check user1's liked movies against user2's
     user1LikedMovies.forEach(movie1 => {
-      if (user2MoviesMap.has(movie1.tmdbId)) {
+      if (movie1 && movie1.tmdbId && user2MoviesMap.has(movie1.tmdbId)) {
         sharedMovies.push({
           title: movie1.title,
           type: 'liked_movie',

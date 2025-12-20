@@ -81,8 +81,14 @@ class StreamingAPIService {
       return fallbackMovies;
     }
     
-    const data = await this.makeRequest('/movie/popular');
-    return data.results || [];
+    try {
+      const data = await this.makeRequest('/movie/popular');
+      const results = data.results || [];
+      return results.length > 0 ? results : fallbackMovies;
+    } catch (error) {
+      console.error('Error fetching popular movies:', error.message);
+      return fallbackMovies;
+    }
   }
 
   /**
@@ -136,9 +142,31 @@ class StreamingAPIService {
       return fallbackMovies;
     }
     
-    const endpoint = `/discover/${type}`;
-    const data = await this.makeRequest(endpoint, filters);
-    return data.results || [];
+    try {
+      const endpoint = `/discover/${type}`;
+      const data = await this.makeRequest(endpoint, filters);
+      const results = data.results || [];
+      
+      // If no results and we have genre filters, return filtered fallback
+      if (results.length === 0 && filters.with_genres) {
+        const genreIds = filters.with_genres.split(',').map(id => parseInt(id));
+        return fallbackMovies.filter(movie => 
+          movie.genre_ids.some(gid => genreIds.includes(gid))
+        );
+      }
+      
+      return results.length > 0 ? results : fallbackMovies;
+    } catch (error) {
+      console.error('Error in discover method:', error.message);
+      // Return filtered fallback on error
+      if (type === 'movie' && filters.with_genres) {
+        const genreIds = filters.with_genres.split(',').map(id => parseInt(id));
+        return fallbackMovies.filter(movie => 
+          movie.genre_ids.some(gid => genreIds.includes(gid))
+        );
+      }
+      return fallbackMovies;
+    }
   }
 
   /**

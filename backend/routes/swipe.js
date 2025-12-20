@@ -41,19 +41,38 @@ router.get('/movies/:userId', async (req, res) => {
 
     let movies = [];
 
-    if (genreIds.length > 0 || watchHistoryGenres.length > 0) {
-      // Combine genre IDs from preferences and watch history
-      const allGenreIds = [...new Set([...genreIds])];
+    try {
+      if (genreIds.length > 0 || watchHistoryGenres.length > 0) {
+        // Combine genre IDs from preferences and watch history
+        const allGenreIds = [...new Set([...genreIds])];
+        
+        // Discover movies with user's preferred genres
+        movies = await streamingAPIService.discover('movie', {
+          with_genres: allGenreIds.join(','),
+          sort_by: 'popularity.desc',
+          page: 1
+        });
+      } else {
+        // If no genre preferences, get popular movies
+        movies = await streamingAPIService.getPopularMovies();
+      }
       
-      // Discover movies with user's preferred genres
-      movies = await streamingAPIService.discover('movie', {
-        with_genres: allGenreIds.join(','),
-        sort_by: 'popularity.desc',
-        page: 1
-      });
-    } else {
-      // If no genre preferences, get popular movies
-      movies = await streamingAPIService.getPopularMovies();
+      // If no movies returned from API, fallback to popular movies
+      if (!movies || movies.length === 0) {
+        console.log('No movies from discover/genres, falling back to popular movies');
+        movies = await streamingAPIService.getPopularMovies();
+      }
+    } catch (apiError) {
+      // If API fails, fallback to popular movies
+      console.error('Error fetching movies from TMDB, using fallback:', apiError.message);
+      try {
+        movies = await streamingAPIService.getPopularMovies();
+      } catch (fallbackError) {
+        console.error('Error fetching popular movies fallback:', fallbackError);
+        // Use hardcoded fallback from fallbackData
+        const { fallbackMovies } = require('../services/fallbackData');
+        movies = fallbackMovies;
+      }
     }
 
     // Filter out already swiped movies
