@@ -84,6 +84,8 @@
 
 ## Data Flow Diagram
 
+**Note:** The diagrams below use ASCII art. For best viewing, use a monospace font or view in a plain text editor. If the formatting appears broken, refer to the textual descriptions that follow each diagram.
+
 ### Creating an Invitation
 
 ```
