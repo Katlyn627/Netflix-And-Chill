@@ -65,7 +65,12 @@ async function fetchDiverseMovies(genreIds, limit) {
       sort_by: discoverSort,
       page: discoverPage,
       'vote_count.gte': 100 // Ensure movies have enough votes
-    }).then(movies => movies.slice(0, targetPerSource))
+    })
+      .then(movies => movies.slice(0, targetPerSource))
+      .catch(err => {
+        console.error('Error fetching from source 1 (discover):', err.message);
+        return [];
+      })
   );
   
   // Source 2: Trending movies (different time windows)
@@ -73,6 +78,10 @@ async function fetchDiverseMovies(genreIds, limit) {
   movieSources.push(
     streamingAPIService.getTrending('movie', timeWindow)
       .then(movies => movies.slice(0, targetPerSource))
+      .catch(err => {
+        console.error('Error fetching from source 2 (trending):', err.message);
+        return [];
+      })
   );
   
   // Source 3: Top rated movies with random page
@@ -82,7 +91,12 @@ async function fetchDiverseMovies(genreIds, limit) {
       sort_by: 'vote_average.desc',
       'vote_count.gte': 1000,
       page: topRatedPage
-    }).then(movies => movies.slice(0, targetPerSource))
+    })
+      .then(movies => movies.slice(0, targetPerSource))
+      .catch(err => {
+        console.error('Error fetching from source 3 (top rated):', err.message);
+        return [];
+      })
   );
   
   // Source 4: Popular movies with different criteria
@@ -92,10 +106,15 @@ async function fetchDiverseMovies(genreIds, limit) {
       sort_by: 'popularity.desc',
       page: getRandomPageNumber(20),
       'primary_release_date.gte': new Date(Date.now() - 365 * 24 * 60 * 60 * 1000 * 3).toISOString().split('T')[0] // Last 3 years
-    }).then(movies => movies.slice(0, targetPerSource))
+    })
+      .then(movies => movies.slice(0, targetPerSource))
+      .catch(err => {
+        console.error('Error fetching from source 4 (popular recent):', err.message);
+        return [];
+      })
   );
   
-  // Fetch all sources in parallel
+  // Fetch all sources in parallel - each source has its own error handling
   const allMovieSets = await Promise.all(movieSources);
   
   // Combine and deduplicate by movie ID
