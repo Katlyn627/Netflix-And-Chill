@@ -26,6 +26,7 @@ class User {
     this.likes = data.likes || [];
     this.superLikes = data.superLikes || [];
     this.leastFavoriteMovies = data.leastFavoriteMovies || [];
+    this.movieDebateTopics = data.movieDebateTopics || [];
     this.favoriteSnacks = data.favoriteSnacks || [];
     this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
     // Swipe preferences - movies liked/disliked through swipe feature
@@ -262,6 +263,7 @@ class User {
       likes: this.likes,
       superLikes: this.superLikes,
       leastFavoriteMovies: this.leastFavoriteMovies,
+      movieDebateTopics: this.movieDebateTopics,
       favoriteSnacks: this.favoriteSnacks,
       videoChatPreference: this.videoChatPreference,
       swipedMovies: this.swipedMovies,
