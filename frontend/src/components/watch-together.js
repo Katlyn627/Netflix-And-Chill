@@ -64,7 +64,7 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
-        currentUserId = localStorage.getItem('userId');
+        currentUserId = localStorage.getItem('currentUserId');
         
         if (!currentUserId) {
             window.location.href = 'login.html';
@@ -77,12 +77,40 @@
         setupEventListeners();
         setMinDate();
         checkForConflictingExtensions();
+        
+        // Handle URL parameters for direct links
+        handleURLParameters();
     });
 
     function setMinDate() {
         const dateInput = document.getElementById('watch-date');
         const today = new Date().toISOString().split('T')[0];
         dateInput.min = today;
+    }
+
+    function handleURLParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('matchId');
+        const invitationId = urlParams.get('invitationId');
+        
+        // If matchId is provided, pre-select it in the form
+        if (matchId) {
+            setTimeout(() => {
+                const matchSelect = document.getElementById('invite-match');
+                if (matchSelect) {
+                    matchSelect.value = matchId;
+                    // Trigger change event to load movie options
+                    matchSelect.dispatchEvent(new Event('change'));
+                }
+            }, 1000); // Wait for matches to load
+        }
+        
+        // If invitationId is provided, show the invitation details
+        if (invitationId) {
+            setTimeout(() => {
+                showInvitationDetails(invitationId);
+            }, 1000); // Wait for invitations to load
+        }
     }
 
     function checkForConflictingExtensions() {
@@ -109,6 +137,8 @@
             currentUser = await API.getUser(currentUserId);
         } catch (error) {
             console.error('Error loading user:', error);
+            // Don't redirect on error, just log it
+            // The user can still use the page with limited functionality
         }
     }
 
@@ -139,6 +169,11 @@
             }
         } catch (error) {
             console.error('Error loading matches:', error);
+            // Don't redirect on error, show a message instead
+            const matchSelect = document.getElementById('invite-match');
+            if (matchSelect) {
+                matchSelect.innerHTML = '<option value="">Error loading matches. Please refresh.</option>';
+            }
         }
     }
 
@@ -150,6 +185,15 @@
             displayInvitations('sent');
         } catch (error) {
             console.error('Error loading invitations:', error);
+            // Don't redirect on error, show a message instead
+            const sentContainer = document.getElementById('sent-invitations');
+            const receivedContainer = document.getElementById('received-invitations');
+            if (sentContainer) {
+                sentContainer.innerHTML = '<p class="empty-message">Error loading invitations. Please refresh.</p>';
+            }
+            if (receivedContainer) {
+                receivedContainer.innerHTML = '<p class="empty-message">Error loading invitations. Please refresh.</p>';
+            }
         }
     }
 
