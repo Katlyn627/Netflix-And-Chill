@@ -19,7 +19,8 @@ class StreamingAPIService {
    * @returns {Promise<Object>}
    */
   async makeRequest(endpoint, params = {}) {
-    if (!this.apiKey) {
+    // Check if API key is not configured or is a placeholder
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       console.warn('TMDB API key not configured. Returning empty results.');
       return { results: [] };
     }
@@ -75,8 +76,8 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getPopularMovies() {
-    // If no API key, return fallback movies
-    if (!this.apiKey) {
+    // If no API key or placeholder, return fallback movies
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       return fallbackMovies;
     }
     
@@ -123,8 +124,8 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async discover(type = 'movie', filters = {}) {
-    // If no API key, return filtered fallback movies
-    if (!this.apiKey) {
+    // If no API key or placeholder, return filtered fallback movies
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       if (type === 'movie' && filters.with_genres) {
         const genreIds = filters.with_genres.split(',').map(id => parseInt(id));
         // Filter fallback movies by genre
@@ -156,8 +157,8 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getAllGenres() {
-    // If no API key, return fallback data
-    if (!this.apiKey) {
+    // If no API key or placeholder, return fallback data
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       return fallbackGenres;
     }
 
@@ -200,8 +201,8 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getStreamingProviders(region = 'US') {
-    // If no API key, return fallback data (already limited to top 20)
-    if (!this.apiKey) {
+    // If no API key or placeholder, return fallback data (already limited to top 20)
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       return fallbackProviders;
     }
 
