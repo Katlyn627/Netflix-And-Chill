@@ -144,37 +144,9 @@
 
     <script src="src/utils/errorHandler.js"></script>
     <script src="src/services/api.js"></script>
+    <script src="src/utils/sharedFilters.js"></script>
     <script src="src/components/chat.js"></script>
     <script>
-        // Filter state for chat page
-        let chatFilters = {
-            minMatchScore: 0,
-            minAge: 18,
-            maxAge: 100,
-            locationRadius: 50,
-            genderPreference: [],
-            sexualOrientationPreference: []
-        };
-
-        // Load saved filters from localStorage
-        function loadSavedFilters() {
-            const savedFilters = localStorage.getItem('chatFilters');
-            if (savedFilters) {
-                try {
-                    chatFilters = JSON.parse(savedFilters);
-                    console.log('Loaded saved chat filters:', chatFilters);
-                } catch (e) {
-                    console.error('Error loading saved filters:', e);
-                }
-            }
-        }
-
-        // Save filters to localStorage
-        function saveFilters() {
-            localStorage.setItem('chatFilters', JSON.stringify(chatFilters));
-            console.log('Saved chat filters to localStorage:', chatFilters);
-        }
-
         // Initialize chat when page loads
         document.addEventListener('DOMContentLoaded', () => {
             const userId = localStorage.getItem('currentUserId');
@@ -183,11 +155,11 @@
                 return;
             }
             
-            // Load saved filters
-            loadSavedFilters();
+            // Load saved filters from shared utility
+            const chatFilters = window.SharedFilters.loadFilters();
             
             // Load matches for chat with filters
-            loadMatchesForChat(userId);
+            loadMatchesForChat(userId, chatFilters);
             
             // Check if there's a pre-selected match from URL or localStorage
             const urlParams = new URLSearchParams(window.location.search);
@@ -234,45 +206,17 @@
             });
         });
 
-        async function loadMatchesForChat(userId) {
+        async function loadMatchesForChat(userId, chatFilters) {
             try {
-                // Build URL with filters
-                let url = `${window.API_BASE_URL || 'http://localhost:3000/api'}/matches/find/${userId}?limit=50`;
+                console.log('[Chat] Loading matches with filters:', chatFilters);
                 
-                if (chatFilters.minMatchScore) {
-                    url += `&minMatchScore=${chatFilters.minMatchScore}`;
-                }
-                if (chatFilters.minAge) {
-                    url += `&minAge=${chatFilters.minAge}`;
-                }
-                if (chatFilters.maxAge) {
-                    url += `&maxAge=${chatFilters.maxAge}`;
-                }
-                if (chatFilters.locationRadius) {
-                    url += `&locationRadius=${chatFilters.locationRadius}`;
-                }
-                if (chatFilters.genderPreference && chatFilters.genderPreference.length > 0) {
-                    url += `&genderPreference=${chatFilters.genderPreference.join(',')}`;
-                }
-                if (chatFilters.sexualOrientationPreference && chatFilters.sexualOrientationPreference.length > 0) {
-                    url += `&sexualOrientationPreference=${chatFilters.sexualOrientationPreference.join(',')}`;
-                }
-
-                console.log('Loading matches with filters:', chatFilters);
-                console.log('Request URL:', url);
+                // Use shared filters utility to load matches
+                const matches = await window.SharedFilters.loadFilteredMatches(userId, chatFilters);
                 
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.success && data.matches) {
-                    console.log(`Loaded ${data.matches.length} matches for chat`);
-                    displayMatchesList(data.matches);
-                } else {
-                    console.log('No matches found');
-                    displayMatchesList([]);
-                }
+                console.log(`[Chat] Loaded ${matches.length} matches`);
+                displayMatchesList(matches);
             } catch (error) {
-                console.error('Error loading matches:', error);
+                console.error('[Chat] Error loading matches:', error);
                 displayMatchesList([]);
             }
         }
@@ -324,29 +268,12 @@
             const modal = document.getElementById('chat-filters-modal');
             modal.style.display = 'flex';
             
-            console.log('Opening filters modal with current filters:', chatFilters);
+            // Load current filters from shared utility
+            const chatFilters = window.SharedFilters.loadFilters();
+            console.log('[Chat] Opening filters modal with current filters:', chatFilters);
             
-            // Set current filter values
-            document.getElementById('chat-match-score-filter').value = chatFilters.minMatchScore;
-            document.getElementById('chat-match-score-value').textContent = `${chatFilters.minMatchScore}%`;
-            document.getElementById('chat-age-range-min-filter').value = chatFilters.minAge;
-            document.getElementById('chat-age-range-max-filter').value = chatFilters.maxAge;
-            document.getElementById('chat-distance-filter').value = chatFilters.locationRadius;
-            document.getElementById('chat-distance-value').textContent = `${chatFilters.locationRadius} miles`;
-            
-            // Set gender checkboxes
-            document.querySelectorAll('input[name="chatGenderFilter"]').forEach(cb => {
-                cb.checked = chatFilters.genderPreference.length === 0 
-                    ? cb.value === 'any'
-                    : chatFilters.genderPreference.includes(cb.value);
-            });
-            
-            // Set orientation checkboxes
-            document.querySelectorAll('input[name="chatOrientationFilter"]').forEach(cb => {
-                cb.checked = chatFilters.sexualOrientationPreference.length === 0 
-                    ? cb.value === 'any'
-                    : chatFilters.sexualOrientationPreference.includes(cb.value);
-            });
+            // Use shared utility to apply filters to form
+            window.SharedFilters.applyFiltersToForm(chatFilters, 'chat-');
         }
 
         // Hide filters modal
@@ -357,74 +284,32 @@
 
         // Apply filters
         function applyChatFilters() {
-            chatFilters.minMatchScore = parseInt(document.getElementById('chat-match-score-filter').value);
-            chatFilters.minAge = parseInt(document.getElementById('chat-age-range-min-filter').value);
-            chatFilters.maxAge = parseInt(document.getElementById('chat-age-range-max-filter').value);
-            chatFilters.locationRadius = parseInt(document.getElementById('chat-distance-filter').value);
+            // Extract filters from form using shared utility
+            const chatFilters = window.SharedFilters.extractFiltersFromForm('chat');
             
-            // Get gender preferences
-            const genderCheckboxes = document.querySelectorAll('input[name="chatGenderFilter"]:checked');
-            let genderPrefs = Array.from(genderCheckboxes).map(cb => cb.value);
-            // Remove 'any' if specific options are selected
-            if (genderPrefs.length > 1 && genderPrefs.includes('any')) {
-                genderPrefs = genderPrefs.filter(p => p !== 'any');
-            }
-            chatFilters.genderPreference = genderPrefs;
+            console.log('[Chat] Applied chat filters:', chatFilters);
             
-            // Get orientation preferences
-            const orientationCheckboxes = document.querySelectorAll('input[name="chatOrientationFilter"]:checked');
-            let orientationPrefs = Array.from(orientationCheckboxes).map(cb => cb.value);
-            // Remove 'any' if specific options are selected
-            if (orientationPrefs.length > 1 && orientationPrefs.includes('any')) {
-                orientationPrefs = orientationPrefs.filter(p => p !== 'any');
-            }
-            chatFilters.sexualOrientationPreference = orientationPrefs;
-            
-            console.log('Applied chat filters:', chatFilters);
-            
-            // Save filters to localStorage
-            saveFilters();
+            // Save filters using shared utility
+            window.SharedFilters.saveFilters(chatFilters);
             
             hideChatFiltersModal();
             
             // Reload matches with new filters
             const userId = localStorage.getItem('currentUserId');
             if (userId) {
-                loadMatchesForChat(userId);
+                loadMatchesForChat(userId, chatFilters);
             }
         }
 
         // Reset filters
         function resetChatFilters() {
-            chatFilters = {
-                minMatchScore: 0,
-                minAge: 18,
-                maxAge: 100,
-                locationRadius: 50,
-                genderPreference: [],
-                sexualOrientationPreference: []
-            };
+            // Reset filters using shared utility
+            const chatFilters = window.SharedFilters.resetFilters();
             
-            console.log('Reset chat filters to defaults');
+            console.log('[Chat] Reset chat filters to defaults');
             
-            // Update UI
-            document.getElementById('chat-match-score-filter').value = 0;
-            document.getElementById('chat-match-score-value').textContent = '0%';
-            document.getElementById('chat-age-range-min-filter').value = 18;
-            document.getElementById('chat-age-range-max-filter').value = 100;
-            document.getElementById('chat-distance-filter').value = 50;
-            document.getElementById('chat-distance-value').textContent = '50 miles';
-            
-            // Reset checkboxes
-            document.querySelectorAll('input[name="chatGenderFilter"]').forEach(cb => {
-                cb.checked = cb.value === 'any';
-            });
-            document.querySelectorAll('input[name="chatOrientationFilter"]').forEach(cb => {
-                cb.checked = cb.value === 'any';
-            });
-            
-            // Save reset filters
-            saveFilters();
+            // Update UI with reset filters
+            window.SharedFilters.applyFiltersToForm(chatFilters, 'chat-');
         }
 
         // Close modal when clicking outside

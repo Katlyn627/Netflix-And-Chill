@@ -1,0 +1,184 @@
+// Shared filter management across pages
+// This utility ensures consistent filter state across matches, chat, and watch-together pages
+
+class SharedFilters {
+    constructor() {
+        this.FILTER_STORAGE_KEY = 'sharedMatchFilters';
+        this.defaultFilters = {
+            minMatchScore: 0,
+            minAge: 18,
+            maxAge: 100,
+            locationRadius: 50,
+            genderPreference: [],
+            sexualOrientationPreference: []
+        };
+    }
+
+    // Load filters from localStorage
+    loadFilters() {
+        const savedFilters = localStorage.getItem(this.FILTER_STORAGE_KEY);
+        if (savedFilters) {
+            try {
+                const filters = JSON.parse(savedFilters);
+                console.log('[SharedFilters] Loaded filters from localStorage:', filters);
+                return filters;
+            } catch (e) {
+                console.error('[SharedFilters] Error parsing saved filters:', e);
+                return { ...this.defaultFilters };
+            }
+        }
+        console.log('[SharedFilters] No saved filters found, using defaults');
+        return { ...this.defaultFilters };
+    }
+
+    // Save filters to localStorage
+    saveFilters(filters) {
+        try {
+            localStorage.setItem(this.FILTER_STORAGE_KEY, JSON.stringify(filters));
+            console.log('[SharedFilters] Saved filters to localStorage:', filters);
+            return true;
+        } catch (e) {
+            console.error('[SharedFilters] Error saving filters:', e);
+            return false;
+        }
+    }
+
+    // Reset filters to defaults
+    resetFilters() {
+        const filters = { ...this.defaultFilters };
+        this.saveFilters(filters);
+        console.log('[SharedFilters] Reset filters to defaults');
+        return filters;
+    }
+
+    // Build API URL with filters
+    buildFilteredMatchesURL(baseURL, userId, filters, limit = 50) {
+        let url = `${baseURL}/matches/find/${userId}?limit=${limit}`;
+        
+        if (filters.minMatchScore) {
+            url += `&minMatchScore=${filters.minMatchScore}`;
+        }
+        if (filters.minAge) {
+            url += `&minAge=${filters.minAge}`;
+        }
+        if (filters.maxAge) {
+            url += `&maxAge=${filters.maxAge}`;
+        }
+        if (filters.locationRadius) {
+            url += `&locationRadius=${filters.locationRadius}`;
+        }
+        if (filters.genderPreference && filters.genderPreference.length > 0) {
+            url += `&genderPreference=${filters.genderPreference.join(',')}`;
+        }
+        if (filters.sexualOrientationPreference && filters.sexualOrientationPreference.length > 0) {
+            url += `&sexualOrientationPreference=${filters.sexualOrientationPreference.join(',')}`;
+        }
+        
+        console.log('[SharedFilters] Built URL with filters:', url);
+        return url;
+    }
+
+    // Load filtered matches from API
+    async loadFilteredMatches(userId, filters) {
+        const baseURL = window.API_BASE_URL || 'http://localhost:3000/api';
+        const url = this.buildFilteredMatchesURL(baseURL, userId, filters);
+        
+        try {
+            console.log('[SharedFilters] Loading filtered matches for user:', userId);
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.success && data.matches) {
+                console.log(`[SharedFilters] Loaded ${data.matches.length} filtered matches`);
+                return data.matches;
+            } else {
+                console.log('[SharedFilters] No matches found or API returned error');
+                return [];
+            }
+        } catch (error) {
+            console.error('[SharedFilters] Error loading filtered matches:', error);
+            return [];
+        }
+    }
+
+    // Extract filters from form elements (for modal forms)
+    extractFiltersFromForm(formPrefix = '') {
+        const filters = {};
+        
+        // Get range/number inputs
+        const matchScoreInput = document.getElementById(`${formPrefix}match-score-filter`);
+        const ageMinInput = document.getElementById(`${formPrefix}age-range-min-filter`);
+        const ageMaxInput = document.getElementById(`${formPrefix}age-range-max-filter`);
+        const distanceInput = document.getElementById(`${formPrefix}distance-filter`);
+        
+        if (matchScoreInput) filters.minMatchScore = parseInt(matchScoreInput.value);
+        if (ageMinInput) filters.minAge = parseInt(ageMinInput.value);
+        if (ageMaxInput) filters.maxAge = parseInt(ageMaxInput.value);
+        if (distanceInput) filters.locationRadius = parseInt(distanceInput.value);
+        
+        // Get gender preferences
+        const genderCheckboxes = document.querySelectorAll(`input[name="${formPrefix}genderFilter"]:checked`);
+        let genderPrefs = Array.from(genderCheckboxes).map(cb => cb.value);
+        if (genderPrefs.length > 1 && genderPrefs.includes('any')) {
+            genderPrefs = genderPrefs.filter(p => p !== 'any');
+        }
+        filters.genderPreference = genderPrefs.includes('any') ? [] : genderPrefs;
+        
+        // Get orientation preferences
+        const orientationCheckboxes = document.querySelectorAll(`input[name="${formPrefix}orientationFilter"]:checked`);
+        let orientationPrefs = Array.from(orientationCheckboxes).map(cb => cb.value);
+        if (orientationPrefs.length > 1 && orientationPrefs.includes('any')) {
+            orientationPrefs = orientationPrefs.filter(p => p !== 'any');
+        }
+        filters.sexualOrientationPreference = orientationPrefs.includes('any') ? [] : orientationPrefs;
+        
+        console.log('[SharedFilters] Extracted filters from form:', filters);
+        return filters;
+    }
+
+    // Apply filters to form elements (populate form with current filters)
+    applyFiltersToForm(filters, formPrefix = '') {
+        // Set range/number inputs
+        const matchScoreInput = document.getElementById(`${formPrefix}match-score-filter`);
+        const matchScoreValue = document.getElementById(`${formPrefix}match-score-value`);
+        const ageMinInput = document.getElementById(`${formPrefix}age-range-min-filter`);
+        const ageMaxInput = document.getElementById(`${formPrefix}age-range-max-filter`);
+        const distanceInput = document.getElementById(`${formPrefix}distance-filter`);
+        const distanceValue = document.getElementById(`${formPrefix}distance-value`);
+        
+        if (matchScoreInput) {
+            matchScoreInput.value = filters.minMatchScore || 0;
+            if (matchScoreValue) matchScoreValue.textContent = `${filters.minMatchScore || 0}%`;
+        }
+        if (ageMinInput) ageMinInput.value = filters.minAge || 18;
+        if (ageMaxInput) ageMaxInput.value = filters.maxAge || 100;
+        if (distanceInput) {
+            distanceInput.value = filters.locationRadius || 50;
+            if (distanceValue) distanceValue.textContent = `${filters.locationRadius || 50} miles`;
+        }
+        
+        // Set gender checkboxes
+        document.querySelectorAll(`input[name="${formPrefix}genderFilter"]`).forEach(cb => {
+            cb.checked = filters.genderPreference.length === 0 
+                ? cb.value === 'any'
+                : filters.genderPreference.includes(cb.value);
+        });
+        
+        // Set orientation checkboxes
+        document.querySelectorAll(`input[name="${formPrefix}orientationFilter"]`).forEach(cb => {
+            cb.checked = filters.sexualOrientationPreference.length === 0 
+                ? cb.value === 'any'
+                : filters.sexualOrientationPreference.includes(cb.value);
+        });
+        
+        console.log('[SharedFilters] Applied filters to form');
+    }
+}
+
+// Create a singleton instance
+const sharedFilters = new SharedFilters();
+
+// Export for use in other scripts
+if (typeof window !== 'undefined') {
+    window.SharedFilters = sharedFilters;
+}
