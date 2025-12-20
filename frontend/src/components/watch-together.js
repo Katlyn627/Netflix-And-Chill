@@ -124,10 +124,7 @@
 
     async function loadInvitations() {
         try {
-            const response = await fetch(`/api/watch-invitations/user/${currentUserId}`);
-            if (!response.ok) throw new Error('Failed to load invitations');
-            
-            const data = await response.json();
+            const data = await API.getUserInvitations(currentUserId);
             invitations = data;
             
             displayInvitations('sent');
@@ -266,17 +263,7 @@
         };
 
         try {
-            const response = await fetch('/api/watch-invitations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(invitationData)
-            });
-
-            if (!response.ok) throw new Error('Failed to create invitation');
-
-            const invitation = await response.json();
+            const invitation = await API.createWatchInvitation(invitationData);
             
             alert('Watch invitation created successfully! 🎉');
             
@@ -394,9 +381,7 @@
         } else {
             // It's an ID, fetch the invitation
             try {
-                const response = await fetch(`/api/watch-invitations/${invitationId}`);
-                if (!response.ok) throw new Error('Failed to load invitation');
-                selectedInvitation = await response.json();
+                selectedInvitation = await API.getWatchInvitation(invitationId);
             } catch (error) {
                 console.error('Error loading invitation:', error);
                 alert('Failed to load invitation details');
@@ -460,15 +445,7 @@
 
     async function updateStatus(invitationId, newStatus) {
         try {
-            const response = await fetch(`/api/watch-invitations/${invitationId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            if (!response.ok) throw new Error('Failed to update status');
+            await API.updateWatchInvitation(invitationId, { status: newStatus });
 
             alert(`Invitation ${newStatus} successfully!`);
             await loadInvitations();
