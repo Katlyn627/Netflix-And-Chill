@@ -26,12 +26,10 @@ class User {
     this.likes = data.likes || [];
     this.superLikes = data.superLikes || [];
     this.leastFavoriteMovies = data.leastFavoriteMovies || [];
-    this.movieDebateTopics = data.movieDebateTopics || [];
-    this.movieDebateResponses = data.movieDebateResponses || {}; // New: Debate responses
-    this.moviePromptResponses = data.moviePromptResponses || {}; // New: Prompt responses
     this.favoriteSnacks = data.favoriteSnacks || [];
-    this.quizResponses = data.quizResponses || {};
     this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
+    // Swipe preferences - movies liked/disliked through swipe feature
+    this.swipedMovies = data.swipedMovies || []; // Array of {tmdbId, title, posterPath, action: 'like'|'dislike', swipedAt}
     // New fields for enhanced profile features
     this.favoriteMovies = data.favoriteMovies || []; // Array of movie objects with TMDB data
     this.favoriteTVShows = data.favoriteTVShows || []; // Array of TV show objects with TMDB data
@@ -198,6 +196,28 @@ class User {
     this.tvWatchlist = this.tvWatchlist.filter(tv => tv.tmdbId !== tmdbId);
   }
 
+  // Methods for managing swiped movies
+  addSwipedMovie(movieData, action) {
+    const existingIndex = this.swipedMovies.findIndex(m => m.tmdbId === movieData.tmdbId);
+    const swipeObj = {
+      tmdbId: movieData.tmdbId,
+      title: movieData.title,
+      posterPath: movieData.posterPath,
+      action: action, // 'like' or 'dislike'
+      swipedAt: new Date().toISOString()
+    };
+
+    if (existingIndex >= 0) {
+      this.swipedMovies[existingIndex] = swipeObj;
+    } else {
+      this.swipedMovies.push(swipeObj);
+    }
+  }
+
+  getLikedMovies() {
+    return this.swipedMovies.filter(m => m.action === 'like');
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -216,12 +236,9 @@ class User {
       likes: this.likes,
       superLikes: this.superLikes,
       leastFavoriteMovies: this.leastFavoriteMovies,
-      movieDebateTopics: this.movieDebateTopics,
-      movieDebateResponses: this.movieDebateResponses,
-      moviePromptResponses: this.moviePromptResponses,
       favoriteSnacks: this.favoriteSnacks,
-      quizResponses: this.quizResponses,
       videoChatPreference: this.videoChatPreference,
+      swipedMovies: this.swipedMovies,
       favoriteMovies: this.favoriteMovies,
       favoriteTVShows: this.favoriteTVShows,
       movieRatings: this.movieRatings,

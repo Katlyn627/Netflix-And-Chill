@@ -33,6 +33,11 @@ class MatchingEngine {
     score += sharedFavoriteMovies.length * 25;
     sharedContent.push(...sharedFavoriteMovies);
 
+    // Check for shared swiped/liked movies (from swipe feature)
+    const sharedLikedMovies = this.findSharedLikedMovies(user1, user2);
+    score += sharedLikedMovies.length * 30; // High weight for movies liked through swiping
+    sharedContent.push(...sharedLikedMovies);
+
     // Bonus for similar binge-watching patterns
     const bingeDifference = Math.abs(
       (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
@@ -41,17 +46,9 @@ class MatchingEngine {
       score += 15;
     }
 
-    // Quiz response compatibility (increased weight to 30 points)
-    const quizCompatibility = this.calculateQuizCompatibility(user1, user2);
-    score += quizCompatibility;
-
     // Snack preferences compatibility
     const snackCompatibility = this.calculateSnackCompatibility(user1, user2);
     score += snackCompatibility;
-
-    // Movie debate topics compatibility
-    const debateCompatibility = this.calculateDebateCompatibility(user1, user2);
-    score += debateCompatibility;
 
     // Emotional tone alignment
     const emotionalToneCompatibility = this.calculateEmotionalToneAlignment(user1, user2);
@@ -72,9 +69,9 @@ class MatchingEngine {
     // Generate match description
     const matchDescription = this.generateMatchDescription(normalizedScore, {
       sharedFavoriteMovies,
+      sharedLikedMovies,
       sharedGenres,
       sharedShows,
-      quizCompatibility,
       emotionalToneCompatibility,
       user1,
       user2
@@ -86,9 +83,8 @@ class MatchingEngine {
       sharedServices: sharedServices,
       sharedGenres: sharedGenres,
       sharedFavoriteMovies: sharedFavoriteMovies,
-      quizCompatibility: quizCompatibility,
+      sharedLikedMovies: sharedLikedMovies,
       snackCompatibility: snackCompatibility,
-      debateCompatibility: debateCompatibility,
       emotionalToneCompatibility: emotionalToneCompatibility,
       matchDescription: matchDescription
     };
@@ -177,31 +173,46 @@ class MatchingEngine {
   }
 
   /**
-   * Calculate compatibility based on quiz responses
-   * With the expanded 50-question quiz, this is a major compatibility factor
+   * Find shared movies liked through swipe feature
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {Array}
+   */
+  static findSharedLikedMovies(user1, user2) {
+    const sharedMovies = [];
+    
+    // Get liked movies for both users
+    const user1LikedMovies = user1.getLikedMovies ? user1.getLikedMovies() : (user1.swipedMovies || []).filter(m => m.action === 'like');
+    const user2LikedMovies = user2.getLikedMovies ? user2.getLikedMovies() : (user2.swipedMovies || []).filter(m => m.action === 'like');
+    
+    // Create a map of user2's liked movies by TMDB ID for O(1) lookups
+    const user2MoviesMap = new Map();
+    user2LikedMovies.forEach(movie => {
+      user2MoviesMap.set(movie.tmdbId, movie);
+    });
+    
+    // Check user1's liked movies against user2's
+    user1LikedMovies.forEach(movie1 => {
+      if (user2MoviesMap.has(movie1.tmdbId)) {
+        sharedMovies.push({
+          title: movie1.title,
+          type: 'liked_movie',
+          tmdbId: movie1.tmdbId
+        });
+      }
+    });
+    
+    return sharedMovies;
+  }
+
+  /**
+   * Calculate compatibility based on quiz responses (DEPRECATED - kept for backward compatibility)
    * @param {User} user1 
    * @param {User} user2 
    * @returns {number} Compatibility score from quiz
    */
   static calculateQuizCompatibility(user1, user2) {
-    const quiz1 = user1.quizResponses || {};
-    const quiz2 = user2.quizResponses || {};
-    
-    const commonQuestions = Object.keys(quiz1).filter(q => Object.prototype.hasOwnProperty.call(quiz2, q));
-    if (commonQuestions.length === 0) return 0;
-
-    let matches = 0;
-    commonQuestions.forEach(question => {
-      if (quiz1[question] === quiz2[question]) {
-        matches++;
-      }
-    });
-
-    // Award up to 50 points for quiz compatibility (increased from 30)
-    // With 50 detailed questions, quiz is now the most important compatibility factor
-    // This rewards users who take the time to complete the full quiz
-    const compatibilityScore = (matches / commonQuestions.length) * 50;
-    return compatibilityScore;
+    return 0; // Quiz is no longer used
   }
 
   /**
@@ -225,23 +236,13 @@ class MatchingEngine {
   }
 
   /**
-   * Calculate compatibility based on movie debate topics
+   * Calculate compatibility based on movie debate topics (DEPRECATED - kept for backward compatibility)
    * @param {User} user1 
    * @param {User} user2 
    * @returns {number} Compatibility score from debate topics
    */
   static calculateDebateCompatibility(user1, user2) {
-    const debates1 = user1.movieDebateTopics || [];
-    const debates2 = user2.movieDebateTopics || [];
-    
-    if (debates1.length === 0 || debates2.length === 0) return 0;
-    
-    // Find shared debate topics
-    const sharedDebates = debates1.filter(debate => debates2.includes(debate));
-    
-    // Award up to 10 points for debate compatibility
-    const score = Math.min(10, sharedDebates.length * this.POINTS_PER_SHARED_DEBATE);
-    return score;
+    return 0; // Debate topics are no longer used
   }
 
   /**
@@ -323,9 +324,9 @@ class MatchingEngine {
   static generateMatchDescription(score, matchData) {
     const {
       sharedFavoriteMovies = [],
+      sharedLikedMovies = [],
       sharedGenres = [],
       sharedShows = [],
-      quizCompatibility = 0,
       emotionalToneCompatibility = 0,
       user1,
       user2
@@ -341,6 +342,17 @@ class MatchingEngine {
         descriptions.push(`You both love "${sharedFavoriteMovies[0].title}" and "${sharedFavoriteMovies[1].title}"`);
       } else {
         descriptions.push(`You share ${sharedFavoriteMovies.length} favorite movies`);
+      }
+    }
+    
+    // Check for shared liked movies from swipe feature
+    if (sharedLikedMovies.length > 0) {
+      if (sharedLikedMovies.length === 1) {
+        descriptions.push(`Both liked "${sharedLikedMovies[0].title}"`);
+      } else if (sharedLikedMovies.length === 2) {
+        descriptions.push(`Both liked "${sharedLikedMovies[0].title}" and "${sharedLikedMovies[1].title}"`);
+      } else {
+        descriptions.push(`Liked ${sharedLikedMovies.length} of the same movies`);
       }
     }
     
@@ -370,11 +382,6 @@ class MatchingEngine {
       }
     }
     
-    // Check for viewing style compatibility (quiz)
-    if (quizCompatibility >= 20) {
-      descriptions.push('have similar viewing preferences');
-    }
-    
     // Check for emotional tone alignment
     if (emotionalToneCompatibility >= 7) {
       descriptions.push('share the same emotional vibe');
@@ -386,34 +393,6 @@ class MatchingEngine {
     );
     if (bingeDiff <= 2 && user1.preferences.bingeWatchCount > 0 && user2.preferences.bingeWatchCount > 0) {
       descriptions.push('are both binge-watchers');
-    }
-    
-    // Check quiz responses for specific details
-    if (user1.quizResponses && user2.quizResponses) {
-      const q1 = user1.quizResponses;
-      const q2 = user2.quizResponses;
-      
-      // Check for spoiler preferences
-      if (q1.q3 === q2.q3 && q1.q3 === 'hate') {
-        descriptions.push('hate spoilers');
-      }
-      
-      // Check for movie length preferences
-      if (q1.q2 === q2.q2 && q1.q2 === 'over_120') {
-        descriptions.push('love long epic movies');
-      }
-      
-      // Check for talking during movies
-      if (q1.q5 === q2.q5 && q1.q5 === 'never') {
-        descriptions.push('prefer silence during movies');
-      } else if (q1.q5 === q2.q5 && q1.q5 === 'often') {
-        descriptions.push('love discussing movies while watching');
-      }
-      
-      // Check for rewatching preferences
-      if (q1.q6 === q2.q6 && q1.q6 === 'infinite') {
-        descriptions.push('could rewatch favorites endlessly');
-      }
     }
     
     // Build final description
@@ -469,10 +448,9 @@ class MatchingEngine {
             matchResult.sharedContent,
             matchResult.matchDescription,
             {
-              quizCompatibility: matchResult.quizCompatibility,
               snackCompatibility: matchResult.snackCompatibility,
-              debateCompatibility: matchResult.debateCompatibility,
-              emotionalToneCompatibility: matchResult.emotionalToneCompatibility
+              emotionalToneCompatibility: matchResult.emotionalToneCompatibility,
+              sharedLikedMovies: matchResult.sharedLikedMovies
             }
           ));
         }

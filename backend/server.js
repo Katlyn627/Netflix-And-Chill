@@ -11,7 +11,7 @@ const likeRoutes = require('./routes/likes');
 const streamingRoutes = require('./routes/streaming');
 const uploadRoutes = require('./routes/uploads');
 const chatRoutes = require('./routes/chat');
-const quizRoutes = require('./routes/quiz');
+const swipeRoutes = require('./routes/swipe');
 const watchInvitationRoutes = require('./routes/watchInvitations');
 
 const app = express();
@@ -33,7 +33,7 @@ app.use('/api/likes', likeRoutes);
 app.use('/api/streaming', streamingRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/quiz', quizRoutes);
+app.use('/api/swipe', swipeRoutes);
 app.use('/api/watch-invitations', watchInvitationRoutes);
 
 // Health check

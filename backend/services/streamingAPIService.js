@@ -1,5 +1,5 @@
 const config = require('../config/config');
-const { fallbackGenres, fallbackProviders } = require('./fallbackData');
+const { fallbackGenres, fallbackProviders, fallbackMovies } = require('./fallbackData');
 
 /**
  * Service for interacting with TMDB (The Movie Database) API
@@ -75,6 +75,11 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getPopularMovies() {
+    // If no API key, return fallback movies
+    if (!this.apiKey) {
+      return fallbackMovies;
+    }
+    
     const data = await this.makeRequest('/movie/popular');
     return data.results || [];
   }
@@ -118,6 +123,18 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async discover(type = 'movie', filters = {}) {
+    // If no API key, return filtered fallback movies
+    if (!this.apiKey) {
+      if (type === 'movie' && filters.with_genres) {
+        const genreIds = filters.with_genres.split(',').map(id => parseInt(id));
+        // Filter fallback movies by genre
+        return fallbackMovies.filter(movie => 
+          movie.genre_ids.some(gid => genreIds.includes(gid))
+        );
+      }
+      return fallbackMovies;
+    }
+    
     const endpoint = `/discover/${type}`;
     const data = await this.makeRequest(endpoint, filters);
     return data.results || [];

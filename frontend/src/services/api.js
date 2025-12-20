@@ -199,17 +199,6 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
-    async submitQuizResponses(userId, quizResponses) {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/quiz`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quizResponses })
-        });
-        return await response.json();
-    }
-
     async updatePassword(userId, currentPassword, newPassword) {
         const response = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
             method: 'PUT',
@@ -354,3 +343,8 @@ const api = new NetflixAndChillAPI();
 
 // Export as global API for use in other scripts
 const API = api;
+
+// Make API_BASE_URL available globally
+if (typeof window !== 'undefined') {
+    window.API_BASE_URL = API_BASE_URL;
+}
