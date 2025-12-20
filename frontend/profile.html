@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/swipe.css">
 </head>
 <body>
     <div class="container">
@@ -314,50 +315,33 @@
                 </form>
             </section>
 
-            <!-- Movie Debate Topics Section -->
-            <section id="debate-topics" class="card" style="display: none;">
-                <h2>Movie Debate Preferences</h2>
-                <p>Let's see where you stand on some classic movie debates!</p>
-                <form id="debate-topics-form">
-                    <div class="form-group">
-                        <label>Select topics you enjoy debating: (optional)</label>
-                        <div class="debate-options">
-                            <label><input type="checkbox" name="debate" value="Best Star Wars trilogy"> Best Star Wars trilogy</label>
-                            <label><input type="checkbox" name="debate" value="Marvel vs DC"> Marvel vs DC</label>
-                            <label><input type="checkbox" name="debate" value="Book vs Movie adaptations"> Book vs Movie adaptations</label>
-                            <label><input type="checkbox" name="debate" value="Remakes and reboots"> Remakes and reboots</label>
-                            <label><input type="checkbox" name="debate" value="Horror movie rankings"> Horror movie rankings</label>
-                            <label><input type="checkbox" name="debate" value="Best decade for movies"> Best decade for movies</label>
-                            <label><input type="checkbox" name="debate" value="Director styles"> Director styles</label>
-                            <label><input type="checkbox" name="debate" value="Ending interpretations"> Ending interpretations</label>
-                        </div>
+            <!-- Swipe Feature Section -->
+            <section id="swipe-movies" class="card" style="display: none;">
+                <div id="swipe-container">
+                    <div class="swipe-header">
+                        <h2>🎬 Discover Movies</h2>
+                        <p>Swipe right to like, left to pass. We'll use your preferences to find great matches!</p>
+                        <p id="swipe-counter">0 / 0</p>
+                        <p style="margin-top: 10px;">Movies liked: <span id="total-likes-counter">0</span></p>
                     </div>
-                    <button type="submit" class="btn btn-primary">Continue</button>
-                    <button type="button" id="skip-debate-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip</button>
-                </form>
-            </section>
-
-            <!-- Compatibility Quiz Section -->
-            <section id="compatibility-quiz" class="card" style="display: none;">
-                <h2>🎬 Movie Compatibility Quiz</h2>
-                <p>Answer 50 questions to help us find your perfect binge-watching partner!</p>
-                <div id="quiz-progress" style="margin: 20px 0;">
-                    <div style="background: #333; border-radius: 10px; overflow: hidden; height: 20px;">
-                        <div id="quiz-progress-bar" style="background: linear-gradient(90deg, #E50914, #FF6B6B); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    
+                    <div id="swipe-card-container">
+                        <!-- Swipe cards will be rendered here -->
                     </div>
-                    <p style="text-align: center; margin-top: 5px; color: #888;">
-                        <span id="quiz-progress-text">0 of 50 questions answered</span>
-                    </p>
-                </div>
-                <form id="compatibility-quiz-form">
-                    <div id="quiz-questions-container">
-                        <!-- Questions will be dynamically loaded here -->
+                    
+                    <div class="swipe-actions">
+                        <button type="button" class="swipe-btn dislike-btn" onclick="window.SwipeModule.handleDislikeButton()" aria-label="Dislike">
+                            ✕
+                        </button>
+                        <button type="button" class="swipe-btn like-btn" onclick="window.SwipeModule.handleLikeButton()" aria-label="Like">
+                            ♥
+                        </button>
                     </div>
+                    
                     <div style="margin-top: 30px; text-align: center;">
-                        <button type="submit" class="btn btn-primary" id="submit-quiz-btn" disabled>Complete Quiz</button>
-                        <button type="button" id="skip-quiz-btn" class="btn btn-secondary" style="margin-left: 10px;">Skip Quiz</button>
+                        <button type="button" id="skip-swipe-btn" class="btn btn-secondary">Continue Without Swiping</button>
                     </div>
-                </form>
+                </div>
             </section>
 
             <!-- Find Matches Section -->
@@ -380,7 +364,7 @@
     </div>
 
     <script src="src/services/api.js"></script>
-    <script src="src/components/quiz.js"></script>
+    <script src="src/components/swipe.js"></script>
     <script src="src/components/app.js"></script>
 </body>
 </html>

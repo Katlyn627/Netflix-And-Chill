@@ -5,7 +5,7 @@ let availableProviders = [];
 
 // Show/hide sections
 function showSection(sectionId) {
-    const sections = ['create-profile', 'streaming-services', 'watch-history', 'preferences', 'movie-preferences', 'debate-topics', 'compatibility-quiz', 'find-matches'];
+    const sections = ['create-profile', 'streaming-services', 'watch-history', 'preferences', 'movie-preferences', 'swipe-movies', 'find-matches'];
     sections.forEach(id => {
         const section = document.getElementById(id);
         if (section) {
@@ -18,10 +18,10 @@ function showSection(sectionId) {
         loadStreamingProviders();
     } else if (sectionId === 'preferences') {
         loadGenres();
-    } else if (sectionId === 'compatibility-quiz') {
-        // Initialize the quiz when showing the quiz section
-        if (window.QuizModule && typeof window.QuizModule.initializeQuiz === 'function') {
-            window.QuizModule.initializeQuiz();
+    } else if (sectionId === 'swipe-movies') {
+        // Initialize the swipe feature when showing the swipe section
+        if (window.SwipeModule && typeof window.SwipeModule.initializeSwipe === 'function' && currentUserId) {
+            window.SwipeModule.initializeSwipe(currentUserId);
         }
     }
 }
@@ -372,7 +372,7 @@ if (moviePreferencesForm) {
                 videoChatPreference: videoChatPreference
             });
             showMessage('Movie preferences saved!');
-            showSection('debate-topics');
+            showSection('swipe-movies');
         } catch (error) {
             showMessage('Error saving movie preferences: ' + error.message, true);
         }
@@ -383,85 +383,15 @@ if (moviePreferencesForm) {
 const skipMoviePrefsBtn = document.getElementById('skip-movie-prefs-btn');
 if (skipMoviePrefsBtn) {
     skipMoviePrefsBtn.addEventListener('click', () => {
-        showSection('debate-topics');
+        showSection('swipe-movies');
     });
 }
 
-// Handle debate topics form
-const debateTopicsForm = document.getElementById('debate-topics-form');
-if (debateTopicsForm) {
-    debateTopicsForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (!currentUserId) {
-            showMessage('Please create a profile first', true);
-            return;
-        }
-        
-        const debateCheckboxes = document.querySelectorAll('input[name="debate"]:checked');
-        const movieDebateTopics = Array.from(debateCheckboxes).map(cb => cb.value);
-        
-        try {
-            await api.updateProfileDetails(currentUserId, {
-                movieDebateTopics: movieDebateTopics
-            });
-            showMessage('Debate preferences saved!');
-            showSection('compatibility-quiz');
-        } catch (error) {
-            showMessage('Error saving debate preferences: ' + error.message, true);
-        }
-    });
-}
-
-// Skip debate topics button
-const skipDebateBtn = document.getElementById('skip-debate-btn');
-if (skipDebateBtn) {
-    skipDebateBtn.addEventListener('click', () => {
-        showSection('compatibility-quiz');
-    });
-}
-
-// Handle compatibility quiz form
-const compatibilityQuizForm = document.getElementById('compatibility-quiz-form');
-if (compatibilityQuizForm) {
-    compatibilityQuizForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (!currentUserId) {
-            showMessage('Please create a profile first', true);
-            return;
-        }
-        
-        const formData = new FormData(e.target);
-        const quizResponses = {};
-        
-        for (const [key, value] of formData.entries()) {
-            if (value) {
-                quizResponses[key] = value;
-            }
-        }
-        
-        try {
-            if (Object.keys(quizResponses).length > 0) {
-                await api.submitQuizResponses(currentUserId, quizResponses);
-                showMessage('Quiz completed!');
-            }
-            
-            // Navigate to completion page
-            setTimeout(() => {
-                window.location.href = `profile-view.html?userId=${currentUserId}`;
-            }, 1000);
-        } catch (error) {
-            showMessage('Error submitting quiz: ' + error.message, true);
-        }
-    });
-}
-
-// Skip quiz button
-const skipQuizBtn = document.getElementById('skip-quiz-btn');
-if (skipQuizBtn) {
-    skipQuizBtn.addEventListener('click', () => {
-        // Navigate to completion page without saving quiz
+// Skip swipe button - continue to profile completion
+const skipSwipeBtn = document.getElementById('skip-swipe-btn');
+if (skipSwipeBtn) {
+    skipSwipeBtn.addEventListener('click', () => {
+        // Navigate to profile view page
         setTimeout(() => {
             window.location.href = `profile-view.html?userId=${currentUserId}`;
         }, 500);
