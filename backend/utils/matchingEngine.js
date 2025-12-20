@@ -162,12 +162,14 @@ class MatchingEngine {
     // Create a map of user2's favorite movies by TMDB ID for O(1) lookups
     const user2MoviesMap = new Map();
     user2Movies.forEach(movie => {
-      user2MoviesMap.set(movie.tmdbId, movie);
+      if (movie && movie.tmdbId) {
+        user2MoviesMap.set(movie.tmdbId, movie);
+      }
     });
     
     // Check user1's favorite movies against user2's
     user1Movies.forEach(movie1 => {
-      if (user2MoviesMap.has(movie1.tmdbId)) {
+      if (movie1 && movie1.tmdbId && user2MoviesMap.has(movie1.tmdbId)) {
         sharedMovies.push({
           title: movie1.title,
           type: 'favorite_movie',

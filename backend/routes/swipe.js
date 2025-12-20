@@ -33,13 +33,6 @@ router.get('/movies/:userId', async (req, res) => {
     const favoriteMovieIds = (user.favoriteMovies || []).map(m => m.tmdbId);
     const watchlistMovieIds = (user.movieWatchlist || []).map(m => m.tmdbId);
     
-    // Collect genre IDs from favorite movies for better recommendations
-    const genreIdsFromFavorites = new Set();
-    if (user.favoriteMovies && user.favoriteMovies.length > 0) {
-      // Note: favoriteMovies might not have genre_ids, but we use user's preferred genres
-      // In a real implementation, we'd fetch genre data for favorite movies
-    }
-    
     // Get genre IDs from user's watch history to enhance recommendations
     const watchHistoryGenres = [];
     if (user.watchHistory && user.watchHistory.length > 0) {
