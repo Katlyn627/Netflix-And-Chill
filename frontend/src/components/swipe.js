@@ -1,16 +1,21 @@
 /**
  * Swipe Feature Component
  * Allows users to swipe through movies and like/dislike them
+ * Supports unlimited swiping with dynamic loading
  */
 
 // Constants - Unlimited swipes enabled
 const UNLIMITED_SWIPES = true;
+const INITIAL_LOAD_COUNT = 50; // Load 50 movies initially
+const RELOAD_THRESHOLD = 10; // When stack has 10 or fewer movies, load more
 
 let currentMovieIndex = 0;
 let movieStack = [];
 let isDragging = false;
 let startX = 0;
 let currentX = 0;
+let currentPage = 1;
+let isLoadingMore = false;
 
 /**
  * Initialize the swipe feature
@@ -34,7 +39,8 @@ async function initializeSwipe(userId) {
     }
 
     // Fetch movies for swiping - unlimited
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=100`);
+    currentPage = 1;
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}`);
     const data = await response.json();
 
     if (data.success && data.movies) {
@@ -52,18 +58,52 @@ async function initializeSwipe(userId) {
 }
 
 /**
+ * Load more movies when running low
+ */
+async function loadMoreMoviesInBackground(userId) {
+  if (isLoadingMore) return;
+  
+  isLoadingMore = true;
+  try {
+    currentPage++;
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}`);
+    const data = await response.json();
+
+    if (data.success && data.movies && data.movies.length > 0) {
+      // Append new movies to the stack
+      movieStack = [...movieStack, ...data.movies];
+      console.log(`Loaded ${data.movies.length} more movies. Total in stack: ${movieStack.length}`);
+    }
+  } catch (error) {
+    console.error('Error loading more movies:', error);
+  } finally {
+    isLoadingMore = false;
+  }
+}
+
+/**
  * Render the current movie card
  */
 function renderCurrentMovie() {
   const container = document.getElementById('swipe-card-container');
   if (!container) return;
 
+  // Check if we need to load more movies in the background
+  const remainingMovies = movieStack.length - currentMovieIndex;
+  if (remainingMovies <= RELOAD_THRESHOLD && !isLoadingMore) {
+    const userId = window.currentUserId || localStorage.getItem('currentUserId');
+    if (userId) {
+      loadMoreMoviesInBackground(userId);
+    }
+  }
+
   if (currentMovieIndex >= movieStack.length) {
+    // Don't recursively try to load more - show message instead
     container.innerHTML = `
       <div class="no-more-cards">
-        <h3>That's all for now!</h3>
-        <p>You've swiped through all available movies.</p>
-        <button onclick="loadMoreMovies()" class="btn btn-primary">Load More Movies</button>
+        <h3>Loading more movies...</h3>
+        <p>Please wait while we fetch more recommendations for you.</p>
+        <button onclick="loadMoreMovies()" class="btn btn-primary">Refresh</button>
       </div>
     `;
     return;
@@ -312,6 +352,8 @@ async function loadMoreMovies() {
   const userId = window.currentUserId || localStorage.getItem('currentUserId');
   if (!userId) return;
 
+  // Reset and reload from the beginning
+  currentPage = 1;
   await initializeSwipe(userId);
 }
 
