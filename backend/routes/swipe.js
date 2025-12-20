@@ -4,6 +4,42 @@ const { getDatabase } = require('../utils/database');
 const User = require('../models/User');
 const streamingAPIService = require('../services/streamingAPIService');
 
+// Constants
+const TMDB_PAGE_SIZE = 20; // TMDB API returns approximately 20 results per page
+const MAX_PAGES_TO_FETCH = 5; // Maximum number of pages to fetch from TMDB
+
+/**
+ * Calculate how many pages to fetch based on requested limit
+ * @param {number} limit - Number of movies requested
+ * @returns {number} Number of pages to fetch
+ */
+function calculatePagesToFetch(limit) {
+  return Math.min(MAX_PAGES_TO_FETCH, Math.ceil(limit / TMDB_PAGE_SIZE));
+}
+
+/**
+ * Fetch multiple pages of movies from TMDB
+ * @param {Object} params - Parameters for TMDB discover endpoint
+ * @param {number} startPage - Starting page number
+ * @param {number} numPages - Number of pages to fetch
+ * @returns {Promise<Array>} Array of movies
+ */
+async function fetchMultiplePages(params, startPage, numPages) {
+  const pagePromises = [];
+  
+  for (let i = 0; i < numPages; i++) {
+    pagePromises.push(
+      streamingAPIService.discover('movie', {
+        ...params,
+        page: startPage + i
+      })
+    );
+  }
+  
+  const pageResults = await Promise.all(pagePromises);
+  return pageResults.flat();
+}
+
 /**
  * Get movies for swiping based on user preferences
  * Returns a batch of movies from TMDB filtered by user's genre preferences
@@ -47,42 +83,30 @@ router.get('/movies/:userId', async (req, res) => {
     let movies = [];
 
     try {
+      const numPages = calculatePagesToFetch(parseInt(limit));
+      
       if (genreIds.length > 0 || watchHistoryGenres.length > 0) {
         // Combine genre IDs from preferences and watch history
         const allGenreIds = [...new Set([...genreIds])];
         
         // Fetch multiple pages for more diverse recommendations
-        const maxPages = Math.min(5, Math.ceil(parseInt(limit) / 20)); // Fetch up to 5 pages
-        const pagePromises = [];
-        
-        for (let i = 0; i < maxPages; i++) {
-          pagePromises.push(
-            streamingAPIService.discover('movie', {
-              with_genres: allGenreIds.join(','),
-              sort_by: 'popularity.desc',
-              page: parseInt(page) + i
-            })
-          );
-        }
-        
-        const pageResults = await Promise.all(pagePromises);
-        movies = pageResults.flat();
+        movies = await fetchMultiplePages(
+          {
+            with_genres: allGenreIds.join(','),
+            sort_by: 'popularity.desc'
+          },
+          parseInt(page),
+          numPages
+        );
       } else {
         // If no genre preferences, get popular movies from multiple pages
-        const maxPages = Math.min(5, Math.ceil(parseInt(limit) / 20));
-        const pagePromises = [];
-        
-        for (let i = 0; i < maxPages; i++) {
-          pagePromises.push(
-            streamingAPIService.discover('movie', {
-              sort_by: 'popularity.desc',
-              page: parseInt(page) + i
-            })
-          );
-        }
-        
-        const pageResults = await Promise.all(pagePromises);
-        movies = pageResults.flat();
+        movies = await fetchMultiplePages(
+          {
+            sort_by: 'popularity.desc'
+          },
+          parseInt(page),
+          numPages
+        );
       }
       
       // If no movies returned from API, fallback to popular movies

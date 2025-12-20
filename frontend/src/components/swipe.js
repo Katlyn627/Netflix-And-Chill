@@ -98,6 +98,7 @@ function renderCurrentMovie() {
   }
 
   if (currentMovieIndex >= movieStack.length) {
+    // Don't recursively try to load more - show message instead
     container.innerHTML = `
       <div class="no-more-cards">
         <h3>Loading more movies...</h3>
@@ -105,16 +106,6 @@ function renderCurrentMovie() {
         <button onclick="loadMoreMovies()" class="btn btn-primary">Refresh</button>
       </div>
     `;
-    
-    // Try to load more movies immediately
-    const userId = window.currentUserId || localStorage.getItem('currentUserId');
-    if (userId) {
-      loadMoreMoviesInBackground(userId).then(() => {
-        if (currentMovieIndex < movieStack.length) {
-          renderCurrentMovie();
-        }
-      });
-    }
     return;
   }
 
