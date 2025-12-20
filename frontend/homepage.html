@@ -91,5 +91,15 @@
     </div>
 
     <script src="src/utils/errorHandler.js"></script>
+    <script>
+        // Check if user is logged in and redirect to profile
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('currentUserId');
+            if (userId) {
+                // User is logged in, redirect to their profile
+                window.location.href = 'profile-view.html';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -3,16 +3,14 @@
  * Allows users to swipe through movies and like/dislike them
  */
 
-// Constants
-const DEFAULT_SWIPE_LIMIT = 50; // Daily swipe limit per user
+// Constants - Unlimited swipes enabled
+const UNLIMITED_SWIPES = true;
 
 let currentMovieIndex = 0;
 let movieStack = [];
 let isDragging = false;
 let startX = 0;
 let currentX = 0;
-let swipeLimit = DEFAULT_SWIPE_LIMIT; // Current swipe limit (can be updated from server)
-let swipeCount = 0;
 
 /**
  * Initialize the swipe feature
@@ -24,31 +22,19 @@ async function initializeSwipe(userId) {
   }
 
   try {
-    // Get swipe stats from backend (uses user data with timestamps)
-    const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=${DEFAULT_SWIPE_LIMIT}`);
+    // Update likes counter if available
+    const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}`);
     const statsData = await statsResponse.json();
     
     if (statsData.success) {
-      swipeCount = statsData.dailySwipeCount;
-      swipeLimit = statsData.swipeLimit;
-      
-      // Update display with backend data
-      updateSwipeStats();
-      
-      // Update likes counter if available
       const likesCounter = document.getElementById('total-likes-counter');
       if (likesCounter && statsData.totalLikes !== undefined) {
         likesCounter.textContent = statsData.totalLikes;
       }
-    } else {
-      // Fallback to localStorage if backend fails
-      const savedSwipeCount = localStorage.getItem(`swipeCount_${userId}`);
-      swipeCount = savedSwipeCount ? parseInt(savedSwipeCount) : 0;
-      updateSwipeStats();
     }
 
-    // Fetch movies for swiping
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${DEFAULT_SWIPE_LIMIT}`);
+    // Fetch movies for swiping - unlimited
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=100`);
     const data = await response.json();
 
     if (data.success && data.movies) {
@@ -71,19 +57,6 @@ async function initializeSwipe(userId) {
 function renderCurrentMovie() {
   const container = document.getElementById('swipe-card-container');
   if (!container) return;
-
-  // Check if swipe limit reached
-  if (swipeCount >= swipeLimit) {
-    container.innerHTML = `
-      <div class="no-more-cards">
-        <h3>Daily Swipe Limit Reached!</h3>
-        <p>You've reached your daily limit of ${swipeLimit} swipes.</p>
-        <p>Come back tomorrow for more or find your matches now!</p>
-        <button onclick="window.location.href='matches.html'" class="btn btn-primary">Find Matches</button>
-      </div>
-    `;
-    return;
-  }
 
   if (currentMovieIndex >= movieStack.length) {
     container.innerHTML = `
@@ -119,8 +92,6 @@ function renderCurrentMovie() {
   if (counter) {
     counter.textContent = `${currentMovieIndex + 1} / ${movieStack.length}`;
   }
-  
-  updateSwipeStats();
 }
 
 /**
@@ -265,9 +236,6 @@ async function handleSwipeRight(card) {
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('like', movie);
   
-  // Refresh swipe count from backend (uses user data with timestamps)
-  await refreshSwipeCount();
-  
   setTimeout(() => {
     currentMovieIndex++;
     renderCurrentMovie();
@@ -283,9 +251,6 @@ async function handleSwipeLeft(card) {
   
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('dislike', movie);
-  
-  // Refresh swipe count from backend (uses user data with timestamps)
-  await refreshSwipeCount();
   
   setTimeout(() => {
     currentMovieIndex++;
@@ -368,54 +333,6 @@ function showSwipeMessage(message, isError = false) {
       <p>${message}</p>
     </div>
   `;
-}
-
-/**
- * Update swipe statistics display
- */
-function updateSwipeStats() {
-  const swipesRemaining = document.getElementById('swipes-remaining');
-  if (swipesRemaining) {
-    const remaining = Math.max(0, swipeLimit - swipeCount);
-    swipesRemaining.textContent = remaining;
-    
-    // Change color if running low
-    if (remaining <= 10) {
-      swipesRemaining.style.color = '#E50914'; // Red
-    } else if (remaining <= 20) {
-      swipesRemaining.style.color = '#FFA500'; // Orange
-    } else {
-      swipesRemaining.style.color = '#00FF00'; // Green
-    }
-  }
-}
-
-/**
- * Refresh swipe count from backend user data
- * This uses the swipedAt timestamps to calculate today's swipe count
- */
-async function refreshSwipeCount() {
-  const userId = window.currentUserId || localStorage.getItem('currentUserId');
-  if (!userId) return;
-
-  try {
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}?limit=${DEFAULT_SWIPE_LIMIT}`);
-    const data = await response.json();
-    
-    if (data.success) {
-      swipeCount = data.dailySwipeCount;
-      swipeLimit = data.swipeLimit;
-      updateSwipeStats();
-      
-      // Update likes counter if available
-      const likesCounter = document.getElementById('total-likes-counter');
-      if (likesCounter && data.totalLikes !== undefined) {
-        likesCounter.textContent = data.totalLikes;
-      }
-    }
-  } catch (error) {
-    console.error('Error refreshing swipe count:', error);
-  }
 }
 
 // Export functions for use in other files
