@@ -248,6 +248,68 @@ function showMatchDetails(index) {
     const matchScore = Math.round(match.matchScore);
     const MAX_DISPLAYED_RESPONSES = 3;
     
+    // Build photo gallery array - combine profile picture and photo gallery
+    let photoGalleryArray = [];
+    
+    // Add profile picture first if it exists
+    if (match.user.profilePicture) {
+        photoGalleryArray.push({
+            url: match.user.profilePicture,
+            isProfilePic: true
+        });
+    }
+    
+    // Add photos from photo gallery
+    if (match.user.photoGallery && match.user.photoGallery.length > 0) {
+        match.user.photoGallery.forEach(photo => {
+            // Handle both string URLs and photo objects
+            const photoUrl = typeof photo === 'string' ? photo : (photo && photo.url ? photo.url : null);
+            // Don't add duplicate if photoGallery contains the profile picture or if URL is invalid
+            if (photoUrl && photoUrl !== match.user.profilePicture) {
+                photoGalleryArray.push({
+                    url: photoUrl,
+                    isProfilePic: false
+                });
+            }
+        });
+    }
+    
+    // If no photos at all, use default
+    if (photoGalleryArray.length === 0) {
+        photoGalleryArray.push({
+            url: 'assets/images/default-profile.svg',
+            isProfilePic: true
+        });
+    }
+    
+    // Create photo gallery HTML with carousel
+    const hasMultiplePhotos = photoGalleryArray.length > 1;
+    const photoGalleryHtml = `
+        <div class="details-photo-gallery-container">
+            ${hasMultiplePhotos ? '<button class="photo-nav photo-prev" onclick="navigateModalPhoto(-1)">❮</button>' : ''}
+            <div class="details-photo-wrapper">
+                ${photoGalleryArray.map((photo, idx) => `
+                    <img src="${photo.url}" 
+                         alt="${username}" 
+                         class="details-photo ${idx === 0 ? 'active' : ''}" 
+                         data-photo-index="${idx}" />
+                `).join('')}
+                <div class="details-score-badge">
+                    <div class="score-number">${matchScore}%</div>
+                    <div class="score-label">Match Score</div>
+                </div>
+            </div>
+            ${hasMultiplePhotos ? '<button class="photo-nav photo-next" onclick="navigateModalPhoto(1)">❯</button>' : ''}
+        </div>
+        ${hasMultiplePhotos ? `
+            <div class="photo-indicators">
+                ${photoGalleryArray.map((_, idx) => 
+                    `<span class="photo-indicator ${idx === 0 ? 'active' : ''}" onclick="goToModalPhoto(${idx})" data-photo-idx="${idx}"></span>`
+                ).join('')}
+            </div>
+        ` : ''}
+    `;
+    
     // Add archetype section if available
     const archetypeHtml = match.user.archetype 
         ? `<div class="detail-section archetype-section">
@@ -351,11 +413,7 @@ function showMatchDetails(index) {
             </div>
             <div class="match-details-body">
                 <div class="details-photo-section">
-                    <img src="${profilePhotoUrl}" alt="${username}" class="details-main-photo" />
-                    <div class="details-score-badge">
-                        <div class="score-number">${matchScore}%</div>
-                        <div class="score-label">Match Score</div>
-                    </div>
+                    ${photoGalleryHtml}
                 </div>
                 <div class="details-info-section">
                     <div class="detail-section">
@@ -380,6 +438,15 @@ function showMatchDetails(index) {
     `;
     
     modal.style.display = 'flex';
+    
+    // Store photo count for navigation
+    modal.dataset.photoCount = photoGalleryArray.length;
+    modal.dataset.currentPhotoIndex = '0';
+    
+    // Add touch swipe support for photos if multiple photos
+    if (hasMultiplePhotos) {
+        addPhotoSwipeSupport();
+    }
 }
 
 function closeMatchDetailsModal() {
@@ -387,6 +454,123 @@ function closeMatchDetailsModal() {
     if (modal) {
         modal.style.display = 'none';
     }
+}
+
+// Navigate through photos in match details modal
+function navigateModalPhoto(direction) {
+    const modal = document.getElementById('match-details-modal');
+    if (!modal) return;
+    
+    const photoCount = parseInt(modal.dataset.photoCount || '1');
+    const currentIndex = parseInt(modal.dataset.currentPhotoIndex || '0');
+    
+    let newIndex = currentIndex + direction;
+    
+    // Wrap around
+    if (newIndex < 0) {
+        newIndex = photoCount - 1;
+    } else if (newIndex >= photoCount) {
+        newIndex = 0;
+    }
+    
+    goToModalPhoto(newIndex);
+}
+
+// Go to specific photo in match details modal
+function goToModalPhoto(index) {
+    const modal = document.getElementById('match-details-modal');
+    if (!modal) return;
+    
+    const photos = modal.querySelectorAll('.details-photo');
+    const indicators = modal.querySelectorAll('.photo-indicator');
+    
+    if (photos.length === 0) return;
+    
+    // Update active photo
+    photos.forEach((photo, i) => {
+        photo.classList.toggle('active', i === index);
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+    });
+    
+    // Store current index
+    modal.dataset.currentPhotoIndex = index.toString();
+}
+
+// Add swipe support for photo gallery in modal
+function addPhotoSwipeSupport() {
+    const modal = document.getElementById('match-details-modal');
+    if (!modal) return;
+    
+    const photoWrapper = modal.querySelector('.details-photo-wrapper');
+    if (!photoWrapper) return;
+    
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    
+    // Helper function to handle swipe direction
+    function handleSwipeDirection(diff) {
+        if (Math.abs(diff) > SWIPE_THRESHOLD) {
+            if (diff > 0) {
+                navigateModalPhoto(1); // Swipe left - next photo
+            } else {
+                navigateModalPhoto(-1); // Swipe right - previous photo
+            }
+        }
+    }
+    
+    photoWrapper.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+    });
+    
+    photoWrapper.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+    });
+    
+    photoWrapper.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const diff = startX - currentX;
+        handleSwipeDirection(diff);
+    });
+    
+    // Mouse drag support for desktop
+    photoWrapper.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+        photoWrapper.style.cursor = 'grabbing';
+    });
+    
+    photoWrapper.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX;
+    });
+    
+    photoWrapper.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        photoWrapper.style.cursor = 'grab';
+        
+        const diff = startX - currentX;
+        handleSwipeDirection(diff);
+    });
+    
+    photoWrapper.addEventListener('mouseleave', () => {
+        if (isDragging) {
+            // Execute swipe logic before cancelling drag
+            const diff = startX - currentX;
+            handleSwipeDirection(diff);
+            isDragging = false;
+            photoWrapper.style.cursor = 'grab';
+        }
+    });
 }
 
 // Find matches
