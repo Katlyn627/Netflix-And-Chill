@@ -2,6 +2,10 @@
 
 Base URL: `http://localhost:3000/api`
 
+## Documentation Index
+
+- **[Quiz Enhancement Features](./QUIZ-ENHANCEMENT-API.md)** - New adaptive quiz, compatibility reports, archetype recommendations, and feedback endpoints
+
 ## User Endpoints
 
 ### Create User

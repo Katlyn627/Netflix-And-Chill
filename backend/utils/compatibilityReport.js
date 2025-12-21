@@ -587,10 +587,11 @@ class CompatibilityReport {
 
     if (report.commonArchetypes.length > 0) {
       const topArchetype = report.commonArchetypes[0];
+      const description = topArchetype.description || 'this viewing style';
       recommendations.push({
         type: 'archetype',
         title: `Embrace Your ${topArchetype.name} Majority`,
-        suggestion: `With ${topArchetype.count} members sharing this archetype, lean into ${topArchetype.description.toLowerCase()}`
+        suggestion: `With ${topArchetype.count} members sharing this archetype, lean into ${description.toLowerCase()}`
       });
     }
 
