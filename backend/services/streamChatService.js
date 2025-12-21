@@ -65,17 +65,18 @@ class StreamChatService {
      * @returns {boolean} - True if the error is caused by an invalid API key
      */
     isInvalidApiKeyError(error) {
-        return error.message && error.message.includes(INVALID_API_KEY_ERROR);
+        return error && error.message && error.message.includes(INVALID_API_KEY_ERROR);
     }
 
     /**
      * Create a user token for authentication
      * @param {string} userId - The user's unique ID
-     * @returns {string} - JWT token for Stream Chat authentication
+     * @returns {string|null} - JWT token for Stream Chat authentication, or null if not configured
      */
     createUserToken(userId) {
         if (!this.isConfigured || !this.client) {
-            throw new Error('Stream Chat is not configured');
+            console.log('Stream Chat not configured, cannot create token');
+            return null;
         }
         return this.client.createToken(userId);
     }
