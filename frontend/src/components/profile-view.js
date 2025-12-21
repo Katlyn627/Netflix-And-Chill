@@ -315,7 +315,7 @@ class ProfileView {
         const servicesContainer = document.getElementById('services-list');
 
         if (services.length > 0) {
-            // Helper function to get logo class based on service name
+            // Helper function to get logo class based on service name (fallback for CSS styling)
             const getLogoClass = (name) => {
                 if (!name || (typeof name === 'string' && name.trim() === '')) return 'other-logo';
                 const nameLower = name.toLowerCase();
@@ -331,7 +331,7 @@ class ProfileView {
                 return 'other-logo';
             };
 
-            // Helper function to get logo text
+            // Helper function to get logo text (fallback)
             const getLogoText = (name) => {
                 if (!name || (typeof name === 'string' && name.trim() === '')) return '?';
                 const nameLower = name.toLowerCase();
@@ -360,9 +360,15 @@ class ProfileView {
                 const logoClass = getLogoClass(service.name);
                 const logoText = escapeHtml(getLogoText(service.name));
                 
+                // Use actual logo from TMDB/Watchmode if available, otherwise fallback to CSS styled logo
+                const hasActualLogo = service.logoUrl && service.logoUrl !== 'null';
+                const logoContent = hasActualLogo 
+                    ? `<img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" class="service-logo-image">`
+                    : `<span class="service-display-logo ${logoClass}">${logoText}</span>`;
+                
                 return `
                     <div class="service-display-item">
-                        <span class="service-display-logo ${logoClass}">${logoText}</span>
+                        ${logoContent}
                         <span class="service-display-name">${serviceName}</span>
                     </div>
                 `;
