@@ -90,15 +90,33 @@ class WatchmodeAPIService {
 
     try {
       // First, find the Watchmode ID using TMDB ID
-      // Use the correct endpoint format: /title/source/tmdb/{tmdb_id}
-      const data = await this.makeRequest(`/title/source/tmdb/${tmdbId}`);
+      // Use the correct search endpoint with tmdb_id as search field
+      const searchParams = {
+        search_field: 'tmdb_id',
+        search_value: tmdbId
+      };
+      
+      // Add type filter to improve search accuracy
+      if (type) {
+        searchParams.types = type === 'movie' ? 'movie' : 'tv_series';
+      }
+      
+      const searchData = await this.makeRequest('/search/', searchParams);
 
-      if (!data || !data.id) {
+      // Check if we got valid search results
+      if (!searchData || !searchData.title_results || searchData.title_results.length === 0) {
+        return null;
+      }
+
+      // Get the first result's Watchmode ID
+      const watchmodeId = searchData.title_results[0].id;
+      
+      if (!watchmodeId) {
         return null;
       }
 
       // Get full details including sources
-      const details = await this.getTitleDetails(data.id);
+      const details = await this.getTitleDetails(watchmodeId);
       return details;
     } catch (error) {
       console.warn('Error getting sources by TMDB ID:', error.message);
