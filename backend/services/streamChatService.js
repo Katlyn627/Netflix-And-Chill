@@ -3,6 +3,7 @@ const { StreamChat } = require('stream-chat');
 
 // Constants
 const INVALID_API_KEY_ERROR = 'api_key not valid';
+const PLACEHOLDER_PREFIX = 'YOUR_';
 
 class StreamChatService {
     constructor() {
@@ -27,7 +28,9 @@ class StreamChatService {
 
             // Check for placeholder values (e.g., YOUR_STREAM_API_KEY)
             // At this point, we know all credentials are truthy from the check above
-            if (apiKey.startsWith('YOUR_') || apiSecret.startsWith('YOUR_') || appId.startsWith('YOUR_')) {
+            if (apiKey.startsWith(PLACEHOLDER_PREFIX) || 
+                apiSecret.startsWith(PLACEHOLDER_PREFIX) || 
+                appId.startsWith(PLACEHOLDER_PREFIX)) {
                 console.warn('⚠️  Stream Chat configuration using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
@@ -65,7 +68,7 @@ class StreamChatService {
      * @returns {boolean} - True if the error is caused by an invalid API key
      */
     isInvalidApiKeyError(error) {
-        return error && error.message && error.message.includes(INVALID_API_KEY_ERROR);
+        return error?.message?.includes(INVALID_API_KEY_ERROR) ?? false;
     }
 
     /**
