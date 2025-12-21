@@ -59,7 +59,7 @@ class MovieQuizScoring {
    * @param {Array} answers - Array of {questionId, selectedValue}
    * @returns {QuizAttempt}
    */
-  static processQuizCompletion(userId, answers) {
+  static processQuizCompletion(userId, answers, useMLScoring = true) {
     const quizAttempt = new QuizAttempt({ userId });
     
     // Add points to each answer based on question configuration
@@ -78,8 +78,21 @@ class MovieQuizScoring {
       quizAttempt.setCategoryScore(category, categoryScores[category]);
     });
     
-    // Compute personality traits
-    const personalityTraits = this.computePersonalityTraits(quizAttempt.answers, categoryScores);
+    // Compute personality traits (with optional ML-enhanced scoring)
+    let personalityTraits;
+    if (useMLScoring) {
+      try {
+        const MLInspiredScoring = require('./mlInspiredScoring');
+        personalityTraits = MLInspiredScoring.enhancedPersonalityComputation(quizAttempt.answers, categoryScores);
+      } catch (error) {
+        // Fallback to standard scoring if ML scoring fails
+        console.warn('ML-inspired scoring failed, using standard scoring:', error.message);
+        personalityTraits = this.computePersonalityTraits(quizAttempt.answers, categoryScores);
+      }
+    } else {
+      personalityTraits = this.computePersonalityTraits(quizAttempt.answers, categoryScores);
+    }
+    
     quizAttempt.personalityTraits = personalityTraits;
     
     // Calculate compatibility factors

@@ -41,6 +41,7 @@ class User {
     this.quizAttempts = data.quizAttempts || []; // Array of QuizAttempt objects
     this.personalityProfile = data.personalityProfile || null; // Latest personality profile from quiz
     this.personalityBio = data.personalityBio || ''; // Auto-generated bio based on personality
+    this.archetype = data.archetype || null; // Primary personality archetype {type, name, description, strength}
     this.lastQuizCompletedAt = data.lastQuizCompletedAt || null; // Timestamp of last quiz completion
     this.createdAt = data.createdAt || new Date().toISOString();
   }
@@ -280,6 +281,7 @@ class User {
       quizAttempts: this.quizAttempts,
       personalityProfile: this.personalityProfile,
       personalityBio: this.personalityBio,
+      archetype: this.archetype,
       lastQuizCompletedAt: this.lastQuizCompletedAt,
       createdAt: this.createdAt
     };
