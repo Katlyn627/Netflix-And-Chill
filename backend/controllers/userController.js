@@ -175,6 +175,35 @@ class UserController {
     }
   }
 
+  async updateStreamingServices(req, res) {
+    try {
+      const { userId } = req.params;
+      const { services } = req.body;
+
+      if (!services || !Array.isArray(services)) {
+        return res.status(400).json({ error: 'Services array is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.updateStreamingServices(services);
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Streaming services updated successfully',
+        user: this.filterSensitiveData(user)
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async addWatchHistory(req, res) {
     try {
       const { userId } = req.params;

@@ -50,6 +50,17 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
+    async updateStreamingServices(userId, services) {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/streaming-services`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ services })
+        });
+        return await response.json();
+    }
+
     async addWatchHistory(userId, watchData) {
         const response = await fetch(`${API_BASE_URL}/users/${userId}/watch-history`, {
             method: 'POST',
