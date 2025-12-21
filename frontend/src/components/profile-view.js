@@ -234,14 +234,14 @@ class ProfileView {
             // Display secondary archetypes
             if (personalityProfile.archetypes && personalityProfile.archetypes.length > 1) {
                 html += '<h4 style="margin-top: 20px;">Secondary Traits</h4>';
-                html += '<div class="personality-archetypes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">';
+                html += '<div class="personality-archetypes">';
                 personalityProfile.archetypes.slice(1, 3).forEach((archetype, index) => {
                     const emoji = index === 0 ? '✨' : '💫';
                     html += `
-                        <div class="archetype-card" style="border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; background: white;">
-                            <strong style="color: #667eea;">${emoji} ${archetype.name}</strong>
-                            <p style="font-size: 0.9em; margin: 8px 0 0 0; color: #666;">${archetype.description}</p>
-                            ${archetype.strength ? `<small style="color: #999;">Strength: ${Math.round(archetype.strength)}%</small>` : ''}
+                        <div class="archetype-card">
+                            <strong>${emoji} ${archetype.name}</strong>
+                            <p>${archetype.description}</p>
+                            ${archetype.strength ? `<small>Strength: ${Math.round(archetype.strength)}%</small>` : ''}
                         </div>
                     `;
                 });
