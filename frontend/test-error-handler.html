@@ -121,9 +121,12 @@
             
             // Simulate common extension errors
             console.error('READ - Host validation failed: {hostName: \'\', hostType: undefined}');
+            console.error('read.js:2530 READ - Host validation failed: {hostName: \'\', hostType: undefined}');
             console.error('Host is not supported');
             console.error('Host is not valid or supported');
+            console.error('Host is not in insights whitelist');
             console.error('content.js:2524 Host validation error');
+            console.error('content.js:2526 Host is not in insights whitelist');
             console.warn('Host validation failed for streaming service');
             
             console.log('--- Extension error tests completed ---');
