@@ -546,6 +546,16 @@ class ProfileView {
         this.setupWatchHistoryModal();
         this.setupPreferencesModal();
         this.setupStreamingServicesModal();
+        
+        // Load Profile View button
+        document.getElementById('load-profile-view-btn').addEventListener('click', () => {
+            this.showProfileViewPopup();
+        });
+        
+        // Close Profile View popup
+        document.getElementById('close-profile-popup-btn').addEventListener('click', () => {
+            document.getElementById('profile-view-popup').style.display = 'none';
+        });
     }
 
     async addPhoto(photoUrl) {
@@ -1731,6 +1741,159 @@ class ProfileView {
             console.error('Error updating streaming services:', error);
             alert('Failed to update streaming services: ' + error.message);
         }
+    }
+
+    showProfileViewPopup() {
+        const user = this.userData;
+        
+        // Helper function to capitalize first letter
+        const capitalize = (str) => {
+            if (!str) return 'N/A';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        };
+
+        // Escape HTML to prevent XSS
+        const escapeHtml = (str) => {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        };
+
+        // Basic Information
+        document.getElementById('popup-profile-username').textContent = user.username;
+        document.getElementById('popup-profile-age').textContent = user.age || 'N/A';
+        document.getElementById('popup-profile-location').textContent = user.location || 'N/A';
+        document.getElementById('popup-profile-gender').textContent = capitalize(user.gender);
+        document.getElementById('popup-profile-sexual-orientation').textContent = capitalize(user.sexualOrientation);
+        document.getElementById('popup-profile-bio').textContent = user.bio || 'No bio added yet.';
+
+        // Profile picture
+        if (user.profilePicture) {
+            document.getElementById('popup-profile-picture').src = user.profilePicture;
+            document.getElementById('popup-profile-picture').style.display = 'block';
+            document.getElementById('popup-no-photo').style.display = 'none';
+        } else {
+            document.getElementById('popup-profile-picture').style.display = 'none';
+            document.getElementById('popup-no-photo').style.display = 'flex';
+        }
+
+        // Streaming Services
+        const services = user.streamingServices || [];
+        const popupServicesContainer = document.getElementById('popup-services-list');
+        
+        if (services.length > 0) {
+            popupServicesContainer.innerHTML = services.map(service => {
+                const serviceName = escapeHtml(service.name);
+                const hasActualLogo = service.logoUrl && service.logoUrl !== 'null';
+                const logoContent = hasActualLogo 
+                    ? `<img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" style="width: 30px; height: 30px; object-fit: contain; border-radius: 5px; margin-right: 8px;">`
+                    : '';
+                
+                return `<span class="tag" style="display: inline-flex; align-items: center; margin: 3px;">${logoContent}${serviceName}</span>`;
+            }).join('');
+        } else {
+            popupServicesContainer.innerHTML = '<em>No streaming services connected.</em>';
+        }
+
+        // Watch History
+        const history = user.watchHistory || [];
+        const popupHistoryContainer = document.getElementById('popup-watch-history-list');
+        
+        if (history.length > 0) {
+            popupHistoryContainer.innerHTML = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">' + 
+                history.slice(0, 6).map(item => {
+                    const posterUrl = item.posterPath 
+                        ? `https://image.tmdb.org/t/p/w92${item.posterPath}`
+                        : 'https://via.placeholder.com/46x69?text=No+Poster';
+                    
+                    return `
+                        <div style="text-align: center;">
+                            <img src="${posterUrl}" alt="${escapeHtml(item.title)}" 
+                                 style="width: 60px; height: 90px; object-fit: cover; border-radius: 5px;">
+                            <div style="font-size: 0.75em; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px;">${escapeHtml(item.title)}</div>
+                        </div>
+                    `;
+                }).join('') + '</div>';
+            
+            if (history.length > 6) {
+                popupHistoryContainer.innerHTML += `<p style="margin-top: 10px; font-size: 0.9em; color: #666;"><em>...and ${history.length - 6} more</em></p>`;
+            }
+        } else {
+            popupHistoryContainer.innerHTML = '<em>No watch history yet.</em>';
+        }
+
+        // Favorite Movies
+        const favoriteMovies = user.favoriteMovies || [];
+        const popupFavMoviesContainer = document.getElementById('popup-favorite-movies-list');
+        
+        if (favoriteMovies.length > 0) {
+            popupFavMoviesContainer.innerHTML = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">' + 
+                favoriteMovies.slice(0, 6).map(movie => {
+                    const posterUrl = movie.posterPath 
+                        ? `https://image.tmdb.org/t/p/w92${movie.posterPath}`
+                        : 'https://via.placeholder.com/46x69?text=No+Poster';
+                    
+                    return `
+                        <div style="text-align: center;">
+                            <img src="${posterUrl}" alt="${escapeHtml(movie.title)}" 
+                                 style="width: 60px; height: 90px; object-fit: cover; border-radius: 5px;">
+                            <div style="font-size: 0.75em; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px;">${escapeHtml(movie.title)}</div>
+                        </div>
+                    `;
+                }).join('') + '</div>';
+            
+            if (favoriteMovies.length > 6) {
+                popupFavMoviesContainer.innerHTML += `<p style="margin-top: 10px; font-size: 0.9em; color: #666;"><em>...and ${favoriteMovies.length - 6} more</em></p>`;
+            }
+        } else {
+            popupFavMoviesContainer.innerHTML = '<em>No favorite movies added yet.</em>';
+        }
+
+        // Movie Personality
+        const personalityProfile = user.personalityProfile;
+        const archetype = user.archetype;
+        const popupPersonalityContainer = document.getElementById('popup-movie-personality');
+        
+        if (this.hasArchetype()) {
+            let html = '';
+            
+            // Display primary archetype prominently if available
+            if (archetype) {
+                html += `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <h4 style="margin: 0 0 8px 0; color: white; font-size: 1.2em;">⭐ ${escapeHtml(archetype.name)}</h4>
+                        <p style="margin: 0; font-size: 0.95em;">${escapeHtml(archetype.description)}</p>
+                        ${archetype.strength ? `<p style="margin: 8px 0 0 0; font-size: 0.85em; opacity: 0.9;">Match Strength: ${Math.round(archetype.strength)}%</p>` : ''}
+                    </div>
+                `;
+            }
+            
+            // Display personality bio
+            if (user.personalityBio) {
+                html += `<p style="font-style: italic; margin: 10px 0; padding: 12px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 5px; font-size: 0.9em;">${escapeHtml(user.personalityBio)}</p>`;
+            }
+            
+            // Display favorite snacks and video chat preference
+            const snacks = user.favoriteSnacks || [];
+            const videoChat = user.videoChatPreference || 'Not specified';
+            
+            if (snacks.length > 0 || videoChat !== 'Not specified') {
+                html += '<div style="margin-top: 15px; padding: 12px; background: #f9f9f9; border-radius: 8px;">';
+                html += '<h5 style="margin: 0 0 8px 0; color: #333;">🍿 Movie Preferences</h5>';
+                if (snacks.length > 0) {
+                    html += `<p style="margin: 5px 0; font-size: 0.9em;"><strong>Favorite Snacks:</strong> ${snacks.map(s => escapeHtml(s)).join(', ')}</p>`;
+                }
+                html += `<p style="margin: 5px 0; font-size: 0.9em;"><strong>Video Chat:</strong> ${escapeHtml(videoChat)}</p>`;
+                html += '</div>';
+            }
+            
+            popupPersonalityContainer.innerHTML = html;
+        } else {
+            popupPersonalityContainer.innerHTML = '<em>No movie personality quiz taken yet.</em>';
+        }
+
+        // Show the modal
+        document.getElementById('profile-view-popup').style.display = 'flex';
     }
 }
 
