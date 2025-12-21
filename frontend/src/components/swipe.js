@@ -117,9 +117,9 @@ function renderCurrentMovie() {
     const sources = movie.streamingAvailability.sources;
     const platforms = [];
     
-    // Collect all subscription platforms
+    // Collect all subscription platforms with their names
     if (sources.subscription && sources.subscription.length > 0) {
-      platforms.push(...sources.subscription.slice(0, 5).map(s => s.name));
+      platforms.push(...sources.subscription.slice(0, 5));
     }
     
     if (platforms.length > 0) {
@@ -127,7 +127,15 @@ function renderCurrentMovie() {
         <div class="streaming-platforms">
           <p class="streaming-label">🎬 Available on:</p>
           <div class="platform-badges">
-            ${platforms.map(name => `<span class="platform-badge">${name}</span>`).join('')}
+            ${platforms.map(platform => {
+              // Escape platform name for display
+              const name = platform.name || 'Unknown';
+              const escapedName = name.replace(/[&<>"']/g, (char) => {
+                const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+                return escapeMap[char] || char;
+              });
+              return `<span class="platform-badge" title="${escapedName}">${escapedName}</span>`;
+            }).join('')}
           </div>
         </div>
       `;

@@ -258,8 +258,16 @@ class StreamingAPIService {
         return fallbackProviders;
       }
       
-      // Limit to top 20 providers by display priority
-      return results.slice(0, 20);
+      // Format providers with logo URLs and limit to top 20 by display priority
+      const formattedProviders = results.slice(0, 20).map((provider, index) => ({
+        id: provider.provider_id,
+        name: provider.provider_name,
+        logoPath: provider.logo_path,
+        logoUrl: provider.logo_path ? this.getLogoUrl(provider.logo_path) : null,
+        displayPriority: provider.display_priority || index + 1
+      }));
+      
+      return formattedProviders;
     } catch (error) {
       console.error('Error fetching streaming providers:', error);
       return fallbackProviders;
