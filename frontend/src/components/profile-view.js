@@ -840,8 +840,12 @@ class ProfileView {
     
     async submitQuiz() {
         try {
+            console.log('[Quiz] Starting quiz submission...');
             const quizForm = document.getElementById('quiz-form');
-            if (!quizForm) return;
+            if (!quizForm) {
+                console.error('[Quiz] Quiz form not found');
+                return;
+            }
             
             const formData = new FormData(quizForm);
             const answers = [];
@@ -854,37 +858,66 @@ class ProfileView {
                 });
             }
             
+            console.log(`[Quiz] Collected ${answers.length} answers`);
+            
             // Validate that all questions were answered
             if (typeof QUIZ_QUESTIONS !== 'undefined' && answers.length < QUIZ_QUESTIONS.length) {
-                alert('Please answer all questions before submitting.');
+                console.warn(`[Quiz] Incomplete quiz: ${answers.length}/${QUIZ_QUESTIONS.length} questions answered`);
+                alert(`Please answer all questions before submitting. (${answers.length}/${QUIZ_QUESTIONS.length} answered)`);
                 return;
             }
             
+            console.log('[Quiz] Sending quiz to server...');
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}/quiz`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ answers })
             });
             
-            if (!response.ok) throw new Error('Failed to submit quiz');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                console.error('[Quiz] Server error:', errorData);
+                throw new Error(errorData.error || 'Failed to submit quiz');
+            }
             
             const result = await response.json();
+            console.log('[Quiz] Server response:', result);
+            
+            if (!result.user) {
+                console.error('[Quiz] No user data in response');
+                throw new Error('Invalid response from server');
+            }
+            
             this.userData = result.user;
+            console.log('[Quiz] User data updated:', {
+                hasArchetype: !!this.userData.archetype,
+                archetypeName: this.userData.archetype?.name,
+                hasPersonalityProfile: !!this.userData.personalityProfile,
+                quizAttempts: this.userData.quizAttempts?.length || 0
+            });
             
             // Display success message with personality info
             let successMessage = 'Quiz submitted successfully! Your matches will be updated.';
-            if (this.hasPersonalityProfile(result.personalityProfile)) {
+            if (result.archetype) {
+                successMessage += `\n\nYour movie personality: ${result.archetype.name}\n${result.archetype.description}`;
+                console.log('[Quiz] Archetype assigned:', result.archetype.name);
+            } else if (this.hasPersonalityProfile(result.personalityProfile)) {
                 const topArchetype = result.personalityProfile.archetypes[0];
                 successMessage += `\n\nYour movie personality: ${topArchetype.name}`;
+                console.log('[Quiz] Archetype from personality profile:', topArchetype.name);
+            } else {
+                console.warn('[Quiz] No archetype in response!');
             }
             
             // Re-render the entire profile to show updated personality data everywhere
             this.renderProfile();
             document.getElementById('quiz-modal').style.display = 'none';
             alert(successMessage);
+            
+            console.log('[Quiz] Submission complete');
         } catch (error) {
-            console.error('Error submitting quiz:', error);
-            alert('Failed to submit quiz. Please try again.');
+            console.error('[Quiz] Error submitting quiz:', error);
+            alert(`Failed to submit quiz: ${error.message}\nPlease try again.`);
         }
     }
 
