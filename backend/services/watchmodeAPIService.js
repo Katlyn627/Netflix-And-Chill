@@ -68,48 +68,79 @@ class WatchmodeAPIService {
       return [];
     }
 
-    const params = { search_field: 'name', search_value: title };
+    const params = { search_value: title };
     if (type) {
       params.types = type === 'movie' ? 'movie' : 'tv_series';
     }
 
-    const data = await this.makeRequest('/search/', params);
-    return data?.title_results || [];
+    const data = await this.makeRequest('/autocomplete-search/', params);
+    return data?.results || [];
   }
 
   /**
    * Get streaming sources for a specific title by TMDB ID
    * @param {number} tmdbId - TMDB ID
    * @param {string} type - 'movie' or 'tv'
+   * @param {string} title - Optional title to help with matching (recommended)
+   * @param {number} year - Optional year to help with matching
    * @returns {Promise<Object|null>}
    */
-  async getSourcesByTMDBId(tmdbId, type = 'movie') {
+  async getSourcesByTMDBId(tmdbId, type = 'movie', title = null, year = null) {
     if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
       return null;
     }
 
     try {
-      // First, find the Watchmode ID using TMDB ID
-      // Use the correct search endpoint with tmdb_id as search field
-      const searchParams = {
-        search_field: 'tmdb_id',
-        search_value: tmdbId
-      };
-      
-      // Add type filter to improve search accuracy
-      if (type) {
-        searchParams.types = type === 'movie' ? 'movie' : 'tv_series';
+      // If title is not provided, we need to fetch it from TMDB
+      if (!title) {
+        const tmdbConfig = require('../config/config').tmdb;
+        if (!tmdbConfig.apiKey) {
+          console.warn('Cannot search Watchmode without TMDB API key to fetch title');
+          return null;
+        }
+        
+        // Fetch title details from TMDB
+        const fetch = (await import('node-fetch')).default;
+        const tmdbUrl = `${tmdbConfig.baseUrl}/${type}/${tmdbId}?api_key=${tmdbConfig.apiKey}`;
+        const tmdbResponse = await fetch(tmdbUrl);
+        
+        if (!tmdbResponse.ok) {
+          console.warn(`Failed to fetch TMDB details for ${type} ${tmdbId}`);
+          return null;
+        }
+        
+        const tmdbData = await tmdbResponse.json();
+        title = tmdbData.title || tmdbData.name;
+        year = tmdbData.release_date ? parseInt(tmdbData.release_date.split('-')[0]) : 
+               (tmdbData.first_air_date ? parseInt(tmdbData.first_air_date.split('-')[0]) : null);
       }
       
-      const searchData = await this.makeRequest('/search/', searchParams);
-
-      // Check if we got valid search results
-      if (!searchData || !searchData.title_results || searchData.title_results.length === 0) {
+      if (!title) {
+        console.warn('Cannot search Watchmode without a title');
         return null;
       }
-
-      // Get the first result's Watchmode ID
-      const watchmodeId = searchData.title_results[0].id;
+      
+      // Search Watchmode by title using autocomplete-search endpoint
+      const searchResults = await this.searchTitle(title, type);
+      
+      // Check if we got valid search results
+      if (!searchResults || searchResults.length === 0) {
+        return null;
+      }
+      
+      // Find the best match - prefer exact title match and matching year
+      let bestMatch = searchResults[0]; // Default to first result
+      
+      if (year) {
+        // Try to find a match with the correct year
+        const yearMatch = searchResults.find(result => result.year === year);
+        if (yearMatch) {
+          bestMatch = yearMatch;
+        }
+      }
+      
+      // Get the Watchmode ID
+      const watchmodeId = bestMatch.id;
       
       if (!watchmodeId) {
         return null;
@@ -227,9 +258,11 @@ class WatchmodeAPIService {
    * @param {number} tmdbId - TMDB ID
    * @param {string} type - 'movie' or 'tv'
    * @param {string} region - Region code (e.g., 'US')
+   * @param {string} title - Optional title to help with matching
+   * @param {number} year - Optional year to help with matching
    * @returns {Promise<Object>}
    */
-  async getStreamingAvailability(tmdbId, type = 'movie', region = 'US') {
+  async getStreamingAvailability(tmdbId, type = 'movie', region = 'US', title = null, year = null) {
     if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
       return {
         available: false,
@@ -238,7 +271,7 @@ class WatchmodeAPIService {
     }
 
     try {
-      const details = await this.getSourcesByTMDBId(tmdbId, type);
+      const details = await this.getSourcesByTMDBId(tmdbId, type, title, year);
       
       if (!details) {
         return {
