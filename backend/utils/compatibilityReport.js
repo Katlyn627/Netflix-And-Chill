@@ -341,7 +341,7 @@ class CompatibilityReport {
       ],
       'pacing': [
         'Choose films that satisfy both preferences',
-        'Be patient with each other\'s pace preferences'
+        "Be patient with each other's pace preferences"
       ]
     };
 

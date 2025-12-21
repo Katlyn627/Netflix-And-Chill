@@ -227,7 +227,7 @@ const ARCHETYPE_RECOMMENDATIONS = {
       'franchise',
       'special edition',
       'limited release',
-      'director\'s cut',
+      "director's cut",
       'box set',
       'remastered',
       'anniversary edition'

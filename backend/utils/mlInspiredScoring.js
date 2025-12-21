@@ -461,8 +461,7 @@ class MLInspiredScoring {
    * @param {number} adjustment 
    */
   static updateWeight(archetypeType, category, adjustment) {
-    if (this.LEARNED_WEIGHTS[archetypeType] && 
-        this.LEARNED_WEIGHTS[archetypeType][category]) {
+    if (this.LEARNED_WEIGHTS[archetypeType]?.[category]) {
       
       // Apply small adjustment (simulating learning rate)
       const learningRate = 0.1;
