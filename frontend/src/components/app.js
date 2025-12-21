@@ -84,7 +84,7 @@ async function loadStreamingProviders() {
     }
 }
 
-// Render streaming providers - displaying top 25 from API (already limited and sorted by backend)
+// Render streaming providers - displays top 25 from API (already limited and sorted by backend)
 function renderStreamingProviders(providers) {
     const servicesList = document.getElementById('services-list');
     if (!servicesList) return;

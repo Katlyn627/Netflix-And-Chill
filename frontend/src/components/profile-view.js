@@ -1682,18 +1682,14 @@ class ProfileView {
                 logoUrl: checkbox.dataset.logoUrl || null
             }));
             
-            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/streaming-services`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ services })
-            });
+            // Use the centralized API service method
+            await api.updateStreamingServices(this.userId, services);
             
-            if (!response.ok) throw new Error('Failed to update streaming services');
+            // Reload user data to get updated information
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}`);
+            if (!response.ok) throw new Error('Failed to reload profile');
             
-            const result = await response.json();
-            this.userData = result.user;
+            this.userData = await response.json();
             this.renderStreamingServices();
             
             document.getElementById('update-streaming-services-modal').style.display = 'none';
