@@ -198,6 +198,10 @@ class ProfileView {
         return profile && profile.archetypes && profile.archetypes.length > 0;
     }
 
+    hasArchetype() {
+        return this.userData.archetype || this.hasPersonalityProfile(this.userData.personalityProfile);
+    }
+
     renderQuizResponses() {
         const moviePrefsContainer = document.getElementById('quiz-responses');
         if (!moviePrefsContainer) return;
@@ -212,7 +216,7 @@ class ProfileView {
         let html = '<div class="profile-section">';
 
         // Display personality profile if available
-        if (this.hasPersonalityProfile(personalityProfile)) {
+        if (this.hasArchetype()) {
             html += '<h3>🎬 Movie Personality</h3>';
             
             // Display primary archetype prominently if available
@@ -231,8 +235,8 @@ class ProfileView {
                 html += `<p class="personality-bio" style="font-style: italic; margin: 15px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 5px;">${personalityBio}</p>`;
             }
             
-            // Display secondary archetypes
-            if (personalityProfile.archetypes && personalityProfile.archetypes.length > 1) {
+            // Display secondary archetypes (only if personalityProfile exists)
+            if (this.hasPersonalityProfile(personalityProfile) && personalityProfile.archetypes.length > 1) {
                 html += '<h4 style="margin-top: 20px;">Secondary Traits</h4>';
                 html += '<div class="personality-archetypes">';
                 personalityProfile.archetypes.slice(1, 3).forEach((archetype, index) => {
