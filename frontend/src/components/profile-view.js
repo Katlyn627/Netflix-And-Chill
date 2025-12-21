@@ -1614,8 +1614,8 @@ class ProfileView {
             const userServices = this.userData.streamingServices || [];
             const userServiceIds = userServices.map(s => s.id || s.name);
             
-            // Render providers as checkboxes (top 25, already sorted alphabetically from API)
-            providers.slice(0, 25).forEach(provider => {
+            // Backend already returns top 25 providers sorted alphabetically, so we use them directly
+            providers.forEach(provider => {
                 const serviceOption = document.createElement('div');
                 serviceOption.className = 'service-option';
                 

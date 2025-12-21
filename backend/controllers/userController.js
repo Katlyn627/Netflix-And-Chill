@@ -184,6 +184,18 @@ class UserController {
         return res.status(400).json({ error: 'Services array is required' });
       }
 
+      // Validate that services array is not empty
+      if (services.length === 0) {
+        return res.status(400).json({ error: 'At least one streaming service must be provided' });
+      }
+
+      // Validate each service has a name
+      for (const service of services) {
+        if (!service.name || typeof service.name !== 'string' || service.name.trim() === '') {
+          return res.status(400).json({ error: 'Each service must have a valid name' });
+        }
+      }
+
       const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {

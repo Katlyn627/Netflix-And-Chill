@@ -58,6 +58,12 @@ class NetflixAndChillAPI {
             },
             body: JSON.stringify({ services })
         });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to update streaming services');
+        }
+        
         return await response.json();
     }
 

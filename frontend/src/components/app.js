@@ -84,7 +84,7 @@ async function loadStreamingProviders() {
     }
 }
 
-// Render streaming providers - now showing top 25, sorted alphabetically
+// Render streaming providers - displaying top 25 from API (already limited and sorted by backend)
 function renderStreamingProviders(providers) {
     const servicesList = document.getElementById('services-list');
     if (!servicesList) return;
@@ -92,11 +92,8 @@ function renderStreamingProviders(providers) {
     // Clear existing content to replace with dynamic data
     servicesList.innerHTML = '';
     
-    // Get top 25 providers, already sorted alphabetically from API
-    const top25Providers = providers.slice(0, 25);
-    
-    // Render each provider as a checkbox option with logo
-    top25Providers.forEach((provider, index) => {
+    // Backend already returns top 25 providers sorted alphabetically, so we use them directly
+    providers.forEach((provider, index) => {
         const serviceOption = document.createElement('div');
         serviceOption.className = 'service-option';
         
