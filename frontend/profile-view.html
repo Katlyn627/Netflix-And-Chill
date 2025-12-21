@@ -143,6 +143,7 @@
                 <div id="services-list">
                     <em id="no-services">No streaming services connected yet.</em>
                 </div>
+                <button id="update-streaming-services-btn" class="btn btn-primary" style="margin-top: 15px;">Update Streaming Services</button>
             </section>
 
             <!-- Watch History Section -->
@@ -267,6 +268,21 @@
                         </div>
                         <button type="submit" id="confirm-add-watch-history-btn" class="btn btn-primary" style="margin-top: 15px;" disabled>Add to Watch History</button>
                         <button type="button" id="cancel-add-watch-history-btn" class="btn btn-secondary" style="margin-top: 15px;">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Update Streaming Services Modal -->
+            <div id="update-streaming-services-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>Update Streaming Services</h2>
+                    <p style="color: #888; margin-bottom: 15px;">Select from the top 25 streaming services in the USA (sorted alphabetically)</p>
+                    <form id="update-streaming-services-form">
+                        <div id="streaming-services-list" class="services-grid">
+                            <!-- Services will be dynamically loaded from TMDB API -->
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Save Changes</button>
+                        <button type="button" id="cancel-update-streaming-btn" class="btn btn-secondary" style="margin-top: 15px;">Cancel</button>
                     </form>
                 </div>
             </div>

@@ -545,6 +545,7 @@ class ProfileView {
         this.setupFavoriteMoviesModal();
         this.setupWatchHistoryModal();
         this.setupPreferencesModal();
+        this.setupStreamingServicesModal();
     }
 
     async addPhoto(photoUrl) {
@@ -1568,6 +1569,134 @@ class ProfileView {
         } catch (error) {
             console.error('Error deleting profile:', error);
             alert('Failed to delete profile: ' + error.message);
+        }
+    }
+
+    // Streaming Services Modal
+    setupStreamingServicesModal() {
+        const updateBtn = document.getElementById('update-streaming-services-btn');
+        const modal = document.getElementById('update-streaming-services-modal');
+        const cancelBtn = document.getElementById('cancel-update-streaming-btn');
+        const form = document.getElementById('update-streaming-services-form');
+        const servicesList = document.getElementById('streaming-services-list');
+
+        updateBtn.addEventListener('click', async () => {
+            modal.style.display = 'block';
+            await this.loadStreamingServicesForUpdate();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.updateStreamingServices();
+        });
+    }
+
+    async loadStreamingServicesForUpdate() {
+        try {
+            const servicesList = document.getElementById('streaming-services-list');
+            servicesList.innerHTML = '<p>Loading streaming services...</p>';
+
+            // Get available streaming providers from TMDB
+            const response = await fetch(`${API_BASE_URL}/streaming/providers?region=US`);
+            if (!response.ok) throw new Error('Failed to load streaming providers');
+            
+            const result = await response.json();
+            const providers = result.providers || [];
+            
+            // Clear loading message
+            servicesList.innerHTML = '';
+            
+            // Get user's currently selected services
+            const userServices = this.userData.streamingServices || [];
+            const userServiceIds = userServices.map(s => s.id || s.name);
+            
+            // Backend already returns top 25 providers sorted alphabetically, so we use them directly
+            providers.forEach(provider => {
+                const serviceOption = document.createElement('div');
+                serviceOption.className = 'service-option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `update-service-${provider.id}`;
+                checkbox.value = provider.name;
+                checkbox.dataset.providerId = provider.id;
+                checkbox.dataset.logoPath = provider.logoPath || '';
+                checkbox.dataset.logoUrl = provider.logoUrl || '';
+                
+                // Check if user already has this service
+                if (userServiceIds.includes(provider.id) || userServiceIds.includes(provider.name)) {
+                    checkbox.checked = true;
+                }
+                
+                const label = document.createElement('label');
+                label.htmlFor = `update-service-${provider.id}`;
+                
+                // Create logo element
+                const logoSpan = document.createElement('span');
+                logoSpan.className = 'service-logo';
+                if (provider.logoUrl) {
+                    const logoImg = document.createElement('img');
+                    logoImg.src = provider.logoUrl;
+                    logoImg.alt = provider.name;
+                    logoImg.style.width = '40px';
+                    logoImg.style.height = '40px';
+                    logoImg.style.objectFit = 'contain';
+                    logoImg.style.borderRadius = '8px';
+                    logoSpan.appendChild(logoImg);
+                } else {
+                    logoSpan.textContent = provider.name.substring(0, 2).toUpperCase();
+                }
+                
+                // Create name element
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'service-name';
+                nameSpan.textContent = provider.name;
+                
+                label.appendChild(logoSpan);
+                label.appendChild(nameSpan);
+                
+                serviceOption.appendChild(checkbox);
+                serviceOption.appendChild(label);
+                
+                servicesList.appendChild(serviceOption);
+            });
+        } catch (error) {
+            console.error('Error loading streaming services:', error);
+            document.getElementById('streaming-services-list').innerHTML = 
+                '<p style="color: red;">Failed to load streaming services. Please try again.</p>';
+        }
+    }
+
+    async updateStreamingServices() {
+        try {
+            const checkboxes = document.querySelectorAll('#streaming-services-list input[type="checkbox"]:checked');
+            
+            const services = Array.from(checkboxes).map(checkbox => ({
+                id: checkbox.dataset.providerId || null,
+                name: checkbox.value,
+                logoPath: checkbox.dataset.logoPath || null,
+                logoUrl: checkbox.dataset.logoUrl || null
+            }));
+            
+            // Use the centralized API service method
+            await api.updateStreamingServices(this.userId, services);
+            
+            // Reload user data to get updated information
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}`);
+            if (!response.ok) throw new Error('Failed to reload profile');
+            
+            this.userData = await response.json();
+            this.renderStreamingServices();
+            
+            document.getElementById('update-streaming-services-modal').style.display = 'none';
+            alert('Streaming services updated successfully!');
+        } catch (error) {
+            console.error('Error updating streaming services:', error);
+            alert('Failed to update streaming services: ' + error.message);
         }
     }
 }

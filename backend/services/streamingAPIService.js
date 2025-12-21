@@ -243,9 +243,9 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getStreamingProviders(region = 'US') {
-    // If no API key or placeholder, return fallback data (already limited to top 20)
+    // If no API key or placeholder, return fallback data (sorted alphabetically)
     if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
-      return fallbackProviders;
+      return fallbackProviders.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     try {
@@ -255,11 +255,11 @@ class StreamingAPIService {
       
       // If no results, use fallback
       if (results.length === 0) {
-        return fallbackProviders;
+        return fallbackProviders.sort((a, b) => a.name.localeCompare(b.name));
       }
       
-      // Format providers with logo URLs and limit to top 20 by display priority
-      const formattedProviders = results.slice(0, 20).map((provider, index) => ({
+      // Format providers with logo URLs and limit to top 25 by display priority
+      const formattedProviders = results.slice(0, 25).map((provider, index) => ({
         id: provider.provider_id,
         name: provider.provider_name,
         logoPath: provider.logo_path,
@@ -267,10 +267,11 @@ class StreamingAPIService {
         displayPriority: provider.display_priority || index + 1
       }));
       
-      return formattedProviders;
+      // Sort alphabetically by name
+      return formattedProviders.sort((a, b) => a.name.localeCompare(b.name));
     } catch (error) {
       console.error('Error fetching streaming providers:', error);
-      return fallbackProviders;
+      return fallbackProviders.sort((a, b) => a.name.localeCompare(b.name));
     }
   }
 
