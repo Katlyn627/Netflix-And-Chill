@@ -75,7 +75,9 @@ class MatchController {
               photoGallery: matchedUser.photoGallery,
               streamingServices: matchedUser.streamingServices,
               movieDebateResponses: matchedUser.movieDebateResponses,
-              moviePromptResponses: matchedUser.moviePromptResponses
+              moviePromptResponses: matchedUser.moviePromptResponses,
+              archetype: matchedUser.archetype,
+              personalityBio: matchedUser.personalityBio
             }
           };
         })
@@ -135,7 +137,9 @@ class MatchController {
               photoGallery: matchedUser.photoGallery,
               streamingServices: matchedUser.streamingServices,
               movieDebateResponses: matchedUser.movieDebateResponses,
-              moviePromptResponses: matchedUser.moviePromptResponses
+              moviePromptResponses: matchedUser.moviePromptResponses,
+              archetype: matchedUser.archetype,
+              personalityBio: matchedUser.personalityBio
             }
           };
         })
