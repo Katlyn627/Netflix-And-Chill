@@ -1,6 +1,10 @@
 // Stream Chat service for real-time messaging
 const { StreamChat } = require('stream-chat');
 
+// Constants
+const INVALID_API_KEY_ERROR = 'api_key not valid';
+const PLACEHOLDER_PREFIX = 'YOUR_';
+
 class StreamChatService {
     constructor() {
         this.client = null;
@@ -14,8 +18,20 @@ class StreamChatService {
             const apiSecret = process.env.STREAM_API_SECRET;
             const appId = process.env.STREAM_APP_ID;
 
+            // Check if credentials are missing
             if (!apiKey || !apiSecret || !appId) {
                 console.warn('⚠️  Stream Chat configuration incomplete.');
+                console.warn('⚠️  Chat features will use fallback storage until configured.');
+                console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+                return;
+            }
+
+            // Check for placeholder values (e.g., YOUR_STREAM_API_KEY)
+            // At this point, we know all credentials are truthy from the check above
+            if ((typeof apiKey === 'string' && apiKey.startsWith(PLACEHOLDER_PREFIX)) || 
+                (typeof apiSecret === 'string' && apiSecret.startsWith(PLACEHOLDER_PREFIX)) || 
+                (typeof appId === 'string' && appId.startsWith(PLACEHOLDER_PREFIX))) {
+                console.warn('⚠️  Stream Chat configuration using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
                 return;
@@ -27,18 +43,43 @@ class StreamChatService {
             console.log('✅ Stream Chat initialized successfully');
         } catch (error) {
             console.error('❌ Error initializing Stream Chat:', error.message);
+            console.warn('⚠️  Chat features will use fallback storage.');
             this.isConfigured = false;
+            this.client = null;
         }
+    }
+
+    /**
+     * Handle invalid API key errors by disabling Stream Chat
+     * @private
+     */
+    handleInvalidApiKeyError() {
+        console.error('❌ Stream Chat API key is invalid. Disabling Stream Chat.');
+        console.warn('⚠️  Please check your STREAM_API_KEY and STREAM_API_SECRET in .env file.');
+        console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+        this.isConfigured = false;
+        this.client = null;
+    }
+
+    /**
+     * Check if an error is caused by an invalid API key
+     * @private
+     * @param {Error} error - The error to check
+     * @returns {boolean} - True if the error is caused by an invalid API key
+     */
+    isInvalidApiKeyError(error) {
+        return error?.message?.includes(INVALID_API_KEY_ERROR) ?? false;
     }
 
     /**
      * Create a user token for authentication
      * @param {string} userId - The user's unique ID
-     * @returns {string} - JWT token for Stream Chat authentication
+     * @returns {string|null} - JWT token for Stream Chat authentication, or null if not configured
      */
     createUserToken(userId) {
         if (!this.isConfigured || !this.client) {
-            throw new Error('Stream Chat is not configured');
+            console.warn('Stream Chat not configured, cannot create token');
+            return null;
         }
         return this.client.createToken(userId);
     }
@@ -49,7 +90,7 @@ class StreamChatService {
      */
     async upsertUser(user) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping user upsert');
+            console.warn('Stream Chat not configured, skipping user upsert');
             return null;
         }
 
@@ -64,6 +105,11 @@ class StreamChatService {
             console.log(`✅ User ${user.id} upserted in Stream Chat`);
             return streamUser;
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (this.isInvalidApiKeyError(error)) {
+                this.handleInvalidApiKeyError();
+                return null;
+            }
             console.error('Error upserting user in Stream Chat:', error.message);
             throw error;
         }
@@ -77,7 +123,7 @@ class StreamChatService {
      */
     async createOrGetChannel(userId1, userId2) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping channel creation');
+            console.warn('Stream Chat not configured, skipping channel creation');
             return null;
         }
 
@@ -97,6 +143,11 @@ class StreamChatService {
                 channelType: 'messaging',
             };
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (this.isInvalidApiKeyError(error)) {
+                this.handleInvalidApiKeyError();
+                return null;
+            }
             console.error('Error creating channel:', error.message);
             throw error;
         }
@@ -110,7 +161,7 @@ class StreamChatService {
      */
     async sendMessage(channelId, senderId, message) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping message send');
+            console.warn('Stream Chat not configured, skipping message send');
             return null;
         }
 
@@ -124,6 +175,11 @@ class StreamChatService {
             console.log(`✅ Message sent to channel ${channelId}`);
             return response.message;
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (this.isInvalidApiKeyError(error)) {
+                this.handleInvalidApiKeyError();
+                return null;
+            }
             console.error('Error sending message:', error.message);
             throw error;
         }
@@ -136,7 +192,7 @@ class StreamChatService {
      */
     async getMessages(channelId, limit = 50) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping message retrieval');
+            console.warn('Stream Chat not configured, skipping message retrieval');
             return [];
         }
 
@@ -150,6 +206,11 @@ class StreamChatService {
 
             return response.messages || [];
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (this.isInvalidApiKeyError(error)) {
+                this.handleInvalidApiKeyError();
+                return [];
+            }
             console.error('Error getting messages:', error.message);
             throw error;
         }
