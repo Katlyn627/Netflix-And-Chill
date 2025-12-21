@@ -41,6 +41,7 @@ const fallbackGenres = [
 // Based on major streaming services available in the US
 // Limited to top 20 most popular streaming services in USA
 // Logo paths from TMDB API for accurate branding
+// Note: Some services share logos (e.g., HBO Max/Max, Peacock/Peacock Premium) as they're the same service
 const fallbackProviders = [
   { id: 8, name: 'Netflix', logoPath: '/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg', displayPriority: 1 },
   { id: 9, name: 'Amazon Prime Video', logoPath: '/emthp39XA2YScoYL1p0sdbAH2WA.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg', displayPriority: 2 },
@@ -50,8 +51,8 @@ const fallbackProviders = [
   { id: 350, name: 'Apple TV+', logoPath: '/6uhKBfmtzFqOcLousHwZuzcrScK.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/6uhKBfmtzFqOcLousHwZuzcrScK.jpg', displayPriority: 6 },
   { id: 387, name: 'Peacock', logoPath: '/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', displayPriority: 7 },
   { id: 531, name: 'Paramount+', logoPath: '/xbhHHa1YgtpwhC8lb1NQ3ACVcLd.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/xbhHHa1YgtpwhC8lb1NQ3ACVcLd.jpg', displayPriority: 8 },
-  { id: 1899, name: 'Max', logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', displayPriority: 9 },
-  { id: 386, name: 'Peacock Premium', logoPath: '/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', displayPriority: 10 },
+  { id: 1899, name: 'Max', logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', displayPriority: 9 }, // Same as HBO Max (rebranded)
+  { id: 386, name: 'Peacock Premium', logoPath: '/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', displayPriority: 10 }, // Same as Peacock
   { id: 2, name: 'Apple iTunes', logoPath: '/q6tl6Ib6X5FT80RMlcDbexIo4St.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/q6tl6Ib6X5FT80RMlcDbexIo4St.jpg', displayPriority: 11 },
   { id: 3, name: 'Google Play Movies', logoPath: '/tbEdFQDwx5LEVr8WpSeXQSIirVq.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/tbEdFQDwx5LEVr8WpSeXQSIirVq.jpg', displayPriority: 12 },
   { id: 10, name: 'Amazon Video', logoPath: '/emthp39XA2YScoYL1p0sdbAH2WA.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg', displayPriority: 13 },

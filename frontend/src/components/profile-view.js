@@ -363,7 +363,7 @@ class ProfileView {
                 // Use actual logo from TMDB/Watchmode if available, otherwise fallback to CSS styled logo
                 const hasActualLogo = service.logoUrl && service.logoUrl !== 'null';
                 const logoContent = hasActualLogo 
-                    ? `<img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" class="service-logo-image" style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px;">`
+                    ? `<img src="${escapeHtml(service.logoUrl)}" alt="${serviceName}" class="service-logo-image">`
                     : `<span class="service-display-logo ${logoClass}">${logoText}</span>`;
                 
                 return `
