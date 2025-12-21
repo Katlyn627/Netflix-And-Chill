@@ -262,9 +262,10 @@ function showMatchDetails(index) {
     // Add photos from photo gallery
     if (match.user.photoGallery && match.user.photoGallery.length > 0) {
         match.user.photoGallery.forEach(photo => {
-            // Don't add duplicate if photoGallery contains the profile picture
-            const photoUrl = typeof photo === 'string' ? photo : photo.url;
-            if (photoUrl !== match.user.profilePicture) {
+            // Handle both string URLs and photo objects
+            const photoUrl = typeof photo === 'string' ? photo : (photo && photo.url ? photo.url : null);
+            // Don't add duplicate if photoGallery contains the profile picture or if URL is invalid
+            if (photoUrl && photoUrl !== match.user.profilePicture) {
                 photoGalleryArray.push({
                     url: photoUrl,
                     isProfilePic: false
@@ -511,6 +512,17 @@ function addPhotoSwipeSupport() {
     let currentX = 0;
     let isDragging = false;
     
+    // Helper function to handle swipe direction
+    function handleSwipeDirection(diff) {
+        if (Math.abs(diff) > SWIPE_THRESHOLD) {
+            if (diff > 0) {
+                navigateModalPhoto(1); // Swipe left - next photo
+            } else {
+                navigateModalPhoto(-1); // Swipe right - previous photo
+            }
+        }
+    }
+    
     photoWrapper.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
         isDragging = true;
@@ -526,13 +538,7 @@ function addPhotoSwipeSupport() {
         isDragging = false;
         
         const diff = startX - currentX;
-        if (Math.abs(diff) > SWIPE_THRESHOLD) {
-            if (diff > 0) {
-                navigateModalPhoto(1); // Swipe left - next photo
-            } else {
-                navigateModalPhoto(-1); // Swipe right - previous photo
-            }
-        }
+        handleSwipeDirection(diff);
     });
     
     // Mouse drag support for desktop
@@ -553,17 +559,14 @@ function addPhotoSwipeSupport() {
         photoWrapper.style.cursor = 'grab';
         
         const diff = startX - currentX;
-        if (Math.abs(diff) > SWIPE_THRESHOLD) {
-            if (diff > 0) {
-                navigateModalPhoto(1);
-            } else {
-                navigateModalPhoto(-1);
-            }
-        }
+        handleSwipeDirection(diff);
     });
     
     photoWrapper.addEventListener('mouseleave', () => {
         if (isDragging) {
+            // Execute swipe logic before cancelling drag
+            const diff = startX - currentX;
+            handleSwipeDirection(diff);
             isDragging = false;
             photoWrapper.style.cursor = 'grab';
         }
