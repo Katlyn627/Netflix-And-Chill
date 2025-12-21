@@ -19,7 +19,14 @@ A modern dating application that matches users based on their streaming preferen
   - Shared favorite movies (25 points each)
   - Similar genre preferences
   - Compatible binge-watching patterns
-- **Advanced Filters**: Filter matches by age range and location radius
+- **Match Persistence**: Matches are automatically saved and accessible from chat page
+- **Real-time Chat**: Message your matches with optional Firebase & Stream Chat integration
+  - Works with fallback storage (no external APIs required)
+  - Optional Stream Chat for real-time features (typing indicators, read receipts)
+  - Optional Firebase for authentication
+  - See [QUICKSTART_CHAT.md](QUICKSTART_CHAT.md) for 5-minute setup
+- **Advanced Filters**: Filter matches by age range, location radius, gender, and orientation
+- **Shared Filter State**: Filters persist across matches and chat pages
 - **Personalized Recommendations**: AI-powered show/movie recommendations based on your watch history and preferences
 - **Social Features**: Like and Super Like other users, with mutual match detection
 - **Match Scoring**: Each match gets a score (0-100) indicating compatibility
@@ -129,8 +136,14 @@ See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder d
 - `PUT /api/users/:userId/preferences` - Update preferences
 
 #### Matches
-- `GET /api/matches/:userId` - Find matches for a user (supports filters)
-- `GET /api/matches/:userId/history` - Get match history
+- `GET /api/matches/find/:userId` - Find matches for a user (supports filters)
+- `GET /api/matches/:userId/history` - Get saved match history
+- `GET /api/matches/:userId` - Find matches (legacy endpoint)
+
+#### Chat
+- `POST /api/chat/send` - Send a message to another user
+- `GET /api/chat/:userId1/:userId2` - Get message history between two users
+- `GET /api/chat/token/:userId` - Get Stream Chat token (if configured)
 
 #### Recommendations
 - `GET /api/recommendations/:userId` - Get personalized show/movie recommendations

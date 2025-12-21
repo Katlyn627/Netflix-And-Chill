@@ -206,19 +206,91 @@
             });
         });
 
+        // Validate userId format to prevent path traversal
+        function validateUserId(userId) {
+            // userId should be alphanumeric with underscores and dashes only
+            const userIdRegex = /^[a-zA-Z0-9_-]+$/;
+            return userId && userIdRegex.test(userId);
+        }
+
         async function loadMatchesForChat(userId, chatFilters) {
             try {
+                // Validate userId to prevent path traversal
+                if (!validateUserId(userId)) {
+                    console.error('[Chat] Invalid userId format');
+                    displayMatchesList([]);
+                    return;
+                }
+
                 console.log('[Chat] Loading matches with filters:', chatFilters);
                 
-                // Use shared filters utility to load matches
-                const matches = await window.SharedFilters.loadFilteredMatches(userId, chatFilters);
+                let matches = [];
                 
-                console.log(`[Chat] Loaded ${matches.length} matches`);
+                // First, try to load saved matches from match history
+                try {
+                    const historyResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/matches/${encodeURIComponent(userId)}/history`);
+                    const historyData = await historyResponse.json();
+                    
+                    if (historyData.success && historyData.matches && historyData.matches.length > 0) {
+                        console.log(`[Chat] Loaded ${historyData.matches.length} saved matches from history`);
+                        matches = historyData.matches;
+                    }
+                } catch (historyError) {
+                    console.log('[Chat] No saved match history found, will use find matches');
+                }
+                
+                // If no saved matches, use the find matches API (which will also save them)
+                if (matches.length === 0) {
+                    console.log('[Chat] Finding new matches...');
+                    matches = await window.SharedFilters.loadFilteredMatches(userId, chatFilters);
+                }
+                
+                // Apply client-side filters if needed
+                if (chatFilters && matches.length > 0) {
+                    matches = filterMatches(matches, chatFilters);
+                }
+                
+                console.log(`[Chat] Displaying ${matches.length} matches`);
                 displayMatchesList(matches);
             } catch (error) {
                 console.error('[Chat] Error loading matches:', error);
                 displayMatchesList([]);
             }
+        }
+
+        function filterMatches(matches, filters) {
+            if (!filters) return matches;
+            
+            return matches.filter(match => {
+                // Filter by match score
+                if (filters.minMatchScore && match.matchScore < filters.minMatchScore) {
+                    return false;
+                }
+                
+                // Filter by age
+                if (filters.minAge && match.user.age < filters.minAge) {
+                    return false;
+                }
+                if (filters.maxAge && match.user.age > filters.maxAge) {
+                    return false;
+                }
+                
+                // Filter by gender
+                if (filters.genderPreference && filters.genderPreference.length > 0) {
+                    if (!filters.genderPreference.includes(match.user.gender)) {
+                        return false;
+                    }
+                }
+                
+                // Filter by sexual orientation
+                if (filters.sexualOrientationPreference && filters.sexualOrientationPreference.length > 0) {
+                    if (!filters.sexualOrientationPreference.includes(match.user.sexualOrientation)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
         }
 
         function displayMatchesList(matches) {
