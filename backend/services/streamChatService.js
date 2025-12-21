@@ -27,7 +27,7 @@ class StreamChatService {
 
             // Check for placeholder values (e.g., YOUR_STREAM_API_KEY)
             // At this point, we know all credentials are truthy from the check above
-            if (apiKey.includes('YOUR_') || apiSecret.includes('YOUR_') || appId.includes('YOUR_')) {
+            if (apiKey.startsWith('YOUR_') || apiSecret.startsWith('YOUR_') || appId.startsWith('YOUR_')) {
                 console.warn('⚠️  Stream Chat configuration using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
@@ -75,7 +75,7 @@ class StreamChatService {
      */
     createUserToken(userId) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, cannot create token');
+            console.warn('Stream Chat not configured, cannot create token');
             return null;
         }
         return this.client.createToken(userId);
@@ -87,7 +87,7 @@ class StreamChatService {
      */
     async upsertUser(user) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping user upsert');
+            console.warn('Stream Chat not configured, skipping user upsert');
             return null;
         }
 
@@ -120,7 +120,7 @@ class StreamChatService {
      */
     async createOrGetChannel(userId1, userId2) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping channel creation');
+            console.warn('Stream Chat not configured, skipping channel creation');
             return null;
         }
 
@@ -158,7 +158,7 @@ class StreamChatService {
      */
     async sendMessage(channelId, senderId, message) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping message send');
+            console.warn('Stream Chat not configured, skipping message send');
             return null;
         }
 
@@ -189,7 +189,7 @@ class StreamChatService {
      */
     async getMessages(channelId, limit = 50) {
         if (!this.isConfigured || !this.client) {
-            console.log('Stream Chat not configured, skipping message retrieval');
+            console.warn('Stream Chat not configured, skipping message retrieval');
             return [];
         }
 
