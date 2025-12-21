@@ -33,6 +33,7 @@ const {
   generateMovieDebateTopics,
   generateVideoChatPreference,
   generateQuizResponses,
+  generateQuizAttempts,
   generateGender,
   generateSexualOrientation,
   generateGenderPreference,
@@ -301,6 +302,21 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
   };
   
   const user = new User(userData);
+  
+  // Generate quiz attempts for approximately 70% of users
+  if (Math.random() < 0.7) {
+    const MovieQuizScoring = require('../utils/movieQuizScoring');
+    const quizAttempts = generateQuizAttempts(user.id, 1);
+    user.quizAttempts = quizAttempts;
+    
+    // Set personality profile and bio from latest attempt
+    if (quizAttempts.length > 0) {
+      const latestAttempt = quizAttempts[0];
+      user.personalityProfile = latestAttempt.personalityTraits;
+      user.personalityBio = MovieQuizScoring.generatePersonalityBio(latestAttempt.personalityTraits);
+      user.lastQuizCompletedAt = latestAttempt.completedAt;
+    }
+  }
   
   // Return user data with password for storage
   return { ...user.toJSON(), password: user.password };

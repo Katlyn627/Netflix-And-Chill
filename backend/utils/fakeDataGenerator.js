@@ -240,6 +240,43 @@ function generateQuizResponses() {
 }
 
 /**
+ * Generate quiz attempts with full personality analysis (new format)
+ * @param {string} userId - User ID
+ * @param {number} count - Number of quiz attempts to generate (default: 1)
+ * @returns {Array} Array of quiz attempt objects
+ */
+function generateQuizAttempts(userId, count = 1) {
+  const { QUIZ_QUESTIONS } = require('../constants/quizQuestions');
+  const MovieQuizScoring = require('./movieQuizScoring');
+  const attempts = [];
+  
+  for (let i = 0; i < count; i++) {
+    // Generate random answers
+    const answers = QUIZ_QUESTIONS.map(question => {
+      const selectedOption = randomItem(question.options);
+      return {
+        questionId: question.id,
+        selectedValue: selectedOption.value
+      };
+    });
+    
+    // Process the quiz completion to get scores and personality
+    const quizAttempt = MovieQuizScoring.processQuizCompletion(userId, answers);
+    
+    // Adjust the completion date to be in the past
+    const daysAgo = randomInt(1, 180);
+    const completedAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+    quizAttempt.completedAt = completedAt;
+    quizAttempt.attemptDate = completedAt;
+    
+    attempts.push(quizAttempt.toJSON());
+  }
+  
+  return attempts;
+}
+
+
+/**
  * Generate gender
  */
 function generateGender() {
@@ -349,6 +386,7 @@ module.exports = {
   generateMovieDebateTopics,
   generateVideoChatPreference,
   generateQuizResponses,
+  generateQuizAttempts,
   generateGender,
   generateSexualOrientation,
   generateGenderPreference,

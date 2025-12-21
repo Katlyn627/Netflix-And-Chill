@@ -445,9 +445,12 @@ class UserController {
   async submitQuizResponses(req, res) {
     try {
       const { userId } = req.params;
-      const { quizResponses } = req.body;
+      const { quizResponses, answers } = req.body;
 
-      if (!quizResponses) {
+      // Support both old format (quizResponses) and new format (answers)
+      const quizAnswers = answers || quizResponses;
+
+      if (!quizAnswers) {
         return res.status(400).json({ error: 'Quiz responses are required' });
       }
 
@@ -458,18 +461,71 @@ class UserController {
       }
 
       const user = new User(userData);
-      user.quizResponses = { ...user.quizResponses, ...quizResponses };
+      
+      // If using old format, maintain backward compatibility
+      if (quizResponses && !answers) {
+        user.quizResponses = { ...user.quizResponses, ...quizResponses };
+      }
+      
+      // If using new format with answer array, process quiz completion
+      if (answers && Array.isArray(answers)) {
+        const MovieQuizScoring = require('../utils/movieQuizScoring');
+        
+        // Process quiz completion
+        const quizAttempt = MovieQuizScoring.processQuizCompletion(userId, answers);
+        
+        // Add to user's quiz attempts
+        if (!user.quizAttempts) {
+          user.quizAttempts = [];
+        }
+        user.quizAttempts.push(quizAttempt.toJSON());
+        
+        // Update personality profile with latest quiz results
+        user.personalityProfile = quizAttempt.personalityTraits;
+        
+        // Generate and save personality bio
+        user.personalityBio = MovieQuizScoring.generatePersonalityBio(quizAttempt.personalityTraits);
+        
+        // Update last quiz completed timestamp
+        user.lastQuizCompletedAt = quizAttempt.completedAt;
+      }
 
       await this.saveUserData(userId, user);
 
       res.json({
         message: 'Quiz responses submitted successfully',
-        user: this.filterSensitiveData(user)
+        user: this.filterSensitiveData(user),
+        personalityProfile: user.personalityProfile,
+        personalityBio: user.personalityBio
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async getQuizAttempts(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+
+      res.json({
+        quizAttempts: user.quizAttempts || [],
+        personalityProfile: user.personalityProfile,
+        personalityBio: user.personalityBio,
+        lastQuizCompletedAt: user.lastQuizCompletedAt
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
 
   async updatePassword(req, res) {
     try {

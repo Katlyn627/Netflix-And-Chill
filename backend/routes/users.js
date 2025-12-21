@@ -42,6 +42,9 @@ router.put('/:userId/profile-details', userController.updateProfileDetails.bind(
 // Submit quiz responses
 router.put('/:userId/quiz', userController.submitQuizResponses.bind(userController));
 
+// Get quiz attempts
+router.get('/:userId/quiz/attempts', userController.getQuizAttempts.bind(userController));
+
 // Update password
 router.put('/:userId/password', userController.updatePassword.bind(userController));
 

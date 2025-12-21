@@ -59,6 +59,10 @@ class MatchingEngine {
     const emotionalToneCompatibility = this.calculateEmotionalToneAlignment(user1, user2);
     score += emotionalToneCompatibility;
 
+    // Quiz compatibility - new enhanced feature
+    const quizCompatibility = this.calculateQuizCompatibility(user1, user2);
+    score += quizCompatibility;
+
     // Bonus for matching video chat preference
     if (user1.videoChatPreference && user2.videoChatPreference) {
       if (user1.videoChatPreference === user2.videoChatPreference || 
@@ -79,6 +83,7 @@ class MatchingEngine {
       sharedGenres,
       sharedShows,
       emotionalToneCompatibility,
+      quizCompatibility,
       user1,
       user2
     });
@@ -93,6 +98,7 @@ class MatchingEngine {
       sharedWatchlistMovies: sharedWatchlistMovies,
       snackCompatibility: snackCompatibility,
       emotionalToneCompatibility: emotionalToneCompatibility,
+      quizCompatibility: quizCompatibility,
       matchDescription: matchDescription
     };
   }
@@ -262,14 +268,31 @@ class MatchingEngine {
   }
 
   /**
-   * Calculate compatibility based on quiz responses (DEPRECATED - kept for backward compatibility)
+   * Calculate compatibility based on quiz responses
    * @param {User} user1 
    * @param {User} user2 
    * @returns {number} Compatibility score from quiz
    */
   static calculateQuizCompatibility(user1, user2) {
-    return 0; // Quiz is no longer used
+    // Import scoring utility
+    const MovieQuizScoring = require('./movieQuizScoring');
+    
+    // Get latest quiz attempts for both users
+    const attempt1 = MovieQuizScoring.getLatestAttempt(user1.quizAttempts);
+    const attempt2 = MovieQuizScoring.getLatestAttempt(user2.quizAttempts);
+    
+    // If either user hasn't completed the quiz, return 0
+    if (!attempt1 || !attempt2) {
+      return 0;
+    }
+    
+    // Calculate quiz-based compatibility
+    const compatibility = MovieQuizScoring.calculateQuizCompatibility(attempt1, attempt2);
+    
+    // Return normalized score (0-100), scaled down for overall match calculation
+    return Math.round(compatibility.score * 0.15); // Max 15 points from quiz
   }
+
 
   /**
    * Calculate compatibility based on snack preferences
@@ -385,11 +408,35 @@ class MatchingEngine {
       sharedGenres = [],
       sharedShows = [],
       emotionalToneCompatibility = 0,
+      quizCompatibility = 0,
       user1,
       user2
     } = matchData;
     
     const descriptions = [];
+    
+    // Check for quiz personality compatibility
+    if (quizCompatibility > 8) {
+      const MovieQuizScoring = require('./movieQuizScoring');
+      const attempt1 = MovieQuizScoring.getLatestAttempt(user1.quizAttempts);
+      const attempt2 = MovieQuizScoring.getLatestAttempt(user2.quizAttempts);
+      
+      if (attempt1 && attempt2) {
+        // Check for shared personality archetypes
+        const archetypes1 = new Set((attempt1.personalityTraits.archetypes || []).map(a => a.type));
+        const archetypes2 = new Set((attempt2.personalityTraits.archetypes || []).map(a => a.type));
+        const sharedArchetypes = [...archetypes1].filter(a => archetypes2.has(a));
+        
+        if (sharedArchetypes.length > 0) {
+          const archetype = attempt1.personalityTraits.archetypes.find(a => a.type === sharedArchetypes[0]);
+          if (archetype) {
+            descriptions.push(`share a ${archetype.name.toLowerCase()} personality`);
+          }
+        } else if (quizCompatibility >= 10) {
+          descriptions.push('have compatible viewing personalities');
+        }
+      }
+    }
     
     // Check for shared favorite movies
     if (sharedFavoriteMovies.length > 0) {

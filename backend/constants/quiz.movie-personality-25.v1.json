@@ -1,0 +1,82 @@
+{
+  "version": "v1",
+  "name": "Movie Personality Quiz - 25 Questions",
+  "description": "A curated 25-question subset of the comprehensive movie compatibility quiz, designed to assess viewing preferences, habits, and personality traits for enhanced matching.",
+  "totalQuestions": 25,
+  "categories": {
+    "viewing_style": "Viewing Style & Preferences",
+    "viewing_habits": "Viewing Habits",
+    "social_viewing": "Social Viewing",
+    "movie_preferences": "Movie Preferences",
+    "franchises": "Franchises & Series",
+    "storytelling": "Storytelling Preferences",
+    "pacing": "Pacing Preferences",
+    "content": "Content Preferences",
+    "representation": "Representation",
+    "production": "Production Values",
+    "viewing_environment": "Viewing Environment",
+    "viewing_etiquette": "Viewing Etiquette",
+    "collecting": "Collecting & Fandom",
+    "engagement": "Engagement Level"
+  },
+  "personalityArchetypes": {
+    "cinephile": {
+      "name": "The Cinephile",
+      "description": "Deep appreciation for film as an art form",
+      "indicators": ["viewing_style", "movie_preferences", "engagement"]
+    },
+    "casual_viewer": {
+      "name": "The Casual Viewer",
+      "description": "Enjoys movies for entertainment and relaxation",
+      "indicators": ["viewing_habits", "pacing"]
+    },
+    "binge_watcher": {
+      "name": "The Binge Watcher",
+      "description": "Loves marathon viewing sessions",
+      "indicators": ["viewing_habits", "viewing_environment"]
+    },
+    "social_butterfly": {
+      "name": "The Social Butterfly",
+      "description": "Prefers watching and discussing with others",
+      "indicators": ["social_viewing", "viewing_etiquette"]
+    },
+    "genre_specialist": {
+      "name": "The Genre Specialist",
+      "description": "Strong preferences for specific genres",
+      "indicators": ["movie_preferences", "content", "franchises"]
+    },
+    "critic": {
+      "name": "The Critic",
+      "description": "Analytical viewer who pays attention to details",
+      "indicators": ["engagement", "movie_preferences", "viewing_habits"]
+    },
+    "collector": {
+      "name": "The Collector",
+      "description": "Passionate about physical media and memorabilia",
+      "indicators": ["collecting", "engagement"]
+    },
+    "tech_enthusiast": {
+      "name": "The Tech Enthusiast",
+      "description": "Values high-quality viewing experience",
+      "indicators": ["viewing_environment", "production"]
+    }
+  },
+  "questions": [
+    "q1", "q2", "q3", "q4", "q5",
+    "q6", "q7", "q8", "q9", "q10",
+    "q11", "q12", "q13", "q14", "q15",
+    "q16", "q17", "q18", "q19", "q20",
+    "q21", "q22", "q23", "q24", "q25"
+  ],
+  "metadata": {
+    "createdAt": "2024-12-21",
+    "compatibilityWith": "full_50_question_quiz",
+    "backwardCompatible": true,
+    "scoringVersion": "1.0"
+  },
+  "instructions": {
+    "usage": "This quiz configuration is used for personality assessment and matching. Questions are referenced from the main QUIZ_QUESTIONS constant in quizQuestions.js.",
+    "scoring": "Each answer has a point value. Category scores are normalized to 0-100 scale. Personality archetypes are derived from category score patterns.",
+    "compatibility": "Quiz compatibility is calculated by comparing category scores, personality archetypes, and individual answer similarities between users."
+  }
+}

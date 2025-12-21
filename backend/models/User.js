@@ -37,6 +37,11 @@ class User {
     this.movieRatings = data.movieRatings || []; // Array of {tmdbId, title, rating, ratedAt}
     this.movieWatchlist = data.movieWatchlist || []; // Array of movie objects with TMDB data
     this.tvWatchlist = data.tvWatchlist || []; // Array of TV show objects with TMDB data
+    // Quiz and personality fields
+    this.quizAttempts = data.quizAttempts || []; // Array of QuizAttempt objects
+    this.personalityProfile = data.personalityProfile || null; // Latest personality profile from quiz
+    this.personalityBio = data.personalityBio || ''; // Auto-generated bio based on personality
+    this.lastQuizCompletedAt = data.lastQuizCompletedAt || null; // Timestamp of last quiz completion
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -272,6 +277,10 @@ class User {
       movieRatings: this.movieRatings,
       movieWatchlist: this.movieWatchlist,
       tvWatchlist: this.tvWatchlist,
+      quizAttempts: this.quizAttempts,
+      personalityProfile: this.personalityProfile,
+      personalityBio: this.personalityBio,
+      lastQuizCompletedAt: this.lastQuizCompletedAt,
       createdAt: this.createdAt
     };
   }
