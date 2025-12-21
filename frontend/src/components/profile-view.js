@@ -719,13 +719,66 @@ class ProfileView {
                 <p><strong>Question ${index + 1}:</strong> ${q.question}</p>
                 ${q.options.map(opt => `
                     <label style="display: block; margin: 5px 0;">
-                        <input type="radio" name="${q.id}" value="${opt.value}" required>
+                        <input type="radio" name="${q.id}" value="${opt.value}" required class="quiz-option">
                         ${opt.label}
                     </label>
                 `).join('')}
             `;
             container.appendChild(questionDiv);
         });
+        
+        // Add event listeners for progress tracking
+        this.setupQuizProgressTracking();
+    }
+    
+    setupQuizProgressTracking() {
+        const quizOptions = document.querySelectorAll('.quiz-option');
+        const submitBtn = document.getElementById('submit-quiz-btn');
+        const progressBar = document.getElementById('quiz-progress-bar');
+        const progressText = document.getElementById('quiz-progress-text');
+        const totalQuestions = QUIZ_QUESTIONS ? QUIZ_QUESTIONS.length : 50;
+        
+        const updateProgress = () => {
+            const answeredQuestions = new Set();
+            quizOptions.forEach(option => {
+                if (option.checked) {
+                    answeredQuestions.add(option.name);
+                }
+            });
+            
+            const answeredCount = answeredQuestions.size;
+            const remaining = totalQuestions - answeredCount;
+            const progressPercent = (answeredCount / totalQuestions) * 100;
+            
+            // Update progress bar
+            if (progressBar) {
+                progressBar.style.width = `${progressPercent}%`;
+            }
+            
+            // Update progress text
+            if (progressText) {
+                progressText.textContent = `${answeredCount} of ${totalQuestions} questions answered`;
+            }
+            
+            // Enable/disable submit button
+            if (submitBtn) {
+                if (answeredCount === totalQuestions) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Complete Quiz';
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = `Complete Quiz (${remaining} remaining)`;
+                }
+            }
+        };
+        
+        // Add change listeners to all radio buttons
+        quizOptions.forEach(option => {
+            option.addEventListener('change', updateProgress);
+        });
+        
+        // Initial update
+        updateProgress();
     }
     
     async submitQuiz() {
