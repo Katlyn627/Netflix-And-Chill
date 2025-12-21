@@ -519,12 +519,15 @@ document.getElementById('distance-filter').addEventListener('input', function() 
 });
 
 // Logout functionality
-document.getElementById('logout-btn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('currentUserId');
-        window.location.href = 'login.html';
-    }
-});
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('currentUserId');
+            window.location.href = 'login.html';
+        }
+    });
+}
 
 // Chat functionality - navigate to chat page
 function openChat(matchUserId, matchUsername) {
@@ -680,6 +683,8 @@ window.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     if (currentUserId) {
         updateNavProfileIcon(currentUserId);
+        // Automatically load matches when page loads
+        findMatches();
     }
 });
 
