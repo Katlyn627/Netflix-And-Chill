@@ -31,8 +31,16 @@ async function generateMatchesForUser(userId, allUsers, matchesPerUser, database
     .filter(u => u.id !== userId) // Exclude self
     .map(u => new User(u));
 
-  // Generate matches using the matching engine
-  const matches = MatchingEngine.findMatches(currentUser, userObjects, matchesPerUser);
+  // Generate matches using the matching engine with very permissive filters
+  // This ensures we get matches even with small test datasets
+  const filters = { 
+    minMatchScore: 0, // Accept all matches regardless of score
+    ageRange: { min: 18, max: 100 }, // Override age restrictions for testing
+    locationRadius: 10000, // Global matching for testing
+    genderPreference: ['any'], // Accept all genders
+    sexualOrientationPreference: ['any'] // Accept all orientations
+  };
+  const matches = MatchingEngine.findMatches(currentUser, userObjects, matchesPerUser, filters);
 
   // Save matches to database
   const savedMatches = [];

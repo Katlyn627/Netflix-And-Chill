@@ -561,6 +561,7 @@ class MatchingEngine {
             matchResult.sharedContent,
             matchResult.matchDescription,
             {
+              quizCompatibility: matchResult.quizCompatibility,
               snackCompatibility: matchResult.snackCompatibility,
               emotionalToneCompatibility: matchResult.emotionalToneCompatibility,
               sharedLikedMovies: matchResult.sharedLikedMovies,
