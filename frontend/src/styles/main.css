@@ -866,3 +866,55 @@ footer {
     }
 }
 
+
+/* Personality Profile Styles */
+.personality-bio {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #E50914;
+    margin-bottom: 20px;
+    font-size: 1.05em;
+    line-height: 1.6;
+}
+
+.personality-archetypes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.archetype-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.archetype-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.archetype-card strong {
+    display: block;
+    color: #E50914;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.archetype-card p {
+    color: #333;
+    font-size: 0.95em;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.archetype-card small {
+    display: block;
+    color: #666;
+    font-size: 0.85em;
+    margin-top: 5px;
+}

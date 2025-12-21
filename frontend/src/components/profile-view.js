@@ -195,24 +195,63 @@ class ProfileView {
     }
 
     renderQuizResponses() {
-        // Quiz feature removed - display movie preferences instead
         const moviePrefsContainer = document.getElementById('quiz-responses');
-        if (moviePrefsContainer) {
-            const snacks = this.userData.favoriteSnacks || [];
-            const videoChat = this.userData.videoChatPreference || 'Not specified';
+        if (!moviePrefsContainer) return;
+
+        const personalityProfile = this.userData.personalityProfile;
+        const personalityBio = this.userData.personalityBio;
+        const quizAttempts = this.userData.quizAttempts || [];
+        const snacks = this.userData.favoriteSnacks || [];
+        const videoChat = this.userData.videoChatPreference || 'Not specified';
+
+        let html = '<div class="profile-section">';
+
+        // Display personality profile if available
+        if (personalityProfile && personalityProfile.archetypes && personalityProfile.archetypes.length > 0) {
+            html += '<h3>🎬 Movie Personality</h3>';
             
-            if (snacks.length > 0 || videoChat !== 'Not specified') {
-                moviePrefsContainer.innerHTML = `
-                    <div class="profile-section">
-                        <h3>🍿 Movie Preferences</h3>
-                        ${snacks.length > 0 ? `<p><strong>Favorite Snacks:</strong> ${snacks.join(', ')}</p>` : ''}
-                        <p><strong>Video Chat Preference:</strong> ${videoChat}</p>
+            // Display personality bio
+            if (personalityBio) {
+                html += `<p class="personality-bio"><em>${personalityBio}</em></p>`;
+            }
+            
+            // Display personality archetypes
+            html += '<div class="personality-archetypes">';
+            personalityProfile.archetypes.slice(0, 3).forEach((archetype, index) => {
+                const emoji = index === 0 ? '⭐' : index === 1 ? '✨' : '💫';
+                html += `
+                    <div class="archetype-card">
+                        <strong>${emoji} ${archetype.name}</strong>
+                        <p>${archetype.description}</p>
+                        ${archetype.strength ? `<small>Strength: ${archetype.strength}%</small>` : ''}
                     </div>
                 `;
-            } else {
-                moviePrefsContainer.innerHTML = '<em>No movie preferences set yet. Swipe on movies to improve your matches!</em>';
+            });
+            html += '</div>';
+            
+            // Display quiz completion info
+            if (quizAttempts.length > 0) {
+                const lastAttempt = quizAttempts[quizAttempts.length - 1];
+                const completedDate = new Date(lastAttempt.completedAt || this.userData.lastQuizCompletedAt);
+                html += `<p style="margin-top: 15px;"><small>Quiz completed: ${completedDate.toLocaleDateString()}</small></p>`;
             }
+        } else {
+            // No quiz data - show call to action
+            html += '<h3>🎬 Movie Personality Quiz</h3>';
+            html += '<p><em>Take the quiz to discover your movie personality and improve your matches!</em></p>';
         }
+
+        // Display movie preferences
+        if (snacks.length > 0 || videoChat !== 'Not specified') {
+            html += '<h3 style="margin-top: 20px;">🍿 Movie Preferences</h3>';
+            if (snacks.length > 0) {
+                html += `<p><strong>Favorite Snacks:</strong> ${snacks.join(', ')}</p>`;
+            }
+            html += `<p><strong>Video Chat Preference:</strong> ${videoChat}</p>`;
+        }
+
+        html += '</div>';
+        moviePrefsContainer.innerHTML = html;
     }
 
     renderStreamingServices() {
@@ -689,25 +728,43 @@ class ProfileView {
             if (!quizForm) return;
             
             const formData = new FormData(quizForm);
-            const quizResponses = {};
+            const answers = [];
             
-            for (let [key, value] of formData.entries()) {
-                quizResponses[key] = value;
+            // Convert form data to answers array format for enhanced quiz processing
+            for (let [questionId, selectedValue] of formData.entries()) {
+                answers.push({
+                    questionId: questionId,
+                    selectedValue: selectedValue
+                });
+            }
+            
+            // Validate that all questions were answered
+            if (typeof QUIZ_QUESTIONS !== 'undefined' && answers.length < QUIZ_QUESTIONS.length) {
+                alert('Please answer all questions before submitting.');
+                return;
             }
             
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}/quiz`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quizResponses })
+                body: JSON.stringify({ answers })
             });
             
             if (!response.ok) throw new Error('Failed to submit quiz');
             
-            this.userData = (await response.json()).user;
-            this.renderQuizResponses();
+            const result = await response.json();
+            this.userData = result.user;
             
+            // Display success message with personality info
+            let successMessage = 'Quiz submitted successfully! Your matches will be updated.';
+            if (result.personalityProfile && result.personalityProfile.archetypes && result.personalityProfile.archetypes.length > 0) {
+                const topArchetype = result.personalityProfile.archetypes[0];
+                successMessage += `\n\nYour movie personality: ${topArchetype.name}`;
+            }
+            
+            this.renderQuizResponses();
             document.getElementById('quiz-modal').style.display = 'none';
-            alert('Quiz submitted successfully! Your matches will be updated.');
+            alert(successMessage);
         } catch (error) {
             console.error('Error submitting quiz:', error);
             alert('Failed to submit quiz. Please try again.');
