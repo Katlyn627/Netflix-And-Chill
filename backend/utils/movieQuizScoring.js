@@ -157,6 +157,8 @@ class MovieQuizScoring {
     const traits = {};
     const archetypes = [];
     
+    console.log('[Quiz Scoring] Category scores:', JSON.stringify(categoryScores, null, 2));
+    
     // Analyze category patterns to determine personality traits
     Object.keys(categoryScores).forEach(category => {
       const score = categoryScores[category];
@@ -182,8 +184,10 @@ class MovieQuizScoring {
       // Average match score for this archetype
       const avgMatch = indicatorCount > 0 ? matchScore / indicatorCount : 0;
       
-      // If average match is high enough, include this archetype
-      if (avgMatch >= 65) {
+      console.log(`[Quiz Scoring] Archetype ${archetypeKey}: avgMatch=${avgMatch.toFixed(2)}, threshold=65`);
+      
+      // LOWERED THRESHOLD from 65 to 40 to ensure archetypes are assigned
+      if (avgMatch >= 40) {
         archetypes.push({
           type: archetypeKey,
           name: archetype.name,
@@ -192,6 +196,8 @@ class MovieQuizScoring {
         });
       }
     });
+    
+    console.log(`[Quiz Scoring] Generated ${archetypes.length} archetypes`);
     
     // Sort archetypes by strength
     archetypes.sort((a, b) => b.strength - a.strength);
