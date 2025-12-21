@@ -14,8 +14,10 @@ class StreamChatService {
             const apiSecret = process.env.STREAM_API_SECRET;
             const appId = process.env.STREAM_APP_ID;
 
-            if (!apiKey || !apiSecret || !appId) {
-                console.warn('⚠️  Stream Chat configuration incomplete.');
+            // Check if credentials are missing or placeholder values
+            if (!apiKey || !apiSecret || !appId || 
+                apiKey.includes('YOUR_') || apiSecret.includes('YOUR_') || appId.includes('YOUR_')) {
+                console.warn('⚠️  Stream Chat configuration incomplete or using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
                 return;
@@ -27,7 +29,9 @@ class StreamChatService {
             console.log('✅ Stream Chat initialized successfully');
         } catch (error) {
             console.error('❌ Error initializing Stream Chat:', error.message);
+            console.warn('⚠️  Chat features will use fallback storage.');
             this.isConfigured = false;
+            this.client = null;
         }
     }
 
@@ -64,6 +68,15 @@ class StreamChatService {
             console.log(`✅ User ${user.id} upserted in Stream Chat`);
             return streamUser;
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (error.message && error.message.includes('api_key not valid')) {
+                console.error('❌ Stream Chat API key is invalid. Disabling Stream Chat.');
+                console.warn('⚠️  Please check your STREAM_API_KEY and STREAM_API_SECRET in .env file.');
+                console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+                this.isConfigured = false;
+                this.client = null;
+                return null;
+            }
             console.error('Error upserting user in Stream Chat:', error.message);
             throw error;
         }
@@ -97,6 +110,15 @@ class StreamChatService {
                 channelType: 'messaging',
             };
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (error.message && error.message.includes('api_key not valid')) {
+                console.error('❌ Stream Chat API key is invalid. Disabling Stream Chat.');
+                console.warn('⚠️  Please check your STREAM_API_KEY and STREAM_API_SECRET in .env file.');
+                console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+                this.isConfigured = false;
+                this.client = null;
+                return null;
+            }
             console.error('Error creating channel:', error.message);
             throw error;
         }
@@ -124,6 +146,15 @@ class StreamChatService {
             console.log(`✅ Message sent to channel ${channelId}`);
             return response.message;
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (error.message && error.message.includes('api_key not valid')) {
+                console.error('❌ Stream Chat API key is invalid. Disabling Stream Chat.');
+                console.warn('⚠️  Please check your STREAM_API_KEY and STREAM_API_SECRET in .env file.');
+                console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+                this.isConfigured = false;
+                this.client = null;
+                return null;
+            }
             console.error('Error sending message:', error.message);
             throw error;
         }
@@ -150,6 +181,15 @@ class StreamChatService {
 
             return response.messages || [];
         } catch (error) {
+            // If API key is invalid, disable Stream Chat and use fallback
+            if (error.message && error.message.includes('api_key not valid')) {
+                console.error('❌ Stream Chat API key is invalid. Disabling Stream Chat.');
+                console.warn('⚠️  Please check your STREAM_API_KEY and STREAM_API_SECRET in .env file.');
+                console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+                this.isConfigured = false;
+                this.client = null;
+                return [];
+            }
             console.error('Error getting messages:', error.message);
             throw error;
         }
