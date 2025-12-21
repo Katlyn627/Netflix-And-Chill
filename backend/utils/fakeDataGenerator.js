@@ -149,13 +149,8 @@ function generateBio() {
  * Generate a profile picture URL (using actual photos)
  */
 function generateProfilePicture(seed) {
-  // Use Lorem Picsum for actual profile photos
-  // Generate a consistent seed number from the string for deterministic results
-  const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  // Lorem Picsum has photos with IDs from 1 to 1000+
-  // Using modulo to keep within a reasonable range and add base offset
-  const photoId = (hash % 200) + 1;
-  // Return a square image suitable for profile pictures
+  // Use Lorem Picsum for actual profile photos with seed-based randomization
+  // This ensures each user gets a unique but deterministic profile picture
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/400/400`;
 }
 
@@ -166,7 +161,6 @@ function generatePhotoGallery(seed, count = 3) {
   const photos = [];
   // Generate unique photo URLs for each gallery item
   for (let i = 0; i < count; i++) {
-    const hash = (seed + i).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     // Use different dimensions to add variety
     const dimensions = [
       { width: 400, height: 400 },  // Square
