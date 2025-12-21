@@ -90,13 +90,8 @@ class WatchmodeAPIService {
 
     try {
       // First, find the Watchmode ID using TMDB ID
-      const source = 'tmdb';
-      const sourceId = tmdbId;
-      
-      const data = await this.makeRequest('/title/find/', {
-        source_id: sourceId,
-        source
-      });
+      // Use the correct endpoint format: /title/source/tmdb/{tmdb_id}
+      const data = await this.makeRequest(`/title/source/tmdb/${tmdbId}`);
 
       if (!data || !data.id) {
         return null;
