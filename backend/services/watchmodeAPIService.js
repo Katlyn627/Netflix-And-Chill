@@ -93,15 +93,18 @@ class WatchmodeAPIService {
     try {
       // If title is not provided, we need to fetch it from TMDB
       if (!title) {
-        const tmdbConfig = require('../config/config').tmdb;
-        if (!tmdbConfig.apiKey) {
+        if (!config.tmdb.apiKey) {
           console.warn('Cannot search Watchmode without TMDB API key to fetch title');
           return null;
         }
         
+        // Wait for fetch to be loaded if not yet available
+        if (!fetch) {
+          fetch = (await import('node-fetch')).default;
+        }
+        
         // Fetch title details from TMDB
-        const fetch = (await import('node-fetch')).default;
-        const tmdbUrl = `${tmdbConfig.baseUrl}/${type}/${tmdbId}?api_key=${tmdbConfig.apiKey}`;
+        const tmdbUrl = `${config.tmdb.baseUrl}/${type}/${tmdbId}?api_key=${config.tmdb.apiKey}`;
         const tmdbResponse = await fetch(tmdbUrl);
         
         if (!tmdbResponse.ok) {
@@ -111,8 +114,13 @@ class WatchmodeAPIService {
         
         const tmdbData = await tmdbResponse.json();
         title = tmdbData.title || tmdbData.name;
-        year = tmdbData.release_date ? parseInt(tmdbData.release_date.split('-')[0]) : 
-               (tmdbData.first_air_date ? parseInt(tmdbData.first_air_date.split('-')[0]) : null);
+        
+        // Extract year from release date or first air date
+        if (tmdbData.release_date) {
+          year = parseInt(tmdbData.release_date.split('-')[0]);
+        } else if (tmdbData.first_air_date) {
+          year = parseInt(tmdbData.first_air_date.split('-')[0]);
+        }
       }
       
       if (!title) {
