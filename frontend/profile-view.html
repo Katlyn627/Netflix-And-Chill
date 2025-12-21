@@ -44,6 +44,7 @@
                         <p id="profile-gender-orientation"><strong>Gender:</strong> <span id="profile-gender"></span> | <strong>Sexual Orientation:</strong> <span id="profile-sexual-orientation"></span></p>
                         <p id="profile-bio" style="font-style: italic;"></p>
                         <button id="edit-basic-info-btn" class="btn btn-secondary" style="margin-top: 10px;">Edit Basic Info</button>
+                        <button id="load-profile-view-btn" class="btn btn-primary" style="margin-top: 10px; margin-left: 10px;">Load Profile View</button>
                     </div>
                 </div>
             </section>
@@ -452,6 +453,72 @@
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                         <button type="button" id="cancel-basic-info-edit-btn" class="btn btn-secondary">Cancel</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Profile View Popup Modal -->
+            <div id="profile-view-popup" class="modal" style="display: none;">
+                <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Complete Profile View</h2>
+                        <button id="close-profile-popup-btn" class="btn btn-secondary" style="padding: 8px 15px;">Close</button>
+                    </div>
+                    
+                    <!-- Basic Information Section -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E50914; margin-bottom: 15px; font-size: 1.3em; border-bottom: 2px solid #E50914; padding-bottom: 5px;">📋 Basic Information</h3>
+                        <div style="display: flex; align-items: start; gap: 20px; margin-bottom: 15px;">
+                            <div id="popup-profile-photo-container" style="flex-shrink: 0;">
+                                <img id="popup-profile-picture" src="" alt="Profile" style="width: 120px; height: 120px; border-radius: 10px; object-fit: cover; display: none;">
+                                <div id="popup-no-photo" style="width: 120px; height: 120px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 40px; color: white;">
+                                    👤
+                                </div>
+                            </div>
+                            <div style="flex-grow: 1;">
+                                <h3 id="popup-profile-username" style="margin-top: 0; font-size: 1.5em;">Username</h3>
+                                <p><strong>Age:</strong> <span id="popup-profile-age"></span></p>
+                                <p><strong>Location:</strong> <span id="popup-profile-location"></span></p>
+                                <p><strong>Gender:</strong> <span id="popup-profile-gender"></span></p>
+                                <p><strong>Sexual Orientation:</strong> <span id="popup-profile-sexual-orientation"></span></p>
+                                <p style="font-style: italic; margin-top: 10px; color: #666;"><strong>Bio:</strong> <span id="popup-profile-bio"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Streaming Services Section -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E50914; margin-bottom: 15px; font-size: 1.3em; border-bottom: 2px solid #E50914; padding-bottom: 5px;">📺 Streaming Services</h3>
+                        <div id="popup-services-list">
+                            <em>No streaming services connected.</em>
+                        </div>
+                    </div>
+
+                    <!-- Shared Content Section -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E50914; margin-bottom: 15px; font-size: 1.3em; border-bottom: 2px solid #E50914; padding-bottom: 5px;">🎬 Shared Content</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #333; margin-bottom: 10px;">Watch History</h4>
+                            <div id="popup-watch-history-list">
+                                <em>No watch history yet.</em>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #333; margin-bottom: 10px;">Favorite Movies</h4>
+                            <div id="popup-favorite-movies-list">
+                                <em>No favorite movies added yet.</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movie Personality Section -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E50914; margin-bottom: 15px; font-size: 1.3em; border-bottom: 2px solid #E50914; padding-bottom: 5px;">🎭 Movie Personality</h3>
+                        <div id="popup-movie-personality">
+                            <em>No movie personality quiz taken yet.</em>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
