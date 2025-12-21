@@ -17,15 +17,16 @@ class StreamChatService {
             const apiSecret = process.env.STREAM_API_SECRET;
             const appId = process.env.STREAM_APP_ID;
 
-            // Check if credentials are missing or placeholder values
+            // Check if credentials are missing
             if (!apiKey || !apiSecret || !appId) {
-                console.warn('⚠️  Stream Chat configuration incomplete or using placeholder values.');
+                console.warn('⚠️  Stream Chat configuration incomplete.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
                 return;
             }
 
             // Check for placeholder values (e.g., YOUR_STREAM_API_KEY)
+            // At this point, we know all credentials are truthy from the check above
             if (apiKey.includes('YOUR_') || apiSecret.includes('YOUR_') || appId.includes('YOUR_')) {
                 console.warn('⚠️  Stream Chat configuration using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
