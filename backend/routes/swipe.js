@@ -265,19 +265,28 @@ router.get('/movies/:userId', async (req, res) => {
 
     // Optionally fetch streaming availability for movies if Watchmode API is configured
     // This is done asynchronously and won't block the response
+    // Limit to first 5 movies to avoid rate limiting
     const includeStreaming = req.query.includeStreaming === 'true';
-    if (includeStreaming) {
-      // Fetch streaming availability for first batch of movies
-      const streamingPromises = formattedMovies.slice(0, 10).map(async (movie) => {
+    if (includeStreaming && formattedMovies.length > 0) {
+      // Fetch streaming availability for first batch of movies with rate limiting
+      const batchSize = Math.min(5, formattedMovies.length);
+      
+      for (let i = 0; i < batchSize; i++) {
         try {
+          const movie = formattedMovies[i];
           const availability = await watchmodeAPIService.getStreamingAvailability(movie.tmdbId, 'movie');
           movie.streamingAvailability = availability;
+          
+          // Small delay to respect API rate limits (100ms between requests)
+          if (i < batchSize - 1) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
         } catch (error) {
           // Silently fail for optional feature
-          movie.streamingAvailability = null;
+          console.warn(`Failed to get streaming availability for movie ${formattedMovies[i].tmdbId}:`, error.message);
+          formattedMovies[i].streamingAvailability = null;
         }
-      });
-      await Promise.all(streamingPromises);
+      }
     }
 
     res.json({

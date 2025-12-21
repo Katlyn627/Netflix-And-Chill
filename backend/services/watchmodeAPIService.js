@@ -1,5 +1,11 @@
 const config = require('../config/config');
 
+// Import node-fetch once at module level for better performance
+let fetch;
+(async () => {
+  fetch = (await import('node-fetch')).default;
+})();
+
 /**
  * Service for interacting with Watchmode API
  * Provides streaming platform availability data for movies and TV shows
@@ -31,7 +37,11 @@ class WatchmodeAPIService {
     const url = `${this.baseUrl}${endpoint}?${queryParams}`;
 
     try {
-      const fetch = (await import('node-fetch')).default;
+      // Wait for fetch to be loaded if not yet available
+      if (!fetch) {
+        fetch = (await import('node-fetch')).default;
+      }
+      
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -80,7 +90,7 @@ class WatchmodeAPIService {
 
     try {
       // First, find the Watchmode ID using TMDB ID
-      const source = type === 'movie' ? 'tmdb' : 'tmdb';
+      const source = 'tmdb';
       const sourceId = tmdbId;
       
       const data = await this.makeRequest('/title/find/', {
