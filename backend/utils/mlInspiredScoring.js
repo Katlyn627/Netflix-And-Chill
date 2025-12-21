@@ -95,6 +95,7 @@ class MLInspiredScoring {
   static calculateWeightedArchetypes(categoryScores) {
     const archetypes = [];
     const archetypeKeys = Object.keys(this.LEARNED_WEIGHTS);
+    const ARCHETYPE_THRESHOLD = 40;
 
     console.log('[ML Scoring] Category scores:', JSON.stringify(categoryScores, null, 2));
 
@@ -112,10 +113,10 @@ class MLInspiredScoring {
 
       const avgScore = totalWeight > 0 ? weightedScore / totalWeight : 0;
 
-      console.log(`[ML Scoring] Archetype ${archetypeKey}: avgScore=${avgScore.toFixed(2)}, threshold=40`);
+      console.log(`[ML Scoring] Archetype ${archetypeKey}: avgScore=${avgScore.toFixed(2)}, threshold=${ARCHETYPE_THRESHOLD}`);
 
       // LOWERED THRESHOLD from 60 to 40 to ensure archetypes are assigned
-      if (avgScore >= 40) {
+      if (avgScore >= ARCHETYPE_THRESHOLD) {
         archetypes.push({
           type: archetypeKey,
           name: this.getArchetypeName(archetypeKey),

@@ -156,6 +156,7 @@ class MovieQuizScoring {
   static computePersonalityTraits(answers, categoryScores) {
     const traits = {};
     const archetypes = [];
+    const ARCHETYPE_THRESHOLD = 40;
     
     console.log('[Quiz Scoring] Category scores:', JSON.stringify(categoryScores, null, 2));
     
@@ -184,10 +185,10 @@ class MovieQuizScoring {
       // Average match score for this archetype
       const avgMatch = indicatorCount > 0 ? matchScore / indicatorCount : 0;
       
-      console.log(`[Quiz Scoring] Archetype ${archetypeKey}: avgMatch=${avgMatch.toFixed(2)}, threshold=65`);
+      console.log(`[Quiz Scoring] Archetype ${archetypeKey}: avgMatch=${avgMatch.toFixed(2)}, threshold=${ARCHETYPE_THRESHOLD}`);
       
       // LOWERED THRESHOLD from 65 to 40 to ensure archetypes are assigned
-      if (avgMatch >= 40) {
+      if (avgMatch >= ARCHETYPE_THRESHOLD) {
         archetypes.push({
           type: archetypeKey,
           name: archetype.name,

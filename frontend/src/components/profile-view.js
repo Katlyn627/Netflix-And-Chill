@@ -917,7 +917,7 @@ class ProfileView {
             console.log('[Quiz] Submission complete');
         } catch (error) {
             console.error('[Quiz] Error submitting quiz:', error);
-            alert('Failed to submit quiz: ' + error.message + '\nPlease try again.');
+            alert(`Failed to submit quiz: ${error.message}\nPlease try again.`);
         }
     }
 
