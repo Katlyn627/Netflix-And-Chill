@@ -1,5 +1,6 @@
 // Stream Chat Client Integration
 // This file handles Stream Chat on the client side
+// Note: Requires Stream Chat JS SDK to be loaded
 
 (function() {
     'use strict';
@@ -15,7 +16,8 @@
 
             // Check if Stream Chat SDK is loaded
             if (typeof StreamChat === 'undefined') {
-                console.warn('Stream Chat SDK not loaded. Using fallback chat.');
+                console.warn('⚠️  Stream Chat SDK not loaded. Using fallback chat.');
+                console.warn('📖 Include Stream Chat SDK: https://cdn.jsdelivr.net/npm/stream-chat');
                 return false;
             }
 
@@ -29,10 +31,10 @@
                 return false;
             }
 
-            // Initialize Stream Chat client
-            streamClient = StreamChat.getInstance(data.apiKey);
+            // Initialize Stream Chat client (client-side uses only API key)
+            streamClient = new StreamChat(data.apiKey);
 
-            // Connect user to Stream Chat
+            // Connect user to Stream Chat with token from backend
             await streamClient.connectUser(
                 {
                     id: userId,

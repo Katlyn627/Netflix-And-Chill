@@ -206,15 +206,29 @@
             });
         });
 
+        // Validate userId format to prevent path traversal
+        function validateUserId(userId) {
+            // userId should be alphanumeric with underscores and dashes only
+            const userIdRegex = /^[a-zA-Z0-9_-]+$/;
+            return userId && userIdRegex.test(userId);
+        }
+
         async function loadMatchesForChat(userId, chatFilters) {
             try {
+                // Validate userId to prevent path traversal
+                if (!validateUserId(userId)) {
+                    console.error('[Chat] Invalid userId format');
+                    displayMatchesList([]);
+                    return;
+                }
+
                 console.log('[Chat] Loading matches with filters:', chatFilters);
                 
                 let matches = [];
                 
                 // First, try to load saved matches from match history
                 try {
-                    const historyResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/matches/${userId}/history`);
+                    const historyResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/matches/${encodeURIComponent(userId)}/history`);
                     const historyData = await historyResponse.json();
                     
                     if (historyData.success && historyData.matches && historyData.matches.length > 0) {

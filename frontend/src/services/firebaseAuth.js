@@ -1,24 +1,25 @@
 // Firebase Frontend Configuration
 // This file initializes Firebase for client-side authentication
+// Note: Uses Firebase v8 compat layer for easier migration
 
 (function() {
     'use strict';
 
-    // Firebase configuration will be loaded from backend API
+    // Firebase configuration will be loaded from backend API or window globals
     let firebaseApp = null;
     let firebaseAuth = null;
 
     // Initialize Firebase with configuration from backend
     async function initializeFirebase() {
         try {
-            // Check if Firebase SDK is loaded
+            // Check if Firebase compat SDK is loaded
             if (typeof firebase === 'undefined') {
-                console.warn('Firebase SDK not loaded. Authentication features will be limited.');
+                console.warn('⚠️  Firebase SDK not loaded. Authentication features will be limited.');
+                console.warn('📖 Include Firebase v8 compat script: https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
                 return false;
             }
 
-            // Get Firebase config from backend (in production, this should be from env)
-            // For now, we'll try to initialize with a dummy config and let it fail gracefully
+            // Get Firebase config from window globals (set by backend or inline script)
             const firebaseConfig = {
                 apiKey: window.FIREBASE_API_KEY || '',
                 authDomain: window.FIREBASE_AUTH_DOMAIN || '',
@@ -37,8 +38,15 @@
                 return false;
             }
 
-            // Initialize Firebase
-            firebaseApp = firebase.initializeApp(firebaseConfig);
+            // Initialize Firebase using v8 compat API
+            // For Firebase v9+, use: import { initializeApp } from 'firebase/app'
+            // This uses v8 compat for easier integration
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+            } else {
+                firebaseApp = firebase.app();
+            }
+            
             firebaseAuth = firebase.auth();
 
             console.log('✅ Firebase initialized successfully');
