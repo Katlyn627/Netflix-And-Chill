@@ -315,6 +315,11 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
       user.personalityProfile = latestAttempt.personalityTraits;
       user.personalityBio = MovieQuizScoring.generatePersonalityBio(latestAttempt.personalityTraits);
       user.lastQuizCompletedAt = latestAttempt.completedAt;
+      
+      // Assign primary archetype to user (same as API does)
+      if (latestAttempt.personalityTraits.archetypes && latestAttempt.personalityTraits.archetypes.length > 0) {
+        user.archetype = latestAttempt.personalityTraits.archetypes[0];
+      }
     }
   }
   
