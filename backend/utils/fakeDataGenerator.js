@@ -146,15 +146,17 @@ function generateBio() {
 }
 
 /**
- * Generate a profile picture URL (using placeholder service)
+ * Generate a profile picture URL (using actual photos)
  */
 function generateProfilePicture(seed) {
-  // Using UI Avatars as a placeholder service
-  // Using a hash-based background for consistency
+  // Use Lorem Picsum for actual profile photos
+  // Generate a consistent seed number from the string for deterministic results
   const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const colors = ['007bff', 'dc3545', '28a745', 'ffc107', '17a2b8', '6f42c1', 'e83e8c', 'fd7e14'];
-  const bgColor = colors[hash % colors.length];
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(seed)}&size=200&background=${bgColor}&color=fff`;
+  // Lorem Picsum has photos with IDs from 1 to 1000+
+  // Using modulo to keep within a reasonable range and add base offset
+  const photoId = (hash % 200) + 1;
+  // Return a square image suitable for profile pictures
+  return `https://picsum.photos/seed/${encodeURIComponent(seed)}/400/400`;
 }
 
 /**
@@ -162,12 +164,18 @@ function generateProfilePicture(seed) {
  */
 function generatePhotoGallery(seed, count = 3) {
   const photos = [];
-  const colors = ['007bff', 'dc3545', '28a745', 'ffc107', '17a2b8', '6f42c1', 'e83e8c', 'fd7e14'];
+  // Generate unique photo URLs for each gallery item
   for (let i = 0; i < count; i++) {
     const hash = (seed + i).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const bgColor = colors[hash % colors.length];
+    // Use different dimensions to add variety
+    const dimensions = [
+      { width: 400, height: 400 },  // Square
+      { width: 400, height: 500 },  // Portrait
+      { width: 500, height: 400 },  // Landscape
+    ];
+    const dimension = dimensions[i % dimensions.length];
     photos.push({
-      url: `https://ui-avatars.com/api/?name=${encodeURIComponent(seed + i)}&size=400&background=${bgColor}&color=fff`,
+      url: `https://picsum.photos/seed/${encodeURIComponent(seed + '-photo' + i)}/${dimension.width}/${dimension.height}`,
       uploadedAt: new Date(Date.now() - randomInt(1, 365) * 24 * 60 * 60 * 1000).toISOString()
     });
   }
