@@ -182,6 +182,129 @@ Update user's genre preferences and binge-watching habits.
 }
 ```
 
+### Submit Quiz Responses
+Submit movie quiz responses to generate personality profile and improve matching.
+
+**Endpoint:** `PUT /users/:userId/quiz`
+
+**Request Body (New Format - Recommended):**
+```json
+{
+  "answers": [
+    {
+      "questionId": "q1",
+      "selectedValue": "subtitles"
+    },
+    {
+      "questionId": "q2",
+      "selectedValue": "90_120"
+    }
+  ]
+}
+```
+
+**Request Body (Legacy Format - Backward Compatible):**
+```json
+{
+  "quizResponses": {
+    "q1": "subtitles",
+    "q2": "90_120"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Quiz responses submitted successfully",
+  "user": {
+    "id": "user_123",
+    "personalityProfile": {
+      "archetypes": [
+        {
+          "type": "cinephile",
+          "name": "The Cinephile",
+          "description": "Deep appreciation for film as an art form",
+          "strength": 87.5
+        }
+      ],
+      "traits": {
+        "viewing_style": {
+          "score": 75.5,
+          "level": "high"
+        }
+      },
+      "dominantTraits": [
+        {
+          "category": "viewing_style",
+          "name": "Viewing Style & Preferences",
+          "score": 75.5
+        }
+      ]
+    },
+    "personalityBio": "Deep appreciation for film as an art form. Has strong preferences about how to watch.",
+    "lastQuizCompletedAt": "2024-01-01T00:00:00.000Z",
+    ...
+  },
+  "personalityProfile": { ... },
+  "personalityBio": "Deep appreciation for film as an art form..."
+}
+```
+
+**Notes:**
+- The new `answers` format processes quiz completion with full scoring and personality analysis
+- Quiz responses are used to:
+  - Calculate normalized scores by category (0-100 scale)
+  - Derive personality archetypes (e.g., Cinephile, Casual Viewer, Binge Watcher)
+  - Generate personality-based biography
+  - Enhance compatibility matching (adds up to 15 points to match score)
+- Users can retake the quiz; latest attempt is used for matching
+
+### Get Quiz Attempts
+Retrieve user's quiz attempt history and personality profile.
+
+**Endpoint:** `GET /users/:userId/quiz/attempts`
+
+**Response:**
+```json
+{
+  "quizAttempts": [
+    {
+      "id": "quiz_123",
+      "userId": "user_123",
+      "attemptDate": "2024-01-01T00:00:00.000Z",
+      "quizVersion": "v1",
+      "answers": [
+        {
+          "questionId": "q1",
+          "selectedValue": "subtitles",
+          "points": 1
+        }
+      ],
+      "categoryScores": {
+        "viewing_style": 75.5,
+        "movie_preferences": 82.3
+      },
+      "personalityTraits": {
+        "archetypes": [...],
+        "traits": {...},
+        "dominantTraits": [...]
+      },
+      "compatibilityFactors": {
+        "viewingStyle": 75.5,
+        "contentPreferences": 68.4,
+        "socialViewing": 71.2,
+        "engagement": 79.8
+      },
+      "completedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "personalityProfile": { ... },
+  "personalityBio": "Deep appreciation for film as an art form...",
+  "lastQuizCompletedAt": "2024-01-01T00:00:00.000Z"
+}
+```
+
 ### Add Favorite Movie
 Add a movie to user's favorite movies list.
 
