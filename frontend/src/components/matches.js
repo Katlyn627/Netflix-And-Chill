@@ -680,6 +680,8 @@ window.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     if (currentUserId) {
         updateNavProfileIcon(currentUserId);
+        // Automatically load matches when page loads
+        findMatches();
     }
 });
 
