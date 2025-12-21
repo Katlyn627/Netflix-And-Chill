@@ -58,6 +58,16 @@ class StreamChatService {
     }
 
     /**
+     * Check if an error is caused by an invalid API key
+     * @private
+     * @param {Error} error - The error to check
+     * @returns {boolean} - True if the error is caused by an invalid API key
+     */
+    isInvalidApiKeyError(error) {
+        return error.message && error.message.includes(INVALID_API_KEY_ERROR);
+    }
+
+    /**
      * Create a user token for authentication
      * @param {string} userId - The user's unique ID
      * @returns {string} - JWT token for Stream Chat authentication
@@ -91,7 +101,7 @@ class StreamChatService {
             return streamUser;
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
+            if (this.isInvalidApiKeyError(error)) {
                 this.handleInvalidApiKeyError();
                 return null;
             }
@@ -129,7 +139,7 @@ class StreamChatService {
             };
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
+            if (this.isInvalidApiKeyError(error)) {
                 this.handleInvalidApiKeyError();
                 return null;
             }
@@ -161,7 +171,7 @@ class StreamChatService {
             return response.message;
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
+            if (this.isInvalidApiKeyError(error)) {
                 this.handleInvalidApiKeyError();
                 return null;
             }
@@ -192,7 +202,7 @@ class StreamChatService {
             return response.messages || [];
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
+            if (this.isInvalidApiKeyError(error)) {
                 this.handleInvalidApiKeyError();
                 return [];
             }
