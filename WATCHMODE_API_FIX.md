@@ -84,7 +84,6 @@ The fix has been verified to:
 
 ## References
 - [Watchmode API Documentation](https://api.watchmode.com/docs/)
-- [Issue: Watchmode API 500 Error](https://github.com/Katlyn627/Netflix-And-Chill/issues/)
 
 ## Related Files
 - `backend/services/watchmodeAPIService.js` - Main service file (fixed)

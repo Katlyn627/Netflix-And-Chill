@@ -91,10 +91,17 @@ class WatchmodeAPIService {
     try {
       // First, find the Watchmode ID using TMDB ID
       // Use the correct search endpoint with tmdb_id as search field
-      const searchData = await this.makeRequest('/search/', {
+      const searchParams = {
         search_field: 'tmdb_id',
         search_value: tmdbId
-      });
+      };
+      
+      // Add type filter to improve search accuracy
+      if (type) {
+        searchParams.types = type === 'movie' ? 'movie' : 'tv_series';
+      }
+      
+      const searchData = await this.makeRequest('/search/', searchParams);
 
       // Check if we got valid search results
       if (!searchData || !searchData.title_results || searchData.title_results.length === 0) {
