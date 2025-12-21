@@ -28,9 +28,9 @@ class StreamChatService {
 
             // Check for placeholder values (e.g., YOUR_STREAM_API_KEY)
             // At this point, we know all credentials are truthy from the check above
-            if (apiKey.startsWith(PLACEHOLDER_PREFIX) || 
-                apiSecret.startsWith(PLACEHOLDER_PREFIX) || 
-                appId.startsWith(PLACEHOLDER_PREFIX)) {
+            if ((typeof apiKey === 'string' && apiKey.startsWith(PLACEHOLDER_PREFIX)) || 
+                (typeof apiSecret === 'string' && apiSecret.startsWith(PLACEHOLDER_PREFIX)) || 
+                (typeof appId === 'string' && appId.startsWith(PLACEHOLDER_PREFIX))) {
                 console.warn('⚠️  Stream Chat configuration using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
