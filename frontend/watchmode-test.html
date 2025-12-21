@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watchmode API Test - Netflix and Chill</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #E50914;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .test-section h2 {
+            color: #E50914;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #E50914 0%, #831010 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #4CAF50;
+        }
+        
+        .loading {
+            color: #FFC107;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #f44336;
+        }
+        
+        .streaming-platforms {
+            margin: 15px 0;
+        }
+        
+        .platform-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .platform-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #E50914 0%, #831010 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(229, 9, 20, 0.3);
+        }
+        
+        .movie-card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .movie-title {
+            color: #E50914;
+            margin-top: 0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-ok {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .status-warning {
+            background: #FFC107;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Watchmode API Integration Test</h1>
+        <p class="subtitle">Testing streaming platform availability feature</p>
+        
+        <div class="test-section">
+            <h2>API Configuration Status</h2>
+            <button onclick="checkApiStatus()">Check API Status</button>
+            <div id="status-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Movie: Fight Club (TMDB ID: 550)</h2>
+            <button onclick="testMovieAvailability(550, 'Fight Club')">Get Streaming Availability</button>
+            <div id="movie-550-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Movie: The Dark Knight (TMDB ID: 155)</h2>
+            <button onclick="testMovieAvailability(155, 'The Dark Knight')">Get Streaming Availability</button>
+            <div id="movie-155-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Get Available Streaming Services</h2>
+            <button onclick="getStreamingServices()">Get Services List</button>
+            <div id="services-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Visual Demo: Movie Card with Streaming Info</h2>
+            <button onclick="showVisualDemo()">Show Demo Card</button>
+            <div id="demo-result" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = window.location.origin;
+        
+        async function checkApiStatus() {
+            const resultDiv = document.getElementById('status-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p class="loading">Checking API status...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <h3>Server Status <span class="status-indicator status-ok">OK</span></h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <p style="color: #999; margin-top: 15px;">
+                        <strong>Note:</strong> Watchmode API integration is optional. 
+                        If the API key is not configured, streaming availability will show empty results.
+                    </p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testMovieAvailability(tmdbId, title) {
+            const resultDiv = document.getElementById(`movie-${tmdbId}-result`);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p class="loading">Fetching streaming availability...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/streaming/availability/${tmdbId}?type=movie&region=US`);
+                const data = await response.json();
+                
+                let html = `<h3>${title}</h3>`;
+                
+                if (data.available) {
+                    html += '<div class="streaming-platforms">';
+                    html += '<p><strong>🎬 Available on:</strong></p>';
+                    
+                    if (data.sources.subscription.length > 0) {
+                        html += '<p style="color: #4CAF50;">Subscription Services:</p>';
+                        html += '<div class="platform-badges">';
+                        data.sources.subscription.forEach(service => {
+                            html += `<span class="platform-badge">${service.name}</span>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    if (data.sources.rent.length > 0) {
+                        html += '<p style="color: #FFC107; margin-top: 10px;">Rental Options:</p>';
+                        html += '<div class="platform-badges">';
+                        data.sources.rent.forEach(service => {
+                            html += `<span class="platform-badge">${service.name} - $${service.price}</span>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    html += '</div>';
+                } else {
+                    html += `
+                        <p style="color: #999;">
+                            <strong>Status:</strong> No streaming data available
+                            ${!data.sources ? '(Watchmode API not configured)' : ''}
+                        </p>
+                    `;
+                }
+                
+                html += '<details style="margin-top: 15px;"><summary style="cursor: pointer; color: #999;">View Raw JSON</summary>';
+                html += `<pre style="margin-top: 10px;">${JSON.stringify(data, null, 2)}</pre>`;
+                html += '</details>';
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function getStreamingServices() {
+            const resultDiv = document.getElementById('services-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p class="loading">Fetching streaming services...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/streaming/services?region=US`);
+                const data = await response.json();
+                
+                let html = '<h3>Available Streaming Services</h3>';
+                
+                if (data.services && data.services.length > 0) {
+                    html += `<p>Found ${data.count} services in region: ${data.region}</p>`;
+                    html += '<div class="platform-badges">';
+                    data.services.slice(0, 20).forEach(service => {
+                        html += `<span class="platform-badge">${service.name}</span>`;
+                    });
+                    html += '</div>';
+                } else {
+                    html += `
+                        <p style="color: #999;">
+                            No services data available. This is expected if Watchmode API key is not configured.
+                        </p>
+                    `;
+                }
+                
+                html += '<details style="margin-top: 15px;"><summary style="cursor: pointer; color: #999;">View Raw JSON</summary>';
+                html += `<pre style="margin-top: 10px;">${JSON.stringify(data, null, 2)}</pre>`;
+                html += '</details>';
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        function showVisualDemo() {
+            const resultDiv = document.getElementById('demo-result');
+            resultDiv.style.display = 'block';
+            
+            resultDiv.innerHTML = `
+                <div class="movie-card">
+                    <h3 class="movie-title">The Dark Knight</h3>
+                    <p style="color: #999;">2008 | ⭐ 9.0/10</p>
+                    
+                    <div class="streaming-platforms">
+                        <p style="color: #bbb; font-weight: 500;">🎬 Available on:</p>
+                        <div class="platform-badges">
+                            <span class="platform-badge">Netflix</span>
+                            <span class="platform-badge">HBO Max</span>
+                            <span class="platform-badge">Amazon Prime</span>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #ccc; margin-top: 15px;">
+                        When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, 
+                        Batman must accept one of the greatest psychological and physical tests of his ability 
+                        to fight injustice.
+                    </p>
+                </div>
+                
+                <p style="color: #999; margin-top: 15px;">
+                    <strong>Note:</strong> This is a visual demonstration of how streaming platforms 
+                    will appear on movie cards when Watchmode API is configured.
+                </p>
+            `;
+        }
+    </script>
+</body>
+</html>
