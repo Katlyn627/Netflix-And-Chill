@@ -42,6 +42,35 @@ This guide will walk you through setting up all the API keys and external servic
 
 ---
 
+### 2. Watchmode API - **OPTIONAL** (Recommended)
+
+**Purpose:** Get streaming platform availability data - shows which services (Netflix, Hulu, Disney+, etc.) have each movie/show available.
+
+**Setup Steps:**
+1. Go to [Watchmode API Website](https://api.watchmode.com/)
+2. Sign up for a free account
+3. Verify your email address
+4. Navigate to your **Dashboard**
+5. Copy your **API Key**
+6. Add to `.env` file:
+   ```
+   WATCHMODE_API_KEY=your_watchmode_api_key_here
+   ```
+
+**Cost:** FREE (1,000 requests per day)
+
+**Features:**
+- Shows which streaming platforms have each movie/show
+- Displays subscription, rental, and purchase options
+- Supports multiple regions (US, UK, CA, etc.)
+- Updates daily with latest streaming availability
+
+**Documentation:** https://api.watchmode.com/docs/
+
+**Note:** This feature is optional. If not configured, the app will still work but won't show streaming platform information on movie cards.
+
+---
+
 ## Authentication Services
 
 ### Option 1: Firebase Authentication (Recommended)
@@ -389,6 +418,7 @@ This guide will walk you through setting up all the API keys and external servic
 - [ ] **JWT Secret** - Generate with: `openssl rand -base64 32`
 
 ### Recommended for Full Functionality:
+- [ ] **Watchmode API Key** - For streaming platform availability (OPTIONAL)
 - [ ] **Firebase Auth** or **Auth0** - User authentication
 - [ ] **SendBird** or **Twilio** - Real-time chat
 - [ ] **AWS S3** or **GCP Storage** - Profile picture uploads

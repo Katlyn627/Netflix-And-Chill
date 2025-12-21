@@ -40,7 +40,7 @@ async function initializeSwipe(userId) {
 
     // Fetch movies for swiping - unlimited
     currentPage = 1;
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}`);
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}&includeStreaming=true`);
     const data = await response.json();
 
     if (data.success && data.movies) {
@@ -66,7 +66,7 @@ async function loadMoreMoviesInBackground(userId) {
   isLoadingMore = true;
   try {
     currentPage++;
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}`);
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}&includeStreaming=true`);
     const data = await response.json();
 
     if (data.success && data.movies && data.movies.length > 0) {
@@ -111,6 +111,29 @@ function renderCurrentMovie() {
 
   const movie = movieStack[currentMovieIndex];
   
+  // Build streaming platforms HTML if available
+  let streamingHTML = '';
+  if (movie.streamingAvailability && movie.streamingAvailability.available) {
+    const sources = movie.streamingAvailability.sources;
+    const platforms = [];
+    
+    // Collect all subscription platforms
+    if (sources.subscription && sources.subscription.length > 0) {
+      platforms.push(...sources.subscription.slice(0, 5).map(s => s.name));
+    }
+    
+    if (platforms.length > 0) {
+      streamingHTML = `
+        <div class="streaming-platforms">
+          <p class="streaming-label">🎬 Available on:</p>
+          <div class="platform-badges">
+            ${platforms.map(name => `<span class="platform-badge">${name}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+  
   container.innerHTML = `
     <div class="swipe-card" id="current-swipe-card" data-movie-id="${movie.tmdbId}">
       <div class="swipe-card-image" style="background-image: url('${movie.posterPath || ''}');">
@@ -120,6 +143,7 @@ function renderCurrentMovie() {
         <h3 class="movie-title">${movie.title}</h3>
         ${movie.releaseDate ? `<p class="movie-year">${new Date(movie.releaseDate).getFullYear()}</p>` : ''}
         ${movie.rating ? `<p class="movie-rating">⭐ ${movie.rating.toFixed(1)}/10</p>` : ''}
+        ${streamingHTML}
         <p class="movie-overview">${movie.overview || 'No description available.'}</p>
       </div>
       <div class="swipe-overlay swipe-like">LIKE</div>

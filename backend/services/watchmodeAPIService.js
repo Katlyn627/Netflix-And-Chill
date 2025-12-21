@@ -1,0 +1,246 @@
+const config = require('../config/config');
+
+/**
+ * Service for interacting with Watchmode API
+ * Provides streaming platform availability data for movies and TV shows
+ */
+class WatchmodeAPIService {
+  constructor() {
+    this.apiKey = config.watchmode.apiKey;
+    this.baseUrl = config.watchmode.baseUrl;
+  }
+
+  /**
+   * Make a request to Watchmode API
+   * @param {string} endpoint 
+   * @param {Object} params 
+   * @returns {Promise<Object>}
+   */
+  async makeRequest(endpoint, params = {}) {
+    // Check if API key is not configured or is a placeholder
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      console.warn('Watchmode API key not configured. Streaming availability data will not be available.');
+      return null;
+    }
+
+    const queryParams = new URLSearchParams({
+      apiKey: this.apiKey,
+      ...params
+    });
+
+    const url = `${this.baseUrl}${endpoint}?${queryParams}`;
+
+    try {
+      const fetch = (await import('node-fetch')).default;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        // Don't throw error, just log warning for optional feature
+        console.warn(`Watchmode API error: ${response.status} ${response.statusText}`);
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.warn('Error calling Watchmode API:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Search for a title by name on Watchmode
+   * @param {string} title - Movie or TV show title
+   * @param {string} type - 'movie' or 'tv'
+   * @returns {Promise<Array>}
+   */
+  async searchTitle(title, type = null) {
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      return [];
+    }
+
+    const params = { search_field: 'name', search_value: title };
+    if (type) {
+      params.types = type === 'movie' ? 'movie' : 'tv_series';
+    }
+
+    const data = await this.makeRequest('/search/', params);
+    return data?.title_results || [];
+  }
+
+  /**
+   * Get streaming sources for a specific title by TMDB ID
+   * @param {number} tmdbId - TMDB ID
+   * @param {string} type - 'movie' or 'tv'
+   * @returns {Promise<Object|null>}
+   */
+  async getSourcesByTMDBId(tmdbId, type = 'movie') {
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      return null;
+    }
+
+    try {
+      // First, find the Watchmode ID using TMDB ID
+      const source = type === 'movie' ? 'tmdb' : 'tmdb';
+      const sourceId = tmdbId;
+      
+      const data = await this.makeRequest('/title/find/', {
+        source_id: sourceId,
+        source
+      });
+
+      if (!data || !data.id) {
+        return null;
+      }
+
+      // Get full details including sources
+      const details = await this.getTitleDetails(data.id);
+      return details;
+    } catch (error) {
+      console.warn('Error getting sources by TMDB ID:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Get detailed information about a title including streaming sources
+   * @param {number} watchmodeId - Watchmode ID
+   * @returns {Promise<Object|null>}
+   */
+  async getTitleDetails(watchmodeId) {
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      return null;
+    }
+
+    const data = await this.makeRequest(`/title/${watchmodeId}/details/`);
+    return data;
+  }
+
+  /**
+   * Get streaming sources for a title
+   * @param {number} watchmodeId - Watchmode ID
+   * @param {string} region - Region code (e.g., 'US')
+   * @returns {Promise<Array>}
+   */
+  async getSources(watchmodeId, region = 'US') {
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      return [];
+    }
+
+    const data = await this.makeRequest(`/title/${watchmodeId}/sources/`, {
+      regions: region
+    });
+
+    return data || [];
+  }
+
+  /**
+   * Get list of available streaming services
+   * @param {string} region - Region code (e.g., 'US')
+   * @returns {Promise<Array>}
+   */
+  async getStreamingServices(region = 'US') {
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      return [];
+    }
+
+    const data = await this.makeRequest('/sources/', {
+      regions: region
+    });
+
+    return data || [];
+  }
+
+  /**
+   * Format streaming sources into a simple structure
+   * @param {Object} titleDetails - Title details from Watchmode
+   * @returns {Object}
+   */
+  formatStreamingSources(titleDetails) {
+    if (!titleDetails || !titleDetails.sources) {
+      return {
+        subscription: [],
+        free: [],
+        rent: [],
+        buy: []
+      };
+    }
+
+    const formatted = {
+      subscription: [],
+      free: [],
+      rent: [],
+      buy: []
+    };
+
+    titleDetails.sources.forEach(source => {
+      const serviceInfo = {
+        id: source.source_id,
+        name: source.name,
+        type: source.type,
+        region: source.region,
+        webUrl: source.web_url,
+        format: source.format,
+        price: source.price
+      };
+
+      // Categorize by type
+      if (source.type === 'sub') {
+        formatted.subscription.push(serviceInfo);
+      } else if (source.type === 'free') {
+        formatted.free.push(serviceInfo);
+      } else if (source.type === 'rent') {
+        formatted.rent.push(serviceInfo);
+      } else if (source.type === 'buy') {
+        formatted.buy.push(serviceInfo);
+      }
+    });
+
+    return formatted;
+  }
+
+  /**
+   * Get streaming availability for a movie/show by TMDB ID
+   * This is the main method to use for integration
+   * @param {number} tmdbId - TMDB ID
+   * @param {string} type - 'movie' or 'tv'
+   * @param {string} region - Region code (e.g., 'US')
+   * @returns {Promise<Object>}
+   */
+  async getStreamingAvailability(tmdbId, type = 'movie', region = 'US') {
+    if (!this.apiKey || this.apiKey === 'YOUR_WATCHMODE_API_KEY_HERE') {
+      return {
+        available: false,
+        sources: { subscription: [], free: [], rent: [], buy: [] }
+      };
+    }
+
+    try {
+      const details = await this.getSourcesByTMDBId(tmdbId, type);
+      
+      if (!details) {
+        return {
+          available: false,
+          sources: { subscription: [], free: [], rent: [], buy: [] }
+        };
+      }
+
+      const sources = this.formatStreamingSources(details);
+      
+      return {
+        available: Object.values(sources).some(arr => arr.length > 0),
+        sources,
+        watchmodeId: details.id,
+        title: details.title,
+        year: details.year
+      };
+    } catch (error) {
+      console.warn('Error getting streaming availability:', error.message);
+      return {
+        available: false,
+        sources: { subscription: [], free: [], rent: [], buy: [] }
+      };
+    }
+  }
+}
+
+module.exports = new WatchmodeAPIService();

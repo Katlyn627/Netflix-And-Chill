@@ -322,3 +322,36 @@
     gap: 25px;
   }
 }
+
+/* Streaming Platforms Styles */
+.streaming-platforms {
+  margin: 10px 0;
+  padding: 8px 0;
+}
+
+.streaming-label {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.platform-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.platform-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #E50914 0%, #831010 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(229, 9, 20, 0.3);
+}
+

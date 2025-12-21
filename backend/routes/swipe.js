@@ -3,6 +3,7 @@ const router = express.Router();
 const { getDatabase } = require('../utils/database');
 const User = require('../models/User');
 const streamingAPIService = require('../services/streamingAPIService');
+const watchmodeAPIService = require('../services/watchmodeAPIService');
 
 // Constants
 const TMDB_PAGE_SIZE = 20; // TMDB API returns approximately 20 results per page
@@ -261,6 +262,23 @@ router.get('/movies/:userId', async (req, res) => {
       rating: movie.vote_average,
       genreIds: movie.genre_ids
     }));
+
+    // Optionally fetch streaming availability for movies if Watchmode API is configured
+    // This is done asynchronously and won't block the response
+    const includeStreaming = req.query.includeStreaming === 'true';
+    if (includeStreaming) {
+      // Fetch streaming availability for first batch of movies
+      const streamingPromises = formattedMovies.slice(0, 10).map(async (movie) => {
+        try {
+          const availability = await watchmodeAPIService.getStreamingAvailability(movie.tmdbId, 'movie');
+          movie.streamingAvailability = availability;
+        } catch (error) {
+          // Silently fail for optional feature
+          movie.streamingAvailability = null;
+        }
+      });
+      await Promise.all(streamingPromises);
+    }
 
     res.json({
       success: true,
