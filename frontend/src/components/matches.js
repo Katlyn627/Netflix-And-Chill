@@ -92,6 +92,13 @@ function createMatchCard(match, index) {
     const age = match.user.age || 'N/A';
     const matchScore = Math.round(match.matchScore);
     
+    // Add archetype badge if available
+    const archetypeBadge = match.user.archetype 
+        ? `<div class="archetype-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; margin: 8px 0; display: inline-block; font-weight: bold;">
+            ⭐ ${escapeHtml(match.user.archetype.name)}
+           </div>`
+        : '';
+    
     return `
         <div class="carousel-card ${index === 0 ? 'active' : ''}" data-index="${index}">
             <div class="match-image-container" onclick="showMatchDetails(${index})">
@@ -106,6 +113,7 @@ function createMatchCard(match, index) {
             <div class="match-basic-info">
                 <h3 class="match-username">${username}, ${age}</h3>
                 <p class="match-location">📍 ${location}</p>
+                ${archetypeBadge}
                 <p class="match-bio">${bio.length > 100 ? bio.substring(0, 100) + '...' : bio}</p>
                 <div class="match-stats-preview">
                     <div class="stat-item">
@@ -240,6 +248,19 @@ function showMatchDetails(index) {
     const matchScore = Math.round(match.matchScore);
     const MAX_DISPLAYED_RESPONSES = 3;
     
+    // Add archetype section if available
+    const archetypeHtml = match.user.archetype 
+        ? `<div class="detail-section archetype-section">
+            <h4>⭐ Movie Personality</h4>
+            <div class="archetype-display" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                <h5 style="margin: 0 0 8px 0; color: white; font-size: 1.1em;">${escapeHtml(match.user.archetype.name)}</h5>
+                <p style="margin: 0; font-size: 0.95em; opacity: 0.95;">${escapeHtml(match.user.archetype.description)}</p>
+                ${match.user.archetype.strength ? `<p style="margin: 8px 0 0 0; font-size: 0.85em; opacity: 0.9;">Strength: ${Math.round(match.user.archetype.strength)}%</p>` : ''}
+            </div>
+            ${match.user.personalityBio ? `<p style="font-style: italic; margin: 12px 0 0 0; padding: 12px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 5px;">${escapeHtml(match.user.personalityBio)}</p>` : ''}
+           </div>`
+        : '';
+    
     const sharedContentHtml = match.sharedContent && match.sharedContent.length > 0
         ? `<div class="detail-section">
             <h4>🎬 Shared Content (${match.sharedContent.length})</h4>
@@ -344,6 +365,7 @@ function showMatchDetails(index) {
                         <p><strong>Location:</strong> ${location}</p>
                         <p><strong>Bio:</strong> ${bio}</p>
                     </div>
+                    ${archetypeHtml}
                     ${quizCompatibilityHtml}
                     ${textPromptsHtml}
                     ${streamingServicesHtml}

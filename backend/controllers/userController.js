@@ -486,16 +486,21 @@ class UserController {
       const { userId } = req.params;
       const { quizResponses, answers } = req.body;
 
+      console.log(`[Quiz Submission] User ${userId} submitting quiz...`);
+      console.log(`[Quiz Submission] Received ${answers ? answers.length : 0} answers`);
+
       // Support both old format (quizResponses) and new format (answers)
       const quizAnswers = answers || quizResponses;
 
       if (!quizAnswers) {
+        console.error('[Quiz Submission] No quiz answers provided');
         return res.status(400).json({ error: 'Quiz responses are required' });
       }
 
       const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
       if (!userData) {
+        console.error(`[Quiz Submission] User ${userId} not found`);
         return res.status(404).json({ error: 'User not found' });
       }
 
@@ -504,37 +509,61 @@ class UserController {
       // If using old format, maintain backward compatibility
       if (quizResponses && !answers) {
         user.quizResponses = { ...user.quizResponses, ...quizResponses };
+        console.log('[Quiz Submission] Using legacy quiz format');
       }
       
       // If using new format with answer array, process quiz completion
       if (answers && Array.isArray(answers)) {
+        console.log('[Quiz Submission] Processing quiz with new format...');
         const MovieQuizScoring = require('../utils/movieQuizScoring');
         
         // Process quiz completion
         const quizAttempt = MovieQuizScoring.processQuizCompletion(userId, answers);
+        console.log(`[Quiz Submission] Quiz processed. Generated ${quizAttempt.personalityTraits.archetypes.length} archetypes`);
         
         // Add to user's quiz attempts
         if (!user.quizAttempts) {
           user.quizAttempts = [];
         }
         user.quizAttempts.push(quizAttempt.toJSON());
+        console.log(`[Quiz Submission] User now has ${user.quizAttempts.length} quiz attempts`);
         
         // Update personality profile with latest quiz results
         user.personalityProfile = quizAttempt.personalityTraits;
         
         // Generate and save personality bio
         user.personalityBio = MovieQuizScoring.generatePersonalityBio(quizAttempt.personalityTraits);
+        console.log(`[Quiz Submission] Generated personality bio: ${user.personalityBio.substring(0, 50)}...`);
         
         // Assign primary archetype to user
         if (quizAttempt.personalityTraits.archetypes && quizAttempt.personalityTraits.archetypes.length > 0) {
           user.archetype = quizAttempt.personalityTraits.archetypes[0];
+          console.log(`[Quiz Submission] Assigned archetype: ${user.archetype.name}`);
+        } else {
+          console.warn('[Quiz Submission] No archetypes generated!');
         }
         
         // Update last quiz completed timestamp
         user.lastQuizCompletedAt = quizAttempt.completedAt;
       }
 
-      await this.saveUserData(userId, user);
+      console.log('[Quiz Submission] Saving user data to database...');
+      const savedUser = await this.saveUserData(userId, user);
+      
+      if (!savedUser) {
+        console.error('[Quiz Submission] Failed to save user data - saveUserData returned null/undefined');
+        throw new Error('Failed to save quiz results to database');
+      }
+      
+      console.log('[Quiz Submission] User data saved successfully');
+      
+      // Verify the save by re-fetching the user
+      const verifyUser = await dataStore.findUserById(userId);
+      if (verifyUser && verifyUser.archetype) {
+        console.log(`[Quiz Submission] Verification: Archetype "${verifyUser.archetype.name}" persisted to database`);
+      } else {
+        console.warn('[Quiz Submission] Verification: Archetype not found in database after save!');
+      }
 
       res.json({
         message: 'Quiz responses submitted successfully',
@@ -544,6 +573,7 @@ class UserController {
         archetype: user.archetype
       });
     } catch (error) {
+      console.error('[Quiz Submission] Error:', error);
       res.status(500).json({ error: error.message });
     }
   }
