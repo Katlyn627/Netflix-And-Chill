@@ -600,6 +600,46 @@ async function findMatches() {
     }
 }
 
+// Load match history (existing matches)
+async function loadMatchHistory() {
+    if (!currentUserId) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const loadingDiv = document.getElementById('matches-loading');
+    const matchesContainer = document.getElementById('matches-container');
+    
+    loadingDiv.style.display = 'block';
+    matchesContainer.innerHTML = '';
+    
+    try {
+        const result = await api.getMatchHistory(currentUserId);
+        loadingDiv.style.display = 'none';
+        if (result.matches && result.matches.length > 0) {
+            displayMatches(result.matches);
+        } else {
+            // If no history, show empty state with option to find new matches
+            matchesContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>No matches found yet.</p>
+                    <p>Click "Find Matches" to discover your perfect streaming partners!</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        loadingDiv.style.display = 'none';
+        // If match history fails, fall back to finding new matches
+        console.log('No match history found, will use Find Matches button');
+        matchesContainer.innerHTML = `
+            <div class="empty-state">
+                <p>No matches found yet.</p>
+                <p>Click "Find Matches" to discover your perfect streaming partners!</p>
+            </div>
+        `;
+    }
+}
+
 // Show filters modal
 function showFiltersModal() {
     const modal = document.getElementById('filters-modal');
@@ -889,8 +929,8 @@ window.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     if (currentUserId) {
         updateNavProfileIcon(currentUserId);
-        // Automatically load matches when page loads
-        findMatches();
+        // Automatically load match history when page loads
+        loadMatchHistory();
     }
 });
 

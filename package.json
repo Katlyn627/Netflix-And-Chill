@@ -9,7 +9,11 @@
     "dev:express": "node src/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "node backend/scripts/seedUsers.js",
-    "seed:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/seedUsers.js"
+    "seed:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/seedUsers.js",
+    "seed:matches": "node backend/scripts/seedMatches.js",
+    "seed:matches:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/seedMatches.js",
+    "seed:all": "npm run seed && npm run seed:matches",
+    "seed:all:mongodb": "npm run seed:mongodb && npm run seed:matches:mongodb"
   },
   "keywords": [
     "dating",
