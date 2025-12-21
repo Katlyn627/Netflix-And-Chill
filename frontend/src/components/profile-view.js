@@ -194,6 +194,10 @@ class ProfileView {
         }
     }
 
+    hasPersonalityProfile(profile) {
+        return profile && profile.archetypes && profile.archetypes.length > 0;
+    }
+
     renderQuizResponses() {
         const moviePrefsContainer = document.getElementById('quiz-responses');
         if (!moviePrefsContainer) return;
@@ -207,7 +211,7 @@ class ProfileView {
         let html = '<div class="profile-section">';
 
         // Display personality profile if available
-        if (personalityProfile && personalityProfile.archetypes && personalityProfile.archetypes.length > 0) {
+        if (this.hasPersonalityProfile(personalityProfile)) {
             html += '<h3>🎬 Movie Personality</h3>';
             
             // Display personality bio
@@ -232,8 +236,10 @@ class ProfileView {
             // Display quiz completion info
             if (quizAttempts.length > 0) {
                 const lastAttempt = quizAttempts[quizAttempts.length - 1];
-                const completedDate = new Date(lastAttempt.completedAt || this.userData.lastQuizCompletedAt);
-                html += `<p style="margin-top: 15px;"><small>Quiz completed: ${completedDate.toLocaleDateString()}</small></p>`;
+                if (lastAttempt.completedAt) {
+                    const completedDate = new Date(lastAttempt.completedAt);
+                    html += `<p style="margin-top: 15px;"><small>Quiz completed: ${completedDate.toLocaleDateString()}</small></p>`;
+                }
             }
         } else {
             // No quiz data - show call to action
@@ -757,7 +763,7 @@ class ProfileView {
             
             // Display success message with personality info
             let successMessage = 'Quiz submitted successfully! Your matches will be updated.';
-            if (result.personalityProfile && result.personalityProfile.archetypes && result.personalityProfile.archetypes.length > 0) {
+            if (this.hasPersonalityProfile(result.personalityProfile)) {
                 const topArchetype = result.personalityProfile.archetypes[0];
                 successMessage += `\n\nYour movie personality: ${topArchetype.name}`;
             }
