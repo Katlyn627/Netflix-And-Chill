@@ -23,7 +23,7 @@ The app uses multiple logo variants for different contexts:
 
 ## Onboarding Assets
 
-### 1. Logo (`logo.svg`)
+### 1. Logo (`logo.png`)
 - **Purpose**: Central branding image used throughout the app
 - **Usage**: 
   - App icon and splash screens
@@ -31,31 +31,35 @@ The app uses multiple logo variants for different contexts:
   - Marketing materials
   - App store listings
 - **Design**: Features the Netflix & Chill branding with TV/heart icon
-- **Dimensions**: 400x400px (scalable SVG)
+- **Dimensions**: 800x800px (high-quality PNG)
+- **Source**: Converted from `logo.svg` for production use
 
-### 2. Onboarding Screen 1 (`onboard1.svg`)
+### 2. Onboarding Screen 1 (`onboard1.png`)
 - **Title**: "Chat & Watch Together"
 - **Message**: Connect with matches and enjoy streaming content together
 - **Visual Theme**: Two TV screens with play buttons and chat bubbles
 - **Color Scheme**: Cinematic Red (#E50914), Black, White
 - **Purpose**: Introduces the social watching feature
-- **Dimensions**: 400x400px (scalable SVG)
+- **Dimensions**: 800x800px (high-quality PNG)
+- **Source**: Converted from `onboard1.svg` for production use
 
-### 3. Onboarding Screen 2 (`onboard2.svg`)
+### 3. Onboarding Screen 2 (`onboard2.png`)
 - **Title**: "Build Real Connections"
 - **Message**: Form genuine relationships based on shared interests
 - **Visual Theme**: Two people silhouettes with connecting hearts
 - **Color Scheme**: Cinematic Red (#E50914), Black, White
 - **Purpose**: Emphasizes relationship building over casual swiping
-- **Dimensions**: 400x400px (scalable SVG)
+- **Dimensions**: 800x800px (high-quality PNG)
+- **Source**: Converted from `onboard2.svg` for production use
 
-### 4. Onboarding Screen 3 (`onboard3.svg`)
+### 4. Onboarding Screen 3 (`onboard3.png`)
 - **Title**: "Discover Matches Through Movies"
 - **Message**: Get matched based on your streaming preferences and watch history
 - **Visual Theme**: Film reel with magnifying glass and heart
 - **Color Scheme**: Cinematic Red (#E50914), Black, White
 - **Purpose**: Explains the unique matching algorithm
-- **Dimensions**: 400x400px (scalable SVG)
+- **Dimensions**: 800x800px (high-quality PNG)
+- **Source**: Converted from `onboard3.svg` for production use
 
 ## Value Proposition
 
@@ -68,9 +72,10 @@ The onboarding screens guide new users through the app's core features:
 ## Implementation Notes
 
 ### File Format
-- Images are provided in SVG format for scalability and small file size
-- SVG files can be easily converted to PNG/JPEG if needed for specific platforms
-- Maintain aspect ratio when converting to raster formats
+- Images are provided in high-quality PNG format (800x800px)
+- SVG source files are retained for future modifications if needed
+- PNG files provide optimal quality and compatibility across all platforms
+- Images maintain 1:1 aspect ratio for consistency
 
 ### Accessibility
 - All images include descriptive alt text in implementation
@@ -81,7 +86,7 @@ The onboarding screens guide new users through the app's core features:
 - Images scale seamlessly across devices (mobile, tablet, desktop)
 - Maintain 1:1 aspect ratio for consistency
 - Minimum display size: 300x300px
-- Maximum display size: 600x600px (for optimal performance)
+- Maximum display size: 800x800px (native resolution)
 
 ### Integration Points
 1. **First Launch**: Show onboarding carousel on first app launch
@@ -110,21 +115,24 @@ The onboarding screens guide new users through the app's core features:
 
 To update or replace these assets:
 
-1. Ensure new images follow the brand guidelines
-2. Maintain the same file naming convention
-3. Keep dimensions consistent (400x400px recommended)
-4. Test on multiple devices and screen sizes
-5. Update this README with any changes to usage or guidelines
+1. Edit the SVG source files in this directory
+2. Use `rsvg-convert` to regenerate high-quality PNG files:
+   ```bash
+   rsvg-convert logo.svg -o logo.png -w 800 -h 800
+   rsvg-convert onboard1.svg -o onboard1.png -w 800 -h 800
+   rsvg-convert onboard2.svg -o onboard2.png -w 800 -h 800
+   rsvg-convert onboard3.svg -o onboard3.png -w 800 -h 800
+   ```
+3. Ensure new images follow the brand guidelines
+4. Keep dimensions consistent (800x800px recommended)
+5. Test on multiple devices and screen sizes
+6. Update this README with any changes to usage or guidelines
 
 ## Technical Specifications
 
-- **Format**: SVG (Scalable Vector Graphics)
-- **Dimensions**: 400x400px base size
+- **Format**: PNG (Portable Network Graphics) with SVG sources
+- **Dimensions**: 800x800px native resolution
 - **Color Space**: sRGB
-- **Compression**: Optimized for web delivery
+- **Compression**: PNG optimized for web delivery
 - **Browser Support**: All modern browsers (Chrome, Firefox, Safari, Edge)
-- **Fallback**: PNG versions available if needed
-
----
-
-**Note**: Replace the SVG placeholder images with actual high-quality PNG images before production deployment. The current SVG files serve as visual placeholders demonstrating the intended design and layout.
+- **Source Files**: SVG files available for editing and regeneration

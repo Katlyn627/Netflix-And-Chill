@@ -219,10 +219,10 @@ function announceScreenChange(screenIndex) {
 // Preload images for smooth transitions
 function preloadImages() {
     const images = [
-        'assets/onboarding/logo.svg',
-        'assets/onboarding/onboard1.svg',
-        'assets/onboarding/onboard2.svg',
-        'assets/onboarding/onboard3.svg'
+        'assets/onboarding/logo.png',
+        'assets/onboarding/onboard1.png',
+        'assets/onboarding/onboard2.png',
+        'assets/onboarding/onboard3.png'
     ];
 
     images.forEach(src => {
