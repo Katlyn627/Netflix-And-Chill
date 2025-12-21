@@ -171,6 +171,14 @@
 
         // Check if user has seen onboarding and created profile
         function checkAppStatus() {
+            // Check for reset parameter in URL (for development/testing)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('reset') === 'true') {
+                // Clear all localStorage data for fresh start
+                localStorage.clear();
+                console.log('🔄 App state reset - starting fresh');
+            }
+            
             const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
             const hasCreatedProfile = localStorage.getItem('profileCreated');
             const currentUserId = localStorage.getItem('currentUserId');

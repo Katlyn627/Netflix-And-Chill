@@ -7,9 +7,10 @@
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
-    <meta http-equiv="refresh" content="0; url=splash.html">
     <script>
-        window.location.href = 'splash.html';
+        // Pass through any query parameters (e.g., ?reset=true)
+        const params = window.location.search;
+        window.location.href = 'splash.html' + params;
     </script>
 </head>
 <body>
