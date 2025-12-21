@@ -486,6 +486,11 @@ class UserController {
         // Generate and save personality bio
         user.personalityBio = MovieQuizScoring.generatePersonalityBio(quizAttempt.personalityTraits);
         
+        // Assign primary archetype to user
+        if (quizAttempt.personalityTraits.archetypes && quizAttempt.personalityTraits.archetypes.length > 0) {
+          user.archetype = quizAttempt.personalityTraits.archetypes[0];
+        }
+        
         // Update last quiz completed timestamp
         user.lastQuizCompletedAt = quizAttempt.completedAt;
       }
@@ -496,7 +501,8 @@ class UserController {
         message: 'Quiz responses submitted successfully',
         user: this.filterSensitiveData(user),
         personalityProfile: user.personalityProfile,
-        personalityBio: user.personalityBio
+        personalityBio: user.personalityBio,
+        archetype: user.archetype
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -675,6 +681,186 @@ class UserController {
 
       res.json({
         message: 'User profile and all associated data deleted successfully'
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Adaptive Quiz endpoints
+  async getAdaptiveQuiz(req, res) {
+    try {
+      const { questionCount } = req.query;
+      const AdaptiveQuiz = require('../utils/adaptiveQuiz');
+      
+      const count = parseInt(questionCount) || 25;
+      const quiz = AdaptiveQuiz.getAdaptiveQuiz(count);
+      
+      res.json(quiz);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getQuizOptions(req, res) {
+    try {
+      const AdaptiveQuiz = require('../utils/adaptiveQuiz');
+      const options = AdaptiveQuiz.getAvailableQuizzes();
+      
+      res.json({
+        availableQuizzes: options,
+        message: 'Choose a quiz length that fits your schedule'
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Compatibility Report endpoints
+  async getCompatibilityReport(req, res) {
+    try {
+      const { userId } = req.params;
+      const { otherUserId } = req.query;
+
+      if (!otherUserId) {
+        return res.status(400).json({ error: 'otherUserId query parameter is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData1 = await dataStore.findUserById(userId);
+      const userData2 = await dataStore.findUserById(otherUserId);
+
+      if (!userData1 || !userData2) {
+        return res.status(404).json({ error: 'One or both users not found' });
+      }
+
+      const CompatibilityReport = require('../utils/compatibilityReport');
+      const report = CompatibilityReport.generateReport(userData1, userData2);
+
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getGroupCompatibilityReport(req, res) {
+    try {
+      const { userIds } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length < 2) {
+        return res.status(400).json({ error: 'Array of at least 2 user IDs is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const users = [];
+
+      for (const userId of userIds) {
+        const userData = await dataStore.findUserById(userId);
+        if (userData) {
+          users.push(userData);
+        }
+      }
+
+      if (users.length < 2) {
+        return res.status(400).json({ error: 'At least 2 valid users required for group compatibility' });
+      }
+
+      const CompatibilityReport = require('../utils/compatibilityReport');
+      const report = CompatibilityReport.generateGroupReport(users);
+
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Archetype Recommendations endpoints
+  async getArchetypeRecommendations(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const ArchetypeRecommendations = require('../utils/archetypeRecommendations');
+      const recommendations = ArchetypeRecommendations.getRecommendations(userData);
+
+      res.json(recommendations);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getMoodBasedRecommendations(req, res) {
+    try {
+      const { userId } = req.params;
+      const { mood } = req.query;
+
+      if (!mood) {
+        return res.status(400).json({ error: 'mood query parameter is required (relaxed, excited, thoughtful, social)' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const ArchetypeRecommendations = require('../utils/archetypeRecommendations');
+      const recommendations = ArchetypeRecommendations.getMoodBasedRecommendations(userData, mood);
+
+      res.json(recommendations);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Quiz Feedback endpoints
+  async submitQuizFeedback(req, res) {
+    try {
+      const { userId } = req.params;
+      const feedback = req.body;
+
+      const QuizEvolution = require('../utils/quizEvolution');
+      const feedbackRecord = QuizEvolution.submitQuizFeedback({
+        ...feedback,
+        userId
+      });
+
+      // In production, this would be saved to database
+      res.json({
+        message: 'Quiz feedback submitted successfully',
+        feedback: feedbackRecord
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async submitQuestionFeedback(req, res) {
+    try {
+      const { userId } = req.params;
+      const { questionId, rating, comment } = req.body;
+
+      if (!questionId || !rating) {
+        return res.status(400).json({ error: 'questionId and rating are required' });
+      }
+
+      const QuizEvolution = require('../utils/quizEvolution');
+      const feedbackRecord = QuizEvolution.submitQuestionFeedback(questionId, {
+        rating,
+        comment,
+        userId
+      });
+
+      res.json({
+        message: 'Question feedback submitted successfully',
+        feedback: feedbackRecord
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

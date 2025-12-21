@@ -60,4 +60,20 @@ router.delete('/:userId/favorite-movies/:movieId', userController.removeFavorite
 // Delete user profile
 router.delete('/:userId', userController.deleteUser.bind(userController));
 
+// Adaptive Quiz routes
+router.get('/quiz/adaptive', userController.getAdaptiveQuiz.bind(userController));
+router.get('/quiz/options', userController.getQuizOptions.bind(userController));
+
+// Compatibility Report routes
+router.get('/:userId/compatibility/report', userController.getCompatibilityReport.bind(userController));
+router.post('/compatibility/group', userController.getGroupCompatibilityReport.bind(userController));
+
+// Archetype Recommendations routes
+router.get('/:userId/recommendations/archetype', userController.getArchetypeRecommendations.bind(userController));
+router.get('/:userId/recommendations/mood', userController.getMoodBasedRecommendations.bind(userController));
+
+// Quiz Feedback routes
+router.post('/:userId/quiz/feedback', userController.submitQuizFeedback.bind(userController));
+router.post('/:userId/quiz/question-feedback', userController.submitQuestionFeedback.bind(userController));
+
 module.exports = router;

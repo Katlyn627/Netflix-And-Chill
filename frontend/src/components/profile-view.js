@@ -204,6 +204,7 @@ class ProfileView {
 
         const personalityProfile = this.userData.personalityProfile;
         const personalityBio = this.userData.personalityBio;
+        const archetype = this.userData.archetype;
         const quizAttempts = this.userData.quizAttempts || [];
         const snacks = this.userData.favoriteSnacks || [];
         const videoChat = this.userData.videoChatPreference || 'Not specified';
@@ -214,24 +215,49 @@ class ProfileView {
         if (this.hasPersonalityProfile(personalityProfile)) {
             html += '<h3>🎬 Movie Personality</h3>';
             
-            // Display personality bio
-            if (personalityBio) {
-                html += `<p class="personality-bio"><em>${personalityBio}</em></p>`;
-            }
-            
-            // Display personality archetypes
-            html += '<div class="personality-archetypes">';
-            personalityProfile.archetypes.slice(0, 3).forEach((archetype, index) => {
-                const emoji = index === 0 ? '⭐' : index === 1 ? '✨' : '💫';
+            // Display primary archetype prominently if available
+            if (archetype) {
                 html += `
-                    <div class="archetype-card">
-                        <strong>${emoji} ${archetype.name}</strong>
-                        <p>${archetype.description}</p>
-                        ${archetype.strength ? `<small>Strength: ${archetype.strength}%</small>` : ''}
+                    <div class="primary-archetype" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 10px 0; color: white;">⭐ ${archetype.name}</h4>
+                        <p style="margin: 0; font-size: 1.1em;">${archetype.description}</p>
+                        ${archetype.strength ? `<p style="margin: 10px 0 0 0; font-size: 0.9em; opacity: 0.9;">Match Strength: ${Math.round(archetype.strength)}%</p>` : ''}
                     </div>
                 `;
-            });
-            html += '</div>';
+            }
+            
+            // Display personality bio
+            if (personalityBio) {
+                html += `<p class="personality-bio" style="font-style: italic; margin: 15px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 5px;">${personalityBio}</p>`;
+            }
+            
+            // Display secondary archetypes
+            if (personalityProfile.archetypes && personalityProfile.archetypes.length > 1) {
+                html += '<h4 style="margin-top: 20px;">Secondary Traits</h4>';
+                html += '<div class="personality-archetypes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">';
+                personalityProfile.archetypes.slice(1, 3).forEach((archetype, index) => {
+                    const emoji = index === 0 ? '✨' : '💫';
+                    html += `
+                        <div class="archetype-card" style="border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; background: white;">
+                            <strong style="color: #667eea;">${emoji} ${archetype.name}</strong>
+                            <p style="font-size: 0.9em; margin: 8px 0 0 0; color: #666;">${archetype.description}</p>
+                            ${archetype.strength ? `<small style="color: #999;">Strength: ${Math.round(archetype.strength)}%</small>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            // Add confidence indicator if available
+            if (personalityProfile.confidence) {
+                const conf = personalityProfile.confidence;
+                html += `
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                        <strong>Profile Confidence:</strong> ${conf.level.replace('_', ' ')} (${Math.round(conf.overall * 100)}%)
+                        <br><small>${conf.message}</small>
+                    </p>
+                `;
+            }
             
             // Display quiz completion info
             if (quizAttempts.length > 0) {
@@ -241,10 +267,30 @@ class ProfileView {
                     html += `<p style="margin-top: 15px;"><small>Quiz completed: ${completedDate.toLocaleDateString()}</small></p>`;
                 }
             }
+            
+            // Add link to get recommendations
+            html += `
+                <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px;">
+                    <p style="margin: 0;"><strong>🎯 Want personalized content recommendations?</strong></p>
+                    <p style="margin: 8px 0 0 0; font-size: 0.9em;">Based on your ${archetype ? archetype.name : 'personality'}, we can suggest movies and shows you'll love!</p>
+                </div>
+            `;
         } else {
             // No quiz data - show call to action
             html += '<h3>🎬 Movie Personality Quiz</h3>';
-            html += '<p><em>Take the quiz to discover your movie personality and improve your matches!</em></p>';
+            html += `
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                    <p style="font-size: 1.1em; margin: 0 0 15px 0;">Discover your movie personality!</p>
+                    <p style="margin: 0; color: #666;">Take our personalized quiz to:</p>
+                    <ul style="text-align: left; margin: 15px auto; max-width: 400px; color: #666;">
+                        <li>Find your unique viewing archetype</li>
+                        <li>Get personalized content recommendations</li>
+                        <li>Improve your match compatibility</li>
+                        <li>Connect with like-minded viewers</li>
+                    </ul>
+                    <p style="margin: 15px 0 0 0;"><em>Choose from 15, 25, or 50 question versions!</em></p>
+                </div>
+            `;
         }
 
         // Display movie preferences
