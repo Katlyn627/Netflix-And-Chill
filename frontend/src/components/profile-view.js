@@ -877,7 +877,8 @@ class ProfileView {
                 successMessage += `\n\nYour movie personality: ${topArchetype.name}`;
             }
             
-            this.renderQuizResponses();
+            // Re-render the entire profile to show updated personality data everywhere
+            this.renderProfile();
             document.getElementById('quiz-modal').style.display = 'none';
             alert(successMessage);
         } catch (error) {
