@@ -205,6 +205,24 @@ class MongoDBAdapter {
     
     return mutual;
   }
+
+  // Chat operations
+  async addChatMessage(chatMessage) {
+    const result = await this.db.collection('chats').insertOne(chatMessage);
+    return { ...chatMessage, _id: result.insertedId };
+  }
+
+  async getChatMessages(userId1, userId2) {
+    // Get all messages between the two users (both directions)
+    const messages = await this.db.collection('chats').find({
+      $or: [
+        { senderId: userId1, receiverId: userId2 },
+        { senderId: userId2, receiverId: userId1 }
+      ]
+    }).sort({ timestamp: 1 }).toArray();
+    
+    return messages;
+  }
 }
 
 module.exports = MongoDBAdapter;

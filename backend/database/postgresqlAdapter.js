@@ -74,9 +74,21 @@ class PostgreSQLAdapter {
       )
     `;
 
+    const createChatsTable = `
+      CREATE TABLE IF NOT EXISTS chats (
+        id VARCHAR(255) PRIMARY KEY,
+        sender_id VARCHAR(255) REFERENCES users(id),
+        receiver_id VARCHAR(255) REFERENCES users(id),
+        message TEXT NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        read BOOLEAN DEFAULT FALSE
+      )
+    `;
+
     await this.pool.query(createUsersTable);
     await this.pool.query(createMatchesTable);
     await this.pool.query(createLikesTable);
+    await this.pool.query(createChatsTable);
   }
 
   // User operations
@@ -204,6 +216,39 @@ class PostgreSQLAdapter {
     return mutual;
   }
 
+  // Chat operations
+  async addChatMessage(chatMessage) {
+    const query = `
+      INSERT INTO chats (id, sender_id, receiver_id, message, timestamp, read)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
+    
+    const values = [
+      chatMessage.id,
+      chatMessage.senderId,
+      chatMessage.receiverId,
+      chatMessage.message,
+      chatMessage.timestamp,
+      chatMessage.read || false
+    ];
+
+    const result = await this.pool.query(query, values);
+    return this.formatChat(result.rows[0]);
+  }
+
+  async getChatMessages(userId1, userId2) {
+    const query = `
+      SELECT * FROM chats 
+      WHERE (sender_id = $1 AND receiver_id = $2) 
+         OR (sender_id = $2 AND receiver_id = $1)
+      ORDER BY timestamp ASC
+    `;
+    
+    const result = await this.pool.query(query, [userId1, userId2]);
+    return result.rows.map(row => this.formatChat(row));
+  }
+
   // Helper methods
   formatUser(row) {
     if (!row) return null;
@@ -245,6 +290,18 @@ class PostgreSQLAdapter {
       toUserId: row.to_user_id,
       type: row.type,
       createdAt: row.created_at
+    };
+  }
+
+  formatChat(row) {
+    if (!row) return null;
+    return {
+      id: row.id,
+      senderId: row.sender_id,
+      receiverId: row.receiver_id,
+      message: row.message,
+      timestamp: row.timestamp,
+      read: row.read
     };
   }
 
