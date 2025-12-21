@@ -60,7 +60,7 @@
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-bottom: 40px;
 }
@@ -71,11 +71,28 @@
     padding: 30px;
     text-align: center;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feature-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(229, 9, 20, 0.3);
+}
+
+.feature-image {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
 }
 
 .feature-icon {
@@ -209,6 +226,15 @@
         font-size: 2em;
     }
 
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-image {
+        width: 150px;
+        height: 150px;
+    }
+
     .steps-container {
         grid-template-columns: 1fr;
     }
@@ -219,5 +245,16 @@
 
     .cta-section h2 {
         font-size: 1.8em;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .feature-image {
+        width: 160px;
+        height: 160px;
     }
 }
