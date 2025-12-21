@@ -14,8 +14,10 @@
         /Host validation failed/i,
         /Host is not supported/i,
         /Host is not valid or supported/i,
+        /Host is not in insights whitelist/i,
         /hostName.*hostType/i,
-        /content\.js:\d+/i  // Common pattern for browser extension content scripts
+        /content\.js:\d+/i,  // Common pattern for browser extension content scripts
+        /read\.js:\d+/i      // Common pattern for browser extension read scripts
     ];
 
     /**
