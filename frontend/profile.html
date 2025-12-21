@@ -85,84 +85,9 @@
             <!-- Streaming Services Section -->
             <section id="streaming-services" class="card" style="display: none;">
                 <h2>Connect Your Streaming Services</h2>
-                <p style="color: #888; margin-bottom: 15px;">Select from the top 10 streaming services in the USA</p>
+                <p style="color: #888; margin-bottom: 15px;">Select from the top 25 streaming services in the USA (sorted alphabetically)</p>
                 <div id="services-list" class="services-grid">
-                    <div class="service-option">
-                        <input type="checkbox" id="amazon-prime" value="Amazon Prime">
-                        <label for="amazon-prime">
-                            <span class="service-logo prime-logo">prime</span>
-                            <span class="service-name">Amazon Prime</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="netflix" value="Netflix">
-                        <label for="netflix">
-                            <span class="service-logo netflix-logo">N</span>
-                            <span class="service-name">Netflix</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="hulu" value="Hulu">
-                        <label for="hulu">
-                            <span class="service-logo hulu-logo">hulu</span>
-                            <span class="service-name">Hulu</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="disney" value="Disney+">
-                        <label for="disney">
-                            <span class="service-logo disney-logo">D+</span>
-                            <span class="service-name">Disney+</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="paramount" value="Paramount+">
-                        <label for="paramount">
-                            <span class="service-logo paramount-logo">P+</span>
-                            <span class="service-name">Paramount+</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="apple" value="Apple TV">
-                        <label for="apple">
-                            <span class="service-logo apple-logo"></span>
-                            <span class="service-name">Apple TV</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="hbo" value="HBO">
-                        <label for="hbo">
-                            <span class="service-logo hbo-logo">HBO</span>
-                            <span class="service-name">HBO</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="peacock" value="Peacock">
-                        <label for="peacock">
-                            <span class="service-logo peacock-logo">🦚</span>
-                            <span class="service-name">Peacock</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="sling" value="Sling">
-                        <label for="sling">
-                            <span class="service-logo sling-logo">S</span>
-                            <span class="service-name">Sling</span>
-                        </label>
-                    </div>
-                    <div class="service-option">
-                        <input type="checkbox" id="other-service" value="Other">
-                        <label for="other-service">
-                            <span class="service-logo other-logo">+</span>
-                            <span class="service-name">Other</span>
-                        </label>
-                    </div>
-                </div>
-                <div id="other-service-input" style="display: none; margin-top: 20px;">
-                    <div class="form-group">
-                        <label for="custom-service-name">Enter Streaming Service Name:</label>
-                        <input type="text" id="custom-service-name" placeholder="Type service name..." autocomplete="off">
-                    </div>
+                    <!-- Services will be dynamically loaded from TMDB API -->
                 </div>
                 <button id="add-services-btn" class="btn btn-primary">Add Services</button>
             </section>

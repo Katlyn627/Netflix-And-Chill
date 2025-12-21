@@ -63,6 +63,23 @@ class User {
     }
   }
 
+  removeStreamingService(serviceId, serviceName) {
+    this.streamingServices = this.streamingServices.filter(s => 
+      s.id !== serviceId && s.name !== serviceName
+    );
+  }
+
+  updateStreamingServices(services) {
+    this.streamingServices = services.map(service => ({
+      id: service.id || null,
+      name: service.name,
+      logoPath: service.logoPath || null,
+      logoUrl: service.logoUrl || null,
+      connected: true,
+      connectedAt: new Date().toISOString()
+    }));
+  }
+
   addToWatchHistory(item) {
     this.watchHistory.push({
       title: item.title,

@@ -18,6 +18,9 @@ router.put('/:userId/bio', userController.updateBio.bind(userController));
 // Add streaming service
 router.post('/:userId/streaming-services', userController.addStreamingService.bind(userController));
 
+// Update streaming services
+router.put('/:userId/streaming-services', userController.updateStreamingServices.bind(userController));
+
 // Add to watch history
 router.post('/:userId/watch-history', userController.addWatchHistory.bind(userController));
 
