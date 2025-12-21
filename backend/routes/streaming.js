@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const streamingAPIService = require('../services/streamingAPIService');
+const watchmodeAPIService = require('../services/watchmodeAPIService');
 
 /**
  * GET /api/streaming/search
@@ -169,6 +170,62 @@ router.get('/details/:id', async (req, res) => {
   } catch (error) {
     console.error('Error getting details:', error);
     res.status(500).json({ error: 'Failed to get content details' });
+  }
+});
+
+/**
+ * GET /api/streaming/availability/:id
+ * Get streaming platform availability for a specific movie or TV show
+ */
+router.get('/availability/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type = 'movie', region = 'US' } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'ID parameter is required' });
+    }
+
+    const availability = await watchmodeAPIService.getStreamingAvailability(
+      parseInt(id),
+      type,
+      region
+    );
+    
+    res.json({
+      tmdbId: parseInt(id),
+      type,
+      region,
+      ...availability
+    });
+  } catch (error) {
+    console.error('Error getting streaming availability:', error);
+    res.status(500).json({ 
+      error: 'Failed to get streaming availability',
+      available: false,
+      sources: { subscription: [], free: [], rent: [], buy: [] }
+    });
+  }
+});
+
+/**
+ * GET /api/streaming/services
+ * Get list of available streaming services in a region
+ */
+router.get('/services', async (req, res) => {
+  try {
+    const { region = 'US' } = req.query;
+    
+    const services = await watchmodeAPIService.getStreamingServices(region);
+    
+    res.json({
+      region,
+      count: services.length,
+      services
+    });
+  } catch (error) {
+    console.error('Error getting streaming services:', error);
+    res.status(500).json({ error: 'Failed to get streaming services' });
   }
 });
 

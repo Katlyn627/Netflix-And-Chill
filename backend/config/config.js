@@ -13,6 +13,13 @@ module.exports = {
     imageBaseUrl: 'https://image.tmdb.org/t/p'
   },
 
+  // Watchmode API configuration (Streaming availability)
+  // Get your free API key at: https://api.watchmode.com/
+  watchmode: {
+    apiKey: process.env.WATCHMODE_API_KEY || null,
+    baseUrl: 'https://api.watchmode.com/v1'
+  },
+
   // Server configuration
   server: {
     port: process.env.PORT || 3000,
