@@ -60,7 +60,7 @@
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
     margin-bottom: 40px;
 }
@@ -226,10 +226,6 @@
         font-size: 2em;
     }
 
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-
     .feature-image {
         width: 150px;
         height: 150px;
@@ -245,16 +241,5 @@
 
     .cta-section h2 {
         font-size: 1.8em;
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .features-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .feature-image {
-        width: 160px;
-        height: 160px;
     }
 }
