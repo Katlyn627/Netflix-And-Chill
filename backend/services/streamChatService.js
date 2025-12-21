@@ -1,6 +1,9 @@
 // Stream Chat service for real-time messaging
 const { StreamChat } = require('stream-chat');
 
+// Constants
+const INVALID_API_KEY_ERROR = 'api_key not valid';
+
 class StreamChatService {
     constructor() {
         this.client = null;
@@ -15,11 +18,16 @@ class StreamChatService {
             const appId = process.env.STREAM_APP_ID;
 
             // Check if credentials are missing or placeholder values
-            if (!apiKey || !apiSecret || !appId || 
-                (apiKey && apiKey.includes('YOUR_')) || 
-                (apiSecret && apiSecret.includes('YOUR_')) || 
-                (appId && appId.includes('YOUR_'))) {
+            if (!apiKey || !apiSecret || !appId) {
                 console.warn('⚠️  Stream Chat configuration incomplete or using placeholder values.');
+                console.warn('⚠️  Chat features will use fallback storage until configured.');
+                console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
+                return;
+            }
+
+            // Check for placeholder values (e.g., YOUR_STREAM_API_KEY)
+            if (apiKey.includes('YOUR_') || apiSecret.includes('YOUR_') || appId.includes('YOUR_')) {
+                console.warn('⚠️  Stream Chat configuration using placeholder values.');
                 console.warn('⚠️  Chat features will use fallback storage until configured.');
                 console.warn('📖 See CHAT_SETUP_GUIDE.md for setup instructions.');
                 return;
@@ -83,7 +91,7 @@ class StreamChatService {
             return streamUser;
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes('api_key not valid')) {
+            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
                 this.handleInvalidApiKeyError();
                 return null;
             }
@@ -121,7 +129,7 @@ class StreamChatService {
             };
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes('api_key not valid')) {
+            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
                 this.handleInvalidApiKeyError();
                 return null;
             }
@@ -153,7 +161,7 @@ class StreamChatService {
             return response.message;
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes('api_key not valid')) {
+            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
                 this.handleInvalidApiKeyError();
                 return null;
             }
@@ -184,7 +192,7 @@ class StreamChatService {
             return response.messages || [];
         } catch (error) {
             // If API key is invalid, disable Stream Chat and use fallback
-            if (error.message && error.message.includes('api_key not valid')) {
+            if (error.message && error.message.includes(INVALID_API_KEY_ERROR)) {
                 this.handleInvalidApiKeyError();
                 return [];
             }
