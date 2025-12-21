@@ -1,6 +1,43 @@
-# User Database Seeder
+# Database Seeders
 
-This seeder script automatically generates and imports 100 fake user profiles with complete data including TMDB movie/TV show information. This eliminates the need to manually create users for testing.
+This directory contains seeder scripts that automatically generate fake data for testing the Netflix and Chill app.
+
+## Available Seeders
+
+### 1. User Seeder (`seedUsers.js`)
+
+Generates 100 fake user profiles with complete data including TMDB movie/TV show information.
+
+### 2. Match Seeder (`seedMatches.js`)
+
+Pre-generates matches between seeded users so they appear immediately on the matches page without needing to click "Find Matches".
+
+## Quick Start
+
+### Seed Everything (Recommended)
+
+```bash
+npm run seed:all
+```
+
+This will:
+1. Generate 100 users with complete profiles
+2. Pre-generate up to 10 matches per user
+3. Create a TEST_CREDENTIALS.md file with login information
+
+### Seed Only Users
+
+```bash
+npm run seed
+```
+
+### Seed Only Matches
+
+```bash
+npm run seed:matches
+```
+
+**Note:** You must seed users before seeding matches.
 
 ## Features
 
@@ -35,8 +72,38 @@ The seeder generates realistic user profiles with:
 - Least favorite movies
 - Movie debate topics
 - Favorite snacks
-- Quiz responses
+- Quiz responses (with personality archetypes)
 - Video chat preferences
+- Profile picture (using Lorem Picsum)
+- Photo gallery (2-6 photos using Lorem Picsum)
+
+## Match Seeder
+
+The match seeder pre-generates matches between users to populate the matches page immediately without requiring users to click "Find Matches".
+
+### Match Seeder Features
+- Uses the same matching algorithm as the live app
+- Generates up to 10 high-quality matches per user by default
+- Includes all compatibility scores (quiz, snack, debate, etc.)
+- Shows shared content between matched users
+- Preserves archetype data for display on matches page
+- Photo galleries work with carousel navigation
+
+### Match Seeder Usage
+
+```bash
+# Seed matches with default settings (10 matches per user)
+npm run seed:matches
+
+# Custom number of matches per user
+node backend/scripts/seedMatches.js --matches-per-user=5
+
+# With MongoDB
+npm run seed:matches:mongodb
+
+# Seed both users and matches
+npm run seed:all
+```
 
 ## Usage
 

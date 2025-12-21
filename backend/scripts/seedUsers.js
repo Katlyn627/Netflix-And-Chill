@@ -472,6 +472,7 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     console.log(`   - Database type: ${process.env.DB_TYPE || 'file'}`);
     console.log(`   - Credentials file: ${path.relative(process.cwd(), markdownPath)}`);
     console.log(`\n💡 You can now login with any user's email and password: ${DEFAULT_PASSWORD}`);
+    console.log(`\n💡 To pre-generate matches for testing, run: npm run seed:matches`);
     
   } catch (error) {
     console.error('\n❌ Error seeding users:', error);
