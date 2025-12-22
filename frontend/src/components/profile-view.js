@@ -888,10 +888,13 @@ class ProfileView {
                 });
                 
                 // Display missed question numbers
-                const missedCount = QUIZ_QUESTIONS.length - answers.length;
-                let alertMessage = `Please answer all questions before submitting.\n\n`;
-                alertMessage += `${answers.length} of ${QUIZ_QUESTIONS.length} questions answered.\n\n`;
-                alertMessage += `Missed questions: ${missedQuestions.join(', ')}`;
+                const alertMessage = [
+                    'Please answer all questions before submitting.',
+                    '',
+                    `${answers.length} of ${QUIZ_QUESTIONS.length} questions answered.`,
+                    '',
+                    `Missed questions: ${missedQuestions.join(', ')}`
+                ].join('\n');
                 
                 alert(alertMessage);
                 return;
