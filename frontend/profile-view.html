@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/analytics.css">
 </head>
 <body>
     <div class="container">
@@ -136,6 +137,16 @@
                 </div>
 
                 <button id="take-quiz-btn" class="btn btn-primary">Take/Update Quiz</button>
+            </section>
+
+            <!-- Swipe Analytics Section -->
+            <section id="swipe-analytics-section" class="card">
+                <h2>🎬 Your Swipe Preferences</h2>
+                <p>See what genres and content types you love based on your swipes!</p>
+                
+                <div id="compact-analytics-container">
+                    <p style="text-align: center; color: #666;">Loading analytics...</p>
+                </div>
             </section>
 
             <!-- Streaming Services Section -->
@@ -532,6 +543,7 @@
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
     <script src="src/components/quiz.js"></script>
+    <script src="src/components/swipeAnalytics.js"></script>
     <script src="src/components/profile-view.js"></script>
 </body>
 </html>

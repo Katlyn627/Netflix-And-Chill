@@ -326,6 +326,7 @@ async function recordSwipeAction(action, movie) {
         tmdbId: movie.tmdbId,
         title: movie.title,
         posterPath: movie.posterPath,
+        genreIds: movie.genreIds || [], // Include genre IDs for analytics
         action: action
       })
     });
