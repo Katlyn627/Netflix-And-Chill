@@ -337,10 +337,22 @@ function showMatchDetails(index) {
     const streamingServicesHtml = match.user.streamingServices && match.user.streamingServices.length > 0
         ? `<div class="detail-section">
             <h4>📺 Streaming Services</h4>
-            <div class="services-list">
-                ${match.user.streamingServices.map(s => 
-                    `<span class="service-tag">${escapeHtml(s.name)}</span>`
-                ).join('')}
+            <div class="services-display-grid">
+                ${match.user.streamingServices.map(s => {
+                    const serviceName = escapeHtml(s.name);
+                    // Use actual logo from TMDB/Watchmode if available, otherwise fallback to text
+                    const hasActualLogo = s.logoUrl && s.logoUrl !== 'null';
+                    const logoContent = hasActualLogo 
+                        ? `<img src="${escapeHtml(s.logoUrl)}" alt="${serviceName}" class="service-logo-image">`
+                        : `<span class="service-display-logo" style="background: #667eea;">${serviceName.charAt(0).toUpperCase()}</span>`;
+                    
+                    return `
+                        <div class="service-display-item">
+                            ${logoContent}
+                            <span class="service-display-name">${serviceName}</span>
+                        </div>
+                    `;
+                }).join('')}
             </div>
            </div>`
         : '';
