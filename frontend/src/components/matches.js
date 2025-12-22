@@ -341,10 +341,35 @@ function showMatchDetails(index) {
                 ${match.user.streamingServices.map(s => {
                     const serviceName = escapeHtml(s.name);
                     // Use actual logo from TMDB/Watchmode if available, otherwise fallback to text
-                    const hasActualLogo = s.logoUrl && s.logoUrl !== 'null';
+                    const hasActualLogo = s.logoUrl && s.logoUrl !== null && s.logoUrl.trim() !== '';
+                    
+                    // Helper function to get logo class based on service name (fallback for CSS styling)
+                    const getLogoClass = (name) => {
+                        if (!name || (typeof name === 'string' && name.trim() === '')) return 'other-logo';
+                        const nameLower = name.toLowerCase();
+                        if (nameLower.includes('netflix')) return 'netflix-logo';
+                        if (nameLower.includes('amazon') || nameLower.includes('prime')) return 'prime-logo';
+                        if (nameLower.includes('disney')) return 'disney-logo';
+                        if (nameLower.includes('hulu')) return 'hulu-logo';
+                        if (nameLower.includes('hbo')) return 'hbo-logo';
+                        if (nameLower.includes('apple')) return 'apple-logo';
+                        if (nameLower.includes('paramount')) return 'paramount-logo';
+                        if (nameLower.includes('peacock')) return 'peacock-logo';
+                        return 'other-logo';
+                    };
+                    
+                    // Helper function to get logo text (fallback)
+                    const getLogoText = (name) => {
+                        if (!name || (typeof name === 'string' && name.trim() === '')) return '?';
+                        return name.charAt(0).toUpperCase();
+                    };
+                    
+                    const logoClass = getLogoClass(s.name);
+                    const logoText = escapeHtml(getLogoText(s.name));
+                    
                     const logoContent = hasActualLogo 
                         ? `<img src="${escapeHtml(s.logoUrl)}" alt="${serviceName}" class="service-logo-image">`
-                        : `<span class="service-display-logo" style="background: #667eea;">${serviceName.charAt(0).toUpperCase()}</span>`;
+                        : `<span class="service-display-logo ${logoClass}">${logoText}</span>`;
                     
                     return `
                         <div class="service-display-item">
