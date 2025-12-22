@@ -185,18 +185,27 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getPopularTVShows() {
-    // If no API key or placeholder, return fallback movies (can be used for TV shows too)
+    // If no API key or placeholder, return fallback TV shows
     if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
-      return fallbackMovies;
+      const { fallbackTVShows } = require('./fallbackData');
+      return fallbackTVShows;
     }
     
     try {
       const data = await this.makeRequest('/tv/popular');
       const results = data.results || [];
-      return results.length > 0 ? results : fallbackMovies;
+      
+      if (results.length > 0) {
+        return results;
+      }
+      
+      // Return fallback TV shows if no results
+      const { fallbackTVShows } = require('./fallbackData');
+      return fallbackTVShows;
     } catch (error) {
       console.error('Error fetching popular TV shows:', error.message);
-      return fallbackMovies;
+      const { fallbackTVShows } = require('./fallbackData');
+      return fallbackTVShows;
     }
   }
 
