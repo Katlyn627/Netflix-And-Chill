@@ -48,6 +48,12 @@ const {
 const DEFAULT_USER_COUNT = 100;
 const DEFAULT_PASSWORD = 'password123'; // Simple password for testing
 
+// Age range preferences configuration
+const AGE_RANGE_MIN_OFFSET = 10; // Minimum years below user's age
+const AGE_RANGE_MAX_OFFSET = 15; // Maximum years above user's age
+const MINIMUM_LEGAL_AGE = 18;
+const MAXIMUM_AGE = 65;
+
 /**
  * Fetch popular movies from TMDB API with retry logic
  * Falls back to sample movies if API is unavailable
@@ -110,6 +116,19 @@ async function fetchProviders() {
     console.warn('Could not fetch providers from TMDB:', error.message);
   }
   return fallbackProviders;
+}
+
+/**
+ * Calculate age range preferences based on user's age
+ * Returns an age range that's relative to the user's age to increase match probability
+ * @param {number} userAge - The user's age
+ * @returns {Object} Object with min and max age range
+ */
+function calculateAgeRangePreferences(userAge) {
+  return {
+    min: Math.max(MINIMUM_LEGAL_AGE, userAge - randomInt(AGE_RANGE_MIN_OFFSET, AGE_RANGE_MAX_OFFSET)),
+    max: Math.min(MAXIMUM_AGE, userAge + randomInt(AGE_RANGE_MIN_OFFSET, AGE_RANGE_MAX_OFFSET))
+  };
 }
 
 /**
@@ -338,12 +357,7 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
     preferences: {
       genres: genrePreferences,
       bingeWatchCount: randomInt(1, 15),
-      ageRange: {
-        // Generate age range relative to user's age for better matching
-        // Range is typically ±10-15 years from user's age, but ensure it's within legal bounds
-        min: Math.max(18, age - randomInt(10, 15)),
-        max: Math.min(65, age + randomInt(10, 15))
-      },
+      ageRange: calculateAgeRangePreferences(age),
       locationRadius: randomItem([250, 500, 1000]), // Large radii for better matching across demo data
       genderPreference,
       sexualOrientationPreference
