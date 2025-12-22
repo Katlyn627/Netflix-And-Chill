@@ -71,9 +71,19 @@ function renderPieChart(containerId, data, title) {
     const percentage = (item.value / total) * 100;
     const color = colors[index % colors.length];
     
-    gradientStops.push(`${color} ${currentPercentage}% ${currentPercentage + percentage}%`);
+    // Round to 2 decimal places to avoid floating point precision issues
+    const roundedStart = Math.round(currentPercentage * 100) / 100;
+    const roundedEnd = Math.round((currentPercentage + percentage) * 100) / 100;
+    
+    gradientStops.push(`${color} ${roundedStart}% ${roundedEnd}%`);
     currentPercentage += percentage;
   });
+
+  // Ensure the gradient ends at exactly 100%
+  if (gradientStops.length > 0) {
+    const lastStop = gradientStops[gradientStops.length - 1];
+    gradientStops[gradientStops.length - 1] = lastStop.replace(/\d+\.?\d*%$/, '100%');
+  }
 
   html += `
           <div class="pie-slice" style="background: conic-gradient(${gradientStops.join(', ')});"></div>

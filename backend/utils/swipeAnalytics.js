@@ -99,19 +99,14 @@ function analyzeSwipePreferences(swipedMovies) {
         // Count by category
         const category = categorizeGenre(genreId);
         genreCategories[category] = (genreCategories[category] || 0) + 1;
-
-        // Check if TV show
-        if (isTVShowGenre(genreId)) {
-          tvShowCount++;
-        }
       });
 
-      // Count movies (if no TV genre found)
+      // Count movies vs TV shows (once per movie, not per genre)
       const hasTVGenre = movie.genreIds.some(id => isTVShowGenre(id));
-      if (!hasTVGenre) {
-        movieCount++;
-      } else {
+      if (hasTVGenre) {
         tvShowCount++;
+      } else {
+        movieCount++;
       }
     } else {
       // Default to movie if no genre info
@@ -125,7 +120,7 @@ function analyzeSwipePreferences(swipedMovies) {
     .map(([genre, count]) => ({
       genre,
       count,
-      percentage: Math.round((count / likedMovies.length) * 100)
+      percentage: likedMovies.length > 0 ? Math.round((count / likedMovies.length) * 100) : 0
     }));
 
   // Calculate recent activity
