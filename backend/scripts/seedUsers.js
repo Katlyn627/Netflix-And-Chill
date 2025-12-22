@@ -48,6 +48,12 @@ const {
 const DEFAULT_USER_COUNT = 100;
 const DEFAULT_PASSWORD = 'password123'; // Simple password for testing
 
+// Age range preferences configuration
+const AGE_RANGE_MIN_OFFSET = 10; // Minimum years below user's age
+const AGE_RANGE_MAX_OFFSET = 15; // Maximum years above user's age
+const MINIMUM_LEGAL_AGE = 18;
+const MAXIMUM_AGE = 65;
+
 /**
  * Fetch popular movies from TMDB API with retry logic
  * Falls back to sample movies if API is unavailable
@@ -110,6 +116,19 @@ async function fetchProviders() {
     console.warn('Could not fetch providers from TMDB:', error.message);
   }
   return fallbackProviders;
+}
+
+/**
+ * Calculate age range preferences based on user's age
+ * Returns an age range that's relative to the user's age to increase match probability
+ * @param {number} userAge - The user's age
+ * @returns {Object} Object with min and max age range
+ */
+function calculateAgeRangePreferences(userAge) {
+  return {
+    min: Math.max(MINIMUM_LEGAL_AGE, userAge - randomInt(AGE_RANGE_MIN_OFFSET, AGE_RANGE_MAX_OFFSET)),
+    max: Math.min(MAXIMUM_AGE, userAge + randomInt(AGE_RANGE_MIN_OFFSET, AGE_RANGE_MAX_OFFSET))
+  };
 }
 
 /**
@@ -319,11 +338,14 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
   const genderPreference = generateGenderPreference(gender, sexualOrientation);
   const sexualOrientationPreference = generateSexualOrientationPreference();
   
+  // Generate age first so we can use it for age range preferences
+  const age = randomInt(21, 55);
+  
   const userData = {
     username,
     email,
     password: DEFAULT_PASSWORD,
-    age: randomInt(21, 55),
+    age,
     location: randomItem(cities),
     gender,
     sexualOrientation,
@@ -335,11 +357,8 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
     preferences: {
       genres: genrePreferences,
       bingeWatchCount: randomInt(1, 15),
-      ageRange: {
-        min: randomInt(18, 30),
-        max: randomInt(40, 65)
-      },
-      locationRadius: randomItem([10, 25, 50, 100, 250]),
+      ageRange: calculateAgeRangePreferences(age),
+      locationRadius: randomItem([250, 500, 1000]), // Large radii for better matching across demo data
       genderPreference,
       sexualOrientationPreference
     },
