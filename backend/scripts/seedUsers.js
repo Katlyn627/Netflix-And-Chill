@@ -109,17 +109,31 @@ async function fetchProviders() {
 }
 
 /**
- * Generate watch history from movies and TV shows
+ * Generate watch history from movies and TV shows with weighted selection
+ * Favors popular content to increase match probability
  */
 function generateWatchHistory(movies, tvShows, streamingServices) {
   const watchHistory = [];
   const totalItems = randomInt(5, 20);
   
+  // Use weighted selection - 70% probability from top 50% popular content
+  const popularMovies = movies.slice(0, Math.ceil(movies.length / 2));
+  const popularShows = tvShows.slice(0, Math.ceil(tvShows.length / 2));
+  
   for (let i = 0; i < totalItems; i++) {
     const useMovie = Math.random() > 0.5;
-    const item = useMovie 
-      ? randomItem(movies.length > 0 ? movies : [])
-      : randomItem(tvShows.length > 0 ? tvShows : []);
+    
+    // 70% chance to pick from popular content (Math.random() > 0.3)
+    const usePopular = Math.random() > 0.3; // 70% probability
+    
+    let item;
+    if (useMovie) {
+      const pool = usePopular && popularMovies.length > 0 ? popularMovies : movies;
+      item = randomItem(pool.length > 0 ? pool : []);
+    } else {
+      const pool = usePopular && popularShows.length > 0 ? popularShows : tvShows;
+      item = randomItem(pool.length > 0 ? pool : []);
+    }
     
     if (!item) continue;
     
@@ -143,13 +157,31 @@ function generateWatchHistory(movies, tvShows, streamingServices) {
 }
 
 /**
- * Generate favorite movies
+ * Generate favorite movies with weighted selection
+ * Favors popular movies to increase match probability
  */
 function generateFavoriteMovies(movies) {
   if (!movies || movies.length === 0) return [];
   
   const count = randomInt(2, 8);
-  const selected = randomItems(movies, count);
+  
+  // Use weighted selection - 70% probability from top 50% popular content
+  const popularMovies = movies.slice(0, Math.ceil(movies.length / 2));
+  const selected = [];
+  
+  for (let i = 0; i < count; i++) {
+    const usePopular = Math.random() > 0.3; // 70% probability
+    const pool = usePopular && popularMovies.length > 0 ? popularMovies : movies;
+    
+    // Avoid duplicates
+    const available = pool.filter(m => 
+      !selected.some(s => s.id === m.id)
+    );
+    
+    if (available.length > 0) {
+      selected.push(randomItem(available));
+    }
+  }
   
   return selected.map(movie => ({
     tmdbId: movie.id,
@@ -162,13 +194,31 @@ function generateFavoriteMovies(movies) {
 }
 
 /**
- * Generate favorite TV shows
+ * Generate favorite TV shows with weighted selection
+ * Favors popular shows to increase match probability
  */
 function generateFavoriteTVShows(tvShows) {
   if (!tvShows || tvShows.length === 0) return [];
   
   const count = randomInt(2, 8);
-  const selected = randomItems(tvShows, count);
+  
+  // Use weighted selection - 70% probability from top 50% popular content
+  const popularShows = tvShows.slice(0, Math.ceil(tvShows.length / 2));
+  const selected = [];
+  
+  for (let i = 0; i < count; i++) {
+    const usePopular = Math.random() > 0.3; // 70% probability
+    const pool = usePopular && popularShows.length > 0 ? popularShows : tvShows;
+    
+    // Avoid duplicates
+    const available = pool.filter(s => 
+      !selected.some(sel => sel.id === s.id)
+    );
+    
+    if (available.length > 0) {
+      selected.push(randomItem(available));
+    }
+  }
   
   return selected.map(show => ({
     tmdbId: show.id,
