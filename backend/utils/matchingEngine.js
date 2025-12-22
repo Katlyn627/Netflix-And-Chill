@@ -638,19 +638,37 @@ class MatchingEngine {
 
     // Location radius filter (simplified - would need proper geolocation in production)
     const MAX_GLOBAL_RADIUS = 1000; // Maximum radius to consider as "anywhere" (in miles/km)
+    const LENIENT_RADIUS_THRESHOLD = 250; // Treat radii >= 250 as "anywhere in US" for demo purposes
     
     if (filters.locationRadius !== undefined || user.preferences.locationRadius !== undefined) {
       // In a real implementation, this would calculate actual distance
-      // For now, we just check if locations are similar (same city/area)
       const radius = filters.locationRadius !== undefined ? filters.locationRadius : user.preferences.locationRadius;
-      if (radius !== null && radius !== undefined && radius < MAX_GLOBAL_RADIUS) {
-        // Simplified: if locations don't match at all and radius is set, skip
-        // In production, use proper geocoding and distance calculation
+      
+      // For demo/testing: if radius is >= 250 miles or >= MAX_GLOBAL_RADIUS, don't filter by location
+      // This allows seeded users across the US to match each other
+      if (radius !== null && radius !== undefined && radius < LENIENT_RADIUS_THRESHOLD && radius < MAX_GLOBAL_RADIUS) {
+        // Only apply strict location filtering for small radii (< 250 miles)
         if (user.location && otherUser.location) {
           const userLoc = user.location.toLowerCase();
           const otherLoc = otherUser.location.toLowerCase();
-          if (!userLoc.includes(otherLoc.split(',')[0]) && !otherLoc.includes(userLoc.split(',')[0])) {
-            return false;
+          
+          // Extract city and state
+          const userParts = userLoc.split(',').map(p => p.trim());
+          const otherParts = otherLoc.split(',').map(p => p.trim());
+          
+          // For radii > 100 but < 250, match within same state OR same city
+          if (radius > 100) {
+            const sameState = userParts.length > 1 && otherParts.length > 1 && userParts[1] === otherParts[1];
+            const sameCity = userParts[0] === otherParts[0];
+            if (!sameState && !sameCity) {
+              return false;
+            }
+          } else {
+            // For smaller radii (<= 100), require same city
+            const sameCity = userParts[0] === otherParts[0];
+            if (!sameCity) {
+              return false;
+            }
           }
         }
       }
