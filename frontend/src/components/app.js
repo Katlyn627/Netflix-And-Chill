@@ -326,7 +326,7 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
     }
 });
 
-// Skip to preferences button
+// Continue to preferences button
 const skipToPreferencesBtn = document.getElementById('skip-to-preferences-btn');
 if (skipToPreferencesBtn) {
     skipToPreferencesBtn.addEventListener('click', () => {
@@ -365,7 +365,7 @@ if (moviePreferencesForm) {
     });
 }
 
-// Skip movie preferences button
+// Continue button for movie preferences
 const skipMoviePrefsBtn = document.getElementById('skip-movie-prefs-btn');
 if (skipMoviePrefsBtn) {
     skipMoviePrefsBtn.addEventListener('click', () => {
