@@ -327,13 +327,14 @@ async function recordSwipeAction(action, movie) {
         title: movie.title,
         posterPath: movie.posterPath,
         genreIds: movie.genreIds || [], // Include genre IDs for analytics
+        contentType: movie.contentType || 'movie', // Include content type (movie or tv)
         action: action
       })
     });
 
     const data = await response.json();
     if (data.success) {
-      console.log(`Movie ${action}d:`, movie.title);
+      console.log(`${movie.contentType === 'tv' ? 'TV show' : 'Movie'} ${action}d:`, movie.title);
       
       // Update likes counter if available
       const likesCounter = document.getElementById('total-likes-counter');

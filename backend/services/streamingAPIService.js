@@ -1,5 +1,5 @@
 const config = require('../config/config');
-const { fallbackGenres, fallbackProviders, fallbackMovies } = require('./fallbackData');
+const { fallbackGenres, fallbackProviders, fallbackMovies, fallbackTVShows } = require('./fallbackData');
 
 /**
  * Service for interacting with TMDB (The Movie Database) API
@@ -117,8 +117,14 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getTrending(mediaType = 'all', timeWindow = 'week') {
-    // If no API key or placeholder, return fallback movies
+    // If no API key or placeholder, return fallback data based on media type
     if (!this.isApiKeyConfigured()) {
+      if (mediaType === 'tv') {
+        return fallbackTVShows;
+      } else if (mediaType === 'all') {
+        // For 'all', mix movies and TV shows
+        return [...fallbackMovies, ...fallbackTVShows];
+      }
       return fallbackMovies;
     }
     
@@ -126,9 +132,27 @@ class StreamingAPIService {
       const endpoint = `/trending/${mediaType}/${timeWindow}`;
       const data = await this.makeRequest(endpoint);
       const results = data.results || [];
-      return results.length > 0 ? results : fallbackMovies;
+      
+      if (results.length > 0) {
+        return results;
+      }
+      
+      // Return appropriate fallback based on media type
+      if (mediaType === 'tv') {
+        return fallbackTVShows;
+      } else if (mediaType === 'all') {
+        return [...fallbackMovies, ...fallbackTVShows];
+      }
+      return fallbackMovies;
     } catch (error) {
       console.error('Error fetching trending content:', error.message);
+      
+      // Return appropriate fallback based on media type on error
+      if (mediaType === 'tv') {
+        return fallbackTVShows;
+      } else if (mediaType === 'all') {
+        return [...fallbackMovies, ...fallbackTVShows];
+      }
       return fallbackMovies;
     }
   }
@@ -158,18 +182,24 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getPopularTVShows() {
-    // If no API key or placeholder, return fallback movies (can be used for TV shows too)
+    // If no API key or placeholder, return fallback TV shows
     if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
-      return fallbackMovies;
+      return fallbackTVShows;
     }
     
     try {
       const data = await this.makeRequest('/tv/popular');
       const results = data.results || [];
-      return results.length > 0 ? results : fallbackMovies;
+      
+      if (results.length > 0) {
+        return results;
+      }
+      
+      // Return fallback TV shows if no results
+      return fallbackTVShows;
     } catch (error) {
       console.error('Error fetching popular TV shows:', error.message);
-      return fallbackMovies;
+      return fallbackTVShows;
     }
   }
 
@@ -246,13 +276,15 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async discover(type = 'movie', filters = {}) {
-    // If no API key or placeholder, return filtered fallback movies
+    // If no API key or placeholder, return filtered fallback data
     if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       if (type === 'movie' && filters.with_genres) {
         const genreIds = filters.with_genres.split(',').map(id => parseInt(id));
         return this._filterFallbackByGenres(genreIds);
       }
-      return fallbackMovies;
+      
+      // Return appropriate fallback based on type
+      return type === 'tv' ? fallbackTVShows : fallbackMovies;
     }
     
     try {
@@ -266,7 +298,12 @@ class StreamingAPIService {
         return this._filterFallbackByGenres(genreIds);
       }
       
-      return results.length > 0 ? results : fallbackMovies;
+      // Return appropriate fallback based on type if no results
+      if (results.length === 0) {
+        return type === 'tv' ? fallbackTVShows : fallbackMovies;
+      }
+      
+      return results;
     } catch (error) {
       console.error('Error in discover method:', error.message);
       // Return filtered fallback on error
@@ -274,7 +311,9 @@ class StreamingAPIService {
         const genreIds = filters.with_genres.split(',').map(id => parseInt(id));
         return this._filterFallbackByGenres(genreIds);
       }
-      return fallbackMovies;
+      
+      // Return appropriate fallback based on type on error
+      return type === 'tv' ? fallbackTVShows : fallbackMovies;
     }
   }
 
