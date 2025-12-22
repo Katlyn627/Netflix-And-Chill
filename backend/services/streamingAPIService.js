@@ -54,9 +54,40 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async search(query, type = 'multi') {
-    const endpoint = `/search/${type}`;
-    const data = await this.makeRequest(endpoint, { query });
-    return data.results || [];
+    // If no API key or placeholder, return filtered fallback movies based on search query
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      // Simple title matching for fallback search
+      const queryLower = query.toLowerCase();
+      const filtered = fallbackMovies.filter(movie => 
+        movie.title && movie.title.toLowerCase().includes(queryLower)
+      );
+      return filtered.length > 0 ? filtered : fallbackMovies;
+    }
+    
+    try {
+      const endpoint = `/search/${type}`;
+      const data = await this.makeRequest(endpoint, { query });
+      const results = data.results || [];
+      
+      // If no results from API, try fallback search
+      if (results.length === 0) {
+        const queryLower = query.toLowerCase();
+        const filtered = fallbackMovies.filter(movie => 
+          movie.title && movie.title.toLowerCase().includes(queryLower)
+        );
+        return filtered.length > 0 ? filtered : fallbackMovies;
+      }
+      
+      return results;
+    } catch (error) {
+      console.error('Error searching content:', error.message);
+      // Fallback to filtered search on error
+      const queryLower = query.toLowerCase();
+      const filtered = fallbackMovies.filter(movie => 
+        movie.title && movie.title.toLowerCase().includes(queryLower)
+      );
+      return filtered.length > 0 ? filtered : fallbackMovies;
+    }
   }
 
   /**
@@ -66,9 +97,20 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getTrending(mediaType = 'all', timeWindow = 'week') {
-    const endpoint = `/trending/${mediaType}/${timeWindow}`;
-    const data = await this.makeRequest(endpoint);
-    return data.results || [];
+    // If no API key or placeholder, return fallback movies
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      return fallbackMovies;
+    }
+    
+    try {
+      const endpoint = `/trending/${mediaType}/${timeWindow}`;
+      const data = await this.makeRequest(endpoint);
+      const results = data.results || [];
+      return results.length > 0 ? results : fallbackMovies;
+    } catch (error) {
+      console.error('Error fetching trending content:', error.message);
+      return fallbackMovies;
+    }
   }
 
   /**
@@ -96,8 +138,19 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getPopularTVShows() {
-    const data = await this.makeRequest('/tv/popular');
-    return data.results || [];
+    // If no API key or placeholder, return fallback movies (can be used for TV shows too)
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      return fallbackMovies;
+    }
+    
+    try {
+      const data = await this.makeRequest('/tv/popular');
+      const results = data.results || [];
+      return results.length > 0 ? results : fallbackMovies;
+    } catch (error) {
+      console.error('Error fetching popular TV shows:', error.message);
+      return fallbackMovies;
+    }
   }
 
   /**
@@ -107,8 +160,25 @@ class StreamingAPIService {
    * @returns {Promise<Object>}
    */
   async getDetails(id, type = 'movie') {
-    const endpoint = `/${type}/${id}`;
-    return await this.makeRequest(endpoint);
+    // If no API key or placeholder, try to find in fallback data
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      const movie = fallbackMovies.find(m => m.id === parseInt(id));
+      if (movie) {
+        return movie;
+      }
+      // Return empty object if not found in fallback
+      return {};
+    }
+    
+    try {
+      const endpoint = `/${type}/${id}`;
+      return await this.makeRequest(endpoint);
+    } catch (error) {
+      console.error('Error fetching content details:', error.message);
+      // Try to find in fallback data
+      const movie = fallbackMovies.find(m => m.id === parseInt(id));
+      return movie || {};
+    }
   }
 
   /**
@@ -118,9 +188,20 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getRecommendations(id, type = 'movie') {
-    const endpoint = `/${type}/${id}/recommendations`;
-    const data = await this.makeRequest(endpoint);
-    return data.results || [];
+    // If no API key or placeholder, return fallback movies
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      return fallbackMovies;
+    }
+    
+    try {
+      const endpoint = `/${type}/${id}/recommendations`;
+      const data = await this.makeRequest(endpoint);
+      const results = data.results || [];
+      return results.length > 0 ? results : fallbackMovies;
+    } catch (error) {
+      console.error('Error fetching recommendations:', error.message);
+      return fallbackMovies;
+    }
   }
 
   /**
@@ -189,9 +270,20 @@ class StreamingAPIService {
    * @returns {Promise<Array>}
    */
   async getGenres(type = 'movie') {
-    const endpoint = `/genre/${type}/list`;
-    const data = await this.makeRequest(endpoint);
-    return data.genres || [];
+    // If no API key or placeholder, return fallback genres
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      return fallbackGenres;
+    }
+    
+    try {
+      const endpoint = `/genre/${type}/list`;
+      const data = await this.makeRequest(endpoint);
+      const results = data.genres || [];
+      return results.length > 0 ? results : fallbackGenres;
+    } catch (error) {
+      console.error('Error fetching genres:', error.message);
+      return fallbackGenres;
+    }
   }
 
   /**
@@ -282,9 +374,19 @@ class StreamingAPIService {
    * @returns {Promise<Object>}
    */
   async getWatchProviders(id, type = 'movie') {
-    const endpoint = `/${type}/${id}/watch/providers`;
-    const data = await this.makeRequest(endpoint);
-    return data.results || {};
+    // If no API key or placeholder, return empty object
+    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+      return {};
+    }
+    
+    try {
+      const endpoint = `/${type}/${id}/watch/providers`;
+      const data = await this.makeRequest(endpoint);
+      return data.results || {};
+    } catch (error) {
+      console.error('Error fetching watch providers:', error.message);
+      return {};
+    }
   }
 
   /**
