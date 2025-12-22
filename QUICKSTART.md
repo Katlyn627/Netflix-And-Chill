@@ -23,7 +23,7 @@ This guide will help you get Netflix and Chill running on your local machine.
 
 3. **Start the server**
    ```bash
-   npm startn
+   npm start
    ```
    
    You should see: `Netflix and Chill server running on port 3000`
