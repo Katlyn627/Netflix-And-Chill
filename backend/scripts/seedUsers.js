@@ -319,11 +319,14 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
   const genderPreference = generateGenderPreference(gender, sexualOrientation);
   const sexualOrientationPreference = generateSexualOrientationPreference();
   
+  // Generate age first so we can use it for age range preferences
+  const age = randomInt(21, 55);
+  
   const userData = {
     username,
     email,
     password: DEFAULT_PASSWORD,
-    age: randomInt(21, 55),
+    age,
     location: randomItem(cities),
     gender,
     sexualOrientation,
@@ -336,10 +339,12 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
       genres: genrePreferences,
       bingeWatchCount: randomInt(1, 15),
       ageRange: {
-        min: randomInt(18, 30),
-        max: randomInt(40, 65)
+        // Generate age range relative to user's age for better matching
+        // Range is typically ±10-15 years from user's age, but ensure it's within legal bounds
+        min: Math.max(18, age - randomInt(10, 15)),
+        max: Math.min(65, age + randomInt(10, 15))
       },
-      locationRadius: randomItem([10, 25, 50, 100, 250]),
+      locationRadius: randomItem([250, 500, 1000]), // Large radii for better matching across demo data
       genderPreference,
       sexualOrientationPreference
     },
