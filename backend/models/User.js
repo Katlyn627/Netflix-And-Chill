@@ -229,6 +229,7 @@ class User {
       title: movieData.title,
       posterPath: movieData.posterPath,
       genreIds: movieData.genreIds || [], // Store genre IDs for analytics
+      contentType: movieData.contentType || 'movie', // Store content type (movie or tv)
       action: action, // 'like' or 'dislike'
       swipedAt: new Date().toISOString()
     };
