@@ -13,6 +13,39 @@ class StreamingAPIService {
   }
 
   /**
+   * Check if TMDB API key is configured
+   * @private
+   * @returns {boolean}
+   */
+  isApiKeyConfigured() {
+    return this.apiKey && this.apiKey !== 'YOUR_TMDB_API_KEY_HERE';
+  }
+
+  /**
+   * Filter fallback movies by search query
+   * @private
+   * @param {string} query - Search query
+   * @returns {Array} Filtered movies
+   */
+  filterFallbackMoviesByQuery(query) {
+    const queryLower = query.toLowerCase();
+    const filtered = fallbackMovies.filter(movie => 
+      movie.title && movie.title.toLowerCase().includes(queryLower)
+    );
+    return filtered.length > 0 ? filtered : fallbackMovies;
+  }
+
+  /**
+   * Find a fallback movie by ID
+   * @private
+   * @param {number} id - Movie ID
+   * @returns {Object|null} Movie object or null if not found
+   */
+  findFallbackMovieById(id) {
+    return fallbackMovies.find(m => m.id === parseInt(id)) || null;
+  }
+
+  /**
    * Make a request to TMDB API
    * @param {string} endpoint 
    * @param {Object} params 
@@ -55,13 +88,8 @@ class StreamingAPIService {
    */
   async search(query, type = 'multi') {
     // If no API key or placeholder, return filtered fallback movies based on search query
-    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
-      // Simple title matching for fallback search
-      const queryLower = query.toLowerCase();
-      const filtered = fallbackMovies.filter(movie => 
-        movie.title && movie.title.toLowerCase().includes(queryLower)
-      );
-      return filtered.length > 0 ? filtered : fallbackMovies;
+    if (!this.isApiKeyConfigured()) {
+      return this.filterFallbackMoviesByQuery(query);
     }
     
     try {
@@ -71,22 +99,14 @@ class StreamingAPIService {
       
       // If no results from API, try fallback search
       if (results.length === 0) {
-        const queryLower = query.toLowerCase();
-        const filtered = fallbackMovies.filter(movie => 
-          movie.title && movie.title.toLowerCase().includes(queryLower)
-        );
-        return filtered.length > 0 ? filtered : fallbackMovies;
+        return this.filterFallbackMoviesByQuery(query);
       }
       
       return results;
     } catch (error) {
       console.error('Error searching content:', error.message);
       // Fallback to filtered search on error
-      const queryLower = query.toLowerCase();
-      const filtered = fallbackMovies.filter(movie => 
-        movie.title && movie.title.toLowerCase().includes(queryLower)
-      );
-      return filtered.length > 0 ? filtered : fallbackMovies;
+      return this.filterFallbackMoviesByQuery(query);
     }
   }
 
@@ -98,7 +118,7 @@ class StreamingAPIService {
    */
   async getTrending(mediaType = 'all', timeWindow = 'week') {
     // If no API key or placeholder, return fallback movies
-    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+    if (!this.isApiKeyConfigured()) {
       return fallbackMovies;
     }
     
@@ -161,13 +181,8 @@ class StreamingAPIService {
    */
   async getDetails(id, type = 'movie') {
     // If no API key or placeholder, try to find in fallback data
-    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
-      const movie = fallbackMovies.find(m => m.id === parseInt(id));
-      if (movie) {
-        return movie;
-      }
-      // Return empty object if not found in fallback
-      return {};
+    if (!this.isApiKeyConfigured()) {
+      return this.findFallbackMovieById(id) || {};
     }
     
     try {
@@ -176,8 +191,7 @@ class StreamingAPIService {
     } catch (error) {
       console.error('Error fetching content details:', error.message);
       // Try to find in fallback data
-      const movie = fallbackMovies.find(m => m.id === parseInt(id));
-      return movie || {};
+      return this.findFallbackMovieById(id) || {};
     }
   }
 
@@ -189,7 +203,7 @@ class StreamingAPIService {
    */
   async getRecommendations(id, type = 'movie') {
     // If no API key or placeholder, return fallback movies
-    if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
+    if (!this.isApiKeyConfigured()) {
       return fallbackMovies;
     }
     
