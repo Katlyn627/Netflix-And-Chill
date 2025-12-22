@@ -177,11 +177,50 @@ function generatePhotoGallery(seed, count = 3) {
 }
 
 /**
- * Generate streaming services for a user
+ * Generate streaming services for a user with weighted selection
+ * Favors popular services to increase match probability
  */
 function generateStreamingServices(providers) {
   const count = randomInt(2, 5);
-  const selectedProviders = randomItems(providers, count);
+  
+  // Define popular streaming services (most common ones)
+  const popularServiceNames = [
+    'Netflix', 'Hulu', 'Disney+', 'Amazon Prime Video', 
+    'HBO Max', 'Max', 'Apple TV+', 'Paramount+', 'Peacock'
+  ];
+  
+  // Split providers into popular and other
+  const popularProviders = providers.filter(p => 
+    popularServiceNames.some(name => p.name.includes(name))
+  );
+  const otherProviders = providers.filter(p => 
+    !popularServiceNames.some(name => p.name.includes(name))
+  );
+  
+  const selectedProviders = [];
+  
+  // Always include 1-2 popular services (70% chance for each)
+  const popularCount = Math.random() > 0.5 ? 2 : 1;
+  if (popularProviders.length > 0) {
+    const selected = randomItems(popularProviders, Math.min(popularCount, popularProviders.length, count));
+    selectedProviders.push(...selected);
+  }
+  
+  // Fill remaining slots with a mix (60% popular, 40% other)
+  const remaining = count - selectedProviders.length;
+  for (let i = 0; i < remaining; i++) {
+    const usePopular = Math.random() > 0.4 && popularProviders.length > 0;
+    const pool = usePopular ? popularProviders : otherProviders;
+    
+    // Avoid duplicates
+    const available = pool.filter(p => 
+      !selectedProviders.some(s => s.id === p.id)
+    );
+    
+    if (available.length > 0) {
+      selectedProviders.push(randomItem(available));
+    }
+  }
   
   return selectedProviders.map(provider => ({
     id: provider.id,
@@ -194,11 +233,52 @@ function generateStreamingServices(providers) {
 }
 
 /**
- * Generate genre preferences
+ * Generate genre preferences with weighted selection
+ * Favors popular genres to increase match probability
  */
 function generateGenrePreferences(genres) {
   const count = randomInt(3, 8);
-  return randomItems(genres, count);
+  
+  // Define popular genres (most common ones)
+  const popularGenreNames = [
+    'Action', 'Comedy', 'Drama', 'Romance', 'Science Fiction',
+    'Sci-Fi & Fantasy', 'Thriller', 'Horror', 'Animation', 'Documentary'
+  ];
+  
+  // Split genres into popular and other
+  const popularGenres = genres.filter(g => 
+    popularGenreNames.some(name => g.name.includes(name))
+  );
+  const otherGenres = genres.filter(g => 
+    !popularGenreNames.some(name => g.name.includes(name))
+  );
+  
+  const selectedGenres = [];
+  
+  // Always include 2-3 popular genres (ensure commonality)
+  const popularCount = Math.min(randomInt(2, 3), popularGenres.length);
+  if (popularGenres.length > 0) {
+    const selected = randomItems(popularGenres, popularCount);
+    selectedGenres.push(...selected);
+  }
+  
+  // Fill remaining slots with a mix (60% popular, 40% other)
+  const remaining = count - selectedGenres.length;
+  for (let i = 0; i < remaining; i++) {
+    const usePopular = Math.random() > 0.4 && popularGenres.length > 0;
+    const pool = usePopular ? popularGenres : otherGenres;
+    
+    // Avoid duplicates
+    const available = pool.filter(g => 
+      !selectedGenres.some(s => s.id === g.id)
+    );
+    
+    if (available.length > 0) {
+      selectedGenres.push(randomItem(available));
+    }
+  }
+  
+  return selectedGenres;
 }
 
 /**

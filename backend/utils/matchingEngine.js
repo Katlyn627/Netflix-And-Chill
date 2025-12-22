@@ -15,6 +15,11 @@ class MatchingEngine {
     let score = 0;
     const sharedContent = [];
 
+    // Base compatibility score to ensure non-zero matches
+    // Award points simply for being active users with profiles
+    const BASE_SCORE = 10;
+    score += BASE_SCORE;
+
     // Check for shared streaming services
     const sharedServices = this.findSharedServices(user1, user2);
     score += sharedServices.length * 10;
