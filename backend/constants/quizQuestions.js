@@ -248,7 +248,7 @@ const QUIZ_QUESTIONS = [
       { value: 'essential', label: 'Essential - Love romantic subplots', points: 1 },
       { value: 'nice', label: 'Nice when done well', points: 2 },
       { value: 'unnecessary', label: 'Often unnecessary', points: 3 },
-      { value: 'skip', label: 'Skip romantic scenes', points: 4 }
+      { value: 'avoid', label: 'Prefer to avoid romantic scenes', points: 4 }
     ]
   },
   {
@@ -423,7 +423,7 @@ const QUIZ_QUESTIONS = [
       { value: 'must_watch', label: 'Must watch - Never leave early', points: 1 },
       { value: 'usually_stay', label: 'Usually stay for them', points: 2 },
       { value: 'if_told', label: 'Only if someone tells me', points: 3 },
-      { value: 'skip', label: 'Always skip them', points: 4 }
+      { value: 'leave_early', label: 'Usually leave when credits start', points: 4 }
     ]
   },
   {
