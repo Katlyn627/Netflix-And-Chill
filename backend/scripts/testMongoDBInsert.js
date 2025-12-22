@@ -72,7 +72,9 @@ async function testMongoDBInsert() {
     
     const testUser = new User(testUserData);
     const userToSave = testUser.toJSON();
-    userToSave.password = testUser.password; // Include password for storage
+    // Note: toJSON() excludes the password field, so we add it back for database storage
+    // In production, this should be hashed. Here we preserve the plain text for testing.
+    userToSave.password = testUser.password;
     
     console.log('📊 User data before saving:');
     console.log(`  - streamingServices: ${userToSave.streamingServices.length} items`);
@@ -133,10 +135,12 @@ async function testMongoDBInsert() {
     
     // Cleanup test user
     console.log('\n🧹 Cleaning up test user...');
-    if (dbType === 'mongodb') {
+    if (dbType === 'mongodb' && database.db) {
       await database.db.collection('users').deleteOne({ email: 'test_array@test.com' });
+      console.log('✅ Cleanup complete');
+    } else {
+      console.log('⚠️  Skipping cleanup (not using MongoDB or db property not available)');
     }
-    console.log('✅ Cleanup complete');
     
     process.exit(allPassed ? 0 : 1);
     
