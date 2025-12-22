@@ -61,12 +61,8 @@ class ProfileView {
         // User email in account settings
         document.getElementById('user-email').textContent = user.email || 'N/A';
 
-        // Profile picture
-        if (user.profilePicture) {
-            document.getElementById('profile-picture').src = user.profilePicture;
-            document.getElementById('profile-picture').style.display = 'block';
-            document.getElementById('no-photo').style.display = 'none';
-        }
+        // Profile picture with frame
+        this.renderProfilePicture();
 
         // Photo gallery
         this.renderPhotoGallery();
@@ -91,6 +87,43 @@ class ProfileView {
 
         // Swipe Analytics
         this.renderSwipeAnalytics();
+    }
+
+    renderProfilePicture() {
+        const user = this.userData;
+        const profilePictureElement = document.getElementById('profile-picture');
+        const noPhotoElement = document.getElementById('no-photo');
+
+        if (user.profilePicture) {
+            profilePictureElement.src = user.profilePicture;
+            profilePictureElement.style.display = 'block';
+            noPhotoElement.style.display = 'none';
+
+            // Apply profile frame if user has one selected
+            if (user.profileFrame && user.profileFrame.isActive && user.profileFrame.archetypeType) {
+                // Wrap the profile picture with frame
+                const pictureContainer = profilePictureElement.parentElement;
+                if (pictureContainer && !pictureContainer.classList.contains('profile-frame')) {
+                    const frameWrapper = document.createElement('div');
+                    frameWrapper.className = `profile-picture-with-frame`;
+                    frameWrapper.style.width = '200px';
+                    frameWrapper.style.height = '200px';
+                    frameWrapper.style.margin = '0 auto';
+                    
+                    const frame = document.createElement('div');
+                    frame.className = `profile-frame profile-frame-${user.profileFrame.archetypeType}`;
+                    
+                    const inner = document.createElement('div');
+                    inner.className = 'profile-frame-inner';
+                    
+                    // Move profile picture inside frame
+                    pictureContainer.insertBefore(frameWrapper, profilePictureElement);
+                    inner.appendChild(profilePictureElement);
+                    frame.appendChild(inner);
+                    frameWrapper.appendChild(frame);
+                }
+            }
+        }
     }
 
     renderPhotoGallery() {
@@ -273,6 +306,20 @@ class ProfileView {
                     const completedDate = new Date(lastAttempt.completedAt);
                     html += `<p style="margin-top: 15px;"><small>Quiz completed: ${completedDate.toLocaleDateString()}</small></p>`;
                 }
+            }
+            
+            // Add profile frame customization option if user has archetype
+            if (archetype) {
+                const hasFrame = this.userData.profileFrame && this.userData.profileFrame.isActive;
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 8px; border: 2px solid #667eea;">
+                        <p style="margin: 0;"><strong>🎨 Customize Your Profile Frame</strong></p>
+                        <p style="margin: 8px 0; font-size: 0.9em;">Based on your ${archetype.name} personality, you can apply a unique themed frame to your profile picture!</p>
+                        <button id="customize-frame-btn" class="btn btn-primary" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            ${hasFrame ? '✨ Change Profile Frame' : '🎨 Choose Profile Frame'}
+                        </button>
+                    </div>
+                `;
             }
             
             // Add link to get recommendations
@@ -526,6 +573,13 @@ class ProfileView {
             if (confirm('Are you sure you want to logout?')) {
                 localStorage.removeItem('currentUserId');
                 window.location.href = 'login.html';
+            }
+        });
+
+        // Customize profile frame button (dynamically added, so use event delegation)
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'customize-frame-btn') {
+                this.showFrameSelector();
             }
         });
 
@@ -1923,6 +1977,65 @@ class ProfileView {
         // Render compact analytics using the SwipeAnalyticsModule
         if (window.SwipeAnalyticsModule && typeof window.SwipeAnalyticsModule.renderCompactAnalytics === 'function') {
             window.SwipeAnalyticsModule.renderCompactAnalytics('compact-analytics-container', this.userId);
+        }
+    }
+
+    async showFrameSelector() {
+        // Create modal for frame selector
+        const modal = document.createElement('div');
+        modal.id = 'frame-selector-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        `;
+
+        modal.innerHTML = `
+            <div style="background: white; padding: 30px; border-radius: 16px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #333;">Choose Your Profile Frame</h2>
+                    <button id="close-frame-modal" style="background: none; border: none; font-size: 32px; cursor: pointer; color: #666; padding: 0; width: 40px; height: 40px;">×</button>
+                </div>
+                <div id="profile-frame-selector"></div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Close button
+        document.getElementById('close-frame-modal').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+
+        // Initialize the ProfileFrameSelector
+        if (typeof ProfileFrameSelector !== 'undefined') {
+            const selector = new ProfileFrameSelector(this.userId, {
+                containerSelector: '#profile-frame-selector',
+                onFrameSelected: (result) => {
+                    // Reload profile to show updated frame
+                    this.loadProfile().then(() => {
+                        modal.remove();
+                    });
+                }
+            });
+            await selector.init();
+        } else {
+            console.error('ProfileFrameSelector not loaded');
+            document.getElementById('profile-frame-selector').innerHTML = '<p style="color: red;">Error: Frame selector component not loaded.</p>';
         }
     }
 }

@@ -935,6 +935,123 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Profile Frame endpoints
+  async getAvailableFrames(req, res) {
+    try {
+      const { userId } = req.params;
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const { getAllFrameThemes, getFrameTheme } = require('../constants/profileFrames');
+      
+      // Get all available frames
+      const allFrames = getAllFrameThemes();
+      
+      // Get user's archetype and recommended frame
+      let recommendedFrame = null;
+      if (userData.archetype && userData.archetype.type) {
+        recommendedFrame = getFrameTheme(userData.archetype.type);
+      }
+
+      res.json({
+        userId,
+        archetype: userData.archetype,
+        recommendedFrame: recommendedFrame ? {
+          type: userData.archetype.type,
+          ...recommendedFrame
+        } : null,
+        allFrames: Object.keys(allFrames).map(type => ({
+          type,
+          ...allFrames[type]
+        })),
+        currentFrame: userData.profileFrame
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async updateProfileFrame(req, res) {
+    try {
+      const { userId } = req.params;
+      const { archetypeType, isActive } = req.body;
+
+      if (!archetypeType) {
+        return res.status(400).json({ error: 'archetypeType is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const { hasFrameTheme, getFrameTheme } = require('../constants/profileFrames');
+
+      // Validate that the archetype type has a corresponding frame theme
+      if (!hasFrameTheme(archetypeType)) {
+        return res.status(400).json({ error: 'Invalid archetype type or frame theme not found' });
+      }
+
+      // Create User instance
+      const user = new User(userData);
+
+      // Update profile frame
+      user.profileFrame = {
+        archetypeType,
+        isActive: isActive !== undefined ? isActive : true,
+        selectedAt: new Date().toISOString()
+      };
+
+      // Save the updated user
+      await this.saveUserData(userId, user);
+
+      // Get the frame theme details
+      const frameTheme = getFrameTheme(archetypeType);
+
+      res.json({
+        message: 'Profile frame updated successfully',
+        profileFrame: user.profileFrame,
+        frameTheme: {
+          type: archetypeType,
+          ...frameTheme
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async removeProfileFrame(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.profileFrame = null;
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Profile frame removed successfully',
+        profileFrame: null
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();
