@@ -15,13 +15,14 @@ class User {
     this.photoGallery = data.photoGallery || [];
     this.streamingServices = data.streamingServices || [];
     this.watchHistory = data.watchHistory || [];
-    this.preferences = data.preferences || {
-      genres: [], // Array of genre objects with {id, name, types}
-      bingeWatchCount: 0,
-      ageRange: { min: 18, max: 100 },
-      locationRadius: 50, // in miles/km
-      genderPreference: data.preferences?.genderPreference || [], // Array of preferred genders
-      sexualOrientationPreference: data.preferences?.sexualOrientationPreference || [] // Array of preferred orientations
+    // Initialize preferences with proper defaults for all nested properties
+    this.preferences = {
+      genres: data.preferences?.genres || [],
+      bingeWatchCount: data.preferences?.bingeWatchCount !== undefined ? data.preferences.bingeWatchCount : 0,
+      ageRange: data.preferences?.ageRange || { min: 18, max: 100 },
+      locationRadius: data.preferences?.locationRadius !== undefined ? data.preferences.locationRadius : 50,
+      genderPreference: data.preferences?.genderPreference || [],
+      sexualOrientationPreference: data.preferences?.sexualOrientationPreference || []
     };
     this.likes = data.likes || [];
     this.superLikes = data.superLikes || [];
