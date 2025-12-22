@@ -30,7 +30,8 @@ class User {
     this.favoriteSnacks = data.favoriteSnacks || [];
     this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
     // Swipe preferences - movies liked/disliked through swipe feature
-    this.swipedMovies = data.swipedMovies || []; // Array of {tmdbId, title, posterPath, action: 'like'|'dislike', swipedAt}
+    this.swipedMovies = data.swipedMovies || []; // Array of {tmdbId, title, posterPath, action: 'like'|'dislike', swipedAt, genreIds}
+    this.swipePreferences = data.swipePreferences || null; // Cached analytics: {genrePreferences, contentTypeBreakdown, topGenres, etc.}
     // New fields for enhanced profile features
     this.favoriteMovies = data.favoriteMovies || []; // Array of movie objects with TMDB data
     this.favoriteTVShows = data.favoriteTVShows || []; // Array of TV show objects with TMDB data
@@ -227,6 +228,7 @@ class User {
       tmdbId: movieData.tmdbId,
       title: movieData.title,
       posterPath: movieData.posterPath,
+      genreIds: movieData.genreIds || [], // Store genre IDs for analytics
       action: action, // 'like' or 'dislike'
       swipedAt: new Date().toISOString()
     };
@@ -240,6 +242,16 @@ class User {
 
   getLikedMovies() {
     return this.swipedMovies.filter(m => m.action === 'like');
+  }
+
+  // Calculate and update swipe preferences analytics
+  updateSwipePreferences(analytics) {
+    this.swipePreferences = analytics;
+  }
+
+  // Get swipe preferences (returns cached or null)
+  getSwipePreferences() {
+    return this.swipePreferences;
   }
 
   // Get swipe count for today based on swipedAt timestamps (using UTC dates)
@@ -290,6 +302,7 @@ class User {
       favoriteSnacks: this.favoriteSnacks,
       videoChatPreference: this.videoChatPreference,
       swipedMovies: this.swipedMovies,
+      swipePreferences: this.swipePreferences,
       favoriteMovies: this.favoriteMovies,
       favoriteTVShows: this.favoriteTVShows,
       movieRatings: this.movieRatings,

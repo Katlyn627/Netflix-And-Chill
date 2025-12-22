@@ -313,7 +313,7 @@ router.get('/movies/:userId', async (req, res) => {
 router.post('/action/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { tmdbId, title, posterPath, action } = req.body;
+    const { tmdbId, title, posterPath, action, genreIds } = req.body;
 
     if (!['like', 'dislike'].includes(action)) {
       return res.status(400).json({
@@ -334,8 +334,14 @@ router.post('/action/:userId', async (req, res) => {
     
     const user = new User(userData);
 
-    // Add swiped movie - unlimited swipes
-    user.addSwipedMovie({ tmdbId, title, posterPath }, action);
+    // Add swiped movie with genre IDs - unlimited swipes
+    user.addSwipedMovie({ tmdbId, title, posterPath, genreIds }, action);
+    
+    // Update swipe preferences analytics after each swipe
+    const { analyzeSwipePreferences } = require('../utils/swipeAnalytics');
+    const analytics = analyzeSwipePreferences(user.swipedMovies);
+    user.updateSwipePreferences(analytics);
+    
     await dataStore.updateUser(userId, user);
 
     res.json({
@@ -417,6 +423,50 @@ router.get('/stats/:userId', async (req, res) => {
     });
   } catch (error) {
     console.error('Error getting swipe stats:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Get user's swipe analytics and preferences
+ * Returns genre preferences, content type breakdown, and insights
+ */
+router.get('/analytics/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    const user = new User(userData);
+    const { analyzeSwipePreferences, getChartData, getSwipeInsights } = require('../utils/swipeAnalytics');
+    
+    // Calculate fresh analytics
+    const analytics = analyzeSwipePreferences(user.swipedMovies);
+    const chartData = getChartData(analytics);
+    const insights = getSwipeInsights(analytics);
+    
+    // Update cached analytics in user profile
+    user.updateSwipePreferences(analytics);
+    await dataStore.updateUser(userId, user);
+
+    res.json({
+      success: true,
+      analytics,
+      chartData,
+      insights
+    });
+  } catch (error) {
+    console.error('Error getting swipe analytics:', error);
     res.status(500).json({
       success: false,
       error: error.message

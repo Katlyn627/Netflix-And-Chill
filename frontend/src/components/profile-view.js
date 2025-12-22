@@ -88,6 +88,9 @@ class ProfileView {
 
         // Preferences
         this.renderPreferences();
+
+        // Swipe Analytics
+        this.renderSwipeAnalytics();
     }
 
     renderPhotoGallery() {
@@ -1894,6 +1897,13 @@ class ProfileView {
 
         // Show the modal
         document.getElementById('profile-view-popup').style.display = 'flex';
+    }
+
+    renderSwipeAnalytics() {
+        // Render compact analytics using the SwipeAnalyticsModule
+        if (window.SwipeAnalyticsModule && typeof window.SwipeAnalyticsModule.renderCompactAnalytics === 'function') {
+            window.SwipeAnalyticsModule.renderCompactAnalytics('compact-analytics-container', this.userId);
+        }
     }
 }
 
