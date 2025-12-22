@@ -837,7 +837,7 @@ class ProfileView {
                     submitBtn.textContent = 'Complete Quiz';
                 } else {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = `Complete Quiz (${remaining} remaining)`;
+                    submitBtn.textContent = `Complete Quiz (${remaining} unanswered)`;
                 }
             }
         };
@@ -876,7 +876,27 @@ class ProfileView {
             // Validate that all questions were answered
             if (typeof QUIZ_QUESTIONS !== 'undefined' && answers.length < QUIZ_QUESTIONS.length) {
                 console.warn(`[Quiz] Incomplete quiz: ${answers.length}/${QUIZ_QUESTIONS.length} questions answered`);
-                alert(`Please answer all questions before submitting. (${answers.length}/${QUIZ_QUESTIONS.length} answered)`);
+                
+                // Find which questions were missed
+                const answeredQuestionIds = new Set(answers.map(a => a.questionId));
+                const missedQuestions = [];
+                
+                QUIZ_QUESTIONS.forEach((q, index) => {
+                    if (!answeredQuestionIds.has(q.id)) {
+                        missedQuestions.push(index + 1); // Question numbers are 1-based
+                    }
+                });
+                
+                // Display missed question numbers
+                const alertMessage = [
+                    'Please answer all questions before submitting.',
+                    '',
+                    `${answers.length} of ${QUIZ_QUESTIONS.length} questions answered.`,
+                    '',
+                    `Missed questions: ${missedQuestions.join(', ')}`
+                ].join('\n');
+                
+                alert(alertMessage);
                 return;
             }
             

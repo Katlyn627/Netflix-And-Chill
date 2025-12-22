@@ -585,8 +585,8 @@ const QUIZ_QUESTIONS = [
         "points": 3
       },
       {
-        "value": "skip",
-        "label": "Skip romantic scenes",
+        "value": "avoid",
+        "label": "Prefer to avoid romantic scenes",
         "points": 4
       }
     ]
@@ -1012,8 +1012,8 @@ const QUIZ_QUESTIONS = [
         "points": 3
       },
       {
-        "value": "skip",
-        "label": "Always skip them",
+        "value": "leave_early",
+        "label": "Usually leave when credits start",
         "points": 4
       }
     ]
