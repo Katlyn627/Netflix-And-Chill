@@ -79,4 +79,9 @@ router.get('/:userId/recommendations/mood', userController.getMoodBasedRecommend
 router.post('/:userId/quiz/feedback', userController.submitQuizFeedback.bind(userController));
 router.post('/:userId/quiz/question-feedback', userController.submitQuestionFeedback.bind(userController));
 
+// Profile Frame routes
+router.get('/:userId/profile-frames', userController.getAvailableFrames.bind(userController));
+router.put('/:userId/profile-frames', userController.updateProfileFrame.bind(userController));
+router.delete('/:userId/profile-frames', userController.removeProfileFrame.bind(userController));
+
 module.exports = router;

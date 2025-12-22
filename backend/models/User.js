@@ -44,6 +44,8 @@ class User {
     this.personalityBio = data.personalityBio || ''; // Auto-generated bio based on personality
     this.archetype = data.archetype || null; // Primary personality archetype {type, name, description, strength}
     this.lastQuizCompletedAt = data.lastQuizCompletedAt || null; // Timestamp of last quiz completion
+    // Profile frame customization based on archetype
+    this.profileFrame = data.profileFrame || null; // Selected profile frame theme {archetypeType, isActive, selectedAt}
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -314,6 +316,7 @@ class User {
       personalityBio: this.personalityBio,
       archetype: this.archetype,
       lastQuizCompletedAt: this.lastQuizCompletedAt,
+      profileFrame: this.profileFrame,
       createdAt: this.createdAt
     };
   }

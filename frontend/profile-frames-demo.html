@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Frame Demo - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/profile-frames.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .demo-header h1 {
+            color: #E50914;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .demo-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .frame-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .frame-demo-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .frame-demo-card:hover {
+            transform: translateY(-5px);
+        }
+        .frame-demo-card h3 {
+            margin: 15px 0 10px 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+        .frame-demo-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .frame-colors {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .traits-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .trait-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .back-link a {
+            color: #E50914;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .profile-demo-avatar {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎨 Profile Frame Showcase</h1>
+            <p>Unique themed frames for each movie personality archetype</p>
+        </div>
+
+        <div class="frame-showcase">
+            <!-- Cinephile Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-cinephile">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">🎬</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Cinephile</h3>
+                <p>Vintage elegance meets artistic appreciation</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #D4AF37;" title="Gold"></div>
+                    <div class="color-swatch" style="background: #000000;" title="Black"></div>
+                    <div class="color-swatch" style="background: #8B7355;" title="Vintage brown"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Artistic</span>
+                    <span class="trait-tag">Cultured</span>
+                    <span class="trait-tag">Analytical</span>
+                </div>
+            </div>
+
+            <!-- Casual Viewer Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-casual_viewer">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">🍿</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Casual Viewer</h3>
+                <p>Light and breezy entertainment vibes</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #87CEEB;" title="Sky blue"></div>
+                    <div class="color-swatch" style="background: #98FB98;" title="Pale green"></div>
+                    <div class="color-swatch" style="background: #B0E0E6;" title="Powder blue"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Relaxed</span>
+                    <span class="trait-tag">Easy-going</span>
+                    <span class="trait-tag">Fun-loving</span>
+                </div>
+            </div>
+
+            <!-- Binge Watcher Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-binge_watcher">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">📺</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Binge Watcher</h3>
+                <p>Vibrant energy for marathon sessions</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #9D4EDD;" title="Neon purple"></div>
+                    <div class="color-swatch" style="background: #F72585;" title="Hot pink"></div>
+                    <div class="color-swatch" style="background: #FF6B35;" title="Vibrant orange"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Dedicated</span>
+                    <span class="trait-tag">Immersive</span>
+                    <span class="trait-tag">Passionate</span>
+                </div>
+            </div>
+
+            <!-- Social Butterfly Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-social_butterfly">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">🎉</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Social Butterfly</h3>
+                <p>Bright and engaging social vibes</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #FFD700;" title="Bright yellow"></div>
+                    <div class="color-swatch" style="background: #FF69B4;" title="Hot pink"></div>
+                    <div class="color-swatch" style="background: #FF8C00;" title="Dark orange"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Outgoing</span>
+                    <span class="trait-tag">Enthusiastic</span>
+                    <span class="trait-tag">Collaborative</span>
+                </div>
+            </div>
+
+            <!-- Genre Specialist Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-genre_specialist">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">🎯</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Genre Specialist</h3>
+                <p>Bold and focused genre expertise</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #8B0000;" title="Dark red"></div>
+                    <div class="color-swatch" style="background: #006400;" title="Dark green"></div>
+                    <div class="color-swatch" style="background: #2F4F4F;" title="Dark slate"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Focused</span>
+                    <span class="trait-tag">Expert</span>
+                    <span class="trait-tag">Discerning</span>
+                </div>
+            </div>
+
+            <!-- Critic Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-critic">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">📝</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Critic</h3>
+                <p>Sophisticated minimalist aesthetic</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #000000;" title="Black"></div>
+                    <div class="color-swatch" style="background: #FFFFFF; border-color: #ccc;" title="White"></div>
+                    <div class="color-swatch" style="background: #696969;" title="Dim gray"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Analytical</span>
+                    <span class="trait-tag">Thoughtful</span>
+                    <span class="trait-tag">Detail-oriented</span>
+                </div>
+            </div>
+
+            <!-- Collector Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-collector">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">📀</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Collector</h3>
+                <p>Nostalgic warmth and timeless appeal</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #704214;" title="Sepia brown"></div>
+                    <div class="color-swatch" style="background: #DEB887;" title="Burlywood"></div>
+                    <div class="color-swatch" style="background: #8B4513;" title="Saddle brown"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Nostalgic</span>
+                    <span class="trait-tag">Passionate</span>
+                    <span class="trait-tag">Curator</span>
+                </div>
+            </div>
+
+            <!-- Tech Enthusiast Frame -->
+            <div class="frame-demo-card">
+                <div class="profile-picture-with-frame" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <div class="profile-frame profile-frame-tech_enthusiast">
+                        <div class="profile-frame-inner">
+                            <div class="profile-demo-avatar">🚀</div>
+                        </div>
+                    </div>
+                </div>
+                <h3>The Tech Enthusiast</h3>
+                <p>Sleek futuristic innovation</p>
+                <div class="frame-colors">
+                    <div class="color-swatch" style="background: #00CED1;" title="Dark turquoise"></div>
+                    <div class="color-swatch" style="background: #C0C0C0;" title="Silver"></div>
+                    <div class="color-swatch" style="background: #4682B4;" title="Steel blue"></div>
+                </div>
+                <div class="traits-list">
+                    <span class="trait-tag">Innovative</span>
+                    <span class="trait-tag">Quality-focused</span>
+                    <span class="trait-tag">Forward-thinking</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="profile-view.html">← Back to Profile</a>
+        </div>
+    </div>
+</body>
+</html>
