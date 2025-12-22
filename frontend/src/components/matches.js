@@ -341,7 +341,7 @@ function showMatchDetails(index) {
                 ${match.user.streamingServices.map(s => {
                     const serviceName = escapeHtml(s.name);
                     // Use actual logo from TMDB/Watchmode if available, otherwise fallback to text
-                    const hasActualLogo = s.logoUrl && s.logoUrl !== null && s.logoUrl.trim() !== '';
+                    const hasActualLogo = s.logoUrl && s.logoUrl !== null && s.logoUrl !== 'null' && s.logoUrl.trim() !== '';
                     
                     // Helper function to get logo class based on service name (fallback for CSS styling)
                     const getLogoClass = (name) => {
