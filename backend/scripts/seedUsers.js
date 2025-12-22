@@ -116,15 +116,15 @@ function generateWatchHistory(movies, tvShows, streamingServices) {
   const watchHistory = [];
   const totalItems = randomInt(5, 20);
   
-  // Use weighted selection - 70% from top 50% popular content, 30% from rest
+  // Use weighted selection - 70% probability from top 50% popular content
   const popularMovies = movies.slice(0, Math.ceil(movies.length / 2));
   const popularShows = tvShows.slice(0, Math.ceil(tvShows.length / 2));
   
   for (let i = 0; i < totalItems; i++) {
     const useMovie = Math.random() > 0.5;
     
-    // 70% chance to pick from popular content
-    const usePopular = Math.random() > 0.3;
+    // 70% chance to pick from popular content (Math.random() > 0.3)
+    const usePopular = Math.random() > 0.3; // 70% probability
     
     let item;
     if (useMovie) {
@@ -165,12 +165,12 @@ function generateFavoriteMovies(movies) {
   
   const count = randomInt(2, 8);
   
-  // Use weighted selection - 70% from top 50% popular content
+  // Use weighted selection - 70% probability from top 50% popular content
   const popularMovies = movies.slice(0, Math.ceil(movies.length / 2));
   const selected = [];
   
   for (let i = 0; i < count; i++) {
-    const usePopular = Math.random() > 0.3;
+    const usePopular = Math.random() > 0.3; // 70% probability
     const pool = usePopular && popularMovies.length > 0 ? popularMovies : movies;
     
     // Avoid duplicates
@@ -202,12 +202,12 @@ function generateFavoriteTVShows(tvShows) {
   
   const count = randomInt(2, 8);
   
-  // Use weighted selection - 70% from top 50% popular content
+  // Use weighted selection - 70% probability from top 50% popular content
   const popularShows = tvShows.slice(0, Math.ceil(tvShows.length / 2));
   const selected = [];
   
   for (let i = 0; i < count; i++) {
-    const usePopular = Math.random() > 0.3;
+    const usePopular = Math.random() > 0.3; // 70% probability
     const pool = usePopular && popularShows.length > 0 ? popularShows : tvShows;
     
     // Avoid duplicates

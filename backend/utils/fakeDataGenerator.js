@@ -199,17 +199,17 @@ function generateStreamingServices(providers) {
   
   const selectedProviders = [];
   
-  // Always include 1-2 popular services (70% chance for each)
+  // Always include 1-2 popular services (50% chance for 2, 50% chance for 1)
   const popularCount = Math.random() > 0.5 ? 2 : 1;
   if (popularProviders.length > 0) {
     const selected = randomItems(popularProviders, Math.min(popularCount, popularProviders.length, count));
     selectedProviders.push(...selected);
   }
   
-  // Fill remaining slots with a mix (60% popular, 40% other)
+  // Fill remaining slots with weighted selection (60% chance popular, 40% chance other)
   const remaining = count - selectedProviders.length;
   for (let i = 0; i < remaining; i++) {
-    const usePopular = Math.random() > 0.4 && popularProviders.length > 0;
+    const usePopular = Math.random() > 0.4 && popularProviders.length > 0; // 60% probability
     const pool = usePopular ? popularProviders : otherProviders;
     
     // Avoid duplicates
@@ -262,10 +262,10 @@ function generateGenrePreferences(genres) {
     selectedGenres.push(...selected);
   }
   
-  // Fill remaining slots with a mix (60% popular, 40% other)
+  // Fill remaining slots with weighted selection (60% chance popular, 40% chance other)
   const remaining = count - selectedGenres.length;
   for (let i = 0; i < remaining; i++) {
-    const usePopular = Math.random() > 0.4 && popularGenres.length > 0;
+    const usePopular = Math.random() > 0.4 && popularGenres.length > 0; // 60% probability
     const pool = usePopular ? popularGenres : otherGenres;
     
     // Avoid duplicates
