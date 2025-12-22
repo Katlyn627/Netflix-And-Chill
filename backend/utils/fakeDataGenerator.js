@@ -450,6 +450,105 @@ function generateSexualOrientationPreference() {
   return ['any'];
 }
 
+/**
+ * Generate swiped movies data with weighted selection
+ * Favors popular movies to increase match probability
+ * @param {Array} movies - Array of movies to choose from
+ * @param {Array} tvShows - Array of TV shows to choose from
+ * @returns {Array} Array of swiped movie objects
+ */
+function generateSwipedMovies(movies, tvShows) {
+  if (!movies || movies.length === 0) return [];
+  
+  // Generate 10-30 swiped movies per user (realistic swipe activity)
+  const count = randomInt(10, 30);
+  
+  // Use weighted selection - 70% probability from top 50% popular content
+  const popularMovies = movies.slice(0, Math.ceil(movies.length / 2));
+  const popularShows = tvShows && tvShows.length > 0 ? tvShows.slice(0, Math.ceil(tvShows.length / 2)) : [];
+  const selected = [];
+  
+  for (let i = 0; i < count; i++) {
+    // 80% movies, 20% TV shows (if available)
+    const useMovie = !tvShows || tvShows.length === 0 || Math.random() > 0.2;
+    const usePopular = Math.random() > 0.3; // 70% probability
+    
+    let item;
+    let contentType;
+    if (useMovie) {
+      const pool = usePopular && popularMovies.length > 0 ? popularMovies : movies;
+      item = randomItem(pool);
+      contentType = 'movie';
+    } else {
+      const pool = usePopular && popularShows.length > 0 ? popularShows : tvShows;
+      item = randomItem(pool);
+      contentType = 'tv';
+    }
+    
+    if (!item) continue;
+    
+    // Avoid duplicates
+    if (selected.some(s => s.tmdbId === item.id)) continue;
+    
+    // 60% like, 40% dislike (biased towards likes for better matches)
+    const action = Math.random() > 0.4 ? 'like' : 'dislike';
+    
+    selected.push({
+      tmdbId: item.id,
+      title: useMovie ? item.title : item.name,
+      posterPath: item.poster_path,
+      genreIds: item.genre_ids || [],
+      contentType: contentType,
+      action: action,
+      swipedAt: new Date(Date.now() - randomInt(1, 90) * 24 * 60 * 60 * 1000).toISOString()
+    });
+  }
+  
+  return selected;
+}
+
+/**
+ * Generate profile frame selection based on archetype
+ * @param {Object} archetype - Primary personality archetype
+ * @returns {Object|null} Profile frame object
+ */
+function generateProfileFrame(archetype) {
+  if (!archetype || !archetype.type) return null;
+  
+  // 60% chance user has activated their profile frame
+  if (Math.random() < 0.6) {
+    return {
+      archetypeType: archetype.type,
+      isActive: true,
+      selectedAt: new Date(Date.now() - randomInt(1, 60) * 24 * 60 * 60 * 1000).toISOString()
+    };
+  }
+  
+  return null;
+}
+
+/**
+ * Generate likes array (users this user has liked)
+ * Empty by default - will be populated by matching/interaction simulation
+ * @returns {Array}
+ */
+function generateLikes() {
+  // Return empty array - likes are generated through user interaction
+  // or can be populated later by match seeding script
+  return [];
+}
+
+/**
+ * Generate super likes array (users this user has super-liked)
+ * Empty by default - will be populated by matching/interaction simulation
+ * @returns {Array}
+ */
+function generateSuperLikes() {
+  // Return empty array - super likes are generated through user interaction
+  // or can be populated later by match seeding script
+  return [];
+}
+
 module.exports = {
   firstNames,
   lastNames,
@@ -472,5 +571,9 @@ module.exports = {
   generateGender,
   generateSexualOrientation,
   generateGenderPreference,
-  generateSexualOrientationPreference
+  generateSexualOrientationPreference,
+  generateSwipedMovies,
+  generateProfileFrame,
+  generateLikes,
+  generateSuperLikes
 };

@@ -22,6 +22,33 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Security Headers - Content Security Policy
+app.use((req, res, next) => {
+  // Set Content Security Policy header to prevent eval() and inline scripts
+  res.setHeader(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: https: http:",
+      "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com",
+      "frame-src 'self' https://*.firebaseapp.com",
+      "object-src 'none'",
+      "base-uri 'self'"
+    ].join('; ')
+  );
+  
+  // Additional security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  next();
+});
+
 // Serve static files from frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 

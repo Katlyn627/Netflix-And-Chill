@@ -37,7 +37,11 @@ const {
   generateGender,
   generateSexualOrientation,
   generateGenderPreference,
-  generateSexualOrientationPreference
+  generateSexualOrientationPreference,
+  generateSwipedMovies,
+  generateProfileFrame,
+  generateLikes,
+  generateSuperLikes
 } = require('../utils/fakeDataGenerator');
 
 // Configuration
@@ -348,7 +352,10 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
     movieDebateTopics: generateMovieDebateTopics(),
     favoriteSnacks: generateFavoriteSnacks(),
     quizResponses: generateQuizResponses(),
-    videoChatPreference: generateVideoChatPreference()
+    videoChatPreference: generateVideoChatPreference(),
+    swipedMovies: generateSwipedMovies(movies, tvShows), // NEW: Generate swiped movies
+    likes: generateLikes(), // NEW: Initialize likes array
+    superLikes: generateSuperLikes() // NEW: Initialize super likes array
   };
   
   const user = new User(userData);
@@ -369,6 +376,9 @@ async function createFakeUser(index, movies, tvShows, genres, providers) {
       // Assign primary archetype to user (same as API does)
       if (latestAttempt.personalityTraits.archetypes && latestAttempt.personalityTraits.archetypes.length > 0) {
         user.archetype = latestAttempt.personalityTraits.archetypes[0];
+        
+        // NEW: Set profile frame based on archetype
+        user.profileFrame = generateProfileFrame(user.archetype);
       }
     }
   }
