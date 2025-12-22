@@ -151,8 +151,8 @@ function renderCurrentMovie() {
         <h3 class="movie-title">${movie.title}</h3>
         ${movie.releaseDate ? `<p class="movie-year">${new Date(movie.releaseDate).getFullYear()}</p>` : ''}
         ${movie.rating ? `<p class="movie-rating">⭐ ${movie.rating.toFixed(1)}/10</p>` : ''}
-        ${streamingHTML}
         <p class="movie-overview">${movie.overview || 'No description available.'}</p>
+        ${streamingHTML}
       </div>
       <div class="swipe-overlay swipe-like">LIKE</div>
       <div class="swipe-overlay swipe-dislike">NOPE</div>

@@ -265,11 +265,11 @@ router.get('/movies/:userId', async (req, res) => {
 
     // Optionally fetch streaming availability for movies if Watchmode API is configured
     // This is done asynchronously and won't block the response
-    // Limit to first 5 movies to avoid rate limiting
+    // Limit to first 20 movies to avoid rate limiting while providing more streaming data
     const includeStreaming = req.query.includeStreaming === 'true';
     if (includeStreaming && formattedMovies.length > 0) {
       // Fetch streaming availability for first batch of movies with rate limiting
-      const batchSize = Math.min(5, formattedMovies.length);
+      const batchSize = Math.min(20, formattedMovies.length);
       
       for (let i = 0; i < batchSize; i++) {
         try {
