@@ -103,7 +103,8 @@ class ProfileView {
             if (user.profileFrame && user.profileFrame.isActive && user.profileFrame.archetypeType) {
                 // Wrap the profile picture with frame
                 const pictureContainer = profilePictureElement.parentElement;
-                if (pictureContainer && !pictureContainer.classList.contains('profile-frame')) {
+                // Check if frame hasn't been applied yet by looking for the wrapper class
+                if (pictureContainer && !pictureContainer.querySelector('.profile-picture-with-frame')) {
                     const frameWrapper = document.createElement('div');
                     frameWrapper.className = `profile-picture-with-frame`;
                     frameWrapper.style.width = '200px';

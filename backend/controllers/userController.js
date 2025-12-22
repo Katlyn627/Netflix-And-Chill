@@ -996,7 +996,10 @@ class UserController {
 
       // Validate that the archetype type has a corresponding frame theme
       if (!hasFrameTheme(archetypeType)) {
-        return res.status(400).json({ error: 'Invalid archetype type or frame theme not found' });
+        return res.status(400).json({ 
+          error: 'Frame theme not available for this archetype type',
+          details: `The archetype type "${archetypeType}" does not have an associated frame theme. Please use a valid archetype type.`
+        });
       }
 
       // Create User instance

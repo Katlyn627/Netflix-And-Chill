@@ -3,6 +3,10 @@
  * Allows users to select and preview profile frames based on their archetype
  */
 
+// Constants
+const DEFAULT_PROFILE_IMAGE = 'assets/images/default-profile.svg';
+const NOTIFICATION_ANIMATION_DURATION = 300; // milliseconds
+
 class ProfileFrameSelector {
   constructor(userId, config = {}) {
     this.userId = userId;
@@ -10,6 +14,7 @@ class ProfileFrameSelector {
       apiBaseUrl: config.apiBaseUrl || window.API_BASE_URL || 'http://localhost:3000/api',
       onFrameSelected: config.onFrameSelected || null,
       containerSelector: config.containerSelector || '#profile-frame-selector',
+      defaultProfileImage: config.defaultProfileImage || DEFAULT_PROFILE_IMAGE,
       ...config
     };
     this.availableFrames = [];
@@ -321,8 +326,8 @@ class ProfileFrameSelector {
     if (profilePic && profilePic.src && !profilePic.src.includes('default-profile')) {
       return profilePic.src;
     }
-    // Return default placeholder
-    return 'assets/images/default-profile.svg';
+    // Return configured default placeholder
+    return this.config.defaultProfileImage;
   }
 
   /**
@@ -348,7 +353,7 @@ class ProfileFrameSelector {
 
     setTimeout(() => {
       notification.style.animation = 'slideOut 0.3s ease-out';
-      setTimeout(() => notification.remove(), 300);
+      setTimeout(() => notification.remove(), NOTIFICATION_ANIMATION_DURATION);
     }, 3000);
   }
 
