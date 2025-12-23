@@ -594,6 +594,18 @@ footer {
         width: 95%;
         padding: 20px;
     }
+    
+    /* Profile card responsiveness */
+    #profile-header > div {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center;
+    }
+    
+    #profile-header button {
+        margin-left: 0 !important;
+        margin-top: 10px;
+    }
 }
 
 /* Search Results Styles */
@@ -916,6 +928,17 @@ footer {
     .logo-banner h1 {
         font-size: 1.5em;
         letter-spacing: 1px;
+    }
+    
+    /* Profile details responsive */
+    #profile-details, #profile-gender-orientation {
+        font-size: 0.9em;
+    }
+    
+    #profile-picture, #no-photo {
+        width: 120px !important;
+        height: 120px !important;
+        font-size: 36px !important;
     }
 }
 
