@@ -612,7 +612,58 @@
     padding: 12px 25px;
 }
 
-/* Filters modal styles */
+/* Filter button with icon */
+.btn-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #6c757d;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-filter:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-filter svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Filters drawer styles - right side slide-in */
+.filters-drawer {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    transition: right 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
+.filters-drawer.open {
+    right: 0;
+}
+
+.filters-drawer-content {
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Filters modal styles (legacy - kept for compatibility) */
 .filters-modal-content {
     max-width: 600px;
     width: 90%;
@@ -793,6 +844,15 @@
     
     .filters-modal-content {
         width: 95%;
+    }
+    
+    .filters-drawer {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .filters-drawer.open {
+        right: 0;
     }
     
     .filters-footer {

@@ -36,9 +36,13 @@
                         <h2>Find Your Perfect Streaming Partner</h2>
                         <div class="matches-actions">
                             <a href="watch-together.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">🎬 Watch Together</a>
-                            <button id="filters-btn" class="btn btn-secondary">🔍 Filters</button>
-                            <button id="find-matches-btn" class="btn btn-primary">Find Matches</button>
-                            <button id="refresh-matches-btn" class="btn btn-secondary" style="margin-left: 10px;">Refresh</button>
+                            <button id="refresh-matches-btn" class="btn btn-secondary">🔄 Refresh</button>
+                            <button id="filters-btn" class="btn btn-filter">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                </svg>
+                                Filters
+                            </button>
                         </div>
                     </div>
 
@@ -51,9 +55,9 @@
             </div>
         </main>
 
-        <!-- Filters Modal -->
-        <div id="filters-modal" class="modal" style="display: none;">
-            <div class="modal-content filters-modal-content">
+        <!-- Filters Drawer -->
+        <div id="filters-modal" class="filters-drawer" style="display: none;">
+            <div class="filters-drawer-content">
                 <div class="filters-header">
                     <h3>Filter Matches</h3>
                     <button class="close-modal" id="close-filters">&times;</button>
