@@ -364,7 +364,12 @@ class ProfileFrameSelector {
 
       console.log('[ProfileFrameSelector] Frame removed:', result);
 
-      // Re-render
+      // Callback to update parent component
+      if (this.config.onFrameSelected) {
+        this.config.onFrameSelected(result);
+      }
+
+      // Re-render selector UI
       this.render();
 
       this.showNotification('Profile frame removed successfully.', 'success');
