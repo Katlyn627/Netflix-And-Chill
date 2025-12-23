@@ -656,22 +656,22 @@ async function loadMatchHistory() {
         if (result.matches && result.matches.length > 0) {
             displayMatches(result.matches);
         } else {
-            // If no history, show empty state with option to find new matches
+            // If no history, show empty state
             matchesContainer.innerHTML = `
                 <div class="empty-state">
                     <p>No matches found yet.</p>
-                    <p>Click "Find Matches" to discover your perfect streaming partners!</p>
+                    <p>Try adding more shows to your watch history to find better matches!</p>
                 </div>
             `;
         }
     } catch (error) {
         loadingDiv.style.display = 'none';
-        // If match history fails, fall back to finding new matches
-        console.log('No match history found, will use Find Matches button');
+        // If match history fails, matches will auto-load on next page load
+        console.log('No match history found');
         matchesContainer.innerHTML = `
             <div class="empty-state">
                 <p>No matches found yet.</p>
-                <p>Click "Find Matches" to discover your perfect streaming partners!</p>
+                <p>Try adding more shows to your watch history to find better matches!</p>
             </div>
         `;
     }
