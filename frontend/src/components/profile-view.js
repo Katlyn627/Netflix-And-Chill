@@ -111,6 +111,7 @@ class ProfileView {
 
             // Apply profile frame if user has one selected
             if (user.profileFrame && user.profileFrame.isActive && user.profileFrame.archetypeType) {
+                // Build the frame wrapper structure
                 const frameWrapper = document.createElement('div');
                 frameWrapper.className = `profile-picture-with-frame`;
                 frameWrapper.style.width = '200px';
@@ -123,11 +124,13 @@ class ProfileView {
                 const inner = document.createElement('div');
                 inner.className = 'profile-frame-inner';
                 
-                // Move profile picture inside frame
-                pictureContainer.insertBefore(frameWrapper, profilePictureElement);
+                // Build the complete structure: wrapper > frame > inner > profilePicture
                 inner.appendChild(profilePictureElement);
                 frame.appendChild(inner);
                 frameWrapper.appendChild(frame);
+                
+                // Insert the complete frame wrapper into the container
+                pictureContainer.appendChild(frameWrapper);
             }
         }
     }
