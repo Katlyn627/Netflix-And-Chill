@@ -564,6 +564,24 @@
     box-shadow: none;
 }
 
+.btn-login {
+    background: transparent;
+    color: #FFFFFF;
+    border: 2px solid #E50914;
+    padding: 14px 32px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: #E50914;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 9, 20, 0.4);
+}
+
 /* Navigation Arrows */
 .navigation-arrows {
     position: absolute;

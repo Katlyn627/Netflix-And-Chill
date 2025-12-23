@@ -130,6 +130,11 @@ function completeOnboarding() {
     }, 500);
 }
 
+// Navigate to login page for existing members
+function goToLogin() {
+    window.location.href = 'login.html';
+}
+
 // Add swipe gesture support for mobile devices
 function addSwipeSupport() {
     let touchStartX = 0;
