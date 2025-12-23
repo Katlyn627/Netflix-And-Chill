@@ -80,8 +80,8 @@
                     
                     <div class="filter-group">
                         <label for="distance-filter">Distance (miles):</label>
-                        <input type="range" id="distance-filter" min="1" max="500" value="50" step="5">
-                        <span id="distance-value">50 miles</span>
+                        <input type="range" id="distance-filter" min="0" max="100" value="100" step="5">
+                        <span id="distance-value">Anywhere</span>
                     </div>
                     
                     <div class="filter-group">
@@ -106,6 +106,21 @@
                             <label><input type="checkbox" name="orientationFilter" value="asexual"> Asexual</label>
                             <label><input type="checkbox" name="orientationFilter" value="other"> Other</label>
                             <label><input type="checkbox" name="orientationFilter" value="any" checked> Any</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Archetype Personality:</label>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="archetypeFilter" value="cinephile"> Cinephile</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="casual_viewer"> Casual Viewer</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="binge_watcher"> Binge Watcher</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="action_fan"> Action Fan</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="comedy_lover"> Comedy Lover</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="horror_enthusiast"> Horror Enthusiast</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="romance_seeker"> Romance Seeker</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="documentary_buff"> Documentary Buff</label>
+                            <label><input type="checkbox" name="archetypeFilter" value="any" checked> Any</label>
                         </div>
                     </div>
                 </div>

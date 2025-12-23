@@ -9,9 +9,10 @@ let currentFilters = window.SharedFilters ? window.SharedFilters.loadFilters() :
     minMatchScore: 0,
     minAge: 18,
     maxAge: 100,
-    locationRadius: 50,
+    locationRadius: 100,
     genderPreference: [],
-    sexualOrientationPreference: []
+    sexualOrientationPreference: [],
+    archetypePreference: []
 };
 
 // Helper function to escape HTML to prevent XSS
@@ -692,7 +693,8 @@ function showFiltersModal() {
     document.getElementById('age-range-min-filter').value = currentFilters.minAge;
     document.getElementById('age-range-max-filter').value = currentFilters.maxAge;
     document.getElementById('distance-filter').value = currentFilters.locationRadius;
-    document.getElementById('distance-value').textContent = `${currentFilters.locationRadius} miles`;
+    const distanceText = currentFilters.locationRadius >= 100 ? 'Anywhere' : `${currentFilters.locationRadius} miles`;
+    document.getElementById('distance-value').textContent = distanceText;
     
     // Set gender checkboxes
     document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
@@ -706,6 +708,13 @@ function showFiltersModal() {
         cb.checked = currentFilters.sexualOrientationPreference.length === 0 
             ? cb.value === 'any'
             : currentFilters.sexualOrientationPreference.includes(cb.value);
+    });
+    
+    // Set archetype checkboxes
+    document.querySelectorAll('input[name="archetypeFilter"]').forEach(cb => {
+        cb.checked = currentFilters.archetypePreference.length === 0 
+            ? cb.value === 'any'
+            : currentFilters.archetypePreference.includes(cb.value);
     });
 }
 
@@ -769,9 +778,10 @@ function resetFilters() {
             minMatchScore: 0,
             minAge: 18,
             maxAge: 100,
-            locationRadius: 50,
+            locationRadius: 100,
             genderPreference: [],
-            sexualOrientationPreference: []
+            sexualOrientationPreference: [],
+            archetypePreference: []
         };
         
         // Update UI
@@ -779,14 +789,17 @@ function resetFilters() {
         document.getElementById('match-score-value').textContent = '0%';
         document.getElementById('age-range-min-filter').value = 18;
         document.getElementById('age-range-max-filter').value = 100;
-        document.getElementById('distance-filter').value = 50;
-        document.getElementById('distance-value').textContent = '50 miles';
+        document.getElementById('distance-filter').value = 100;
+        document.getElementById('distance-value').textContent = 'Anywhere';
         
         // Reset checkboxes
         document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
             cb.checked = cb.value === 'any';
         });
         document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
+            cb.checked = cb.value === 'any';
+        });
+        document.querySelectorAll('input[name="archetypeFilter"]').forEach(cb => {
             cb.checked = cb.value === 'any';
         });
     }
@@ -805,7 +818,8 @@ document.getElementById('match-score-filter').addEventListener('input', function
 });
 
 document.getElementById('distance-filter').addEventListener('input', function() {
-    document.getElementById('distance-value').textContent = `${this.value} miles`;
+    const distanceText = this.value >= 100 ? 'Anywhere' : `${this.value} miles`;
+    document.getElementById('distance-value').textContent = distanceText;
 });
 
 // Logout functionality

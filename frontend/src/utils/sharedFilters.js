@@ -8,9 +8,10 @@ class SharedFilters {
             minMatchScore: 0,
             minAge: 18,
             maxAge: 100,
-            locationRadius: 50,
+            locationRadius: 100,
             genderPreference: [],
-            sexualOrientationPreference: []
+            sexualOrientationPreference: [],
+            archetypePreference: []
         };
     }
 
@@ -73,6 +74,9 @@ class SharedFilters {
         if (filters.sexualOrientationPreference && filters.sexualOrientationPreference.length > 0) {
             url += `&sexualOrientationPreference=${filters.sexualOrientationPreference.join(',')}`;
         }
+        if (filters.archetypePreference && filters.archetypePreference.length > 0) {
+            url += `&archetypePreference=${filters.archetypePreference.join(',')}`;
+        }
         
         console.log('[SharedFilters] Built URL with filters:', url);
         return url;
@@ -132,6 +136,14 @@ class SharedFilters {
         }
         filters.sexualOrientationPreference = orientationPrefs.includes('any') ? [] : orientationPrefs;
         
+        // Get archetype preferences
+        const archetypeCheckboxes = document.querySelectorAll(`input[name="${formPrefix}archetypeFilter"]:checked`);
+        let archetypePrefs = Array.from(archetypeCheckboxes).map(cb => cb.value);
+        if (archetypePrefs.length > 1 && archetypePrefs.includes('any')) {
+            archetypePrefs = archetypePrefs.filter(p => p !== 'any');
+        }
+        filters.archetypePreference = archetypePrefs.includes('any') ? [] : archetypePrefs;
+        
         console.log('[SharedFilters] Extracted filters from form:', filters);
         return filters;
     }
@@ -153,8 +165,11 @@ class SharedFilters {
         if (ageMinInput) ageMinInput.value = filters.minAge || 18;
         if (ageMaxInput) ageMaxInput.value = filters.maxAge || 100;
         if (distanceInput) {
-            distanceInput.value = filters.locationRadius || 50;
-            if (distanceValue) distanceValue.textContent = `${filters.locationRadius || 50} miles`;
+            distanceInput.value = filters.locationRadius || 100;
+            if (distanceValue) {
+                const distanceText = (filters.locationRadius || 100) >= 100 ? 'Anywhere' : `${filters.locationRadius || 100} miles`;
+                distanceValue.textContent = distanceText;
+            }
         }
         
         // Set gender checkboxes
@@ -169,6 +184,13 @@ class SharedFilters {
             cb.checked = filters.sexualOrientationPreference.length === 0 
                 ? cb.value === 'any'
                 : filters.sexualOrientationPreference.includes(cb.value);
+        });
+        
+        // Set archetype checkboxes
+        document.querySelectorAll(`input[name="${formPrefix}archetypeFilter"]`).forEach(cb => {
+            cb.checked = filters.archetypePreference.length === 0 
+                ? cb.value === 'any'
+                : filters.archetypePreference.includes(cb.value);
         });
         
         console.log('[SharedFilters] Applied filters to form');
