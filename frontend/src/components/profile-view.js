@@ -99,14 +99,26 @@ class ProfileView {
             profilePictureElement.style.display = 'block';
             noPhotoElement.style.display = 'none';
 
-            const pictureContainer = profilePictureElement.parentElement;
+            // Get the original container (the parent that should hold the profile picture or frame wrapper)
+            let pictureContainer = profilePictureElement.parentElement;
             
-            // First, clean up any existing frame wrappers to avoid duplicates
-            const existingWrapper = pictureContainer.querySelector('.profile-picture-with-frame');
-            if (existingWrapper) {
-                // Move the profile picture back to the container before removing wrapper
+            // Traverse up to find the actual container (in case picture is nested in frames)
+            while (pictureContainer && (
+                pictureContainer.classList.contains('profile-frame-inner') ||
+                pictureContainer.classList.contains('profile-frame') ||
+                pictureContainer.classList.contains('profile-picture-with-frame')
+            )) {
+                pictureContainer = pictureContainer.parentElement;
+            }
+            
+            // Clean up ALL existing frame wrappers to avoid duplicates/clustering
+            // This handles cases where multiple frames might have been nested
+            const existingWrappers = pictureContainer.querySelectorAll('.profile-picture-with-frame');
+            if (existingWrappers.length > 0) {
+                // First, ensure the profile picture element is moved back to the main container
                 pictureContainer.appendChild(profilePictureElement);
-                existingWrapper.remove();
+                // Then remove all frame wrapper structures
+                existingWrappers.forEach(wrapper => wrapper.remove());
             }
 
             // Apply profile frame if user has one selected
