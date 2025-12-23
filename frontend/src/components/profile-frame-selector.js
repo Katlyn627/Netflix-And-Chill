@@ -21,6 +21,7 @@ class ProfileFrameSelector {
     this.recommendedFrame = null;
     this.currentFrame = null;
     this.userArchetype = null;
+    this.selectedFrameType = null; // Track user's selection in the UI
   }
 
   /**
@@ -118,7 +119,8 @@ class ProfileFrameSelector {
     `;
 
     this.availableFrames.forEach(frame => {
-      const isSelected = this.currentFrame?.archetypeType === frame.type;
+      const isActive = this.currentFrame?.archetypeType === frame.type;
+      const isSelected = this.selectedFrameType === frame.type;
       html += `
         <div class="frame-option ${isSelected ? 'selected' : ''}" 
              data-frame-type="${frame.type}"
@@ -131,7 +133,8 @@ class ProfileFrameSelector {
             </div>
           </div>
           <div class="frame-option-name">${this.escapeHtml(frame.name)}</div>
-          ${isSelected ? '<div style="text-align: center; margin-top: 5px; color: #E50914; font-size: 12px; font-weight: 600;">✓ Active</div>' : ''}
+          ${isActive ? '<div style="text-align: center; margin-top: 5px; color: #28a745; font-size: 12px; font-weight: 600;">✓ Active</div>' : ''}
+          ${isSelected && !isActive ? '<div style="text-align: center; margin-top: 5px; color: #E50914; font-size: 12px; font-weight: 600;">● Selected</div>' : ''}
         </div>
       `;
     });
@@ -141,10 +144,19 @@ class ProfileFrameSelector {
       </div>
     `;
 
+    // Apply Frame button at the bottom
+    html += `
+      <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+        <button id="apply-profile-frame" class="btn btn-primary" style="padding: 14px 32px; background: #E50914; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3); transition: all 0.3s ease;" ${!this.selectedFrameType ? 'disabled' : ''}>
+          Apply Frame
+        </button>
+      </div>
+    `;
+
     // Remove frame option if one is currently selected
     if (this.currentFrame) {
       html += `
-        <div style="text-align: center; margin-top: 20px;">
+        <div style="text-align: center; margin-top: 15px;">
           <button id="remove-profile-frame" class="btn btn-secondary" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 6px; cursor: pointer;">
             Remove Current Frame
           </button>
@@ -168,15 +180,63 @@ class ProfileFrameSelector {
     frameOptions.forEach(option => {
       option.addEventListener('click', (e) => {
         const frameType = option.getAttribute('data-frame-type');
-        this.showFramePreview(frameType);
+        // Select the frame (visual feedback)
+        this.selectFrameForPreview(frameType);
       });
     });
+
+    // Apply frame button
+    const applyBtn = document.getElementById('apply-profile-frame');
+    if (applyBtn) {
+      applyBtn.addEventListener('click', () => this.applySelectedFrame());
+    }
 
     // Remove frame button
     const removeBtn = document.getElementById('remove-profile-frame');
     if (removeBtn) {
       removeBtn.addEventListener('click', () => this.removeFrame());
     }
+  }
+
+  /**
+   * Select a frame for preview (updates UI, doesn't apply yet)
+   */
+  selectFrameForPreview(frameType) {
+    this.selectedFrameType = frameType;
+    
+    // Update visual selection
+    const frameOptions = document.querySelectorAll('.frame-option');
+    frameOptions.forEach(option => {
+      const optionFrameType = option.getAttribute('data-frame-type');
+      if (optionFrameType === frameType) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    });
+
+    // Enable the Apply Frame button
+    const applyBtn = document.getElementById('apply-profile-frame');
+    if (applyBtn) {
+      applyBtn.disabled = false;
+      applyBtn.style.opacity = '1';
+      applyBtn.style.cursor = 'pointer';
+    }
+
+    // Update the selection indicator
+    this.render();
+  }
+
+  /**
+   * Apply the selected frame
+   */
+  async applySelectedFrame() {
+    if (!this.selectedFrameType) {
+      this.showNotification('Please select a frame first', 'error');
+      return;
+    }
+
+    await this.selectFrame(this.selectedFrameType);
   }
 
   /**
