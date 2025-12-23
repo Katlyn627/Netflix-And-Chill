@@ -25,6 +25,7 @@
                 <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
             </div>
             <div class="logo-banner">
+                <img src="assets/images/logo.png" alt="Netflix & Chill Logo">
                 <h1>NETFLIX & CHILL</h1>
             </div>
             <p class="tagline">Your Profile</p>
@@ -33,20 +34,20 @@
         <main>
             <!-- Profile Header Section -->
             <section id="profile-header" class="card">
-                <div style="display: flex; align-items: start; gap: 20px;">
-                    <div id="profile-photo-container" style="flex-shrink: 0;">
-                        <img id="profile-picture" src="" alt="Profile" style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover; display: none;">
-                        <div id="no-photo" style="width: 150px; height: 150px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">
+                <div class="profile-header-container">
+                    <div id="profile-photo-container">
+                        <img id="profile-picture" src="" alt="Profile">
+                        <div id="no-photo">
                             👤
                         </div>
                     </div>
-                    <div style="flex-grow: 1;">
-                        <h2 id="profile-username" style="margin-top: 0;">Username</h2>
+                    <div class="profile-info-container">
+                        <h2 id="profile-username">Username</h2>
                         <p id="profile-details"><strong>Age:</strong> <span id="profile-age"></span> | <strong>Location:</strong> <span id="profile-location"></span></p>
                         <p id="profile-gender-orientation"><strong>Gender:</strong> <span id="profile-gender"></span> | <strong>Sexual Orientation:</strong> <span id="profile-sexual-orientation"></span></p>
-                        <p id="profile-bio" style="font-style: italic;"></p>
-                        <button id="edit-basic-info-btn" class="btn btn-secondary" style="margin-top: 10px;">Edit Basic Info</button>
-                        <button id="load-profile-view-btn" class="btn btn-primary" style="margin-top: 10px; margin-left: 10px;">Load Profile View</button>
+                        <p id="profile-bio"></p>
+                        <button id="edit-basic-info-btn" class="btn btn-secondary profile-action-btn">Edit Basic Info</button>
+                        <button id="load-profile-view-btn" class="btn btn-primary profile-action-btn">Load Profile View</button>
                     </div>
                 </div>
             </section>

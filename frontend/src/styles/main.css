@@ -21,16 +21,21 @@ header {
     color: white;
     margin-bottom: 40px;
     padding: 20px;
+    padding-top: 80px; /* Add space for nav-icons */
     position: relative;
 }
 
 .logo-banner {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
     background: #E50914;
     padding: 15px 30px;
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5);
+    flex-wrap: wrap;
 }
 
 .logo-banner h1 {
@@ -39,6 +44,13 @@ header {
     font-weight: 900;
     letter-spacing: 2px;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.logo-banner img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 header h1 {
@@ -582,6 +594,18 @@ footer {
         width: 95%;
         padding: 20px;
     }
+    
+    /* Profile card responsiveness */
+    .profile-header-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .profile-action-btn + .profile-action-btn {
+        margin-left: 0;
+        margin-top: 10px;
+    }
 }
 
 /* Search Results Styles */
@@ -826,6 +850,10 @@ footer {
 }
 
 @media (max-width: 768px) {
+    header {
+        padding-top: 70px; /* Adjust for smaller nav buttons */
+    }
+    
     .nav-icons {
         position: fixed;
         top: 10px;
@@ -844,6 +872,20 @@ footer {
         font-size: 16px;
     }
     
+    .logo-banner {
+        padding: 12px 20px;
+        gap: 10px;
+    }
+    
+    .logo-banner img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .logo-banner h1 {
+        font-size: 2em;
+    }
+    
     #quiz-questions-container {
         max-height: 500px;
         padding: 15px;
@@ -851,6 +893,10 @@ footer {
 }
 
 @media (max-width: 480px) {
+    header {
+        padding-top: 60px; /* Adjust for smallest screens */
+    }
+    
     .nav-icons {
         top: 5px;
         right: 5px;
@@ -869,13 +915,89 @@ footer {
         font-size: 14px;
     }
     
+    .logo-banner {
+        padding: 10px 15px;
+        gap: 8px;
+    }
+    
+    .logo-banner img {
+        width: 50px;
+        height: 50px;
+    }
+    
     .logo-banner h1 {
-        font-size: 2em;
+        font-size: 1.5em;
+        letter-spacing: 1px;
+    }
+    
+    /* Profile details responsive */
+    #profile-details, #profile-gender-orientation {
+        font-size: 0.9em;
+    }
+    
+    #profile-picture,
+    #no-photo {
+        width: 120px;
+        height: 120px;
+    }
+    
+    #no-photo {
+        font-size: 36px;
     }
 }
 
 
 /* Personality Profile Styles */
+.profile-header-container {
+    display: flex;
+    align-items: start;
+    gap: 20px;
+}
+
+#profile-photo-container {
+    flex-shrink: 0;
+}
+
+#profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: none;
+}
+
+#no-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: white;
+}
+
+.profile-info-container {
+    flex-grow: 1;
+}
+
+#profile-username {
+    margin-top: 0;
+}
+
+#profile-bio {
+    font-style: italic;
+}
+
+.profile-action-btn {
+    margin-top: 10px;
+}
+
+.profile-action-btn + .profile-action-btn {
+    margin-left: 10px;
+}
+
 .personality-bio {
     background: #f8f9fa;
     padding: 15px;
