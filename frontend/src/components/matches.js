@@ -656,22 +656,22 @@ async function loadMatchHistory() {
         if (result.matches && result.matches.length > 0) {
             displayMatches(result.matches);
         } else {
-            // If no history, show empty state with option to find new matches
+            // If no history, show empty state
             matchesContainer.innerHTML = `
                 <div class="empty-state">
                     <p>No matches found yet.</p>
-                    <p>Click "Find Matches" to discover your perfect streaming partners!</p>
+                    <p>Try adding more shows to your watch history to find better matches!</p>
                 </div>
             `;
         }
     } catch (error) {
         loadingDiv.style.display = 'none';
-        // If match history fails, fall back to finding new matches
-        console.log('No match history found, will use Find Matches button');
+        // If match history fails, matches will auto-load on next page load
+        console.log('No match history found');
         matchesContainer.innerHTML = `
             <div class="empty-state">
                 <p>No matches found yet.</p>
-                <p>Click "Find Matches" to discover your perfect streaming partners!</p>
+                <p>Try adding more shows to your watch history to find better matches!</p>
             </div>
         `;
     }
@@ -679,8 +679,12 @@ async function loadMatchHistory() {
 
 // Show filters modal
 function showFiltersModal() {
-    const modal = document.getElementById('filters-modal');
-    modal.style.display = 'flex';
+    const drawer = document.getElementById('filters-modal');
+    drawer.style.display = 'block';
+    // Add a slight delay for animation
+    setTimeout(() => {
+        drawer.classList.add('open');
+    }, 10);
     
     // Set current filter values
     document.getElementById('match-score-filter').value = currentFilters.minMatchScore;
@@ -707,8 +711,12 @@ function showFiltersModal() {
 
 // Hide filters modal
 function hideFiltersModal() {
-    const modal = document.getElementById('filters-modal');
-    modal.style.display = 'none';
+    const drawer = document.getElementById('filters-modal');
+    drawer.classList.remove('open');
+    // Wait for animation to complete before hiding
+    setTimeout(() => {
+        drawer.style.display = 'none';
+    }, 300);
 }
 
 // Apply filters
@@ -785,7 +793,6 @@ function resetFilters() {
 }
 
 // Event listeners
-document.getElementById('find-matches-btn').addEventListener('click', findMatches);
 document.getElementById('refresh-matches-btn').addEventListener('click', findMatches);
 document.getElementById('filters-btn').addEventListener('click', showFiltersModal);
 document.getElementById('close-filters').addEventListener('click', hideFiltersModal);
@@ -948,26 +955,23 @@ document.addEventListener('keypress', (e) => {
 // Close modal when clicking outside
 window.addEventListener('click', (e) => {
     const chatModal = document.getElementById('chat-modal');
-    const filtersModal = document.getElementById('filters-modal');
     const detailsModal = document.getElementById('match-details-modal');
     
     if (e.target === chatModal) {
         closeChatModal();
     }
-    if (e.target === filtersModal) {
-        hideFiltersModal();
-    }
     if (e.target === detailsModal) {
         closeMatchDetailsModal();
     }
+    // Note: filters drawer doesn't close on backdrop click - use close button
 });
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     if (currentUserId) {
         updateNavProfileIcon(currentUserId);
-        // Automatically load match history when page loads
-        loadMatchHistory();
+        // Automatically find matches when page loads
+        findMatches();
     }
 });
 
