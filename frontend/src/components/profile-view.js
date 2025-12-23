@@ -99,30 +99,38 @@ class ProfileView {
             profilePictureElement.style.display = 'block';
             noPhotoElement.style.display = 'none';
 
+            const pictureContainer = profilePictureElement.parentElement;
+            
+            // First, clean up any existing frame wrappers to avoid duplicates
+            const existingWrapper = pictureContainer.querySelector('.profile-picture-with-frame');
+            if (existingWrapper) {
+                // Move the profile picture back to the container before removing wrapper
+                pictureContainer.appendChild(profilePictureElement);
+                existingWrapper.remove();
+            }
+
             // Apply profile frame if user has one selected
             if (user.profileFrame && user.profileFrame.isActive && user.profileFrame.archetypeType) {
-                // Wrap the profile picture with frame
-                const pictureContainer = profilePictureElement.parentElement;
-                // Check if frame hasn't been applied yet by looking for the wrapper class
-                if (pictureContainer && !pictureContainer.querySelector('.profile-picture-with-frame')) {
-                    const frameWrapper = document.createElement('div');
-                    frameWrapper.className = `profile-picture-with-frame`;
-                    frameWrapper.style.width = '200px';
-                    frameWrapper.style.height = '200px';
-                    frameWrapper.style.margin = '0 auto';
-                    
-                    const frame = document.createElement('div');
-                    frame.className = `profile-frame profile-frame-${user.profileFrame.archetypeType}`;
-                    
-                    const inner = document.createElement('div');
-                    inner.className = 'profile-frame-inner';
-                    
-                    // Move profile picture inside frame
-                    pictureContainer.insertBefore(frameWrapper, profilePictureElement);
-                    inner.appendChild(profilePictureElement);
-                    frame.appendChild(inner);
-                    frameWrapper.appendChild(frame);
-                }
+                // Build the frame wrapper structure
+                const frameWrapper = document.createElement('div');
+                frameWrapper.className = `profile-picture-with-frame`;
+                frameWrapper.style.width = '200px';
+                frameWrapper.style.height = '200px';
+                frameWrapper.style.margin = '0 auto';
+                
+                const frame = document.createElement('div');
+                frame.className = `profile-frame profile-frame-${user.profileFrame.archetypeType}`;
+                
+                const inner = document.createElement('div');
+                inner.className = 'profile-frame-inner';
+                
+                // Build the complete structure: wrapper > frame > inner > profilePicture
+                inner.appendChild(profilePictureElement);
+                frame.appendChild(inner);
+                frameWrapper.appendChild(frame);
+                
+                // Insert the complete frame wrapper into the container
+                pictureContainer.appendChild(frameWrapper);
             }
         }
     }
