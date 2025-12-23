@@ -32,6 +32,11 @@ class MatchController {
       if (req.query.minMatchScore !== undefined) {
         filters.minMatchScore = parseInt(req.query.minMatchScore) || 0;
       }
+      if (req.query.archetypePreference) {
+        filters.archetypePreference = Array.isArray(req.query.archetypePreference) 
+          ? req.query.archetypePreference 
+          : req.query.archetypePreference.split(',');
+      }
 
       const dataStore = await getDatabase();
       const user = await dataStore.findUserById(userId);
