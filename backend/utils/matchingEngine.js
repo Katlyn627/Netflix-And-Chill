@@ -682,7 +682,7 @@ class MatchingEngine {
         if (!archetypePref.includes(otherUser.archetype.type)) {
           return false;
         }
-      } else if (archetypePref.length > 0) {
+      } else {
         // If archetype preference is specified but other user has no archetype, exclude them
         return false;
       }
