@@ -104,11 +104,8 @@ class ProfileView {
             // First, clean up any existing frame wrappers to avoid duplicates
             const existingWrapper = pictureContainer.querySelector('.profile-picture-with-frame');
             if (existingWrapper) {
-                // Extract the profile picture from the wrapper before removing it
-                const imgElement = existingWrapper.querySelector('#profile-picture');
-                if (imgElement) {
-                    pictureContainer.appendChild(imgElement);
-                }
+                // Move the profile picture back to the container before removing wrapper
+                pictureContainer.appendChild(profilePictureElement);
                 existingWrapper.remove();
             }
 
