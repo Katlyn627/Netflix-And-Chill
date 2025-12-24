@@ -128,7 +128,7 @@ class CompatibilityReport {
       const complements = complementaryPairs[a1.type] || [];
       complements.forEach(complementType => {
         const a2 = archetypes2Map.get(complementType);
-        if (a2 && !sharedTypes.has(a2.type)) {
+        if (a2 && !sharedTypes.has(complementType)) {
           complementary.push({
             user1: { type: a1.type, name: a1.name },
             user2: { type: a2.type, name: a2.name },
