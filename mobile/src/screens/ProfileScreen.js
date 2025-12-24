@@ -95,7 +95,13 @@ const ProfileScreen = ({ navigation }) => {
     });
 
     if (!result.canceled && result.assets[0]) {
-      // In a real app, you would upload this to your server
+      // TODO: Implement photo upload functionality
+      // Requirements:
+      // 1. Set up cloud storage (AWS S3, Cloudinary, or Firebase Storage)
+      // 2. Create backend endpoint for file upload
+      // 3. Upload image using FormData with multipart/form-data
+      // 4. Update user profile with returned image URL
+      // Example implementation needed in backend/routes/uploads.js
       Alert.alert('Coming Soon', 'Photo upload will be implemented with your backend storage solution.');
     }
   };

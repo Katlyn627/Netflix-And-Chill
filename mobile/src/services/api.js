@@ -2,10 +2,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-// API base URL - update for production
+// API base URL configuration
+// TODO: Set up environment variables for production deployment
+// For development: localhost works for iOS simulator, use 10.0.2.2 for Android emulator
+// For physical devices: use your computer's IP address (e.g., 192.168.1.100)
 const API_BASE_URL = __DEV__ 
   ? 'http://localhost:3000/api'
-  : 'https://your-app.herokuapp.com/api';
+  : Constants.expoConfig?.extra?.apiUrl || 'https://your-production-api.herokuapp.com/api';
 
 class ApiService {
   constructor() {
