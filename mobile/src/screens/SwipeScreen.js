@@ -32,10 +32,10 @@ export default function SwipeScreen() {
     }
   }, [user]);
 
-  const loadMovies = async () => {
+  const loadMovies = async (pageNum = page) => {
     try {
       setLoading(true);
-      const response = await api.getSwipeMovies(user.id, 20, page);
+      const response = await api.getSwipeMovies(user.id, 20, pageNum);
       if (response.success && response.movies) {
         setMovies(response.movies);
         setCurrentIndex(0);
@@ -75,8 +75,9 @@ export default function SwipeScreen() {
         setCurrentIndex(currentIndex + 1);
       } else {
         // Load more movies
-        setPage(page + 1);
-        loadMovies();
+        const nextPage = page + 1;
+        setPage(nextPage);
+        loadMovies(nextPage);
       }
     } catch (error) {
       console.error('Error swiping movie:', error);
