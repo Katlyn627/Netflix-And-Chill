@@ -153,14 +153,14 @@ Find this line (around line 5-10):
 ```javascript
 const API_BASE_URL = __DEV__ 
   ? 'http://localhost:3000/api'
-  : 'https://your-production-api.com/api';
+  : Constants.expoConfig?.extra?.apiUrl || 'https://your-production-api.herokuapp.com/api';
 ```
 
-Replace with your computer's IP address:
+Replace `localhost` with your computer's IP address:
 ```javascript
 const API_BASE_URL = __DEV__ 
   ? 'http://192.168.1.100:3000/api'  // Replace with YOUR IP address
-  : 'https://your-production-api.com/api';
+  : Constants.expoConfig?.extra?.apiUrl || 'https://your-production-api.herokuapp.com/api';
 ```
 
 Save the file.
@@ -261,7 +261,7 @@ Edit `mobile/src/services/api.js`:
 ```javascript
 const API_BASE_URL = __DEV__ 
   ? 'http://10.0.2.2:3000/api'  // Special IP for Android emulator
-  : 'https://your-production-api.com/api';
+  : Constants.expoConfig?.extra?.apiUrl || 'https://your-production-api.herokuapp.com/api';
 ```
 
 Save the file.
@@ -276,9 +276,9 @@ npm run android
 ```
 
 This will:
-1. Build the Android app
-2. Install it on the emulator
-3. Launch the app
+1. Start the Expo development server
+2. Open the app on the Android emulator
+3. Load the app automatically
 
 The app will open automatically on the emulator.
 
@@ -500,6 +500,8 @@ const API_BASE_URL = 'https://your-app.herokuapp.com/api';
 1. **Clear Expo cache and restart:**
    ```bash
    cd mobile
+   npx expo start -c
+   # or if you have expo-cli installed globally:
    expo start -c
    ```
 
@@ -513,9 +515,9 @@ const API_BASE_URL = 'https://your-app.herokuapp.com/api';
    - Go to Play Store
    - Update Expo Go to latest version
 
-4. **Check Expo CLI version:**
+4. **Update Expo packages:**
    ```bash
-   npm install -g expo-cli@latest
+   npx expo install expo@latest
    ```
 
 ### App Loads But Shows Blank Screen
