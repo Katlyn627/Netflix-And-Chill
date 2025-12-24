@@ -67,25 +67,75 @@ A modern dating application that matches users based on their streaming preferen
 - Cloud platform guides (AWS, Heroku, Vercel, Netlify)
 - Kubernetes ready
 
-## Installation
+## Repository Structure
 
-1. Clone the repository:
+This repository contains both the backend API and frontend web application in a unified structure:
+
+```
+Netflix-And-Chill/
+├── backend/          # Backend API (Node.js/Express)
+├── frontend/         # Frontend Web App (HTML/CSS/JS)
+├── mobile/           # Mobile App (React Native)
+├── docker-compose.yml # Docker orchestration
+└── package.json      # Root package with convenience scripts
+```
+
+Each component has its own dependencies and can be developed/deployed independently. See individual READMEs:
+- [Backend README](backend/README.md)
+- [Frontend README](frontend/README.md)
+- [Mobile README](mobile/README.md)
+
+## Quick Start
+
+### Option 1: Using Docker (Recommended)
+
+The easiest way to run the entire application:
+
 ```bash
+# Clone the repository
 git clone https://github.com/Katlyn627/Netflix-And-Chill.git
 cd Netflix-And-Chill
+
+# Configure environment variables
+cp backend/.env.example backend/.env
+# Edit backend/.env and add your TMDB API key
+
+# Build and start all services
+docker-compose up
+
+# Backend will be available at http://localhost:3000
+# Frontend will be available at http://localhost:8080
 ```
 
-2. Install dependencies:
+### Option 2: Manual Setup
+
+#### Step 1: Install Dependencies
+
+You can install all dependencies at once:
 ```bash
-npm install
+# Install all dependencies (backend + frontend + mobile)
+npm run install:all
 ```
 
-3. Configure environment:
+Or install them separately:
+```bash
+# Install backend dependencies
+npm run install:backend
+
+# Install frontend dependencies
+npm run install:frontend
+
+# Install mobile dependencies (optional)
+npm run install:mobile
+```
+
+#### Step 2: Configure Backend
+
 ```bash
 # Copy example env file
-cp .env.example .env
+cp backend/.env.example backend/.env
 
-# Edit .env and add your API keys
+# Edit backend/.env and add your API keys
 # See API_KEYS_GUIDE.md for detailed setup instructions
 ```
 
@@ -97,12 +147,59 @@ cp .env.example .env
 
 📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)**
 
-4. Start the backend server:
+#### Step 3: Start the Application
+
+**Option A: Run both backend and frontend together**
 ```bash
-npm start
+# Start backend
+npm run start:backend
+
+# In a separate terminal, start frontend
+npm run start:frontend
 ```
 
-The server will run on `http://localhost:3000`
+**Option B: Run just the backend**
+```bash
+npm run start:backend
+# or
+cd backend && npm start
+```
+
+Then open `frontend/index.html` directly in your browser.
+
+The backend server will run on `http://localhost:3000`  
+The frontend dev server will run on `http://localhost:8080`
+
+## Docker Deployment
+
+This project includes Docker support with `docker-compose.yml` for easy deployment:
+
+### Available Services
+
+- **backend**: Node.js API server (port 3000)
+- **frontend**: Nginx web server (port 8080)
+- **mongodb**: Optional MongoDB database (port 27017, commented out by default)
+- **postgres**: Optional PostgreSQL database (port 5432, commented out by default)
+
+### Docker Commands
+
+```bash
+# Build all images
+npm run docker:build
+
+# Start all services
+npm run docker:up
+
+# Stop all services
+npm run docker:down
+
+# View logs
+npm run docker:logs
+```
+
+### Using Database Containers
+
+To use MongoDB or PostgreSQL with Docker, edit `docker-compose.yml` and uncomment the respective service.
 
 ## Usage
 
@@ -130,9 +227,18 @@ See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder d
 
 ### Opening the App
 
-1. Start the backend server (see Installation step 3)
-2. Open `frontend/index.html` in your web browser
-3. Follow the on-screen steps to create your profile and find matches
+**With Docker:**
+```bash
+docker-compose up
+# Backend: http://localhost:3000
+# Frontend: http://localhost:8080
+```
+
+**Without Docker:**
+1. Start the backend server: `npm run start:backend`
+2. Start the frontend server: `npm run start:frontend`
+3. Open your browser to `http://localhost:8080`
+4. Follow the on-screen steps to create your profile and find matches
    - Or login with any user from `TEST_CREDENTIALS.md` if you've run the seeder
 
 ### API Endpoints
@@ -177,68 +283,215 @@ See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder d
 
 ```
 Netflix-And-Chill/
-├── assets/
-│   └── onboarding/              # Onboarding assets
-│       ├── logo.svg             # App logo and branding
-│       ├── onboard1.svg         # "Chat & Watch Together"
-│       ├── onboard2.svg         # "Build Real Connections"
-│       ├── onboard3.svg         # "Discover Matches Through Movies"
-│       └── README.md            # Asset documentation
-├── backend/
+├── backend/                      # Backend API Server
 │   ├── config/
-│   │   └── config.js           # Configuration settings
+│   │   ├── config.js             # Configuration settings
+│   │   └── firebase.js           # Firebase configuration
 │   ├── controllers/
-│   │   ├── userController.js   # User management logic
-│   │   └── matchController.js  # Matching logic
+│   │   ├── userController.js     # User management logic
+│   │   ├── matchController.js    # Matching logic
+│   │   ├── chatController.js     # Chat logic
+│   │   └── watchInvitationController.js
 │   ├── database/
-│   │   ├── databaseFactory.js  # Database factory
-│   │   ├── mongodbAdapter.js   # MongoDB adapter
-│   │   └── postgresqlAdapter.js # PostgreSQL adapter
+│   │   ├── databaseFactory.js    # Database factory
+│   │   ├── mongodbAdapter.js     # MongoDB adapter
+│   │   └── postgresqlAdapter.js  # PostgreSQL adapter
 │   ├── models/
-│   │   ├── User.js             # User model
-│   │   ├── Match.js            # Match model
-│   │   └── Like.js             # Like model
+│   │   ├── User.js               # User model
+│   │   ├── Match.js              # Match model
+│   │   ├── Like.js               # Like model
+│   │   ├── Chat.js               # Chat model
+│   │   ├── QuizAttempt.js        # Quiz attempt model
+│   │   └── WatchInvitation.js    # Watch invitation model
 │   ├── routes/
-│   │   ├── users.js            # User routes
-│   │   ├── matches.js          # Match routes
-│   │   ├── recommendations.js  # Recommendation routes
-│   │   └── likes.js            # Like routes
+│   │   ├── users.js              # User routes
+│   │   ├── matches.js            # Match routes
+│   │   ├── chat.js               # Chat routes
+│   │   ├── likes.js              # Like routes
+│   │   ├── recommendations.js    # Recommendation routes
+│   │   ├── streaming.js          # Streaming routes
+│   │   ├── swipe.js              # Swipe routes
+│   │   ├── uploads.js            # Upload routes
+│   │   └── watchInvitations.js   # Watch invitation routes
+│   ├── scripts/
+│   │   ├── seedUsers.js          # Seed test users
+│   │   ├── seedMatches.js        # Seed test matches
+│   │   └── ...                   # Other utility scripts
 │   ├── services/
-│   │   ├── streamingAPIService.js    # TMDB API integration
-│   │   └── recommendationService.js  # Recommendation engine
+│   │   ├── recommendationService.js
+│   │   ├── streamingAPIService.js
+│   │   ├── watchmodeAPIService.js
+│   │   ├── streamChatService.js
+│   │   └── fallbackData.js
 │   ├── utils/
-│   │   ├── dataStore.js        # File-based data persistence
-│   │   └── matchingEngine.js   # Matching algorithm
-│   └── server.js               # Express server
-├── frontend/
-│   ├── onboarding.html         # Onboarding flow
-│   ├── index.html              # Main HTML page
+│   │   ├── matchingEngine.js     # Core matching algorithm
+│   │   ├── movieQuizScoring.js   # Quiz scoring logic
+│   │   ├── compatibilityReport.js
+│   │   └── ...                   # Other utilities
+│   ├── server.js                 # Main server file
+│   ├── package.json              # Backend dependencies
+│   ├── Dockerfile                # Backend Docker configuration
+│   ├── .env.example              # Backend environment template
+│   └── README.md                 # Backend documentation
+├── frontend/                     # Frontend Web Application
 │   ├── assets/
-│   │   └── images/             # App icons and images
-│   └── src/
-│       ├── components/
-│       │   ├── onboarding.js   # Onboarding component
-│       │   └── app.js          # Frontend application logic
-│       ├── services/
-│       │   └── api.js          # API service layer
-│       └── styles/
-│           ├── onboarding.css  # Onboarding styles
-│           └── main.css        # Styling
+│   │   ├── images/               # App icons and images
+│   │   ├── onboarding/           # Onboarding assets
+│   │   └── uploads/              # User uploaded content
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── chat.js
+│   │   │   ├── matches.js
+│   │   │   ├── login.js
+│   │   │   └── ...
+│   │   ├── services/
+│   │   │   └── api.js            # API service layer
+│   │   ├── styles/
+│   │   │   ├── base.css
+│   │   │   └── components.css
+│   │   └── utils/
+│   │       ├── errorHandler.js
+│   │       ├── navigation.js
+│   │       └── sharedFilters.js
+│   ├── index.html                # Landing page
+│   ├── onboarding.html           # Onboarding flow
+│   ├── login.html                # Login page
+│   ├── homepage.html             # Main dashboard
+│   ├── profile.html              # Profile management
+│   ├── swipe.html                # Swipe interface
+│   ├── matches.html              # Matches view
+│   ├── chat.html                 # Chat interface
+│   ├── watch-together.html       # Watch party coordination
+│   ├── manifest.json             # PWA manifest
+│   ├── package.json              # Frontend dependencies
+│   ├── Dockerfile                # Frontend Docker configuration
+│   ├── .env.example              # Frontend environment template
+│   └── README.md                 # Frontend documentation
+├── mobile/                       # Mobile Application (React Native)
+│   ├── src/
+│   │   ├── screens/              # Mobile screens
+│   │   ├── navigation/           # Navigation configuration
+│   │   ├── services/             # API services
+│   │   ├── context/              # React context
+│   │   └── styles/               # Mobile styles
+│   ├── App.js                    # Main mobile app component
+│   ├── package.json              # Mobile dependencies
+│   └── README.md                 # Mobile documentation
+├── assets/
+│   └── onboarding/               # Shared onboarding assets
+│       ├── logo.svg              # App logo
+│       ├── onboard1.svg
+│       ├── onboard2.svg
+│       ├── onboard3.svg
+│       └── README.md
 ├── docs/
 │   ├── deployment/
-│   │   ├── AWS.md              # AWS deployment guide
-│   │   ├── HEROKU.md           # Heroku deployment guide
-│   │   ├── VERCEL-NETLIFY.md   # Vercel/Netlify guide
-│   │   └── DOCKER.md           # Docker deployment guide
+│   │   ├── AWS.md                # AWS deployment guide
+│   │   ├── HEROKU.md             # Heroku deployment guide
+│   │   ├── VERCEL-NETLIFY.md     # Vercel/Netlify guide
+│   │   └── DOCKER.md             # Docker deployment guide
 │   ├── mobile/
-│   │   └── REACT-NATIVE.md     # React Native mobile app guide
-│   └── DATABASE-MIGRATION.md   # Database migration guide
-├── data/                       # User data storage (auto-generated)
-├── .env.example                # Environment variables template
-├── package.json
+│   │   └── REACT-NATIVE.md       # React Native guide
+│   └── DATABASE-MIGRATION.md     # Database migration guide
+├── src/                          # Additional Express/Next.js features
+│   ├── app/                      # Next.js app directory (debates)
+│   ├── server/                   # Express server (debates API)
+│   ├── models/                   # Additional models
+│   └── lib/                      # Shared libraries
+├── data/                         # User data storage (auto-generated)
+├── docker-compose.yml            # Docker orchestration
+├── package.json                  # Root package with convenience scripts
+├── .env.example                  # Environment variables template
 ├── .gitignore
-└── README.md
+└── README.md                     # This file
 ```
+
+## Dependency Management
+
+Each part of the application (backend, frontend, mobile) has its own `package.json` with separate dependencies:
+
+### Backend Dependencies
+The backend has its own package.json in `backend/package.json` with:
+- Express.js - Web framework
+- MongoDB/Mongoose - Database drivers
+- PostgreSQL (pg) - Database driver
+- CORS - Cross-origin resource sharing
+- Multer - File upload handling
+- Firebase - Authentication
+- Stream Chat - Real-time messaging
+- And more...
+
+To install/update backend dependencies:
+```bash
+cd backend
+npm install
+# or from root
+npm run install:backend
+```
+
+### Frontend Dependencies
+The frontend has its own package.json in `frontend/package.json` with:
+- http-server - Development server (dev dependency only)
+
+The frontend is built with vanilla HTML/CSS/JavaScript and has minimal dependencies. Most functionality is self-contained.
+
+To install/update frontend dependencies:
+```bash
+cd frontend
+npm install
+# or from root
+npm run install:frontend
+```
+
+### Mobile Dependencies
+The mobile app has its own package.json in `mobile/package.json` with:
+- React Native - Mobile framework
+- Expo - Development platform
+- React Navigation - Navigation library
+- Axios - HTTP client
+- And more...
+
+To install/update mobile dependencies:
+```bash
+cd mobile
+npm install
+# or from root
+npm run install:mobile
+```
+
+### Root Package.json
+The root `package.json` provides convenience scripts to manage all parts:
+- `npm run install:all` - Install all dependencies
+- `npm run start:backend` - Start backend server
+- `npm run start:frontend` - Start frontend dev server
+- `npm run docker:up` - Start with Docker
+- And more...
+
+## Environment Variables
+
+Each component has its own environment configuration:
+
+### Backend Environment (backend/.env)
+```bash
+# Copy the example file
+cp backend/.env.example backend/.env
+
+# Edit backend/.env with your values
+PORT=3000
+DB_TYPE=file
+TMDB_API_KEY=your_key_here
+```
+
+### Frontend Environment (frontend/.env)
+```bash
+# Copy the example file
+cp frontend/.env.example frontend/.env
+
+# Edit frontend/.env with your values
+API_BASE_URL=http://localhost:3000
+```
+
+The frontend also needs to update the API endpoint in `frontend/src/services/api.js` for production deployments.
 
 ## Onboarding & Brand Assets
 

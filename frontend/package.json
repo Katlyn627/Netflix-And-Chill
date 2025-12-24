@@ -1,0 +1,23 @@
+{
+  "name": "netflix-and-chill-frontend",
+  "version": "1.0.0",
+  "description": "Frontend web application for Netflix and Chill dating app",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -c-1",
+    "dev": "npx http-server . -p 8080 -c-1 -o",
+    "build": "echo 'Frontend is static HTML/CSS/JS - no build needed'",
+    "test": "echo \"Warning: no test specified\" && exit 0"
+  },
+  "keywords": [
+    "dating",
+    "streaming",
+    "netflix",
+    "frontend",
+    "web"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
