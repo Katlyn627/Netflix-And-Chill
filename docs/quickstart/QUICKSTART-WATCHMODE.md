@@ -28,9 +28,9 @@ Movie cards will show which streaming platforms have each movie/show available:
 
 ### Step 2: Configure the App (1 minute)
 
-1. Open your `.env` file (or create one from `.env.example`):
+1. Open your `.env` file (or create one from `.env.sample`):
    ```bash
-   cp .env.example .env
+   cp .env.sample .env
    ```
 
 2. Add your Watchmode API key:

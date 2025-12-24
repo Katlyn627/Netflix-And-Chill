@@ -23,7 +23,7 @@ The app includes fallback demo data with 15 popular movies. This option works wi
 
 2. **Create .env file** (if not already exists):
    ```bash
-   cp .env.example .env
+   cp .env.sample .env
    ```
 
 3. **Start the server**:
