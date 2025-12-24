@@ -192,7 +192,7 @@ PG_PASSWORD=yourpassword
 - `docs/deployment/AWS.md` - AWS deployment (EB, EC2, Lambda)
 - `docs/deployment/VERCEL-NETLIFY.md` - Vercel/Netlify/Render
 - `docs/deployment/DOCKER.md` - Docker & Kubernetes
-- `.env.example` - Environment configuration template
+- `.env.sample` - Environment configuration template
 
 **Platforms Covered:**
 
@@ -337,7 +337,7 @@ While all requested features are implemented, potential additions include:
 
 For questions or issues:
 - Review documentation in `/docs`
-- Check `.env.example` for configuration
+- Check `.env.sample` for configuration
 - See deployment guides for platform-specific help
 - Open GitHub issue for bugs
 

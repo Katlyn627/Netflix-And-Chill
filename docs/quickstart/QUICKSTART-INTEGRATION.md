@@ -10,7 +10,7 @@ git clone https://github.com/Katlyn627/Netflix-And-Chill.git
 cd Netflix-And-Chill
 
 # 2. Configure backend
-cp backend/.env.example backend/.env
+cp backend/.env.sample backend/.env
 # Edit backend/.env and add your TMDB API key
 
 # 3. Start everything with Docker
@@ -32,7 +32,7 @@ cd Netflix-And-Chill
 npm run install:all
 
 # 3. Configure backend
-cp backend/.env.example backend/.env
+cp backend/.env.sample backend/.env
 # Edit backend/.env and add your TMDB API key
 
 # 4. Start backend (Terminal 1)

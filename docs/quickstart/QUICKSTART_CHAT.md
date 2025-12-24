@@ -7,7 +7,7 @@ This is a quick 5-minute guide to get the chat feature working. For detailed set
 ### Step 1: Create Environment File (30 seconds)
 
 ```bash
-cp .env.example .env
+cp .env.sample backend/.env
 ```
 
 ### Step 2: Get TMDB API Key (2 minutes) - **REQUIRED**

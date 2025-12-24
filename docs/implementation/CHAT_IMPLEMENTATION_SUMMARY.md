@@ -54,7 +54,7 @@ This implementation makes the chat feature fully functional with Firebase Authen
 ### 3. Configuration & Documentation
 
 #### Environment Setup
-- `.env.example` with all required and optional API keys
+- `.env.sample` with all required and optional API keys
 - Firebase configuration placeholders
 - Stream Chat configuration placeholders
 - TMDB API configuration
@@ -137,7 +137,7 @@ GET  /api/chat/:userId1/:userId2              - Returns messages from Stream or 
 
 ### Minimum Setup (5 minutes)
 ```bash
-cp .env.example .env
+cp .env.sample .env
 # Add TMDB API key to .env
 npm install
 npm run seed    # Optional: Add test users

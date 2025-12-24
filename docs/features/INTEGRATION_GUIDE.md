@@ -17,14 +17,14 @@ Netflix-And-Chill/
 ├── backend/                      # Backend API Server (Independent)
 │   ├── package.json              # Backend-specific dependencies
 │   ├── Dockerfile                # Backend containerization
-│   ├── .env.example              # Backend environment template
+│   ├── .env.sample              # Backend environment template
 │   ├── README.md                 # Backend documentation
 │   └── server.js                 # Main server entry point
 │
 ├── frontend/                     # Frontend Web Application (Independent)
 │   ├── package.json              # Frontend-specific dependencies
 │   ├── Dockerfile                # Frontend containerization
-│   ├── .env.example              # Frontend environment template
+│   ├── .env.sample              # Frontend environment template
 │   ├── README.md                 # Frontend documentation
 │   └── index.html                # Main entry point
 │
@@ -145,7 +145,7 @@ npm run seed:all             # Seed everything
 # Clone and configure
 git clone https://github.com/Katlyn627/Netflix-And-Chill.git
 cd Netflix-And-Chill
-cp backend/.env.example backend/.env
+cp backend/.env.sample backend/.env
 # Edit backend/.env with your TMDB API key
 
 # Start everything
@@ -167,7 +167,7 @@ cd Netflix-And-Chill
 npm run install:all
 
 # Configure backend
-cp backend/.env.example backend/.env
+cp backend/.env.sample backend/.env
 # Edit backend/.env with your API keys
 
 # Start backend (terminal 1)
