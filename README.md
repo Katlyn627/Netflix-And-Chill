@@ -101,7 +101,7 @@ cp .env.sample backend/.env
 # Edit backend/.env and add your TMDB API key
 
 # Build and start all services
-docker-compose up
+docker compose up
 
 # Backend will be available at http://localhost:3000
 # Frontend will be available at http://localhost:8080
@@ -229,7 +229,7 @@ See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder d
 
 **With Docker:**
 ```bash
-docker-compose up
+docker compose up
 # Backend: http://localhost:3000
 # Frontend: http://localhost:8080
 ```

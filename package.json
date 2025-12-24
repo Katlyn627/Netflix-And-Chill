@@ -22,10 +22,10 @@
     "seed:matches:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/seedMatches.js",
     "seed:all": "npm run seed && npm run seed:matches",
     "seed:all:mongodb": "npm run seed:mongodb && npm run seed:matches:mongodb",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "keywords": [
     "dating",

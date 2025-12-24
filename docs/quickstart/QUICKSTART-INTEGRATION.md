@@ -14,7 +14,7 @@ cp backend/.env.sample backend/.env
 # Edit backend/.env and add your TMDB API key
 
 # 3. Start everything with Docker
-docker-compose up --build
+docker compose up --build
 
 # 4. Access the app
 # Backend API: http://localhost:3000
@@ -140,7 +140,7 @@ npm run install:all
 ```bash
 # Clean Docker cache
 docker system prune -a
-docker-compose build --no-cache
+docker compose build --no-cache
 ```
 
 ### API Connection Issues

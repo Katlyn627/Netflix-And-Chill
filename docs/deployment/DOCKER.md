@@ -220,27 +220,27 @@ volumes:
 echo "TMDB_API_KEY=your_api_key" > .env
 
 # Start all services
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop services
-docker-compose down
+docker compose down
 
 # Stop and remove volumes
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Update Application
 
 ```bash
 # Rebuild and restart
-docker-compose up -d --build
+docker compose up -d --build
 
 # Or pull latest changes and restart
 git pull
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ## Nginx Configuration
@@ -466,7 +466,7 @@ NODE_ENV=production
 
 Load in Docker Compose:
 ```bash
-docker-compose --env-file .env up -d
+docker compose --env-file .env up -d
 ```
 
 ## Security Best Practices
@@ -495,10 +495,10 @@ docker inspect --format='{{.State.Health.Status}}' netflix-chill
 
 ```bash
 # Follow logs
-docker-compose logs -f app
+docker compose logs -f app
 
 # Last 100 lines
-docker-compose logs --tail=100 app
+docker compose logs --tail=100 app
 ```
 
 ## Troubleshooting
@@ -514,7 +514,7 @@ docker logs netflix-chill
 docker network inspect <network-name>
 
 # Check if services can reach each other
-docker-compose exec app ping mongo
+docker compose exec app ping mongo
 ```
 
 ### Permission issues

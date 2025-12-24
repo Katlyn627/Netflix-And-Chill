@@ -157,11 +157,11 @@ docker build -t netflix-and-chill-frontend .
 docker run -p 8080:80 netflix-and-chill-frontend
 ```
 
-Or use docker-compose from the root directory:
+Or use docker compose from the root directory:
 
 ```bash
 cd ..
-docker-compose up frontend
+docker compose up frontend
 ```
 
 ## API Integration
