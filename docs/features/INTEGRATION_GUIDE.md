@@ -149,7 +149,7 @@ cp backend/.env.sample backend/.env
 # Edit backend/.env with your TMDB API key
 
 # Start everything
-docker-compose up --build
+docker compose up --build
 
 # Access the application
 # Backend: http://localhost:3000
@@ -269,7 +269,7 @@ npm start
 
 #### Test with Docker
 ```bash
-docker-compose up --build
+docker compose up --build
 # Backend: http://localhost:3000
 # Frontend: http://localhost:8080
 ```
@@ -304,7 +304,7 @@ npm run install:all
 ```bash
 # Clear Docker cache
 docker system prune -a
-docker-compose build --no-cache
+docker compose build --no-cache
 ```
 
 ### Port Conflicts
