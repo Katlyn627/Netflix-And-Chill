@@ -306,7 +306,7 @@ class ApiService {
   // Watch Together endpoints
   async getWatchInvitations(userId) {
     try {
-      const response = await this.client.get(`/watchInvitations/${userId}`);
+      const response = await this.client.get(`/watch-invitations/user/${userId}`);
       return response.data;
     } catch (error) {
       console.error('Get watch invitations error:', error);
@@ -316,7 +316,7 @@ class ApiService {
 
   async createWatchInvitation(invitationData) {
     try {
-      const response = await this.client.post('/watchInvitations', invitationData);
+      const response = await this.client.post('/watch-invitations', invitationData);
       return response.data;
     } catch (error) {
       console.error('Create watch invitation error:', error);
@@ -326,7 +326,7 @@ class ApiService {
 
   async respondToInvitation(invitationId, response) {
     try {
-      const result = await this.client.put(`/watchInvitations/${invitationId}/respond`, { response });
+      const result = await this.client.put(`/watch-invitations/${invitationId}`, { status: response });
       return result.data;
     } catch (error) {
       console.error('Respond to invitation error:', error);
