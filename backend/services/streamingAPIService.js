@@ -384,10 +384,15 @@ class StreamingAPIService {
 
   /**
    * Get available streaming providers/watch providers
+   * Limited to top 15 streaming services: AMC+, Amazon Prime, Apple TV, BritBox, Disney+, 
+   * HBO Max, Hulu, Netflix, Paramount+, Peacock, Roku, Sling TV, Starz
    * @param {string} region - ISO 3166-1 country code (e.g., 'US')
    * @returns {Promise<Array>}
    */
   async getStreamingProviders(region = 'US') {
+    // Allowed provider IDs for the top 15 streaming services
+    const allowedProviderIds = [528, 9, 350, 380, 337, 384, 15, 8, 531, 387, 1853, 1747, 1825];
+    
     // If no API key or placeholder, return fallback data (sorted alphabetically)
     if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
       return fallbackProviders.sort((a, b) => a.name.localeCompare(b.name));
@@ -403,14 +408,21 @@ class StreamingAPIService {
         return fallbackProviders.sort((a, b) => a.name.localeCompare(b.name));
       }
       
-      // Format providers with logo URLs and limit to top 25 by display priority
-      const formattedProviders = results.slice(0, 25).map((provider, index) => ({
-        id: provider.provider_id,
-        name: provider.provider_name,
-        logoPath: provider.logo_path,
-        logoUrl: provider.logo_path ? this.getLogoUrl(provider.logo_path) : null,
-        displayPriority: provider.display_priority || index + 1
-      }));
+      // Filter to only allowed providers, format with logo URLs
+      const formattedProviders = results
+        .filter(provider => allowedProviderIds.includes(provider.provider_id))
+        .map((provider, index) => ({
+          id: provider.provider_id,
+          name: provider.provider_name,
+          logoPath: provider.logo_path,
+          logoUrl: provider.logo_path ? this.getLogoUrl(provider.logo_path) : null,
+          displayPriority: provider.display_priority || index + 1
+        }));
+      
+      // If filtered results are empty, use fallback
+      if (formattedProviders.length === 0) {
+        return fallbackProviders.sort((a, b) => a.name.localeCompare(b.name));
+      }
       
       // Sort alphabetically by name
       return formattedProviders.sort((a, b) => a.name.localeCompare(b.name));
