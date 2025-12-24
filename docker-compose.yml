@@ -13,8 +13,12 @@ services:
       - PORT=3000
       - NODE_ENV=production
       - DB_TYPE=${DB_TYPE:-file}
-    env_file:
-      - ./backend/.env
+      # Add your environment variables here or uncomment env_file below
+      # - TMDB_API_KEY=${TMDB_API_KEY}
+      # - MONGODB_URI=${MONGODB_URI}
+    # Uncomment to use .env file (create backend/.env first)
+    # env_file:
+    #   - ./backend/.env
     volumes:
       # Mount data directory for file-based storage
       - ./data:/app/data
@@ -24,7 +28,7 @@ services:
       - netflix-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/users"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/users', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -44,7 +48,7 @@ services:
       - netflix-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      test: ["CMD", "sh", "-c", "wget --spider -q http://localhost:80/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
