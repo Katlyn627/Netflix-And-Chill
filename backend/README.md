@@ -263,11 +263,11 @@ docker build -t netflix-and-chill-backend .
 docker run -p 3000:3000 --env-file .env netflix-and-chill-backend
 ```
 
-Or use docker-compose from the root directory:
+Or use docker compose from the root directory:
 
 ```bash
 cd ..
-docker-compose up backend
+docker compose up backend
 ```
 
 ## Troubleshooting
