@@ -46,7 +46,7 @@ const fallbackProviders = [
   { id: 9, name: 'Amazon Prime Video', logoPath: '/emthp39XA2YScoYL1p0sdbAH2WA.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg', displayPriority: 2 },
   { id: 350, name: 'Apple TV+', logoPath: '/6uhKBfmtzFqOcLousHwZuzcrScK.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/6uhKBfmtzFqOcLousHwZuzcrScK.jpg', displayPriority: 3 },
   { id: 380, name: 'BritBox', logoPath: '/q830U76wMbC4R1tQmCxdYB8bLsq.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/q830U76wMbC4R1tQmCxdYB8bLsq.jpg', displayPriority: 4 },
-  { id: 283, name: 'Crunchyroll', logoPath: '/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', displayPriority: 5 },
+  { id: 283, name: 'Crunchyroll', logoPath: '/ypCaAQf60KMrsyiSGq5lBhfYUGK.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/ypCaAQf60KMrsyiSGq5lBhfYUGK.jpg', displayPriority: 5 },
   { id: 337, name: 'Disney+', logoPath: '/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg', displayPriority: 6 },
   { id: 384, name: 'HBO Max', logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', displayPriority: 7 },
   { id: 15, name: 'Hulu', logoPath: '/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg', displayPriority: 8 },
