@@ -50,43 +50,43 @@ class MatchController {
 
       const matches = MatchingEngine.findMatches(currentUser, userObjects, limit, filters);
 
-      // Save matches to database
-      for (const match of matches) {
-        await dataStore.addMatch(match);
-      }
+      // Batch save matches to database for better performance
+      // Use Promise.all to save all matches concurrently
+      await Promise.all(matches.map(match => dataStore.addMatch(match)));
 
-      // Populate match results with user details
-      const matchesWithDetails = await Promise.all(
-        matches.map(async (match) => {
-          const matchedUser = await dataStore.findUserById(match.user2Id);
-          return {
-            matchId: match.id,
-            matchScore: match.matchScore,
-            matchDescription: match.matchDescription,
-            sharedContent: match.sharedContent,
-            quizCompatibility: match.quizCompatibility,
-            snackCompatibility: match.snackCompatibility,
-            debateCompatibility: match.debateCompatibility,
-            emotionalToneCompatibility: match.emotionalToneCompatibility,
-            user: {
-              id: matchedUser.id,
-              username: matchedUser.username,
-              age: matchedUser.age,
-              location: matchedUser.location,
-              gender: matchedUser.gender,
-              sexualOrientation: matchedUser.sexualOrientation,
-              bio: matchedUser.bio,
-              profilePicture: matchedUser.profilePicture,
-              photoGallery: matchedUser.photoGallery,
-              streamingServices: matchedUser.streamingServices,
-              movieDebateResponses: matchedUser.movieDebateResponses,
-              moviePromptResponses: matchedUser.moviePromptResponses,
-              archetype: matchedUser.archetype,
-              personalityBio: matchedUser.personalityBio
-            }
-          };
-        })
-      );
+      // Create a map of users for O(1) lookups instead of N database queries
+      const userMap = new Map(allUsers.map(u => [u.id, u]));
+
+      // Populate match results with user details using the user map
+      const matchesWithDetails = matches.map((match) => {
+        const matchedUser = userMap.get(match.user2Id);
+        return {
+          matchId: match.id,
+          matchScore: match.matchScore,
+          matchDescription: match.matchDescription,
+          sharedContent: match.sharedContent,
+          quizCompatibility: match.quizCompatibility,
+          snackCompatibility: match.snackCompatibility,
+          debateCompatibility: match.debateCompatibility,
+          emotionalToneCompatibility: match.emotionalToneCompatibility,
+          user: {
+            id: matchedUser.id,
+            username: matchedUser.username,
+            age: matchedUser.age,
+            location: matchedUser.location,
+            gender: matchedUser.gender,
+            sexualOrientation: matchedUser.sexualOrientation,
+            bio: matchedUser.bio,
+            profilePicture: matchedUser.profilePicture,
+            photoGallery: matchedUser.photoGallery,
+            streamingServices: matchedUser.streamingServices,
+            movieDebateResponses: matchedUser.movieDebateResponses,
+            moviePromptResponses: matchedUser.moviePromptResponses,
+            archetype: matchedUser.archetype,
+            personalityBio: matchedUser.personalityBio
+          }
+        };
+      });
 
       res.json({
         success: true,
@@ -110,11 +110,28 @@ class MatchController {
 
       const matches = await dataStore.findMatchesForUser(userId);
 
-      // Populate match details with user information
-      const matchesWithDetails = await Promise.all(
-        matches.map(async (match) => {
+      // Get all unique user IDs involved in matches
+      const userIds = new Set();
+      matches.forEach(match => {
+        const otherUserId = match.user1Id === userId ? match.user2Id : match.user1Id;
+        userIds.add(otherUserId);
+      });
+
+      // Batch fetch all users in parallel instead of one at a time
+      const users = await Promise.all(
+        Array.from(userIds).map(id => dataStore.findUserById(id))
+      );
+      
+      // Create a map for O(1) lookups
+      const userMap = new Map(
+        users.filter(u => u !== null).map(u => [u.id, u])
+      );
+
+      // Populate match details with user information using the user map
+      const matchesWithDetails = matches
+        .map((match) => {
           const otherUserId = match.user1Id === userId ? match.user2Id : match.user1Id;
-          const matchedUser = await dataStore.findUserById(otherUserId);
+          const matchedUser = userMap.get(otherUserId);
           
           if (!matchedUser) {
             return null;
@@ -148,16 +165,13 @@ class MatchController {
             }
           };
         })
-      );
-
-      // Filter out null entries (users that no longer exist)
-      const validMatches = matchesWithDetails.filter(m => m !== null);
+        .filter(m => m !== null); // Filter out null entries (users that no longer exist)
 
       res.json({
         success: true,
         userId: userId,
-        matchCount: validMatches.length,
-        matches: validMatches
+        matchCount: matchesWithDetails.length,
+        matches: matchesWithDetails
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

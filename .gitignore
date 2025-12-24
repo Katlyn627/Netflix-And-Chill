@@ -32,3 +32,4 @@ out/
 package-lock.json
 yarn.lock
 frontend/test-frame-selector.html
+backend/test-*.js
