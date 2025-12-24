@@ -384,14 +384,14 @@ class StreamingAPIService {
 
   /**
    * Get available streaming providers/watch providers
-   * Limited to top streaming services (13 services): AMC+, Amazon Prime, Apple TV, BritBox, 
-   * Disney+, HBO Max, Hulu, Netflix, Paramount+, Peacock, Roku, Sling TV, Starz
+   * Limited to top streaming services (15 services): AMC+, Amazon Prime, Apple TV, BritBox, 
+   * Crunchyroll, Disney+, HBO Max, Hulu, Netflix, Paramount+, Peacock, Roku, Showtime, Sling TV, Starz
    * @param {string} region - ISO 3166-1 country code (e.g., 'US')
    * @returns {Promise<Array>}
    */
   async getStreamingProviders(region = 'US') {
     // Allowed provider IDs for the top 15 streaming services
-    const allowedProviderIds = [528, 9, 350, 380, 337, 384, 15, 8, 531, 387, 1853, 1747, 1825];
+    const allowedProviderIds = [528, 9, 350, 380, 283, 337, 384, 15, 8, 531, 387, 1853, 37, 1747, 1825];
     
     // If no API key or placeholder, return fallback data (sorted alphabetically)
     if (!this.apiKey || this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {

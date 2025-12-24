@@ -114,14 +114,14 @@ router.get('/providers', async (req, res) => {
     const { region = 'US' } = req.query;
     const providers = await streamingAPIService.getStreamingProviders(region);
     
-    // Format the providers with logo URLs
+    // Format the providers with logo URLs and sort alphabetically by name
     const formattedProviders = providers.map(provider => ({
       id: provider.provider_id || provider.id,
       name: provider.provider_name || provider.name,
       logoPath: provider.logo_path || provider.logoPath,
       logoUrl: provider.logo_path ? streamingAPIService.getLogoUrl(provider.logo_path) : provider.logoUrl,
       displayPriority: provider.display_priority || provider.displayPriority
-    })).sort((a, b) => a.displayPriority - b.displayPriority);
+    })).sort((a, b) => a.name.localeCompare(b.name));
     
     res.json({
       region,
