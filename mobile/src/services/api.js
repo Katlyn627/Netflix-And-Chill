@@ -225,6 +225,115 @@ class ApiService {
     }
   }
 
+  // Swipe endpoints
+  async getSwipeMovies(userId, limit = 50, page = 1) {
+    try {
+      const response = await this.client.get(`/swipe/movies/${userId}`, {
+        params: { limit, page }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get swipe movies error:', error);
+      throw error;
+    }
+  }
+
+  async swipeMovie(userId, movieId, action) {
+    try {
+      const response = await this.client.post('/swipe/action', {
+        userId,
+        movieId,
+        action
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Swipe movie error:', error);
+      throw error;
+    }
+  }
+
+  async getSwipeStats(userId) {
+    try {
+      const response = await this.client.get(`/swipe/stats/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get swipe stats error:', error);
+      throw error;
+    }
+  }
+
+  async getSwipeAnalytics(userId) {
+    try {
+      const response = await this.client.get(`/swipe/analytics/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get swipe analytics error:', error);
+      throw error;
+    }
+  }
+
+  // Quiz endpoints
+  async getQuizOptions() {
+    try {
+      const response = await this.client.get('/users/quiz/options');
+      return response.data;
+    } catch (error) {
+      console.error('Get quiz options error:', error);
+      throw error;
+    }
+  }
+
+  async submitQuiz(userId, responses) {
+    try {
+      const response = await this.client.put(`/users/${userId}/quiz`, responses);
+      return response.data;
+    } catch (error) {
+      console.error('Submit quiz error:', error);
+      throw error;
+    }
+  }
+
+  async getQuizAttempts(userId) {
+    try {
+      const response = await this.client.get(`/users/${userId}/quiz/attempts`);
+      return response.data;
+    } catch (error) {
+      console.error('Get quiz attempts error:', error);
+      throw error;
+    }
+  }
+
+  // Watch Together endpoints
+  async getWatchInvitations(userId) {
+    try {
+      const response = await this.client.get(`/watch-invitations/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get watch invitations error:', error);
+      throw error;
+    }
+  }
+
+  async createWatchInvitation(invitationData) {
+    try {
+      const response = await this.client.post('/watch-invitations', invitationData);
+      return response.data;
+    } catch (error) {
+      console.error('Create watch invitation error:', error);
+      throw error;
+    }
+  }
+
+  async respondToInvitation(invitationId, response) {
+    try {
+      const result = await this.client.put(`/watch-invitations/${invitationId}`, { status: response });
+      return result.data;
+    } catch (error) {
+      console.error('Respond to invitation error:', error);
+      throw error;
+    }
+  }
+
   // Storage helpers
   async saveUserId(userId) {
     try {
