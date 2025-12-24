@@ -24,7 +24,7 @@ A modern dating application that matches users based on their streaming preferen
   - Works with fallback storage (no external APIs required)
   - Optional Stream Chat for real-time features (typing indicators, read receipts)
   - Optional Firebase for authentication
-  - See [QUICKSTART_CHAT.md](QUICKSTART_CHAT.md) for 5-minute setup
+  - See [docs/quickstart/QUICKSTART_CHAT.md](docs/quickstart/QUICKSTART_CHAT.md) for 5-minute setup
 - **Advanced Filters**: Filter matches by age range, location radius, gender, and orientation
 - **Shared Filter State**: Filters persist across matches and chat pages
 - **Personalized Recommendations**: AI-powered show/movie recommendations based on your watch history and preferences
@@ -60,7 +60,7 @@ A modern dating application that matches users based on their streaming preferen
 - Context API for state management
 - Dark theme optimized design
 - Full feature parity with web version
-- See [QUICKSTART-REACT-NATIVE.md](QUICKSTART-REACT-NATIVE.md) for setup
+- See [docs/quickstart/QUICKSTART-REACT-NATIVE.md](docs/quickstart/QUICKSTART-REACT-NATIVE.md) for setup
 
 ### Deployment
 - Docker support
@@ -97,7 +97,7 @@ git clone https://github.com/Katlyn627/Netflix-And-Chill.git
 cd Netflix-And-Chill
 
 # Configure environment variables
-cp backend/.env.example backend/.env
+cp .env.sample backend/.env
 # Edit backend/.env and add your TMDB API key
 
 # Build and start all services
@@ -132,8 +132,8 @@ npm run install:mobile
 #### Step 2: Configure Backend
 
 ```bash
-# Copy example env file
-cp backend/.env.example backend/.env
+# Copy sample env file
+cp .env.sample backend/.env
 
 # Edit backend/.env and add your API keys
 # See API_KEYS_GUIDE.md for detailed setup instructions
@@ -401,7 +401,7 @@ Netflix-And-Chill/
 ├── data/                         # User data storage (auto-generated)
 ├── docker-compose.yml            # Docker orchestration
 ├── package.json                  # Root package with convenience scripts
-├── .env.example                  # Environment variables template
+├── .env.sample                   # Environment variables template
 ├── .gitignore
 └── README.md                     # This file
 ```
@@ -473,21 +473,22 @@ Each component has its own environment configuration:
 
 ### Backend Environment (backend/.env)
 ```bash
-# Copy the example file
-cp backend/.env.example backend/.env
+# Copy the sample file
+cp .env.sample backend/.env
 
 # Edit backend/.env with your values
 PORT=3000
 DB_TYPE=file
 TMDB_API_KEY=your_key_here
+JWT_SECRET=your_secret_here
 ```
 
 ### Frontend Environment (frontend/.env)
 ```bash
-# Copy the example file
-cp frontend/.env.example frontend/.env
+# Copy the sample file (if needed for frontend-specific config)
+cp .env.sample frontend/.env
 
-# Edit frontend/.env with your values
+# Or create a minimal frontend .env with just:
 API_BASE_URL=http://localhost:3000
 ```
 
@@ -602,12 +603,12 @@ Netflix and Chill integrates with various external APIs and services to provide 
 
 For detailed step-by-step instructions on setting up each API key and service, see:
 - 📖 **[API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)** - Comprehensive setup guide
-- 📝 **[.env.example](.env.example)** - Environment variables template
+- 📝 **[.env.sample](.env.sample)** - Environment variables template
 
 **Quick Start:**
 ```bash
 # 1. Copy environment template
-cp .env.example .env
+cp .env.sample backend/.env
 
 # 2. Add your TMDB API key (minimum required)
 # Edit .env and add: TMDB_API_KEY=your_key_here
@@ -647,7 +648,7 @@ npm start
 - **Fully functional native iOS and Android apps**
 - Built with React Native and Expo for cross-platform development
 - All features available: matching, chat, recommendations, profile management
-- **Quick Start**: See [QUICKSTART-REACT-NATIVE.md](QUICKSTART-REACT-NATIVE.md)
+- **Quick Start**: See [docs/quickstart/QUICKSTART-REACT-NATIVE.md](docs/quickstart/QUICKSTART-REACT-NATIVE.md)
 - **Full Documentation**: See [mobile/README.md](mobile/README.md)
 - **Features**:
   - Native performance and smooth animations
@@ -675,7 +676,7 @@ Choose the database that best fits your needs:
 - NoSQL database
 - Great for flexible schema
 - Free tier available on MongoDB Atlas
-- **Quick Setup:** See [MONGODB_SETUP.md](MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
+- **Quick Setup:** See [docs/setup/MONGODB_SETUP.md](docs/setup/MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
 - **Migration Guide:** See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
 
 ### PostgreSQL
