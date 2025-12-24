@@ -384,8 +384,8 @@ class StreamingAPIService {
 
   /**
    * Get available streaming providers/watch providers
-   * Limited to top 15 streaming services: AMC+, Amazon Prime, Apple TV, BritBox, Disney+, 
-   * HBO Max, Hulu, Netflix, Paramount+, Peacock, Roku, Sling TV, Starz
+   * Limited to top streaming services (13 services): AMC+, Amazon Prime, Apple TV, BritBox, 
+   * Disney+, HBO Max, Hulu, Netflix, Paramount+, Peacock, Roku, Sling TV, Starz
    * @param {string} region - ISO 3166-1 country code (e.g., 'US')
    * @returns {Promise<Array>}
    */

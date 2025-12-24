@@ -37,9 +37,9 @@ const fallbackGenres = [
   { id: 10768, name: 'War & Politics', types: ['tv'] }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-// Top 15 streaming services for profile creation
-// Based on requirements: Apple TV, Amazon Prime, Hulu, HBO Max, Brit Box, Roku, Starz, 
-// Paramount+, Disney+, Netflix, Peacock, Sling TV, AMC+ (sorted alphabetically)
+// Top streaming services for profile creation (13 services)
+// Based on requirements: AMC+, Amazon Prime, Apple TV, Brit Box, Disney+, HBO Max, Hulu,
+// Netflix, Paramount+, Peacock, Roku, Sling TV, Starz (sorted alphabetically)
 // Logo paths from TMDB API for accurate branding
 const fallbackProviders = [
   { id: 528, name: 'AMC+', logoPath: '/aLCMhlprd1JnYW8N5GWy84DEQdf.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aLCMhlprd1JnYW8N5GWy84DEQdf.jpg', displayPriority: 1 },
