@@ -18,6 +18,10 @@ A fully functional React Native mobile dating app that matches users based on th
 
 ✅ **Core Features**
 - Smart matching algorithm based on streaming preferences
+- Movie swiping with like/dislike actions
+- Compatibility quiz with 50 questions
+- Watch party coordination with matches
+- Swipe analytics dashboard
 - Real-time chat with matches
 - Personalized movie/TV show recommendations
 - Swipeable match cards
@@ -25,6 +29,16 @@ A fully functional React Native mobile dating app that matches users based on th
 - Streaming service selection
 - Genre preferences
 - Watch history tracking
+
+✅ **Navigation**
+- 7-tab bottom navigator:
+  - Matches (❤️) - Browse and connect with matches
+  - Swipe (🎬) - Discover and rate movies
+  - Discover (🔍) - Personalized recommendations
+  - Quiz (📝) - Take compatibility quiz
+  - Watch (📺) - Coordinate watch parties
+  - Stats (📊) - View your swipe analytics
+  - Profile (👤) - Manage your profile
 
 ✅ **UI/UX**
 - Netflix-inspired design
