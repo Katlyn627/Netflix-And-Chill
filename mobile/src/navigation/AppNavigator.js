@@ -13,6 +13,10 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import RecommendationsScreen from '../screens/RecommendationsScreen';
 import ChatScreen from '../screens/ChatScreen';
+import SwipeScreen from '../screens/SwipeScreen';
+import QuizScreen from '../screens/QuizScreen';
+import WatchTogetherScreen from '../screens/WatchTogetherScreen';
+import AnalyticsScreen from '../screens/AnalyticsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -45,6 +49,9 @@ function MainTabs() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        tabBarLabelStyle: {
+          fontSize: 10,
+        },
       }}
     >
       <Tab.Screen
@@ -56,11 +63,43 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
+        name="Swipe"
+        component={SwipeScreen}
+        options={{
+          title: 'Swipe',
+          tabBarIcon: ({ color }) => <TabIcon icon="🎬" color={color} />,
+        }}
+      />
+      <Tab.Screen
         name="Recommendations"
         component={RecommendationsScreen}
         options={{
           title: 'Discover',
-          tabBarIcon: ({ color }) => <TabIcon icon="🎬" color={color} />,
+          tabBarIcon: ({ color }) => <TabIcon icon="🔍" color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Quiz"
+        component={QuizScreen}
+        options={{
+          title: 'Quiz',
+          tabBarIcon: ({ color }) => <TabIcon icon="📝" color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="WatchTogether"
+        component={WatchTogetherScreen}
+        options={{
+          title: 'Watch',
+          tabBarIcon: ({ color }) => <TabIcon icon="📺" color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Analytics"
+        component={AnalyticsScreen}
+        options={{
+          title: 'Stats',
+          tabBarIcon: ({ color }) => <TabIcon icon="📊" color={color} />,
         }}
       />
       <Tab.Screen
