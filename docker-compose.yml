@@ -85,9 +85,7 @@ networks:
   netflix-network:
     driver: bridge
 
-volumes:
-  # Uncomment if using MongoDB
-  # mongodb_data:
-  
-  # Uncomment if using PostgreSQL
-  # postgres_data:
+# Uncomment this section if using MongoDB or PostgreSQL
+# volumes:
+#   mongodb_data:
+#   postgres_data:
