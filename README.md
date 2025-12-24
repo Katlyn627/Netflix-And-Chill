@@ -649,6 +649,7 @@ npm start
 - Built with React Native and Expo for cross-platform development
 - All features available: matching, chat, recommendations, profile management
 - **Quick Start**: See [docs/quickstart/QUICKSTART-REACT-NATIVE.md](docs/quickstart/QUICKSTART-REACT-NATIVE.md)
+- **Android Deployment**: See [docs/mobile/ANDROID_DEPLOYMENT_GUIDE.md](docs/mobile/ANDROID_DEPLOYMENT_GUIDE.md) - Complete walkthrough for deploying to Android phone
 - **Full Documentation**: See [mobile/README.md](mobile/README.md)
 - **Features**:
   - Native performance and smooth animations
