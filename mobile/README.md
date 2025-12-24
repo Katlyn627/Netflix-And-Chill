@@ -2,6 +2,11 @@
 
 A fully functional React Native mobile dating app that matches users based on their streaming preferences, watch history, and binge-watching habits. Built with Expo for cross-platform compatibility (iOS and Android).
 
+## 📱 Quick Start Guides
+
+- **🚀 Deploy to Android Phone**: See [../docs/mobile/ANDROID_DEPLOYMENT_GUIDE.md](../docs/mobile/ANDROID_DEPLOYMENT_GUIDE.md) - Complete walkthrough for deploying and opening the app on your Android device
+- **⚡ Quick Start (All Platforms)**: See [../docs/quickstart/QUICKSTART-REACT-NATIVE.md](../docs/quickstart/QUICKSTART-REACT-NATIVE.md) - 10-minute setup guide
+
 ## Features
 
 ✅ **Complete Mobile Experience**

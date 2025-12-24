@@ -2,6 +2,9 @@
 
 This guide will help you get the Netflix & Chill React Native mobile app up and running in under 10 minutes.
 
+> **📱 Looking for Android-specific deployment instructions?**  
+> See the comprehensive [Android Deployment Guide](../mobile/ANDROID_DEPLOYMENT_GUIDE.md) for step-by-step instructions on deploying and opening the app on your Android phone.
+
 ## Prerequisites
 
 Before starting, ensure you have:
