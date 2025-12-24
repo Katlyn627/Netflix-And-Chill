@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -15,6 +16,14 @@ import ChatScreen from '../screens/ChatScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const TabIcon = ({ icon, color }) => {
+  return (
+    <Text style={{ fontSize: 24, opacity: color === colors.primary ? 1 : 0.5 }}>
+      {icon}
+    </Text>
+  );
+};
 
 function MainTabs() {
   return (
@@ -65,10 +74,6 @@ function MainTabs() {
     </Tab.Navigator>
   );
 }
-
-const TabIcon = ({ icon, color }) => {
-  return <span style={{ fontSize: 24, opacity: color === colors.primary ? 1 : 0.5 }}>{icon}</span>;
-};
 
 export default function AppNavigator() {
   return (
