@@ -12,24 +12,24 @@ class RecommendationService {
    * @returns {Promise<Array>}
    */
   async getRecommendationsForUser(user, limit = 10) {
-    const recommendations = [];
     const seenTitles = new Set(user.watchHistory.map(item => item.title.toLowerCase()));
 
     try {
-      // Strategy 1: Get trending content
-      const trending = await streamingAPIService.getTrending('all', 'week');
-      
-      // Strategy 2: Based on user's favorite genres
-      let genreBasedRecs = [];
-      if (user.preferences.genres && user.preferences.genres.length > 0) {
-        genreBasedRecs = await this.getRecommendationsByGenres(user.preferences.genres);
-      }
-
-      // Strategy 3: Based on watch history (collaborative filtering simulation)
-      let watchHistoryRecs = [];
-      if (user.watchHistory.length > 0) {
-        watchHistoryRecs = await this.getRecommendationsByWatchHistory(user.watchHistory);
-      }
+      // Execute all recommendation strategies in parallel for better performance
+      const [trending, genreBasedRecs, watchHistoryRecs] = await Promise.all([
+        // Strategy 1: Get trending content
+        streamingAPIService.getTrending('all', 'week'),
+        
+        // Strategy 2: Based on user's favorite genres
+        user.preferences.genres && user.preferences.genres.length > 0
+          ? this.getRecommendationsByGenres(user.preferences.genres)
+          : Promise.resolve([]),
+        
+        // Strategy 3: Based on watch history (collaborative filtering simulation)
+        user.watchHistory.length > 0
+          ? this.getRecommendationsByWatchHistory(user.watchHistory)
+          : Promise.resolve([])
+      ]);
 
       // Combine and deduplicate recommendations
       const allRecs = [...trending, ...genreBasedRecs, ...watchHistoryRecs];
@@ -69,8 +69,11 @@ class RecommendationService {
           .map(g => g.id);
       } else {
         // Get genre IDs from TMDB (legacy format with genre names as strings)
-        const movieGenres = await streamingAPIService.getGenres('movie');
-        const tvGenres = await streamingAPIService.getGenres('tv');
+        // Fetch both movie and TV genres in parallel
+        const [movieGenres, tvGenres] = await Promise.all([
+          streamingAPIService.getGenres('movie'),
+          streamingAPIService.getGenres('tv')
+        ]);
         
         const genreMap = {};
         [...movieGenres, ...tvGenres].forEach(g => {
@@ -94,16 +97,17 @@ class RecommendationService {
         return [];
       }
 
-      // Discover movies and TV shows with these genres
-      const movies = await streamingAPIService.discover('movie', {
-        with_genres: genreIds.join(','),
-        sort_by: 'popularity.desc'
-      });
-
-      const tvShows = await streamingAPIService.discover('tv', {
-        with_genres: genreIds.join(','),
-        sort_by: 'popularity.desc'
-      });
+      // Discover movies and TV shows with these genres in parallel
+      const [movies, tvShows] = await Promise.all([
+        streamingAPIService.discover('movie', {
+          with_genres: genreIds.join(','),
+          sort_by: 'popularity.desc'
+        }),
+        streamingAPIService.discover('tv', {
+          with_genres: genreIds.join(','),
+          sort_by: 'popularity.desc'
+        })
+      ]);
 
       return [...movies.slice(0, 5), ...tvShows.slice(0, 5)];
     } catch (error) {
@@ -119,26 +123,33 @@ class RecommendationService {
    */
   async getRecommendationsByWatchHistory(watchHistory) {
     try {
-      const recommendations = [];
-      
       // For simplicity, get recommendations from the most recent watched items
       const recentItems = watchHistory.slice(-3);
       
-      for (const item of recentItems) {
-        // Search for the item to get its ID
-        const searchResults = await streamingAPIService.search(item.title);
-        
-        if (searchResults.length > 0) {
-          const match = searchResults[0];
-          const mediaType = match.media_type || (item.type === 'movie' ? 'movie' : 'tv');
+      // Parallelize all API calls to improve performance
+      const recommendationPromises = recentItems.map(async (item) => {
+        try {
+          // Search for the item to get its ID
+          const searchResults = await streamingAPIService.search(item.title);
           
-          // Get recommendations based on this item
-          const recs = await streamingAPIService.getRecommendations(match.id, mediaType);
-          recommendations.push(...recs.slice(0, 3));
+          if (searchResults.length > 0) {
+            const match = searchResults[0];
+            const mediaType = match.media_type || (item.type === 'movie' ? 'movie' : 'tv');
+            
+            // Get recommendations based on this item
+            const recs = await streamingAPIService.getRecommendations(match.id, mediaType);
+            return recs.slice(0, 3);
+          }
+          return [];
+        } catch (error) {
+          console.error(`Error getting recommendations for ${item.title}:`, error);
+          return [];
         }
-      }
+      });
 
-      return recommendations;
+      // Wait for all promises to resolve and flatten results
+      const allRecommendations = await Promise.all(recommendationPromises);
+      return allRecommendations.flat();
     } catch (error) {
       console.error('Error getting watch history-based recommendations:', error);
       return [];
