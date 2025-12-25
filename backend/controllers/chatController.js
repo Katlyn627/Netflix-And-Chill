@@ -117,13 +117,6 @@ class ChatController {
         return res.status(400).json({ error: 'userId is required' });
       }
 
-      if (!streamChatService.isReady()) {
-        return res.status(503).json({ 
-          error: 'Stream Chat is not configured',
-          message: 'Please configure Stream Chat API keys in .env file'
-        });
-      }
-
       const dataStore = await getDatabase();
       const user = await dataStore.findUserById(userId);
 
@@ -131,11 +124,24 @@ class ChatController {
         return res.status(404).json({ error: 'User not found' });
       }
 
+      // Check if Stream Chat is configured
+      if (!streamChatService.isReady()) {
+        // Return success=false to indicate Stream Chat is not available
+        // This allows the frontend to gracefully fall back to polling
+        return res.json({ 
+          success: false,
+          configured: false,
+          message: 'Stream Chat is not configured. Using fallback chat storage.',
+          userId
+        });
+      }
+
       // Create user token for Stream Chat
       const token = streamChatService.createUserToken(userId);
 
       res.json({
         success: true,
+        configured: true,
         token,
         apiKey: process.env.STREAM_API_KEY,
         userId
