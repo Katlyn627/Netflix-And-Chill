@@ -2,7 +2,10 @@ const API_BASE_URL = 'http://localhost:3000/api';
 
 // Error messages
 const ERROR_MESSAGES = {
-    SERVER_UNREACHABLE: 'Unable to connect to server. Please make sure the backend server is running on port 3000.'
+    SERVER_UNREACHABLE: 'Unable to connect to server. Please make sure the backend server is running on port 3000.',
+    USER_CREATION_FAILED: 'User creation failed',
+    LOGIN_FAILED: 'Login failed',
+    FETCH_USER_FAILED: 'Failed to fetch user'
 };
 
 class NetflixAndChillAPI {
@@ -40,7 +43,7 @@ class NetflixAndChillAPI {
             });
             
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'User creation failed' }));
+                const errorData = await response.json().catch(() => ({ error: ERROR_MESSAGES.USER_CREATION_FAILED }));
                 throw new Error(errorData.error || `Server error: ${response.status}`);
             }
             
@@ -61,7 +64,7 @@ class NetflixAndChillAPI {
             });
             
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Login failed' }));
+                const errorData = await response.json().catch(() => ({ error: ERROR_MESSAGES.LOGIN_FAILED }));
                 throw new Error(errorData.error || `Server error: ${response.status}`);
             }
             
@@ -76,7 +79,7 @@ class NetflixAndChillAPI {
             const response = await fetch(`${API_BASE_URL}/users/${userId}`);
             
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Failed to fetch user' }));
+                const errorData = await response.json().catch(() => ({ error: ERROR_MESSAGES.FETCH_USER_FAILED }));
                 throw new Error(errorData.error || `Server error: ${response.status}`);
             }
             
