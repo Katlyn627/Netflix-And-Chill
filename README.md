@@ -87,6 +87,8 @@ Each component has its own dependencies and can be developed/deployed independen
 
 ## Quick Start
 
+> **⚠️ First Time Setup?** If you get a **401 Unauthorized** error when trying to login, see [FIRST_TIME_SETUP.md](FIRST_TIME_SETUP.md) for a quick 2-minute fix. You need to seed the database with test users first!
+
 ### Option 1: Using Docker (Recommended)
 
 The easiest way to run the entire application:
@@ -147,7 +149,26 @@ cp .env.sample backend/.env
 
 📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)**
 
-#### Step 3: Start the Application
+#### Step 3: Seed the Database with Test Users (Important!)
+
+Before you can login, you need to create test users:
+
+```bash
+# Generate 100 test users (takes ~30 seconds)
+npm run seed
+
+# Or specify a custom count
+cd backend && node scripts/seedUsers.js --count=50
+```
+
+After seeding:
+- Login credentials are saved to `TEST_CREDENTIALS.md`
+- All users have the password: `password123`
+- You can now login with any email from the credentials file
+
+**Note:** Skipping this step will result in a **401 Unauthorized** error when trying to login!
+
+#### Step 4: Start the Application
 
 **Option A: Run both backend and frontend together**
 ```bash
