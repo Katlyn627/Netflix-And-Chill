@@ -441,7 +441,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 If you see console errors like "Host validation failed" or "Host is not supported", these are from streaming browser extensions (like Teleparty, Netflix Party) that don't recognize localhost. These errors are harmless and automatically suppressed by our error handler.
 
-📖 **See [BROWSER_EXTENSION_COMPATIBILITY.md](BROWSER_EXTENSION_COMPATIBILITY.md) for more details**
+📖 **See [BROWSER_EXTENSION_COMPATIBILITY.md](docs/features/BROWSER_EXTENSION_COMPATIBILITY.md) for more details**
 
 ### Other Issues
 
