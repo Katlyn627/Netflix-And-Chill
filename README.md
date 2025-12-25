@@ -24,7 +24,7 @@ A modern dating application that matches users based on their streaming preferen
   - Works with fallback storage (no external APIs required)
   - Optional Stream Chat for real-time features (typing indicators, read receipts)
   - Optional Firebase for authentication
-  - See [QUICKSTART_CHAT.md](QUICKSTART_CHAT.md) for 5-minute setup
+  - See [QUICKSTART_CHAT.md](docs/guides/QUICKSTART_CHAT.md) for 5-minute setup
 - **Advanced Filters**: Filter matches by age range, location radius, gender, and orientation
 - **Shared Filter State**: Filters persist across matches and chat pages
 - **Personalized Recommendations**: AI-powered show/movie recommendations based on your watch history and preferences
@@ -76,7 +76,7 @@ npm install
 cp .env.example .env
 
 # Edit .env and add your API keys
-# See API_KEYS_GUIDE.md for detailed setup instructions
+# See docs/guides/API_KEYS_GUIDE.md for detailed setup instructions
 ```
 
 **Required API Keys:**
@@ -85,7 +85,7 @@ cp .env.example .env
 - **Authentication** (Optional): Firebase or Auth0 for user authentication
 - **Chat Service** (Optional): SendBird, Twilio, or Stream for real-time messaging
 
-📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)**
+📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](docs/guides/API_KEYS_GUIDE.md)**
 
 4. Start the backend server:
 ```bash
@@ -215,14 +215,35 @@ Netflix-And-Chill/
 │           ├── onboarding.css  # Onboarding styles
 │           └── main.css        # Styling
 ├── docs/
+│   ├── api/
+│   │   └── API.md                # API documentation
+│   ├── database/
+│   │   ├── DATABASE-MIGRATION.md # Database migration guide
+│   │   ├── MONGODB_SETUP.md      # MongoDB setup guide
+│   │   └── ...                   # Other database docs
 │   ├── deployment/
-│   │   ├── AWS.md              # AWS deployment guide
-│   │   ├── HEROKU.md           # Heroku deployment guide
-│   │   ├── VERCEL-NETLIFY.md   # Vercel/Netlify guide
-│   │   └── DOCKER.md           # Docker deployment guide
+│   │   ├── AWS.md                # AWS deployment guide
+│   │   ├── HEROKU.md             # Heroku deployment guide
+│   │   ├── VERCEL-NETLIFY.md     # Vercel/Netlify guide
+│   │   └── DOCKER.md             # Docker deployment guide
+│   ├── features/
+│   │   ├── WATCH-TOGETHER-FEATURE.md     # Watch Together feature docs
+│   │   ├── BROWSER_EXTENSION_COMPATIBILITY.md
+│   │   └── ...                   # Other feature docs
+│   ├── guides/
+│   │   ├── API_KEYS_GUIDE.md     # API keys setup guide
+│   │   ├── QUICKSTART.md         # Quick start guide
+│   │   ├── QUICKSTART_CHAT.md    # Chat setup guide
+│   │   └── ...                   # Other guides
+│   ├── implementation/
+│   │   └── ...                   # Implementation summaries
 │   ├── mobile/
-│   │   └── REACT-NATIVE.md     # React Native mobile app guide
-│   └── DATABASE-MIGRATION.md   # Database migration guide
+│   │   └── REACT-NATIVE.md       # React Native mobile app guide
+│   ├── security/
+│   │   ├── SECURITY.md           # Security documentation
+│   │   └── ...                   # Security summaries
+│   ├── ICON-ASSETS.md            # Icon assets documentation
+│   └── PASSWORD-AND-PHOTO-GUIDE.md
 ├── data/                       # User data storage (auto-generated)
 ├── .env.example                # Environment variables template
 ├── package.json
@@ -338,7 +359,7 @@ Netflix and Chill integrates with various external APIs and services to provide 
 ### Setup Guide
 
 For detailed step-by-step instructions on setting up each API key and service, see:
-- 📖 **[API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)** - Comprehensive setup guide
+- 📖 **[API_KEYS_GUIDE.md](docs/guides/API_KEYS_GUIDE.md)** - Comprehensive setup guide
 - 📝 **[.env.example](.env.example)** - Environment variables template
 
 **Quick Start:**
@@ -401,7 +422,7 @@ Choose the database that best fits your needs:
 - NoSQL database
 - Great for flexible schema
 - Free tier available on MongoDB Atlas
-- **Quick Setup:** See [MONGODB_SETUP.md](MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
+- **Quick Setup:** See [MONGODB_SETUP.md](docs/database/MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
 - **Migration Guide:** See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
 
 ### PostgreSQL
@@ -420,7 +441,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 If you see console errors like "Host validation failed" or "Host is not supported", these are from streaming browser extensions (like Teleparty, Netflix Party) that don't recognize localhost. These errors are harmless and automatically suppressed by our error handler.
 
-📖 **See [BROWSER_EXTENSION_COMPATIBILITY.md](BROWSER_EXTENSION_COMPATIBILITY.md) for more details**
+📖 **See [BROWSER_EXTENSION_COMPATIBILITY.md](docs/features/BROWSER_EXTENSION_COMPATIBILITY.md) for more details**
 
 ### Other Issues
 
