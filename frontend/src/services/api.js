@@ -19,7 +19,7 @@ class NetflixAndChillAPI {
             return await response.json();
         } catch (error) {
             // If it's a network error (server not running, CORS, etc.)
-            if (error.message === 'Failed to fetch') {
+            if (error.message === 'Failed to fetch' || error.message === 'fetch failed' || error.cause?.code === 'ECONNREFUSED') {
                 throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
             }
             // Re-throw other errors
@@ -45,7 +45,7 @@ class NetflixAndChillAPI {
             return await response.json();
         } catch (error) {
             // If it's a network error (server not running, CORS, etc.)
-            if (error.message === 'Failed to fetch') {
+            if (error.message === 'Failed to fetch' || error.message === 'fetch failed' || error.cause?.code === 'ECONNREFUSED') {
                 throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
             }
             // Re-throw other errors
@@ -65,7 +65,7 @@ class NetflixAndChillAPI {
             return await response.json();
         } catch (error) {
             // If it's a network error (server not running, CORS, etc.)
-            if (error.message === 'Failed to fetch') {
+            if (error.message === 'Failed to fetch' || error.message === 'fetch failed' || error.cause?.code === 'ECONNREFUSED') {
                 throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
             }
             // Re-throw other errors
