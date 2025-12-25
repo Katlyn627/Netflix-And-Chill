@@ -1,6 +1,34 @@
 const API_BASE_URL = 'http://localhost:3000/api';
 
+// Error messages
+const ERROR_MESSAGES = {
+    SERVER_UNREACHABLE: 'Unable to connect to server. Please make sure the backend server is running on port 3000.'
+};
+
 class NetflixAndChillAPI {
+    /**
+     * Helper method to check if an error is a network error
+     * @param {Error} error - The error to check
+     * @returns {boolean} - True if it's a network error
+     */
+    isNetworkError(error) {
+        return error.message === 'Failed to fetch' || 
+               error.message === 'fetch failed' || 
+               error.cause?.code === 'ECONNREFUSED';
+    }
+
+    /**
+     * Helper method to handle fetch errors consistently
+     * @param {Error} error - The error to handle
+     * @throws {Error} - Throws a user-friendly error
+     */
+    handleFetchError(error) {
+        if (this.isNetworkError(error)) {
+            throw new Error(ERROR_MESSAGES.SERVER_UNREACHABLE);
+        }
+        throw error;
+    }
+
     async createUser(userData) {
         try {
             const response = await fetch(`${API_BASE_URL}/users`, {
@@ -18,12 +46,7 @@ class NetflixAndChillAPI {
             
             return await response.json();
         } catch (error) {
-            // If it's a network error (server not running, CORS, etc.)
-            if (error.message === 'Failed to fetch' || error.message === 'fetch failed' || error.cause?.code === 'ECONNREFUSED') {
-                throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
-            }
-            // Re-throw other errors
-            throw error;
+            this.handleFetchError(error);
         }
     }
 
@@ -44,12 +67,7 @@ class NetflixAndChillAPI {
             
             return await response.json();
         } catch (error) {
-            // If it's a network error (server not running, CORS, etc.)
-            if (error.message === 'Failed to fetch' || error.message === 'fetch failed' || error.cause?.code === 'ECONNREFUSED') {
-                throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
-            }
-            // Re-throw other errors
-            throw error;
+            this.handleFetchError(error);
         }
     }
 
@@ -64,12 +82,7 @@ class NetflixAndChillAPI {
             
             return await response.json();
         } catch (error) {
-            // If it's a network error (server not running, CORS, etc.)
-            if (error.message === 'Failed to fetch' || error.message === 'fetch failed' || error.cause?.code === 'ECONNREFUSED') {
-                throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
-            }
-            // Re-throw other errors
-            throw error;
+            this.handleFetchError(error);
         }
     }
 
