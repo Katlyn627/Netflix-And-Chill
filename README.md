@@ -157,8 +157,8 @@ Before you can login, you need to create test users:
 # Generate 100 test users (takes ~30 seconds)
 npm run seed
 
-# Or specify a custom count
-cd backend && node scripts/seedUsers.js --count=50
+# Or specify a custom count using the npm script
+npm run seed -- --count=50
 ```
 
 After seeding:

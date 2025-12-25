@@ -78,7 +78,7 @@ If you prefer to create your own user instead of using test data:
 - **Cause**: Port 3000 is already in use
 - **Solution**: Either:
   - Stop the other process using port 3000
-  - Change the port in `backend/.env`: `PORT=3001`
+  - Create/edit `backend/.env` (copy from `.env.sample` if needed) and add: `PORT=3001`
 
 ## Next Steps
 
