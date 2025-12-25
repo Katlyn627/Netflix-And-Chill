@@ -232,15 +232,22 @@ class ChatComponent {
             return;
         }
         
-        matchesList.innerHTML = matches.map(match => `
-            <div class="match-item" data-match-id="${match.user.id}" onclick="chatComponent.selectMatch('${match.user.id}', '${match.user.username}')">
-                <img src="${match.user.profilePicture || 'assets/images/default-profile.svg'}" alt="${match.user.username}">
-                <div class="match-info">
-                    <h4>${match.user.username}</h4>
-                    <p>${Math.round(match.matchScore)}% match</p>
+        matchesList.innerHTML = matches.map(match => {
+            const userId = this.escapeHtml(match.user.id);
+            const username = this.escapeHtml(match.user.username);
+            const profilePic = this.escapeHtml(match.user.profilePicture || 'assets/images/default-profile.svg');
+            const matchScore = Math.round(match.matchScore);
+            
+            return `
+                <div class="match-item" data-match-id="${userId}" onclick="chatComponent.selectMatch('${userId}', '${username}')">
+                    <img src="${profilePic}" alt="${username}">
+                    <div class="match-info">
+                        <h4>${username}</h4>
+                        <p>${matchScore}% match</p>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     /**
@@ -327,11 +334,12 @@ class ChatComponent {
         chatMessages.innerHTML = messages.map(msg => {
             const isSent = msg.senderId === this.currentUserId;
             const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const escapedTime = this.escapeHtml(time);
             
             return `
                 <div class="message ${isSent ? 'sent' : 'received'}">
                     <p>${this.escapeHtml(msg.message)}</p>
-                    <span class="message-time">${time}</span>
+                    <span class="message-time">${escapedTime}</span>
                 </div>
             `;
         }).join('');
@@ -404,9 +412,27 @@ class ChatComponent {
         this.stopPolling();
         
         console.log('[Chat] Starting message polling');
+        
+        // Poll immediately
+        this.loadMessages();
+        
+        // Then poll at regular intervals
         this.pollInterval = setInterval(() => {
-            this.loadMessages();
+            // Only poll if page is visible
+            if (document.visibilityState === 'visible') {
+                this.loadMessages();
+            }
         }, this.pollFrequency);
+        
+        // Handle visibility changes
+        this.visibilityHandler = () => {
+            if (document.visibilityState === 'visible' && this.selectedMatchId) {
+                console.log('[Chat] Page visible, refreshing messages');
+                this.loadMessages();
+            }
+        };
+        
+        document.addEventListener('visibilitychange', this.visibilityHandler);
     }
 
     /**
@@ -417,6 +443,11 @@ class ChatComponent {
             console.log('[Chat] Stopping message polling');
             clearInterval(this.pollInterval);
             this.pollInterval = null;
+        }
+        
+        if (this.visibilityHandler) {
+            document.removeEventListener('visibilitychange', this.visibilityHandler);
+            this.visibilityHandler = null;
         }
     }
 

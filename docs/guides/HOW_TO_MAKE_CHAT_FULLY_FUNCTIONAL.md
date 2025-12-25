@@ -403,8 +403,7 @@ Chat styles are in `frontend/src/styles/chat.css`. Customize:
 ### Getting Help
 
 - **Documentation**: See [README.md](../../README.md)
-- **Setup Guide**: See [QUICKSTART_CHAT.md](QUICKSTART_CHAT.md)
-- **API Keys**: See [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)
+- **API Keys**: See [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)  
 - **Issues**: Open an issue on GitHub
 
 ### Common Questions
