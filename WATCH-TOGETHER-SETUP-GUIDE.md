@@ -98,7 +98,7 @@ npm install
 
 ### Step 2: Create Environment File
 ```bash
-cp .env.sample .env
+cp .env.example .env
 ```
 
 ### Step 3: Add Minimum Required Configuration
@@ -357,7 +357,7 @@ The app should create this automatically, but if not, create it manually.
 - [ ] Install Node.js (v14 or higher)
 - [ ] Clone the repository
 - [ ] Run `npm install`
-- [ ] Copy `.env.sample` to `.env`
+- [ ] Copy `.env.example` to `.env`
 - [ ] Add TMDB_API_KEY to `.env` (get from themoviedb.org)
 - [ ] Add JWT_SECRET to `.env` (any random string)
 - [ ] Run `npm start`

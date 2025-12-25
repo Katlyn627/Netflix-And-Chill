@@ -90,13 +90,12 @@ class CompatibilityReport {
     const complementary = [];
     const different = [];
 
-    // Create maps for O(1) lookups instead of using find()
-    const archetypes2Map = new Map(archetypes2.map(a => [a.type, a]));
-    const archetypes1Map = new Map(archetypes1.map(a => [a.type, a]));
+    const types1 = new Set(archetypes1.map(a => a.type));
+    const types2 = new Set(archetypes2.map(a => a.type));
 
     // Find shared archetypes
     archetypes1.forEach(a1 => {
-      const match = archetypes2Map.get(a1.type);
+      const match = archetypes2.find(a2 => a2.type === a1.type);
       if (match) {
         shared.push({
           type: a1.type,
@@ -120,15 +119,11 @@ class CompatibilityReport {
       'collector': ['cinephile', 'tech_enthusiast']
     };
 
-    // Create a Set of shared types for O(1) lookups
-    const sharedTypes = new Set(shared.map(s => s.type));
-
-    // Find complementary archetypes - optimized to avoid nested array searches
+    // Find complementary archetypes
     archetypes1.forEach(a1 => {
       const complements = complementaryPairs[a1.type] || [];
-      complements.forEach(complementType => {
-        const a2 = archetypes2Map.get(complementType);
-        if (a2 && !sharedTypes.has(complementType)) {
+      archetypes2.forEach(a2 => {
+        if (complements.includes(a2.type) && !shared.find(s => s.type === a2.type)) {
           complementary.push({
             user1: { type: a1.type, name: a1.name },
             user2: { type: a2.type, name: a2.name },
@@ -139,12 +134,12 @@ class CompatibilityReport {
       });
     });
 
-    // Create a Set of complementary user1 types for O(1) lookups
-    const complementaryUser1Types = new Set(complementary.map(c => c.user1.type));
-
-    // Find different archetypes (not shared or complementary) - optimized
+    // Find different archetypes (not shared or complementary)
     archetypes1.forEach(a1 => {
-      if (!sharedTypes.has(a1.type) && !complementaryUser1Types.has(a1.type)) {
+      const hasMatch = shared.find(s => s.type === a1.type);
+      const hasComplement = complementary.find(c => c.user1.type === a1.type);
+      
+      if (!hasMatch && !hasComplement) {
         archetypes2.forEach(a2 => {
           if (a1.type !== a2.type) {
             different.push({

@@ -84,7 +84,7 @@ async function loadStreamingProviders() {
     }
 }
 
-// Render streaming providers - displays top 20 from API (already limited and sorted alphabetically by backend)
+// Render streaming providers - displays top 15 from API (already limited and sorted alphabetically by backend)
 function renderStreamingProviders(providers) {
     const servicesList = document.getElementById('services-list');
     if (!servicesList) return;
@@ -92,7 +92,7 @@ function renderStreamingProviders(providers) {
     // Clear existing content to replace with dynamic data
     servicesList.innerHTML = '';
     
-    // Backend already returns top 20 providers sorted alphabetically, so we use them directly
+    // Backend already returns top 15 providers sorted alphabetically, so we use them directly
     providers.forEach((provider, index) => {
         const serviceOption = document.createElement('div');
         serviceOption.className = 'service-option';

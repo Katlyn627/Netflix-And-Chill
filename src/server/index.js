@@ -39,11 +39,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Handle Chrome DevTools well-known requests
-app.get("/.well-known/appspecific/com.chrome.devtools.json", (_req, res) => {
-  res.status(204).end();
-});
-
 app.get("/health", async (_req, res) => {
   try {
     await connectDB();
