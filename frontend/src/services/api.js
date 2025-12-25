@@ -2,30 +2,75 @@ const API_BASE_URL = 'http://localhost:3000/api';
 
 class NetflixAndChillAPI {
     async createUser(userData) {
-        const response = await fetch(`${API_BASE_URL}/users`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData)
-        });
-        return await response.json();
+        try {
+            const response = await fetch(`${API_BASE_URL}/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'User creation failed' }));
+                throw new Error(errorData.error || `Server error: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            // If it's a network error (server not running, CORS, etc.)
+            if (error.message === 'Failed to fetch') {
+                throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
+            }
+            // Re-throw other errors
+            throw error;
+        }
     }
 
     async loginUser(email, password) {
-        const response = await fetch(`${API_BASE_URL}/users/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password })
-        });
-        return await response.json();
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Login failed' }));
+                throw new Error(errorData.error || `Server error: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            // If it's a network error (server not running, CORS, etc.)
+            if (error.message === 'Failed to fetch') {
+                throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
+            }
+            // Re-throw other errors
+            throw error;
+        }
     }
 
     async getUser(userId) {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
-        return await response.json();
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Failed to fetch user' }));
+                throw new Error(errorData.error || `Server error: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            // If it's a network error (server not running, CORS, etc.)
+            if (error.message === 'Failed to fetch') {
+                throw new Error('Unable to connect to server. Please make sure the backend server is running on port 3000.');
+            }
+            // Re-throw other errors
+            throw error;
+        }
     }
 
     async updateBio(userId, bio) {
