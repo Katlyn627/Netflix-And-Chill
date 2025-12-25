@@ -19,7 +19,7 @@ This guide will help you quickly get the enhanced MongoDB schema and movie debat
    
    Copy the example environment file:
    ```bash
-   cp .env.sample .env
+   cp .env.example .env
    ```
    
    Edit `.env` and configure:

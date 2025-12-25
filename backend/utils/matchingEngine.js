@@ -110,8 +110,8 @@ class MatchingEngine {
 
   static findSharedServices(user1, user2) {
     const user1Services = user1.streamingServices.map(s => s.name);
-    const user2ServicesSet = new Set(user2.streamingServices.map(s => s.name));
-    return user1Services.filter(service => user2ServicesSet.has(service));
+    const user2Services = user2.streamingServices.map(s => s.name);
+    return user1Services.filter(service => user2Services.includes(service));
   }
 
   static findSharedWatchHistory(user1, user2) {
@@ -311,9 +311,8 @@ class MatchingEngine {
     
     if (snacks1.length === 0 || snacks2.length === 0) return 0;
     
-    // Use Set for O(n) instead of O(n*m) complexity with includes()
-    const snacks2Set = new Set(snacks2);
-    const sharedSnacks = snacks1.filter(snack => snacks2Set.has(snack));
+    // Find shared snacks
+    const sharedSnacks = snacks1.filter(snack => snacks2.includes(snack));
     
     // Award up to 10 points for snack compatibility
     const score = Math.min(10, sharedSnacks.length * this.POINTS_PER_SHARED_SNACK);
@@ -364,13 +363,11 @@ class MatchingEngine {
         const lowerGenreName = genreName.toLowerCase();
         
         // Check which tone category this genre belongs to
-        // Optimized: iterate tone mappings only once per genre
-        for (const [tone, keywords] of Object.entries(toneMappings)) {
-          if (keywords.some(keyword => lowerGenreName.includes(keyword) || keyword.includes(lowerGenreName))) {
+        Object.keys(toneMappings).forEach(tone => {
+          if (toneMappings[tone].some(g => lowerGenreName.includes(g) || g.includes(lowerGenreName))) {
             profile[tone]++;
-            break; // Stop after first match to avoid double-counting
           }
-        }
+        });
       });
       
       return profile;

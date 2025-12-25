@@ -24,14 +24,14 @@ A modern dating application that matches users based on their streaming preferen
   - Works with fallback storage (no external APIs required)
   - Optional Stream Chat for real-time features (typing indicators, read receipts)
   - Optional Firebase for authentication
-  - See [docs/quickstart/QUICKSTART_CHAT.md](docs/quickstart/QUICKSTART_CHAT.md) for 5-minute setup
+  - See [QUICKSTART_CHAT.md](QUICKSTART_CHAT.md) for 5-minute setup
 - **Advanced Filters**: Filter matches by age range, location radius, gender, and orientation
 - **Shared Filter State**: Filters persist across matches and chat pages
 - **Personalized Recommendations**: AI-powered show/movie recommendations based on your watch history and preferences
 - **Social Features**: Like and Super Like other users, with mutual match detection
 - **Match Scoring**: Each match gets a score (0-100) indicating compatibility
 - **Multiple Database Support**: Choose between file-based storage, MongoDB, or PostgreSQL
-- **Native Mobile Apps**: Fully functional React Native app for iOS and Android
+- **Mobile Ready**: React Native guide for iOS and Android apps
 - **Cloud Deployment Ready**: Comprehensive guides for AWS, Heroku, Vercel, and more
 - **Cross-Platform Ready**: Built with web technologies for easy deployment across platforms
 
@@ -47,97 +47,35 @@ A modern dating application that matches users based on their streaming preferen
 - TMDB API integration for real streaming data
 
 ### Frontend
-
-#### Web (Current)
 - **HTML5/CSS3/JavaScript**
 - Responsive design for mobile and desktop
 - Modern gradient UI
-
-#### Mobile (React Native)
-- **React Native** with Expo
-- Native iOS and Android apps
-- React Navigation for seamless navigation
-- Context API for state management
-- Dark theme optimized design
-- Full feature parity with web version
-- See [docs/quickstart/QUICKSTART-REACT-NATIVE.md](docs/quickstart/QUICKSTART-REACT-NATIVE.md) for setup
+- Can be enhanced with React/React Native for native apps
 
 ### Deployment
 - Docker support
 - Cloud platform guides (AWS, Heroku, Vercel, Netlify)
 - Kubernetes ready
 
-## Repository Structure
+## Installation
 
-This repository contains both the backend API and frontend web application in a unified structure:
-
-```
-Netflix-And-Chill/
-├── backend/          # Backend API (Node.js/Express)
-├── frontend/         # Frontend Web App (HTML/CSS/JS)
-├── mobile/           # Mobile App (React Native)
-├── docker-compose.yml # Docker orchestration
-└── package.json      # Root package with convenience scripts
-```
-
-Each component has its own dependencies and can be developed/deployed independently. See individual READMEs:
-- [Backend README](backend/README.md)
-- [Frontend README](frontend/README.md)
-- [Mobile README](mobile/README.md)
-
-## Quick Start
-
-> **⚠️ First Time Setup?** If you get a **401 Unauthorized** error when trying to login, see [FIRST_TIME_SETUP.md](FIRST_TIME_SETUP.md) for a quick 2-minute fix. You need to seed the database with test users first!
-
-### Option 1: Using Docker (Recommended)
-
-The easiest way to run the entire application:
-
+1. Clone the repository:
 ```bash
-# Clone the repository
 git clone https://github.com/Katlyn627/Netflix-And-Chill.git
 cd Netflix-And-Chill
-
-# Configure environment variables
-cp .env.sample backend/.env
-# Edit backend/.env and add your TMDB API key
-
-# Build and start all services
-docker compose up
-
-# Backend will be available at http://localhost:3000
-# Frontend will be available at http://localhost:8080
 ```
 
-### Option 2: Manual Setup
-
-#### Step 1: Install Dependencies
-
-You can install all dependencies at once:
+2. Install dependencies:
 ```bash
-# Install all dependencies (backend + frontend + mobile)
-npm run install:all
+npm install
 ```
 
-Or install them separately:
+3. Configure environment:
 ```bash
-# Install backend dependencies
-npm run install:backend
+# Copy example env file
+cp .env.example .env
 
-# Install frontend dependencies
-npm run install:frontend
-
-# Install mobile dependencies (optional)
-npm run install:mobile
-```
-
-#### Step 2: Configure Backend
-
-```bash
-# Copy sample env file
-cp .env.sample backend/.env
-
-# Edit backend/.env and add your API keys
+# Edit .env and add your API keys
 # See API_KEYS_GUIDE.md for detailed setup instructions
 ```
 
@@ -149,78 +87,12 @@ cp .env.sample backend/.env
 
 📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)**
 
-#### Step 3: Seed the Database with Test Users (Important!)
-
-Before you can login, you need to create test users:
-
+4. Start the backend server:
 ```bash
-# Generate 100 test users (takes ~30 seconds)
-npm run seed
-
-# Or specify a custom count using the npm script
-npm run seed -- --count=50
+npm start
 ```
 
-After seeding:
-- Login credentials are saved to `TEST_CREDENTIALS.md`
-- All users have the password: `password123`
-- You can now login with any email from the credentials file
-
-**Note:** Skipping this step will result in a **401 Unauthorized** error when trying to login!
-
-#### Step 4: Start the Application
-
-**Option A: Run both backend and frontend together**
-```bash
-# Start backend
-npm run start:backend
-
-# In a separate terminal, start frontend
-npm run start:frontend
-```
-
-**Option B: Run just the backend**
-```bash
-npm run start:backend
-# or
-cd backend && npm start
-```
-
-Then open `frontend/index.html` directly in your browser.
-
-The backend server will run on `http://localhost:3000`  
-The frontend dev server will run on `http://localhost:8080`
-
-## Docker Deployment
-
-This project includes Docker support with `docker-compose.yml` for easy deployment:
-
-### Available Services
-
-- **backend**: Node.js API server (port 3000)
-- **frontend**: Nginx web server (port 8080)
-- **mongodb**: Optional MongoDB database (port 27017, commented out by default)
-- **postgres**: Optional PostgreSQL database (port 5432, commented out by default)
-
-### Docker Commands
-
-```bash
-# Build all images
-npm run docker:build
-
-# Start all services
-npm run docker:up
-
-# Stop all services
-npm run docker:down
-
-# View logs
-npm run docker:logs
-```
-
-### Using Database Containers
-
-To use MongoDB or PostgreSQL with Docker, edit `docker-compose.yml` and uncomment the respective service.
+The server will run on `http://localhost:3000`
 
 ## Usage
 
@@ -248,18 +120,9 @@ See [backend/scripts/README.md](backend/scripts/README.md) for detailed seeder d
 
 ### Opening the App
 
-**With Docker:**
-```bash
-docker compose up
-# Backend: http://localhost:3000
-# Frontend: http://localhost:8080
-```
-
-**Without Docker:**
-1. Start the backend server: `npm run start:backend`
-2. Start the frontend server: `npm run start:frontend`
-3. Open your browser to `http://localhost:8080`
-4. Follow the on-screen steps to create your profile and find matches
+1. Start the backend server (see Installation step 3)
+2. Open `frontend/index.html` in your web browser
+3. Follow the on-screen steps to create your profile and find matches
    - Or login with any user from `TEST_CREDENTIALS.md` if you've run the seeder
 
 ### API Endpoints
@@ -304,216 +167,68 @@ docker compose up
 
 ```
 Netflix-And-Chill/
-├── backend/                      # Backend API Server
-│   ├── config/
-│   │   ├── config.js             # Configuration settings
-│   │   └── firebase.js           # Firebase configuration
-│   ├── controllers/
-│   │   ├── userController.js     # User management logic
-│   │   ├── matchController.js    # Matching logic
-│   │   ├── chatController.js     # Chat logic
-│   │   └── watchInvitationController.js
-│   ├── database/
-│   │   ├── databaseFactory.js    # Database factory
-│   │   ├── mongodbAdapter.js     # MongoDB adapter
-│   │   └── postgresqlAdapter.js  # PostgreSQL adapter
-│   ├── models/
-│   │   ├── User.js               # User model
-│   │   ├── Match.js              # Match model
-│   │   ├── Like.js               # Like model
-│   │   ├── Chat.js               # Chat model
-│   │   ├── QuizAttempt.js        # Quiz attempt model
-│   │   └── WatchInvitation.js    # Watch invitation model
-│   ├── routes/
-│   │   ├── users.js              # User routes
-│   │   ├── matches.js            # Match routes
-│   │   ├── chat.js               # Chat routes
-│   │   ├── likes.js              # Like routes
-│   │   ├── recommendations.js    # Recommendation routes
-│   │   ├── streaming.js          # Streaming routes
-│   │   ├── swipe.js              # Swipe routes
-│   │   ├── uploads.js            # Upload routes
-│   │   └── watchInvitations.js   # Watch invitation routes
-│   ├── scripts/
-│   │   ├── seedUsers.js          # Seed test users
-│   │   ├── seedMatches.js        # Seed test matches
-│   │   └── ...                   # Other utility scripts
-│   ├── services/
-│   │   ├── recommendationService.js
-│   │   ├── streamingAPIService.js
-│   │   ├── watchmodeAPIService.js
-│   │   ├── streamChatService.js
-│   │   └── fallbackData.js
-│   ├── utils/
-│   │   ├── matchingEngine.js     # Core matching algorithm
-│   │   ├── movieQuizScoring.js   # Quiz scoring logic
-│   │   ├── compatibilityReport.js
-│   │   └── ...                   # Other utilities
-│   ├── server.js                 # Main server file
-│   ├── package.json              # Backend dependencies
-│   ├── Dockerfile                # Backend Docker configuration
-│   ├── .env.example              # Backend environment template
-│   └── README.md                 # Backend documentation
-├── frontend/                     # Frontend Web Application
-│   ├── assets/
-│   │   ├── images/               # App icons and images
-│   │   ├── onboarding/           # Onboarding assets
-│   │   └── uploads/              # User uploaded content
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── chat.js
-│   │   │   ├── matches.js
-│   │   │   ├── login.js
-│   │   │   └── ...
-│   │   ├── services/
-│   │   │   └── api.js            # API service layer
-│   │   ├── styles/
-│   │   │   ├── base.css
-│   │   │   └── components.css
-│   │   └── utils/
-│   │       ├── errorHandler.js
-│   │       ├── navigation.js
-│   │       └── sharedFilters.js
-│   ├── index.html                # Landing page
-│   ├── onboarding.html           # Onboarding flow
-│   ├── login.html                # Login page
-│   ├── homepage.html             # Main dashboard
-│   ├── profile.html              # Profile management
-│   ├── swipe.html                # Swipe interface
-│   ├── matches.html              # Matches view
-│   ├── chat.html                 # Chat interface
-│   ├── watch-together.html       # Watch party coordination
-│   ├── manifest.json             # PWA manifest
-│   ├── package.json              # Frontend dependencies
-│   ├── Dockerfile                # Frontend Docker configuration
-│   ├── .env.example              # Frontend environment template
-│   └── README.md                 # Frontend documentation
-├── mobile/                       # Mobile Application (React Native)
-│   ├── src/
-│   │   ├── screens/              # Mobile screens
-│   │   ├── navigation/           # Navigation configuration
-│   │   ├── services/             # API services
-│   │   ├── context/              # React context
-│   │   └── styles/               # Mobile styles
-│   ├── App.js                    # Main mobile app component
-│   ├── package.json              # Mobile dependencies
-│   └── README.md                 # Mobile documentation
 ├── assets/
-│   └── onboarding/               # Shared onboarding assets
-│       ├── logo.svg              # App logo
-│       ├── onboard1.svg
-│       ├── onboard2.svg
-│       ├── onboard3.svg
-│       └── README.md
+│   └── onboarding/              # Onboarding assets
+│       ├── logo.svg             # App logo and branding
+│       ├── onboard1.svg         # "Chat & Watch Together"
+│       ├── onboard2.svg         # "Build Real Connections"
+│       ├── onboard3.svg         # "Discover Matches Through Movies"
+│       └── README.md            # Asset documentation
+├── backend/
+│   ├── config/
+│   │   └── config.js           # Configuration settings
+│   ├── controllers/
+│   │   ├── userController.js   # User management logic
+│   │   └── matchController.js  # Matching logic
+│   ├── database/
+│   │   ├── databaseFactory.js  # Database factory
+│   │   ├── mongodbAdapter.js   # MongoDB adapter
+│   │   └── postgresqlAdapter.js # PostgreSQL adapter
+│   ├── models/
+│   │   ├── User.js             # User model
+│   │   ├── Match.js            # Match model
+│   │   └── Like.js             # Like model
+│   ├── routes/
+│   │   ├── users.js            # User routes
+│   │   ├── matches.js          # Match routes
+│   │   ├── recommendations.js  # Recommendation routes
+│   │   └── likes.js            # Like routes
+│   ├── services/
+│   │   ├── streamingAPIService.js    # TMDB API integration
+│   │   └── recommendationService.js  # Recommendation engine
+│   ├── utils/
+│   │   ├── dataStore.js        # File-based data persistence
+│   │   └── matchingEngine.js   # Matching algorithm
+│   └── server.js               # Express server
+├── frontend/
+│   ├── onboarding.html         # Onboarding flow
+│   ├── index.html              # Main HTML page
+│   ├── assets/
+│   │   └── images/             # App icons and images
+│   └── src/
+│       ├── components/
+│       │   ├── onboarding.js   # Onboarding component
+│       │   └── app.js          # Frontend application logic
+│       ├── services/
+│       │   └── api.js          # API service layer
+│       └── styles/
+│           ├── onboarding.css  # Onboarding styles
+│           └── main.css        # Styling
 ├── docs/
 │   ├── deployment/
-│   │   ├── AWS.md                # AWS deployment guide
-│   │   ├── HEROKU.md             # Heroku deployment guide
-│   │   ├── VERCEL-NETLIFY.md     # Vercel/Netlify guide
-│   │   └── DOCKER.md             # Docker deployment guide
+│   │   ├── AWS.md              # AWS deployment guide
+│   │   ├── HEROKU.md           # Heroku deployment guide
+│   │   ├── VERCEL-NETLIFY.md   # Vercel/Netlify guide
+│   │   └── DOCKER.md           # Docker deployment guide
 │   ├── mobile/
-│   │   └── REACT-NATIVE.md       # React Native guide
-│   └── DATABASE-MIGRATION.md     # Database migration guide
-├── src/                          # Additional Express/Next.js features
-│   ├── app/                      # Next.js app directory (debates)
-│   ├── server/                   # Express server (debates API)
-│   ├── models/                   # Additional models
-│   └── lib/                      # Shared libraries
-├── data/                         # User data storage (auto-generated)
-├── docker-compose.yml            # Docker orchestration
-├── package.json                  # Root package with convenience scripts
-├── .env.sample                   # Environment variables template
+│   │   └── REACT-NATIVE.md     # React Native mobile app guide
+│   └── DATABASE-MIGRATION.md   # Database migration guide
+├── data/                       # User data storage (auto-generated)
+├── .env.example                # Environment variables template
+├── package.json
 ├── .gitignore
-└── README.md                     # This file
+└── README.md
 ```
-
-## Dependency Management
-
-Each part of the application (backend, frontend, mobile) has its own `package.json` with separate dependencies:
-
-### Backend Dependencies
-The backend has its own package.json in `backend/package.json` with:
-- Express.js - Web framework
-- MongoDB/Mongoose - Database drivers
-- PostgreSQL (pg) - Database driver
-- CORS - Cross-origin resource sharing
-- Multer - File upload handling
-- Firebase - Authentication
-- Stream Chat - Real-time messaging
-- And more...
-
-To install/update backend dependencies:
-```bash
-cd backend
-npm install
-# or from root
-npm run install:backend
-```
-
-### Frontend Dependencies
-The frontend has its own package.json in `frontend/package.json` with:
-- http-server - Development server (dev dependency only)
-
-The frontend is built with vanilla HTML/CSS/JavaScript and has minimal dependencies. Most functionality is self-contained.
-
-To install/update frontend dependencies:
-```bash
-cd frontend
-npm install
-# or from root
-npm run install:frontend
-```
-
-### Mobile Dependencies
-The mobile app has its own package.json in `mobile/package.json` with:
-- React Native - Mobile framework
-- Expo - Development platform
-- React Navigation - Navigation library
-- Axios - HTTP client
-- And more...
-
-To install/update mobile dependencies:
-```bash
-cd mobile
-npm install
-# or from root
-npm run install:mobile
-```
-
-### Root Package.json
-The root `package.json` provides convenience scripts to manage all parts:
-- `npm run install:all` - Install all dependencies
-- `npm run start:backend` - Start backend server
-- `npm run start:frontend` - Start frontend dev server
-- `npm run docker:up` - Start with Docker
-- And more...
-
-## Environment Variables
-
-Each component has its own environment configuration:
-
-### Backend Environment (backend/.env)
-```bash
-# Copy the sample file
-cp .env.sample backend/.env
-
-# Edit backend/.env with your values
-PORT=3000
-DB_TYPE=file
-TMDB_API_KEY=your_key_here
-JWT_SECRET=your_secret_here
-```
-
-### Frontend Environment (frontend/.env)
-```bash
-# Copy the sample file (if needed for frontend-specific config)
-cp .env.sample frontend/.env
-
-# Or create a minimal frontend .env with just:
-API_BASE_URL=http://localhost:3000
-```
-
-The frontend also needs to update the API endpoint in `frontend/src/services/api.js` for production deployments.
 
 ## Onboarding & Brand Assets
 
@@ -624,12 +339,12 @@ Netflix and Chill integrates with various external APIs and services to provide 
 
 For detailed step-by-step instructions on setting up each API key and service, see:
 - 📖 **[API_KEYS_GUIDE.md](API_KEYS_GUIDE.md)** - Comprehensive setup guide
-- 📝 **[.env.sample](.env.sample)** - Environment variables template
+- 📝 **[.env.example](.env.example)** - Environment variables template
 
 **Quick Start:**
 ```bash
 # 1. Copy environment template
-cp .env.sample backend/.env
+cp .env.example .env
 
 # 2. Add your TMDB API key (minimum required)
 # Edit .env and add: TMDB_API_KEY=your_key_here
@@ -648,9 +363,8 @@ npm start
 - [x] Social features (likes, super likes)
 - [x] Database migration (MongoDB/PostgreSQL)
 - [x] Deployment guides for cloud platforms
-- [x] Native mobile apps (React Native)
 - [ ] User authentication and security (JWT)
-- [x] Real-time chat between matches
+- [ ] Real-time chat between matches
 - [ ] Video chat integration
 - [ ] Push notifications
 - [ ] Advanced analytics and insights
@@ -665,21 +379,10 @@ npm start
   - **Vercel/Netlify**: See [docs/deployment/VERCEL-NETLIFY.md](docs/deployment/VERCEL-NETLIFY.md)
   - **Docker**: See [docs/deployment/DOCKER.md](docs/deployment/DOCKER.md)
 
-### Mobile (React Native)
-- **Fully functional native iOS and Android apps**
-- Built with React Native and Expo for cross-platform development
-- All features available: matching, chat, recommendations, profile management
-- **Quick Start**: See [docs/quickstart/QUICKSTART-REACT-NATIVE.md](docs/quickstart/QUICKSTART-REACT-NATIVE.md)
-- **Android Deployment**: See [docs/mobile/ANDROID_DEPLOYMENT_GUIDE.md](docs/mobile/ANDROID_DEPLOYMENT_GUIDE.md) - Complete walkthrough for deploying to Android phone
-- **Full Documentation**: See [mobile/README.md](mobile/README.md)
-- **Features**:
-  - Native performance and smooth animations
-  - Dark theme optimized for mobile viewing
-  - Image picker for profile photos
-  - Pull-to-refresh on all screens
-  - Persistent login state
-  - Gesture-based navigation
-- **Deployment**: Build for App Store and Google Play with Expo EAS Build
+### Mobile
+- React Native guide available: [docs/mobile/REACT-NATIVE.md](docs/mobile/REACT-NATIVE.md)
+- Same backend API serves mobile apps
+- iOS and Android support
 
 ### Desktop (Future)
 - Electron wrapper for desktop applications
@@ -698,7 +401,7 @@ Choose the database that best fits your needs:
 - NoSQL database
 - Great for flexible schema
 - Free tier available on MongoDB Atlas
-- **Quick Setup:** See [docs/setup/MONGODB_SETUP.md](docs/setup/MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
+- **Quick Setup:** See [MONGODB_SETUP.md](MONGODB_SETUP.md) for step-by-step MongoDB Atlas setup
 - **Migration Guide:** See [docs/DATABASE-MIGRATION.md](docs/DATABASE-MIGRATION.md)
 
 ### PostgreSQL

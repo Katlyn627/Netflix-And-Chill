@@ -75,7 +75,7 @@ Two files are automatically generated:
   - TMDB API setup guide
   - Troubleshooting tips
 
-- **`.env.sample`** - Environment configuration template
+- **`.env.example`** - Environment configuration template
   - TMDB API key setup
   - Database configuration
   - All optional settings
@@ -195,7 +195,7 @@ To configure:
 - `backend/scripts/seedUsers.js` (354 lines)
 - `backend/utils/fakeDataGenerator.js` (192 lines)
 - `backend/scripts/README.md` (203 lines)
-- `.env.sample` (25 lines)
+- `.env.example` (25 lines)
 
 ### Modified
 - `package.json` - Added npm scripts for seeder

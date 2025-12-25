@@ -37,10 +37,9 @@ const fallbackGenres = [
   { id: 10768, name: 'War & Politics', types: ['tv'] }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-// Top streaming services for profile creation (20 services)
-// Based on requirements: AMC+, Amazon Prime, Apple TV, BritBox, Crunchyroll, Discovery+, Disney+, fuboTV,
-// HBO Max, Hulu, MGM+, Netflix, Paramount+, Peacock, Pluto TV, Roku, Showtime, Sling TV, Starz, YouTube Premium
-// (sorted alphabetically)
+// Top streaming services for profile creation (15 services)
+// Based on requirements: AMC+, Amazon Prime, Apple TV, BritBox, Crunchyroll, Disney+, HBO Max, Hulu,
+// Netflix, Paramount+, Peacock, Roku, Showtime, Sling TV, Starz (sorted alphabetically)
 // Logo paths from TMDB API for accurate branding
 const fallbackProviders = [
   { id: 528, name: 'AMC+', logoPath: '/aLCMhlprd1JnYW8N5GWy84DEQdf.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aLCMhlprd1JnYW8N5GWy84DEQdf.jpg', displayPriority: 1 },
@@ -48,21 +47,16 @@ const fallbackProviders = [
   { id: 350, name: 'Apple TV+', logoPath: '/6uhKBfmtzFqOcLousHwZuzcrScK.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/6uhKBfmtzFqOcLousHwZuzcrScK.jpg', displayPriority: 3 },
   { id: 380, name: 'BritBox', logoPath: '/q830U76wMbC4R1tQmCxdYB8bLsq.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/q830U76wMbC4R1tQmCxdYB8bLsq.jpg', displayPriority: 4 },
   { id: 283, name: 'Crunchyroll', logoPath: '/ypCaAQf60KMrsyiSGq5lBhfYUGK.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/ypCaAQf60KMrsyiSGq5lBhfYUGK.jpg', displayPriority: 5 },
-  { id: 510, name: 'Discovery+', logoPath: '/fksCUZ9QDWZMUwL2LgMtLckROUN.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/fksCUZ9QDWZMUwL2LgMtLckROUN.jpg', displayPriority: 6 },
-  { id: 337, name: 'Disney+', logoPath: '/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg', displayPriority: 7 },
-  { id: 257, name: 'fuboTV', logoPath: '/cXxhSYOeOzRFlYu8HHhLswVmM1j.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/cXxhSYOeOzRFlYu8HHhLswVmM1j.jpg', displayPriority: 8 },
-  { id: 384, name: 'HBO Max', logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', displayPriority: 9 },
-  { id: 15, name: 'Hulu', logoPath: '/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg', displayPriority: 10 },
-  { id: 1796, name: 'MGM+', logoPath: '/dTkAlyEwNXYMQnrbLaYbjqsTQFd.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/dTkAlyEwNXYMQnrbLaYbjqsTQFd.jpg', displayPriority: 11 },
-  { id: 8, name: 'Netflix', logoPath: '/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg', displayPriority: 12 },
-  { id: 531, name: 'Paramount+', logoPath: '/xbhHHa1YgtpwhC8lb1NQ3ACVcLd.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/xbhHHa1YgtpwhC8lb1NQ3ACVcLd.jpg', displayPriority: 13 },
-  { id: 387, name: 'Peacock', logoPath: '/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', displayPriority: 14 },
-  { id: 300, name: 'Pluto TV', logoPath: '/jlkLHzUKrDvCHWTKZGcwI2SADrD.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/jlkLHzUKrDvCHWTKZGcwI2SADrD.jpg', displayPriority: 15 },
-  { id: 1853, name: 'Roku Channel', logoPath: '/sQ3aOzySo0GSNOHF21fMGSIfLB.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/sQ3aOzySo0GSNOHF21fMGSIfLB.jpg', displayPriority: 16 },
-  { id: 37, name: 'Showtime', logoPath: '/Allse9kbjiP6ExaQrnSpIhkurEi.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/Allse9kbjiP6ExaQrnSpIhkurEi.jpg', displayPriority: 17 },
-  { id: 1747, name: 'Sling TV', logoPath: '/5NyLm42TmCqCMOZFvH4fcoSNKEW.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/5NyLm42TmCqCMOZFvH4fcoSNKEW.jpg', displayPriority: 18 },
-  { id: 1825, name: 'Starz', logoPath: '/vFIF6QJFyNlKgNcR3CrxlLhR4Gy.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/vFIF6QJFyNlKgNcR3CrxlLhR4Gy.jpg', displayPriority: 19 },
-  { id: 188, name: 'YouTube Premium', logoPath: '/xXJEM2ezw28U3PiCiLb2hXVhFu3.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/xXJEM2ezw28U3PiCiLb2hXVhFu3.jpg', displayPriority: 20 }
+  { id: 337, name: 'Disney+', logoPath: '/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg', displayPriority: 6 },
+  { id: 384, name: 'HBO Max', logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg', displayPriority: 7 },
+  { id: 15, name: 'Hulu', logoPath: '/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg', displayPriority: 8 },
+  { id: 8, name: 'Netflix', logoPath: '/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg', displayPriority: 9 },
+  { id: 531, name: 'Paramount+', logoPath: '/xbhHHa1YgtpwhC8lb1NQ3ACVcLd.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/xbhHHa1YgtpwhC8lb1NQ3ACVcLd.jpg', displayPriority: 10 },
+  { id: 387, name: 'Peacock', logoPath: '/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/8Gt1iClBlzTeQs8WQm8UrCoIxnQ.jpg', displayPriority: 11 },
+  { id: 1853, name: 'Roku Channel', logoPath: '/sQ3aOzySo0GSNOHF21fMGSIfLB.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/sQ3aOzySo0GSNOHF21fMGSIfLB.jpg', displayPriority: 12 },
+  { id: 37, name: 'Showtime', logoPath: '/Allse9kbjiP6ExaQrnSpIhkurEi.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/Allse9kbjiP6ExaQrnSpIhkurEi.jpg', displayPriority: 13 },
+  { id: 1747, name: 'Sling TV', logoPath: '/5NyLm42TmCqCMOZFvH4fcoSNKEW.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/5NyLm42TmCqCMOZFvH4fcoSNKEW.jpg', displayPriority: 14 },
+  { id: 1825, name: 'Starz', logoPath: '/vFIF6QJFyNlKgNcR3CrxlLhR4Gy.jpg', logoUrl: 'https://image.tmdb.org/t/p/original/vFIF6QJFyNlKgNcR3CrxlLhR4Gy.jpg', displayPriority: 15 }
 ];
 
 // Sample movies for demo/testing when TMDB API is not available

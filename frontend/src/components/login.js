@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorDiv.style.display = 'block';
             }
         } catch (error) {
-            errorDiv.textContent = error.message;
+            errorDiv.textContent = 'Error logging in: ' + error.message;
             errorDiv.style.display = 'block';
         }
     });

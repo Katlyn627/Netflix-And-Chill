@@ -2,9 +2,6 @@
 
 This guide helps you create a React Native mobile app for Netflix and Chill.
 
-> **📱 Looking for step-by-step Android deployment instructions?**  
-> The Netflix & Chill mobile app is already built! See [ANDROID_DEPLOYMENT_GUIDE.md](ANDROID_DEPLOYMENT_GUIDE.md) for a complete walkthrough on deploying and opening the app on your Android phone.
-
 ## Prerequisites
 
 - Node.js (v14 or later)

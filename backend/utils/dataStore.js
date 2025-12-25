@@ -155,17 +155,13 @@ class DataStore {
   }
 
   async findMutualLikes(userId) {
-    const [likesFrom, likesTo] = await Promise.all([
-      this.findLikesForUser(userId),
-      this.findLikesToUser(userId)
-    ]);
-    
-    // Use Map for O(1) lookups instead of nested loops for O(n*m) complexity
-    const likesToMap = new Map(likesTo.map(like => [like.fromUserId, like]));
+    const likesFrom = await this.findLikesForUser(userId);
+    const likesTo = await this.findLikesToUser(userId);
     
     const mutual = [];
     likesFrom.forEach(likeFrom => {
-      if (likesToMap.has(likeFrom.toUserId)) {
+      const mutualLike = likesTo.find(likeTo => likeTo.fromUserId === likeFrom.toUserId);
+      if (mutualLike) {
         mutual.push({
           userId: likeFrom.toUserId,
           matched: true

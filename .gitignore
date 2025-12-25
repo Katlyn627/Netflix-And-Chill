@@ -1,14 +1,8 @@
 node_modules/
-backend/node_modules/
-frontend/node_modules/
-mobile/node_modules/
 data/
 *.log
 .DS_Store
 .env
-backend/.env
-frontend/.env
-mobile/.env
 dist/
 build/
 *.tmp
@@ -32,4 +26,3 @@ out/
 package-lock.json
 yarn.lock
 frontend/test-frame-selector.html
-backend/test-*.js
