@@ -281,6 +281,37 @@ class PostgreSQLAdapter {
     return result.rows.map(row => this.formatChat(row));
   }
 
+  async loadChats() {
+    const query = 'SELECT * FROM chats ORDER BY timestamp ASC';
+    const result = await this.pool.query(query);
+    return result.rows.map(row => this.formatChat(row));
+  }
+
+  async saveChats(chats) {
+    // For PostgreSQL, we need to update each row individually
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      for (const chat of chats) {
+        const query = `
+          UPDATE chats 
+          SET read = $1 
+          WHERE id = $2
+        `;
+        await client.query(query, [chat.read, chat.id]);
+      }
+      
+      await client.query('COMMIT');
+      return true;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   // Helper methods
   formatUser(row) {
     if (!row) return null;

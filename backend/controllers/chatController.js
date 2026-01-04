@@ -185,6 +185,45 @@ class ChatController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Mark messages as read between two users
+  async markAsRead(req, res) {
+    try {
+      const { userId, senderId } = req.params;
+
+      if (!userId || !senderId) {
+        return res.status(400).json({ error: 'userId and senderId are required' });
+      }
+
+      const dataStore = await getDatabase();
+      
+      // Get all messages from senderId to userId
+      const allMessages = await dataStore.loadChats();
+      
+      // Mark unread messages as read
+      let markedCount = 0;
+      allMessages.forEach(msg => {
+        if (msg.receiverId === userId && msg.senderId === senderId && !msg.read) {
+          msg.read = true;
+          markedCount++;
+        }
+      });
+
+      // Save updated messages
+      if (markedCount > 0) {
+        await dataStore.saveChats(allMessages);
+      }
+
+      res.json({
+        success: true,
+        userId,
+        senderId,
+        markedCount
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new ChatController();

@@ -1025,6 +1025,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Refresh unread counts when page becomes visible (e.g., returning from chat)
+document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && currentUserId && allMatches.length > 0) {
+        console.log('[Matches] Page visible, refreshing unread counts');
+        try {
+            const unreadResult = await api.getUnreadMessageCounts(currentUserId);
+            if (unreadResult.success) {
+                unreadMessageCounts = unreadResult.unreadCounts || {};
+                
+                // Update UI with new counts
+                allMatches.forEach((match, index) => {
+                    const unreadCount = unreadMessageCounts[match.user.id] || 0;
+                    const hasUnreadMessages = unreadCount > 0;
+                    
+                    // Update card class
+                    const card = document.querySelector(`.carousel-card[data-index="${index}"]`);
+                    if (card) {
+                        if (hasUnreadMessages) {
+                            card.classList.add('has-unread-messages');
+                        } else {
+                            card.classList.remove('has-unread-messages');
+                        }
+                        
+                        // Update badge
+                        let badge = card.querySelector('.unread-badge');
+                        if (hasUnreadMessages) {
+                            if (badge) {
+                                badge.textContent = unreadCount;
+                                badge.title = `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+                            } else {
+                                const container = card.querySelector('.match-image-container');
+                                if (container) {
+                                    badge = document.createElement('div');
+                                    badge.className = 'unread-badge';
+                                    badge.textContent = unreadCount;
+                                    badge.title = `${unreadCount} new message${unreadCount > 1 ? 's' : ''}`;
+                                    container.appendChild(badge);
+                                }
+                            }
+                        } else if (badge) {
+                            badge.remove();
+                        }
+                        
+                        // Update chat button
+                        const chatBtn = card.querySelector('.btn-chat');
+                        if (chatBtn) {
+                            if (hasUnreadMessages) {
+                                chatBtn.classList.add('chat-has-new');
+                                chatBtn.innerHTML = `💬 Chat (${unreadCount})`;
+                            } else {
+                                chatBtn.classList.remove('chat-has-new');
+                                chatBtn.innerHTML = '💬 Chat';
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('[Matches] Error refreshing unread counts:', error);
+        }
+    }
+});
+
 // Discover button functionality - routes to swipe page
 const discoverBtn = document.getElementById('discover-btn');
 if (discoverBtn) {

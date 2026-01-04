@@ -55,6 +55,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .match-item:hover {
@@ -66,11 +67,48 @@
     background: #E50914;
 }
 
+/* Highlight match items with unread messages */
+.match-item.has-unread {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a1a1a 100%);
+    border-left: 4px solid #E50914;
+    padding-left: 6px;
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.3);
+}
+
+.match-item.has-unread:hover {
+    background: linear-gradient(135deg, #333 0%, #4a2020 100%);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.5);
+}
+
+.match-item-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
 .match-item img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+/* Unread count badge on avatar */
+.unread-count-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #E50914 0%, #FF0000 100%);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.75em;
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.6);
+    border: 2px solid #1a1a1a;
 }
 
 .match-info h4 {
