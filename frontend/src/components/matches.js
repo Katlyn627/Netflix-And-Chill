@@ -25,6 +25,7 @@ function escapeHtml(text) {
 // Store matches globally for carousel navigation
 let allMatches = [];
 let currentMatchIndex = 0;
+let unreadMessageCounts = {}; // Store unread message counts per user
 
 // Display matches in carousel format
 function displayMatches(matches) {
@@ -93,6 +94,10 @@ function createMatchCard(match, index) {
     const age = match.user.age || 'N/A';
     const matchScore = Math.round(match.matchScore);
     
+    // Get unread message count for this user
+    const unreadCount = unreadMessageCounts[match.user.id] || 0;
+    const hasUnreadMessages = unreadCount > 0;
+    
     // Add archetype badge if available
     const archetypeBadge = match.user.archetype 
         ? `<div class="archetype-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; margin: 8px 0; display: inline-block; font-weight: bold;">
@@ -101,7 +106,7 @@ function createMatchCard(match, index) {
         : '';
     
     return `
-        <div class="carousel-card ${index === 0 ? 'active' : ''}" data-index="${index}">
+        <div class="carousel-card ${index === 0 ? 'active' : ''} ${hasUnreadMessages ? 'has-unread-messages' : ''}" data-index="${index}">
             <div class="match-image-container" onclick="showMatchDetails(${index})">
                 <img src="${profilePhotoUrl}" alt="${username}" class="match-main-photo" />
                 <div class="movie-ticket-overlay">
@@ -110,6 +115,7 @@ function createMatchCard(match, index) {
                         <div class="ticket-label">MATCH</div>
                     </div>
                 </div>
+                ${hasUnreadMessages ? `<div class="unread-badge" title="${unreadCount} new message${unreadCount > 1 ? 's' : ''}">${unreadCount}</div>` : ''}
             </div>
             <div class="match-basic-info">
                 <h3 class="match-username">${username}, ${age}</h3>
@@ -130,7 +136,7 @@ function createMatchCard(match, index) {
                 </div>
                 <div class="match-quick-actions">
                     <button class="btn btn-primary btn-view-details" onclick="showMatchDetails(${index})">View Details</button>
-                    <button class="btn btn-chat" onclick="openChat('${match.user.id}', '${username}')">💬 Chat</button>
+                    <button class="btn btn-chat ${hasUnreadMessages ? 'chat-has-new' : ''}" onclick="openChat('${match.user.id}', '${username}')">💬 Chat${hasUnreadMessages ? ` (${unreadCount})` : ''}</button>
                 </div>
             </div>
         </div>
@@ -625,9 +631,24 @@ async function findMatches() {
     matchesContainer.innerHTML = '';
     
     try {
-        const result = await api.findMatches(currentUserId, currentFilters);
+        // Fetch matches and unread counts in parallel
+        const [matchResult, unreadResult] = await Promise.all([
+            api.findMatches(currentUserId, currentFilters),
+            api.getUnreadMessageCounts(currentUserId).catch(err => {
+                console.log('Failed to fetch unread counts (non-fatal):', err.message);
+                return { success: false, unreadCounts: {} };
+            })
+        ]);
+        
+        // Store unread counts (gracefully handle failure)
+        if (unreadResult.success) {
+            unreadMessageCounts = unreadResult.unreadCounts || {};
+        } else {
+            unreadMessageCounts = {};
+        }
+        
         loadingDiv.style.display = 'none';
-        displayMatches(result.matches);
+        displayMatches(matchResult.matches);
     } catch (error) {
         loadingDiv.style.display = 'none';
         matchesContainer.innerHTML = `
@@ -652,10 +673,25 @@ async function loadMatchHistory() {
     matchesContainer.innerHTML = '';
     
     try {
-        const result = await api.getMatchHistory(currentUserId);
+        // Fetch match history and unread counts in parallel
+        const [matchResult, unreadResult] = await Promise.all([
+            api.getMatchHistory(currentUserId),
+            api.getUnreadMessageCounts(currentUserId).catch(err => {
+                console.log('Failed to fetch unread counts (non-fatal):', err.message);
+                return { success: false, unreadCounts: {} };
+            })
+        ]);
+        
+        // Store unread counts (gracefully handle failure)
+        if (unreadResult.success) {
+            unreadMessageCounts = unreadResult.unreadCounts || {};
+        } else {
+            unreadMessageCounts = {};
+        }
+        
         loadingDiv.style.display = 'none';
-        if (result.matches && result.matches.length > 0) {
-            displayMatches(result.matches);
+        if (matchResult.matches && matchResult.matches.length > 0) {
+            displayMatches(matchResult.matches);
         } else {
             // If no history, show empty state
             matchesContainer.innerHTML = `
