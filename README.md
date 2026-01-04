@@ -99,7 +99,7 @@ The server will run on `http://localhost:3000`
 ### Test Data Generation
 
 To quickly populate the database with 100 fake users for testing:
-
+n
 ```bash
 # Generate 100 users (default)
 npm run seed
