@@ -286,6 +286,16 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
+    async markMessagesAsRead(userId, senderId) {
+        const response = await fetch(`${API_BASE_URL}/chat/read/${userId}/${senderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        return await response.json();
+    }
+
     async getUserLikes(userId) {
         const response = await fetch(`${API_BASE_URL}/likes/${userId}`);
         if (!response.ok) {

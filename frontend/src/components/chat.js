@@ -12,6 +12,7 @@ class ChatComponent {
         this.pollFrequency = 3000; // Poll every 3 seconds
         this.lastMessageTimestamp = null;
         this.streamChatConnected = false;
+        this.unreadMessageCounts = {}; // Store unread message counts per user
     }
 
     /**
@@ -48,6 +49,9 @@ class ChatComponent {
         
         // Try to connect to Stream Chat for real-time features
         this.initStreamChat();
+        
+        // Start polling for unread counts
+        this.startUnreadCountPolling();
     }
 
     /**
@@ -169,6 +173,9 @@ class ChatComponent {
                 matches = this.filterMatches(matches, filters);
             }
             
+            // Fetch unread message counts
+            await this.loadUnreadCounts();
+            
             console.log(`[Chat] Displaying ${matches.length} matches`);
             this.displayMatchesList(matches);
         } catch (error) {
@@ -238,9 +245,16 @@ class ChatComponent {
             const profilePic = this.escapeHtml(match.user.profilePicture || 'assets/images/default-profile.svg');
             const matchScore = Math.round(match.matchScore);
             
+            // Get unread message count for this user
+            const unreadCount = this.unreadMessageCounts[match.user.id] || 0;
+            const hasUnreadMessages = unreadCount > 0;
+            
             return `
-                <div class="match-item" data-match-id="${userId}" onclick="chatComponent.selectMatch('${userId}', '${username}')">
-                    <img src="${profilePic}" alt="${username}">
+                <div class="match-item ${hasUnreadMessages ? 'has-unread' : ''}" data-match-id="${userId}" onclick="chatComponent.selectMatch('${userId}', '${username}')">
+                    <div class="match-item-avatar">
+                        <img src="${profilePic}" alt="${username}">
+                        ${hasUnreadMessages ? `<span class="unread-count-badge">${unreadCount}</span>` : ''}
+                    </div>
                     <div class="match-info">
                         <h4>${username}</h4>
                         <p>${matchScore}% match</p>
@@ -253,7 +267,7 @@ class ChatComponent {
     /**
      * Select a match to chat with
      */
-    selectMatch(matchId, username) {
+    async selectMatch(matchId, username) {
         this.selectedMatchId = matchId;
         this.selectedMatchUsername = username;
         
@@ -273,6 +287,9 @@ class ChatComponent {
             item.classList.remove('active');
         });
         document.querySelector(`[data-match-id="${matchId}"]`)?.classList.add('active');
+        
+        // Mark messages as read
+        await this.markMessagesAsRead(matchId);
         
         // Load messages
         this.loadMessages();
@@ -495,6 +512,111 @@ class ChatComponent {
         const chatFilters = window.SharedFilters?.resetFilters() || {};
         window.SharedFilters?.applyFiltersToForm(chatFilters, 'chat-');
         console.log('[Chat] Reset filters to defaults');
+    }
+
+    /**
+     * Load unread message counts
+     */
+    async loadUnreadCounts() {
+        try {
+            if (!window.api) {
+                console.error('[Chat] API not available');
+                return;
+            }
+
+            const result = await window.api.getUnreadMessageCounts(this.currentUserId);
+            
+            if (result.success) {
+                this.unreadMessageCounts = result.unreadCounts || {};
+                console.log('[Chat] Loaded unread counts:', this.unreadMessageCounts);
+            } else {
+                this.unreadMessageCounts = {};
+            }
+        } catch (error) {
+            console.error('[Chat] Error loading unread counts:', error);
+            this.unreadMessageCounts = {};
+        }
+    }
+
+    /**
+     * Mark messages as read
+     */
+    async markMessagesAsRead(senderId) {
+        try {
+            if (!window.api) {
+                console.error('[Chat] API not available');
+                return;
+            }
+
+            await window.api.markMessagesAsRead(this.currentUserId, senderId);
+            
+            // Update local unread counts
+            if (this.unreadMessageCounts[senderId]) {
+                delete this.unreadMessageCounts[senderId];
+                
+                // Update UI to remove unread indicator
+                const matchItem = document.querySelector(`[data-match-id="${senderId}"]`);
+                if (matchItem) {
+                    matchItem.classList.remove('has-unread');
+                    const badge = matchItem.querySelector('.unread-count-badge');
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+            }
+            
+            console.log('[Chat] Marked messages as read from:', senderId);
+        } catch (error) {
+            console.error('[Chat] Error marking messages as read:', error);
+        }
+    }
+
+    /**
+     * Start polling for unread counts
+     */
+    startUnreadCountPolling() {
+        // Poll for unread counts every 5 seconds
+        setInterval(async () => {
+            if (document.visibilityState === 'visible') {
+                await this.loadUnreadCounts();
+                
+                // Update the match list display with new counts
+                const matchesList = document.getElementById('matches-list');
+                if (matchesList && matchesList.children.length > 0) {
+                    // Re-render the match items with updated counts
+                    document.querySelectorAll('.match-item').forEach(matchItem => {
+                        const matchId = matchItem.dataset.matchId;
+                        const unreadCount = this.unreadMessageCounts[matchId] || 0;
+                        const hasUnreadMessages = unreadCount > 0;
+                        
+                        // Update class
+                        if (hasUnreadMessages) {
+                            matchItem.classList.add('has-unread');
+                        } else {
+                            matchItem.classList.remove('has-unread');
+                        }
+                        
+                        // Update or remove badge
+                        let badge = matchItem.querySelector('.unread-count-badge');
+                        if (hasUnreadMessages) {
+                            if (badge) {
+                                badge.textContent = unreadCount;
+                            } else {
+                                const avatar = matchItem.querySelector('.match-item-avatar');
+                                if (avatar) {
+                                    badge = document.createElement('span');
+                                    badge.className = 'unread-count-badge';
+                                    badge.textContent = unreadCount;
+                                    avatar.appendChild(badge);
+                                }
+                            }
+                        } else if (badge) {
+                            badge.remove();
+                        }
+                    });
+                }
+            }
+        }, 5000);
     }
 
     /**
