@@ -150,6 +150,41 @@ class ChatController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // New endpoint to get unread message counts for each conversation
+  async getUnreadCounts(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+
+      const dataStore = await getDatabase();
+      
+      // Get all messages where the user is the receiver and message is not read
+      const allMessages = await dataStore.loadChats();
+      
+      // Group unread messages by sender
+      const unreadCounts = {};
+      allMessages.forEach(msg => {
+        if (msg.receiverId === userId && !msg.read) {
+          if (!unreadCounts[msg.senderId]) {
+            unreadCounts[msg.senderId] = 0;
+          }
+          unreadCounts[msg.senderId]++;
+        }
+      });
+
+      res.json({
+        success: true,
+        userId,
+        unreadCounts
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new ChatController();

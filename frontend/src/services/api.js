@@ -281,6 +281,11 @@ class NetflixAndChillAPI {
         return await response.json();
     }
 
+    async getUnreadMessageCounts(userId) {
+        const response = await fetch(`${API_BASE_URL}/chat/unread/${userId}`);
+        return await response.json();
+    }
+
     async getUserLikes(userId) {
         const response = await fetch(`${API_BASE_URL}/likes/${userId}`);
         if (!response.ok) {
