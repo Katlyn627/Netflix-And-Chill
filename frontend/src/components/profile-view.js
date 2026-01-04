@@ -859,6 +859,8 @@ class ProfileView {
             const questionDiv = document.createElement('div');
             questionDiv.className = 'quiz-question';
             questionDiv.style.marginBottom = '20px';
+            questionDiv.setAttribute('data-question-id', q.id);
+            questionDiv.setAttribute('data-question-number', index + 1);
             
             questionDiv.innerHTML = `
                 <p><strong>Question ${index + 1}:</strong> ${q.question}</p>
@@ -888,6 +890,12 @@ class ProfileView {
             quizOptions.forEach(option => {
                 if (option.checked) {
                     answeredQuestions.add(option.name);
+                    
+                    // Remove highlighting when question is answered
+                    const questionDiv = option.closest('.quiz-question');
+                    if (questionDiv && questionDiv.classList.contains('missing-answer')) {
+                        questionDiv.classList.remove('missing-answer');
+                    }
                 }
             });
             
@@ -955,12 +963,38 @@ class ProfileView {
                 // Find which questions were missed
                 const answeredQuestionIds = new Set(answers.map(a => a.questionId));
                 const missedQuestions = [];
+                const missedQuestionIds = [];
                 
                 QUIZ_QUESTIONS.forEach((q, index) => {
                     if (!answeredQuestionIds.has(q.id)) {
                         missedQuestions.push(index + 1); // Question numbers are 1-based
+                        missedQuestionIds.push(q.id);
                     }
                 });
+                
+                // Clear any previous highlighting
+                document.querySelectorAll('.quiz-question').forEach(el => {
+                    el.classList.remove('missing-answer');
+                });
+                
+                // Highlight missed questions
+                missedQuestionIds.forEach(questionId => {
+                    const questionDiv = document.querySelector(`.quiz-question[data-question-id="${questionId}"]`);
+                    if (questionDiv) {
+                        questionDiv.classList.add('missing-answer');
+                    }
+                });
+                
+                // Scroll to the first missing question
+                if (missedQuestionIds.length > 0) {
+                    const firstMissedQuestion = document.querySelector(`.quiz-question[data-question-id="${missedQuestionIds[0]}"]`);
+                    if (firstMissedQuestion) {
+                        firstMissedQuestion.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                    }
+                }
                 
                 // Display missed question numbers
                 const alertMessage = [
@@ -968,7 +1002,9 @@ class ProfileView {
                     '',
                     `${answers.length} of ${QUIZ_QUESTIONS.length} questions answered.`,
                     '',
-                    `Missed questions: ${missedQuestions.join(', ')}`
+                    `Missed questions: ${missedQuestions.join(', ')}`,
+                    '',
+                    'The missing questions are now highlighted in the quiz.'
                 ].join('\n');
                 
                 alert(alertMessage);
