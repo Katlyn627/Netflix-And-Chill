@@ -223,6 +223,29 @@ class MongoDBAdapter {
     
     return messages;
   }
+
+  async loadChats() {
+    // Load all chat messages
+    const messages = await this.db.collection('chats').find({}).sort({ timestamp: 1 }).toArray();
+    return messages;
+  }
+
+  async saveChats(chats) {
+    // For MongoDB, we need to update each document individually
+    // This is a batch operation
+    const bulkOps = chats.map(chat => ({
+      updateOne: {
+        filter: { id: chat.id },
+        update: { $set: chat },
+        upsert: true
+      }
+    }));
+    
+    if (bulkOps.length > 0) {
+      await this.db.collection('chats').bulkWrite(bulkOps);
+    }
+    return true;
+  }
 }
 
 module.exports = MongoDBAdapter;

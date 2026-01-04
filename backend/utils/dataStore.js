@@ -235,6 +235,13 @@ class DataStore {
       return [];
     }
   }
+
+  async saveChats(chats) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.chatsFile);
+    await fs.writeFile(this.chatsFile, JSON.stringify(chats, null, 2));
+    return true;
+  }
 }
 
 module.exports = DataStore;
