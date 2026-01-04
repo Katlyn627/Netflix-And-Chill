@@ -187,10 +187,6 @@ function handleKeyboardNavigation(e) {
             e.preventDefault();
             goToScreen(totalScreens - 1);
             break;
-        case 'Escape':
-            e.preventDefault();
-            skipOnboarding();
-            break;
     }
 }
 
