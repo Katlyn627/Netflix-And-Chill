@@ -634,12 +634,17 @@ async function findMatches() {
         // Fetch matches and unread counts in parallel
         const [matchResult, unreadResult] = await Promise.all([
             api.findMatches(currentUserId, currentFilters),
-            api.getUnreadMessageCounts(currentUserId)
+            api.getUnreadMessageCounts(currentUserId).catch(err => {
+                console.log('Failed to fetch unread counts (non-fatal):', err.message);
+                return { success: false, unreadCounts: {} };
+            })
         ]);
         
-        // Store unread counts
+        // Store unread counts (gracefully handle failure)
         if (unreadResult.success) {
             unreadMessageCounts = unreadResult.unreadCounts || {};
+        } else {
+            unreadMessageCounts = {};
         }
         
         loadingDiv.style.display = 'none';
@@ -671,12 +676,17 @@ async function loadMatchHistory() {
         // Fetch match history and unread counts in parallel
         const [matchResult, unreadResult] = await Promise.all([
             api.getMatchHistory(currentUserId),
-            api.getUnreadMessageCounts(currentUserId)
+            api.getUnreadMessageCounts(currentUserId).catch(err => {
+                console.log('Failed to fetch unread counts (non-fatal):', err.message);
+                return { success: false, unreadCounts: {} };
+            })
         ]);
         
-        // Store unread counts
+        // Store unread counts (gracefully handle failure)
         if (unreadResult.success) {
             unreadMessageCounts = unreadResult.unreadCounts || {};
+        } else {
+            unreadMessageCounts = {};
         }
         
         loadingDiv.style.display = 'none';
