@@ -854,7 +854,25 @@ class ProfileView {
         const container = document.getElementById('quiz-questions-container');
         if (!container || typeof QUIZ_QUESTIONS === 'undefined') return;
         
+        // Get existing answers from last quiz attempt (if updating quiz)
+        // This ensures users see their previous answers when retaking/updating the quiz
+        const existingAnswers = {};
+        const quizAttempts = this.userData.quizAttempts || [];
+        if (quizAttempts.length > 0) {
+            const lastAttempt = quizAttempts[quizAttempts.length - 1];
+            if (lastAttempt.answers && Array.isArray(lastAttempt.answers)) {
+                lastAttempt.answers.forEach(answer => {
+                    // Validate answer object has required properties
+                    if (answer && answer.questionId && answer.selectedValue) {
+                        existingAnswers[answer.questionId] = answer.selectedValue;
+                    }
+                });
+            }
+        }
+        
         container.innerHTML = '';
+        // Note: QUIZ_QUESTIONS is a static, trusted data source from quiz.js
+        // The question and option data is hardcoded and not user-generated
         QUIZ_QUESTIONS.forEach((q, index) => {
             const questionDiv = document.createElement('div');
             questionDiv.className = 'quiz-question';
@@ -862,11 +880,14 @@ class ProfileView {
             questionDiv.setAttribute('data-question-id', q.id);
             questionDiv.setAttribute('data-question-number', index + 1);
             
+            // Check if there's an existing answer for this question
+            const previousAnswer = existingAnswers[q.id];
+            
             questionDiv.innerHTML = `
                 <p><strong>Question ${index + 1}:</strong> ${q.question}</p>
                 ${q.options.map(opt => `
                     <label style="display: block; margin: 5px 0;">
-                        <input type="radio" name="${q.id}" value="${opt.value}" required class="quiz-option">
+                        <input type="radio" name="${q.id}" value="${opt.value}" required class="quiz-option" ${previousAnswer === opt.value ? 'checked' : ''}>
                         ${opt.label}
                     </label>
                 `).join('')}
