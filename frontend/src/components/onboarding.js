@@ -101,17 +101,6 @@ function updateNavigationButtons() {
     }
 }
 
-// Skip onboarding and go directly to profile creation
-function skipOnboarding() {
-    // Mark onboarding as completed
-    localStorage.setItem('onboardingCompleted', 'true');
-    // Mark that profile needs to be created
-    localStorage.setItem('profileCreated', 'false');
-    
-    // Redirect to profile creation
-    window.location.href = 'profile.html';
-}
-
 // Complete onboarding and proceed to profile creation
 function completeOnboarding() {
     // Mark onboarding as completed
