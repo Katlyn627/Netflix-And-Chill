@@ -5,7 +5,7 @@ let availableProviders = [];
 
 // Show/hide sections
 function showSection(sectionId) {
-    const sections = ['create-profile', 'streaming-services', 'watch-history', 'preferences', 'movie-preferences', 'swipe-movies', 'find-matches'];
+    const sections = ['create-profile', 'streaming-services', 'watch-history', 'preferences', 'swipe-movies', 'find-matches'];
     sections.forEach(id => {
         const section = document.getElementById(id);
         if (section) {
@@ -319,8 +319,11 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
         // Save user ID to localStorage for match page
         localStorage.setItem('currentUserId', currentUserId);
         
-        // Navigate to movie preferences section
-        showSection('movie-preferences');
+        // Navigate directly to swipe page, skipping movie preferences
+        // Delay allows the success message to be visible to the user
+        setTimeout(() => {
+            window.location.href = 'swipe.html';
+        }, 1000); // 1 second delay
     } catch (error) {
         showMessage('Error saving preferences: ' + error.message, true);
     }
