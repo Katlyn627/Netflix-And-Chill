@@ -855,18 +855,24 @@ class ProfileView {
         if (!container || typeof QUIZ_QUESTIONS === 'undefined') return;
         
         // Get existing answers from last quiz attempt (if updating quiz)
+        // This ensures users see their previous answers when retaking/updating the quiz
         const existingAnswers = {};
         const quizAttempts = this.userData.quizAttempts || [];
         if (quizAttempts.length > 0) {
             const lastAttempt = quizAttempts[quizAttempts.length - 1];
-            if (lastAttempt.answers) {
+            if (lastAttempt.answers && Array.isArray(lastAttempt.answers)) {
                 lastAttempt.answers.forEach(answer => {
-                    existingAnswers[answer.questionId] = answer.selectedValue;
+                    // Validate answer object has required properties
+                    if (answer && answer.questionId && answer.selectedValue) {
+                        existingAnswers[answer.questionId] = answer.selectedValue;
+                    }
                 });
             }
         }
         
         container.innerHTML = '';
+        // Note: QUIZ_QUESTIONS is a static, trusted data source from quiz.js
+        // The question and option data is hardcoded and not user-generated
         QUIZ_QUESTIONS.forEach((q, index) => {
             const questionDiv = document.createElement('div');
             questionDiv.className = 'quiz-question';
