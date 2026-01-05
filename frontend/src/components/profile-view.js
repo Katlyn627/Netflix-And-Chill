@@ -854,6 +854,18 @@ class ProfileView {
         const container = document.getElementById('quiz-questions-container');
         if (!container || typeof QUIZ_QUESTIONS === 'undefined') return;
         
+        // Get existing answers from last quiz attempt (if updating quiz)
+        const existingAnswers = {};
+        const quizAttempts = this.userData.quizAttempts || [];
+        if (quizAttempts.length > 0) {
+            const lastAttempt = quizAttempts[quizAttempts.length - 1];
+            if (lastAttempt.answers) {
+                lastAttempt.answers.forEach(answer => {
+                    existingAnswers[answer.questionId] = answer.selectedValue;
+                });
+            }
+        }
+        
         container.innerHTML = '';
         QUIZ_QUESTIONS.forEach((q, index) => {
             const questionDiv = document.createElement('div');
@@ -862,11 +874,14 @@ class ProfileView {
             questionDiv.setAttribute('data-question-id', q.id);
             questionDiv.setAttribute('data-question-number', index + 1);
             
+            // Check if there's an existing answer for this question
+            const previousAnswer = existingAnswers[q.id];
+            
             questionDiv.innerHTML = `
                 <p><strong>Question ${index + 1}:</strong> ${q.question}</p>
                 ${q.options.map(opt => `
                     <label style="display: block; margin: 5px 0;">
-                        <input type="radio" name="${q.id}" value="${opt.value}" required class="quiz-option">
+                        <input type="radio" name="${q.id}" value="${opt.value}" required class="quiz-option" ${previousAnswer === opt.value ? 'checked' : ''}>
                         ${opt.label}
                     </label>
                 `).join('')}
