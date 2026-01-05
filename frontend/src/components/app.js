@@ -320,9 +320,10 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
         localStorage.setItem('currentUserId', currentUserId);
         
         // Navigate directly to swipe page, skipping movie preferences
+        // Delay allows the success message to be visible to the user
         setTimeout(() => {
             window.location.href = 'swipe.html';
-        }, 1000);
+        }, 1000); // 1 second delay
     } catch (error) {
         showMessage('Error saving preferences: ' + error.message, true);
     }
