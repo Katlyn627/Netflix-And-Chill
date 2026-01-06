@@ -13,7 +13,9 @@
     "seed:matches": "node backend/scripts/seedMatches.js",
     "seed:matches:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/seedMatches.js",
     "seed:all": "npm run seed && npm run seed:matches",
-    "seed:all:mongodb": "npm run seed:mongodb && npm run seed:matches:mongodb"
+    "seed:all:mongodb": "npm run seed:mongodb && npm run seed:matches:mongodb",
+    "verify:matches": "node backend/scripts/verifySeededMatches.js",
+    "verify:matches:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/verifySeededMatches.js"
   },
   "keywords": [
     "dating",

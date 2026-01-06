@@ -1,223 +1,186 @@
-# Quick Start: Finding Seeded Data
+# Quick Start: Seeded Data and Matches
 
-## 🎯 Quick Reference
+## Overview
 
-### Where is the data?
-```
-📁 Repository Root
-├── 📄 TEST_CREDENTIALS.md     ← Login credentials for all seeded users
-├── 📄 TEST_CREDENTIALS.json   ← Same data in JSON format
-└── 📁 data/
-    ├── users.json             ← All user profile data
-    ├── matches.json           ← Saved matches
-    └── messages.json          ← Chat messages
-```
+This guide helps you quickly set up test data with seeded users and matches.
 
-### Default login info
-- **Password for ALL users**: `password123`
-- **Emails**: See `TEST_CREDENTIALS.md`
+## TL;DR - Fast Setup
 
----
-
-## 📋 Step-by-Step Examples
-
-### 1️⃣ View Login Credentials
 ```bash
-cat TEST_CREDENTIALS.md
+npm run seed:all          # Seed users and matches
+npm run verify:matches    # Verify everything works
+npm start                 # Start the server
 ```
-**Shows**: Table with username, email, age, and location for each user
 
-### 2️⃣ Count Total Users
+Login with any user from `TEST_CREDENTIALS.md` (password: `password123`)
+
+## Detailed Setup
+
+### 1. Seed Users
+
 ```bash
-cat data/users.json | grep '"id":' | wc -l
+npm run seed
 ```
-**Output**: Number of seeded users (e.g., 50)
 
-### 3️⃣ View a User's Profile
+Creates 100 test users with complete profiles.
+
+### 2. Seed Matches
+
 ```bash
-# Basic info
-cat data/users.json | jq '.[0] | {username, email, age, location, bio}'
-
-# Preferences
-cat data/users.json | jq '.[0].preferences'
-
-# Streaming services
-cat data/users.json | jq '.[0].streamingServices'
-
-# Favorite movies
-cat data/users.json | jq '.[0].favoriteMovies'
+npm run seed:matches
 ```
 
-### 4️⃣ Test Matching via API
+Generates ~950 pre-matched pairs (up to 10 matches per user).
+
+### 3. Verify Matches
+
 ```bash
-# Start server
-npm start
-
-# Get first user's matches
-USER_ID=$(cat data/users.json | jq -r '.[0].id')
-curl http://localhost:3000/api/matches/find/$USER_ID | jq '.matches | length'
+npm run verify:matches
 ```
-**Output**: Number of matches found for the user
 
-### 5️⃣ Login to Web Interface
-1. Start server: `npm start`
-2. Open: `http://localhost:8080/login.html`
-3. Use any credentials from `TEST_CREDENTIALS.md`
-4. Password: `password123`
+Confirms all matches are visible to both users.
 
----
+## Understanding Seeded Matches
 
-## 🔍 Common Searches
+### How They Work
 
-### Find user by email
+✅ **Single Storage**: Each match stored once with user1Id and user2Id  
+✅ **Bidirectional Visibility**: Both users see the same match  
+✅ **No Duplicates**: System checks before creating matches  
+✅ **Complete Data**: Match score, shared content, compatibility
+
+### Example
+
+```
+Match: UserA (id: abc123) ↔ UserB (id: def456)
+Storage: { user1Id: "abc123", user2Id: "def456", matchScore: 85 }
+
+UserA queries matches: Finds this match (user1Id = abc123) ✓
+UserB queries matches: Finds this match (user2Id = def456) ✓
+```
+
+Both see the SAME match with the SAME ID and data!
+
+## Verification
+
+The `npm run verify:matches` command tests:
+
+1. **Bidirectional Visibility**: All matches visible to both users
+2. **No Missing Matches**: All users have at least one match
+3. **No Duplicates**: Each user pair matched only once
+4. **Sample Test**: Verifies specific users can see mutual matches
+
+### Expected Output
+
+```
+🎉 ALL TESTS PASSED!
+   Seeded matches are working correctly and showing on both users' profiles.
+
+📝 VERIFICATION SUMMARY
+Total Users:           100
+Total Matches:         945
+Users with no matches: 0
+Duplicate matches:     0
+Visibility issues:     0
+```
+
+## Common Commands
+
 ```bash
-cat data/users.json | jq '.[] | select(.email == "reese_white@gmail.com")'
+# Everything at once
+npm run seed:all
+
+# With MongoDB
+npm run seed:all:mongodb
+npm run verify:matches:mongodb
+
+# Custom match count
+node backend/scripts/seedMatches.js --matches-per-user=15
+
+# Reseed matches only
+rm data/matches.json
+npm run seed:matches
 ```
 
-### Find users in a specific location
+## Testing
+
+### Via UI
+1. `npm start`
+2. Login (see `TEST_CREDENTIALS.md`)
+3. Go to Matches page
+4. See pre-generated matches!
+
+### Via API
 ```bash
-cat data/users.json | jq '.[] | select(.location | contains("Raleigh"))'
+npm start  # Start server
+
+# In another terminal
+USER_ID="user_1234567890_abcdef"  # Get from TEST_CREDENTIALS.md
+curl "http://localhost:3000/api/matches/${USER_ID}/history"
 ```
 
-### Find users with specific age
+### Via Database
+
+**File-based:**
 ```bash
-cat data/users.json | jq '.[] | select(.age >= 40 and .age <= 50)'
+cat data/matches.json | python3 -m json.tool | less
+cat data/matches.json | grep '"id":' | wc -l
 ```
 
-### Check user's age range preferences
-```bash
-cat data/users.json | jq '.[0].preferences.ageRange'
+**MongoDB:**
+```javascript
+use('netflix-and-chill');
+db.matches.find().limit(5);
+db.matches.countDocuments();
 ```
 
-### View all usernames
-```bash
-cat data/users.json | jq '.[].username'
-```
-
----
-
-## 📊 Verification Commands
-
-### Verify data completeness
-```bash
-node backend/scripts/testSeeding.js
-```
-
-### Debug matching issues
-```bash
-node backend/scripts/debugMatching.js
-```
-
-### Test multiple users
-```bash
-node backend/scripts/testMultipleUsers.js
-```
-
----
-
-## 🔄 Reseed Data
-
-### Delete and reseed
-```bash
-rm -rf data/ TEST_CREDENTIALS.*
-npm run seed -- --count=50
-```
-
----
-
-## 📸 Real Example Output
-
-### TEST_CREDENTIALS.md
-```
-# Netflix and Chill - Test User Credentials
-
-Generated: 2025-12-22T20:58:12.990Z
-Total Users: 50
-Default Password: password123
-
-| # | Username | Email | Password | Age | Location |
-|---|----------|-------|----------|-----|----------|
-| 1 | reese_white | reese_white@gmail.com | password123 | 44 | Raleigh, NC |
-| 2 | walker_rowan | walker_rowan@hotmail.com | password123 | 30 | Los Angeles, CA |
-...
-```
-
-### User Profile (JSON)
-```json
-{
-  "username": "reese_white",
-  "email": "reese_white@gmail.com",
-  "age": 44,
-  "location": "Raleigh, NC",
-  "gender": "female",
-  "bio": "Netflix addict ready to find my streaming soulmate",
-  "preferences": {
-    "ageRange": { "min": 31, "max": 58 },
-    "locationRadius": 1000,
-    "genderPreference": ["male"]
-  },
-  "streamingServices": ["Peacock Premium", "Max", "Hulu"],
-  "favoriteMovies": [
-    {"title": "Pulp Fiction"},
-    {"title": "Fight Club"},
-    {"title": "Inception"}
-  ]
-}
-```
-
-### API Response (Matches)
-```json
-{
-  "userId": "user_1766437092406_hu37nrjgq",
-  "matchCount": 10,
-  "matches": [
-    {
-      "matchScore": 100,
-      "user": {
-        "username": "micahw26",
-        "age": 46,
-        "location": "Raleigh, NC"
-      }
-    }
-  ]
-}
-```
-
----
-
-## 💡 Pro Tips
-
-1. **jq is your friend**: Install jq for easy JSON parsing
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install jq
-   ```
-
-2. **Use grep for quick searches**:
-   ```bash
-   cat TEST_CREDENTIALS.md | grep "gmail.com"
-   ```
-
-3. **Check server logs** when testing:
-   ```bash
-   npm start | tee server.log
-   ```
-
-4. **Bookmark common queries** in your terminal history
-
----
-
-## 🆘 Troubleshooting
-
-### Can't find TEST_CREDENTIALS.md?
-→ Run `npm run seed` to generate data
+## Troubleshooting
 
 ### No matches showing?
-→ Check `SEEDED_DATA_GUIDE.md` Step 6 for verification
 
-### API returning errors?
-→ Ensure server is running: `npm start`
+```bash
+# 1. Verify they exist
+npm run verify:matches
 
----
+# 2. Reseed if needed
+npm run seed:matches
 
-For detailed documentation, see: **SEEDED_DATA_GUIDE.md**
+# 3. Check server
+npm start
+```
+
+### Matches in database but not UI?
+
+1. Hard refresh browser (Ctrl+Shift+R)
+2. Check browser console (F12) for errors
+3. Check server logs for errors
+4. Verify API: `curl http://localhost:3000/health`
+
+### Start completely fresh?
+
+```bash
+rm -rf data/
+npm run seed:all
+npm run verify:matches
+```
+
+## What You Get
+
+- **100 test users** with full profiles
+- **~950 match pairs** (varies slightly)
+- **Average ~19 matches per user**
+- **All matches bidirectionally visible**
+- **Test credentials** in `TEST_CREDENTIALS.md`
+
+## More Documentation
+
+- 📖 **Full Verification Guide**: `docs/guides/SEEDED_MATCHES_VERIFICATION.md`
+- 📖 **Technical Details**: `docs/MATCH_AND_LOGIN_FIXES.md`
+- 📖 **Credentials**: `TEST_CREDENTIALS.md`
+
+## Need Help?
+
+1. Run: `npm run verify:matches`
+2. Check output and logs
+3. See documentation above
+4. Open GitHub issue with details
