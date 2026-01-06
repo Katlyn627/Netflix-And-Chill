@@ -42,11 +42,15 @@ async function generateMatchesForUser(userId, allUsers, matchesPerUser, database
   };
   const matches = MatchingEngine.findMatches(currentUser, userObjects, matchesPerUser, filters);
 
-  // Save matches to database
+  // Save matches to database, checking for duplicates
   const savedMatches = [];
   for (const match of matches) {
-    await database.addMatch(match);
-    savedMatches.push(match);
+    // Check if match already exists (in either direction)
+    const exists = await database.matchExists(match.user1Id, match.user2Id);
+    if (!exists) {
+      await database.addMatch(match);
+      savedMatches.push(match);
+    }
   }
 
   return savedMatches;

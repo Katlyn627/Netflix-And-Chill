@@ -72,18 +72,25 @@ class UserController {
       const { email, password } = req.body;
 
       if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
+        return res.status(400).json({ error: 'Email/username and password are required' });
       }
 
       const dataStore = await getDatabase();
-      const userData = await dataStore.findUserByEmail(email);
+      
+      // Try to find user by email first, then by username
+      let userData = await dataStore.findUserByEmail(email);
       if (!userData) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        // If not found by email, try username
+        userData = await dataStore.findUserByUsername(email);
+      }
+      
+      if (!userData) {
+        return res.status(401).json({ error: 'Invalid email/username or password' });
       }
 
       const user = new User(userData);
       if (!user.verifyPassword(password)) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        return res.status(401).json({ error: 'Invalid email/username or password' });
       }
 
       res.json({

@@ -154,6 +154,11 @@ class PostgreSQLAdapter {
     return result.rows.length > 0 ? this.formatUser(result.rows[0]) : null;
   }
 
+  async findUserByUsername(username) {
+    const result = await this.pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
+    return result.rows.length > 0 ? this.formatUser(result.rows[0]) : null;
+  }
+
   async updateUser(userId, updates) {
     // Build dynamic update query
     const fields = [];
@@ -205,6 +210,17 @@ class PostgreSQLAdapter {
     const query = 'SELECT * FROM matches WHERE user1_id = $1 OR user2_id = $1';
     const result = await this.pool.query(query, [userId]);
     return result.rows.map(row => this.formatMatch(row));
+  }
+
+  async matchExists(user1Id, user2Id) {
+    const query = `
+      SELECT 1 FROM matches 
+      WHERE (user1_id = $1 AND user2_id = $2) 
+         OR (user1_id = $2 AND user2_id = $1)
+      LIMIT 1
+    `;
+    const result = await this.pool.query(query, [user1Id, user2Id]);
+    return result.rows.length > 0;
   }
 
   // Like operations

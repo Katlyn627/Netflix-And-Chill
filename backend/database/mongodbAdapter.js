@@ -149,6 +149,12 @@ class MongoDBAdapter {
     return await this.db.collection('users').findOne({ email });
   }
 
+  async findUserByUsername(username) {
+    return await this.db.collection('users').findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, 'i') } 
+    });
+  }
+
   async updateUser(userId, updates) {
     const result = await this.db.collection('users').findOneAndUpdate(
       { id: userId },
@@ -172,6 +178,16 @@ class MongoDBAdapter {
     return await this.db.collection('matches').find({
       $or: [{ user1Id: userId }, { user2Id: userId }]
     }).toArray();
+  }
+
+  async matchExists(user1Id, user2Id) {
+    const match = await this.db.collection('matches').findOne({
+      $or: [
+        { user1Id: user1Id, user2Id: user2Id },
+        { user1Id: user2Id, user2Id: user1Id }
+      ]
+    });
+    return match !== null;
   }
 
   // Like operations
