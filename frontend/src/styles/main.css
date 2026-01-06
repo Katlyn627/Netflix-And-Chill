@@ -6,14 +6,15 @@
 
 :root {
     --bottom-nav-height: 60px;
+    --content-padding: 10px;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #141414 0%, #000000 100%);
     min-height: 100vh;
-    padding: 10px;
-    padding-bottom: calc(var(--bottom-nav-height) + 10px);
+    padding: var(--content-padding);
+    padding-bottom: calc(var(--bottom-nav-height) + var(--content-padding));
 }
 
 .container {
@@ -25,7 +26,7 @@ header {
     text-align: center;
     color: white;
     margin-bottom: 20px;
-    padding: 10px;
+    padding: var(--content-padding);
     position: relative;
 }
 
@@ -727,7 +728,7 @@ footer {
     position: relative;
 }
 
-/* Bottom Navigation Icons */
+/* Fixed Bottom Navigation Bar */
 .nav-icons {
     position: fixed;
     bottom: 0;
