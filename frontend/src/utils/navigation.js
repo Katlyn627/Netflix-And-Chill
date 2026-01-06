@@ -49,7 +49,14 @@ function initLogoutButton() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to logout?')) {
+                // Clear all user-related data from localStorage
                 localStorage.removeItem('currentUserId');
+                localStorage.removeItem('profileCreated');
+                localStorage.removeItem('initialSwipeComplete');
+                localStorage.removeItem('debateResponses');
+                localStorage.removeItem('promptResponses');
+                // Clear any other session-specific data
+                sessionStorage.clear();
                 window.location.href = 'login.html';
             }
         });

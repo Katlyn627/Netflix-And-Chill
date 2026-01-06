@@ -307,7 +307,6 @@
             renderDebates();
             renderPrompts();
             setupTabs();
-            setupLogout();
         });
 
         function setupTabs() {
@@ -467,16 +466,6 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
-
-        function setupLogout() {
-            const logoutBtn = document.getElementById('logout-btn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    localStorage.removeItem('currentUserId');
-                    window.location.href = 'homepage.html';
-                });
-            }
         }
     </script>
 </body>
