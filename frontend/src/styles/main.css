@@ -583,6 +583,10 @@ footer {
 }
 
 @media (max-width: 768px) {
+    header {
+        padding-top: 10px;
+    }
+    
     header h1 {
         font-size: 2em;
     }
@@ -610,6 +614,46 @@ footer {
     .profile-action-btn + .profile-action-btn {
         margin-left: 0;
         margin-top: 10px;
+    }
+    
+    /* Navigation adjustments */
+    .nav-icons {
+        padding: 5px 8px;
+    }
+    
+    .nav-left,
+    .nav-right {
+        gap: 3px;
+    }
+    
+    .nav-icon-btn {
+        width: 50px;
+        font-size: 18px;
+        min-width: 50px;
+        padding: 3px 6px;
+    }
+    
+    .nav-icon-btn::after {
+        font-size: 8px;
+    }
+    
+    .logo-banner {
+        padding: 6px 15px;
+        gap: 8px;
+    }
+    
+    .logo-banner img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .logo-banner h1 {
+        font-size: 1.5em;
+    }
+    
+    #quiz-questions-container {
+        max-height: 500px;
+        padding: 15px;
     }
 }
 
@@ -683,7 +727,7 @@ footer {
     position: relative;
 }
 
-/* Navigation Icons in Bottom */
+/* Bottom Navigation Icons */
 .nav-icons {
     position: fixed;
     bottom: 0;
@@ -864,51 +908,6 @@ header {
     background: #1a1a1a;
     color: white;
     padding: 10px;
-}
-
-@media (max-width: 768px) {
-    header {
-        padding-top: 10px;
-    }
-    
-    .nav-icons {
-        padding: 5px 8px;
-    }
-    
-    .nav-left,
-    .nav-right {
-        gap: 3px;
-    }
-    
-    .nav-icon-btn {
-        width: 50px;
-        font-size: 18px;
-        min-width: 50px;
-        padding: 3px 6px;
-    }
-    
-    .nav-icon-btn::after {
-        font-size: 8px;
-    }
-    
-    .logo-banner {
-        padding: 6px 15px;
-        gap: 8px;
-    }
-    
-    .logo-banner img {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .logo-banner h1 {
-        font-size: 1.5em;
-    }
-    
-    #quiz-questions-container {
-        max-height: 500px;
-        padding: 15px;
-    }
 }
 
 @media (max-width: 480px) {
