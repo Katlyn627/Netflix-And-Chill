@@ -39,3 +39,26 @@ async function updateNavProfileIcon(userId) {
         console.error('Error updating nav profile icon:', error);
     }
 }
+
+/**
+ * Initialize the logout button handler
+ * Should be called when the page loads to set up the logout functionality
+ */
+function initLogoutButton() {
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUserId');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+}
+
+// Initialize logout button when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLogoutButton);
+} else {
+    initLogoutButton();
+}
