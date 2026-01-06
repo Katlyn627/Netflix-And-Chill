@@ -723,35 +723,40 @@ function showFiltersModal() {
         drawer.classList.add('open');
     }, 10);
     
-    // Set current filter values
-    document.getElementById('match-score-filter').value = currentFilters.minMatchScore;
-    document.getElementById('match-score-value').textContent = `${currentFilters.minMatchScore}%`;
-    document.getElementById('age-range-min-filter').value = currentFilters.minAge;
-    document.getElementById('age-range-max-filter').value = currentFilters.maxAge;
-    document.getElementById('distance-filter').value = currentFilters.locationRadius;
-    const distanceText = currentFilters.locationRadius >= 100 ? 'Anywhere' : `${currentFilters.locationRadius} miles`;
-    document.getElementById('distance-value').textContent = distanceText;
-    
-    // Set gender checkboxes
-    document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
-        cb.checked = currentFilters.genderPreference.length === 0 
-            ? cb.value === 'any'
-            : currentFilters.genderPreference.includes(cb.value);
-    });
-    
-    // Set orientation checkboxes
-    document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
-        cb.checked = currentFilters.sexualOrientationPreference.length === 0 
-            ? cb.value === 'any'
-            : currentFilters.sexualOrientationPreference.includes(cb.value);
-    });
-    
-    // Set archetype checkboxes
-    document.querySelectorAll('input[name="archetypeFilter"]').forEach(cb => {
-        cb.checked = currentFilters.archetypePreference.length === 0 
-            ? cb.value === 'any'
-            : currentFilters.archetypePreference.includes(cb.value);
-    });
+    // Use SharedFilters utility to populate form with current filters if available
+    if (window.SharedFilters) {
+        window.SharedFilters.applyFiltersToForm(currentFilters, '');
+    } else {
+        // Fallback: manually set current filter values
+        document.getElementById('match-score-filter').value = currentFilters.minMatchScore;
+        document.getElementById('match-score-value').textContent = `${currentFilters.minMatchScore}%`;
+        document.getElementById('age-range-min-filter').value = currentFilters.minAge;
+        document.getElementById('age-range-max-filter').value = currentFilters.maxAge;
+        document.getElementById('distance-filter').value = currentFilters.locationRadius;
+        const distanceText = currentFilters.locationRadius >= 100 ? 'Anywhere' : `${currentFilters.locationRadius} miles`;
+        document.getElementById('distance-value').textContent = distanceText;
+        
+        // Set gender checkboxes
+        document.querySelectorAll('input[name="genderFilter"]').forEach(cb => {
+            cb.checked = currentFilters.genderPreference.length === 0 
+                ? cb.value === 'any'
+                : currentFilters.genderPreference.includes(cb.value);
+        });
+        
+        // Set orientation checkboxes
+        document.querySelectorAll('input[name="orientationFilter"]').forEach(cb => {
+            cb.checked = currentFilters.sexualOrientationPreference.length === 0 
+                ? cb.value === 'any'
+                : currentFilters.sexualOrientationPreference.includes(cb.value);
+        });
+        
+        // Set archetype checkboxes
+        document.querySelectorAll('input[name="archetypeFilter"]').forEach(cb => {
+            cb.checked = currentFilters.archetypePreference.length === 0 
+                ? cb.value === 'any'
+                : currentFilters.archetypePreference.includes(cb.value);
+        });
+    }
 }
 
 // Hide filters modal

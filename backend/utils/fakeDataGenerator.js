@@ -199,17 +199,18 @@ function generateStreamingServices(providers) {
   
   const selectedProviders = [];
   
-  // Always include 1-2 popular services (50% chance for 2, 50% chance for 1)
-  const popularCount = Math.random() > 0.5 ? 2 : 1;
+  // Always include 2 popular services (increased for better matching overlap)
+  const popularCount = 2;
   if (popularProviders.length > 0) {
     const selected = randomItems(popularProviders, Math.min(popularCount, popularProviders.length, count));
     selectedProviders.push(...selected);
   }
   
-  // Fill remaining slots with weighted selection (60% chance popular, 40% chance other)
+  // Fill remaining slots with weighted selection (70% chance popular, 30% chance other)
+  // Increased from 60/40 to create more overlap
   const remaining = count - selectedProviders.length;
   for (let i = 0; i < remaining; i++) {
-    const usePopular = Math.random() > 0.4 && popularProviders.length > 0; // 60% probability
+    const usePopular = Math.random() > 0.3 && popularProviders.length > 0; // 70% probability
     const pool = usePopular ? popularProviders : otherProviders;
     
     // Avoid duplicates
@@ -239,7 +240,7 @@ function generateStreamingServices(providers) {
 function generateGenrePreferences(genres) {
   const count = randomInt(3, 8);
   
-  // Define popular genres (most common ones)
+  // Define popular genres (most common ones) - increased overlap for better matching
   const popularGenreNames = [
     'Action', 'Comedy', 'Drama', 'Romance', 'Science Fiction',
     'Sci-Fi & Fantasy', 'Thriller', 'Horror', 'Animation', 'Documentary'
@@ -255,17 +256,18 @@ function generateGenrePreferences(genres) {
   
   const selectedGenres = [];
   
-  // Always include 2-3 popular genres (ensure commonality)
-  const popularCount = Math.min(randomInt(2, 3), popularGenres.length);
+  // Always include 3-4 popular genres (increased from 2-3 for better commonality)
+  const popularCount = Math.min(randomInt(3, 4), popularGenres.length);
   if (popularGenres.length > 0) {
     const selected = randomItems(popularGenres, popularCount);
     selectedGenres.push(...selected);
   }
   
-  // Fill remaining slots with weighted selection (60% chance popular, 40% chance other)
+  // Fill remaining slots with weighted selection (70% chance popular, 30% chance other)
+  // Increased from 60/40 to create more overlap between users
   const remaining = count - selectedGenres.length;
   for (let i = 0; i < remaining; i++) {
-    const usePopular = Math.random() > 0.4 && popularGenres.length > 0; // 60% probability
+    const usePopular = Math.random() > 0.3 && popularGenres.length > 0; // 70% probability
     const pool = usePopular ? popularGenres : otherGenres;
     
     // Avoid duplicates

@@ -16,6 +16,10 @@ const MatchingEngine = require('../utils/matchingEngine');
 // Configuration
 const DEFAULT_MATCHES_PER_USER = 10;
 
+// Age range constants for fallback (match those in seedUsers.js)
+const MINIMUM_LEGAL_AGE = 18;
+const MAXIMUM_AGE = 100;
+
 /**
  * Generate matches for a specific user
  */
@@ -31,18 +35,29 @@ async function generateMatchesForUser(userId, allUsers, matchesPerUser, database
     .filter(u => u.id !== userId) // Exclude self
     .map(u => new User(u));
 
-  // Generate matches using the matching engine with very permissive filters
-  // This ensures we get matches even with small test datasets
+  // Generate matches using the matching engine with user's actual preferences
+  // This creates more realistic matches that respect user filters
+  // Falls back to permissive filters only if user has no preferences set
   const filters = { 
-    minMatchScore: 0, // Accept all matches regardless of score
-    ageRange: { min: 18, max: 100 }, // Override age restrictions for testing
-    locationRadius: 10000, // Global matching for testing
-    genderPreference: ['any'], // Accept all genders
-    sexualOrientationPreference: ['any'] // Accept all orientations
+    minMatchScore: 0, // Accept all matches regardless of score for initial seeding
+    // Use user's actual age range preferences if available, otherwise use wide range
+    ageRange: currentUser.preferences?.ageRange || { min: MINIMUM_LEGAL_AGE, max: MAXIMUM_AGE },
+    // Use user's actual location radius if available, otherwise global for testing
+    locationRadius: currentUser.preferences?.locationRadius !== undefined 
+      ? currentUser.preferences.locationRadius 
+      : 10000,
+    // Use user's actual gender preferences if available
+    genderPreference: currentUser.preferences?.genderPreference?.length > 0 
+      ? currentUser.preferences.genderPreference 
+      : ['any'],
+    // Use user's actual sexual orientation preferences if available
+    sexualOrientationPreference: currentUser.preferences?.sexualOrientationPreference?.length > 0 
+      ? currentUser.preferences.sexualOrientationPreference 
+      : ['any']
   };
   const matches = MatchingEngine.findMatches(currentUser, userObjects, matchesPerUser, filters);
 
-  // Save matches to database, checking for duplicates
+  // Save matches to database, checking for duplicates to ensure bidirectional visibility
   const savedMatches = [];
   for (const match of matches) {
     // Check if match already exists (in either direction)
