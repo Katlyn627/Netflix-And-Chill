@@ -1,21 +1,77 @@
 /**
  * Swipe Feature Component
  * Allows users to swipe through movies and like/dislike them
- * Supports unlimited swiping with dynamic loading
+ * Supports unlimited swiping with dynamic loading and gamification features
  */
 
-// Constants - Unlimited swipes enabled
+// Gamification Configuration - Consider moving to environment variables for A/B testing
 const UNLIMITED_SWIPES = true;
 const INITIAL_LOAD_COUNT = 50; // Load 50 movies initially
 const RELOAD_THRESHOLD = 10; // When stack has 10 or fewer movies, load more
+const MAX_SUPER_LIKES_PER_DAY = 3;
+const MAX_DAILY_SWIPES = 50;
 
+// Gamification state
 let currentMovieIndex = 0;
 let movieStack = [];
+let swipeHistory = []; // Track recent swipes for undo
 let isDragging = false;
 let startX = 0;
 let currentX = 0;
 let currentPage = 1;
 let isLoadingMore = false;
+let superLikesRemaining = MAX_SUPER_LIKES_PER_DAY;
+let dailySwipesRemaining = MAX_DAILY_SWIPES;
+
+/**
+ * Initialize gamification counters from localStorage
+ */
+function initializeGamificationState() {
+  const today = new Date().toDateString();
+  const lastSwipeDate = localStorage.getItem('lastSwipeDate');
+  
+  // Reset daily counters if it's a new day
+  if (lastSwipeDate !== today) {
+    localStorage.setItem('lastSwipeDate', today);
+    localStorage.setItem('superLikesRemaining', MAX_SUPER_LIKES_PER_DAY);
+    localStorage.setItem('dailySwipesRemaining', MAX_DAILY_SWIPES);
+    superLikesRemaining = MAX_SUPER_LIKES_PER_DAY;
+    dailySwipesRemaining = MAX_DAILY_SWIPES;
+  } else {
+    superLikesRemaining = parseInt(localStorage.getItem('superLikesRemaining') || MAX_SUPER_LIKES_PER_DAY);
+    dailySwipesRemaining = parseInt(localStorage.getItem('dailySwipesRemaining') || MAX_DAILY_SWIPES);
+  }
+  
+  updateGamificationUI();
+}
+
+/**
+ * Update gamification UI counters
+ */
+function updateGamificationUI() {
+  const superLikesCounter = document.getElementById('super-likes-counter');
+  const dailySwipesCounter = document.getElementById('daily-swipes-counter');
+  
+  if (superLikesCounter) {
+    superLikesCounter.textContent = superLikesRemaining;
+  }
+  
+  if (dailySwipesCounter) {
+    dailySwipesCounter.textContent = dailySwipesRemaining;
+  }
+  
+  // Disable super like button if no super likes remaining
+  const superLikeBtn = document.querySelector('.super-like-btn');
+  if (superLikeBtn) {
+    superLikeBtn.disabled = superLikesRemaining <= 0;
+  }
+  
+  // Disable undo button if no history
+  const undoBtn = document.querySelector('.undo-btn');
+  if (undoBtn) {
+    undoBtn.disabled = swipeHistory.length === 0;
+  }
+}
 
 /**
  * Initialize the swipe feature
@@ -27,6 +83,9 @@ async function initializeSwipe(userId) {
   }
 
   try {
+    // Initialize gamification state
+    initializeGamificationState();
+    
     // Update likes counter if available
     const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}`);
     const statsData = await statsResponse.json();
@@ -48,6 +107,7 @@ async function initializeSwipe(userId) {
       currentMovieIndex = 0;
       renderCurrentMovie();
       setupSwipeListeners();
+      updateGamificationUI();
     } else {
       showSwipeMessage('No more movies to show. Check back later!');
     }
@@ -119,11 +179,12 @@ function renderCurrentMovie() {
       <div class="swipe-card-content">
         <h3 class="movie-title">${movie.title}</h3>
         ${movie.releaseDate ? `<p class="movie-year">${new Date(movie.releaseDate).getFullYear()}</p>` : ''}
-        ${movie.rating ? `<p class="movie-rating">⭐ ${movie.rating.toFixed(1)}/10</p>` : ''}
+        ${movie.rating ? `<p class="movie-rating">${movie.rating.toFixed(1)}/10</p>` : ''}
         <p class="movie-overview">${movie.overview || 'No description available.'}</p>
       </div>
       <div class="swipe-overlay swipe-like">LIKE</div>
       <div class="swipe-overlay swipe-dislike">NOPE</div>
+      <div class="swipe-overlay swipe-super-like">SUPER LIKE</div>
     </div>
   `;
 }
@@ -270,9 +331,22 @@ async function handleSwipeRight(card) {
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('like', movie);
   
+  // Save to history for undo
+  swipeHistory.push({
+    action: 'like',
+    movie: movie,
+    index: currentMovieIndex
+  });
+  
+  // Update daily swipes counter
+  dailySwipesRemaining--;
+  localStorage.setItem('dailySwipesRemaining', dailySwipesRemaining);
+  
   setTimeout(() => {
     currentMovieIndex++;
     renderCurrentMovie();
+    setupSwipeListeners();
+    updateGamificationUI();
   }, 500);
 }
 
@@ -286,9 +360,22 @@ async function handleSwipeLeft(card) {
   const movie = movieStack[currentMovieIndex];
   await recordSwipeAction('dislike', movie);
   
+  // Save to history for undo
+  swipeHistory.push({
+    action: 'dislike',
+    movie: movie,
+    index: currentMovieIndex
+  });
+  
+  // Update daily swipes counter
+  dailySwipesRemaining--;
+  localStorage.setItem('dailySwipesRemaining', dailySwipesRemaining);
+  
   setTimeout(() => {
     currentMovieIndex++;
     renderCurrentMovie();
+    setupSwipeListeners();
+    updateGamificationUI();
   }, 500);
 }
 
@@ -307,6 +394,95 @@ function handleDislikeButton() {
   if (card) {
     handleSwipeLeft(card);
   }
+}
+
+/**
+ * Handle super like button
+ */
+function handleSuperLikeButton() {
+  if (superLikesRemaining <= 0) {
+    alert('No Super Likes remaining today! Come back tomorrow for more.');
+    return;
+  }
+  
+  const card = document.getElementById('current-swipe-card');
+  if (!card) return;
+  
+  const movieId = card.dataset.movieId;
+  const movie = movieStack[currentMovieIndex];
+  
+  // Show super like overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'swipe-overlay swipe-super-like';
+  overlay.textContent = 'SUPER LIKE';
+  overlay.style.opacity = '1';
+  card.appendChild(overlay);
+  
+  // Animate card up
+  card.style.transition = 'transform 0.5s ease';
+  card.style.transform = 'translateY(-100vh) scale(0.8)';
+  
+  setTimeout(() => {
+    // Record super like
+    recordSwipeAction('superlike', movie);
+    
+    // Save to history for undo
+    swipeHistory.push({
+      action: 'superlike',
+      movie: movie,
+      index: currentMovieIndex
+    });
+    
+    // Update counters
+    superLikesRemaining--;
+    dailySwipesRemaining--;
+    localStorage.setItem('superLikesRemaining', superLikesRemaining);
+    localStorage.setItem('dailySwipesRemaining', dailySwipesRemaining);
+    
+    // Move to next movie
+    currentMovieIndex++;
+    renderCurrentMovie();
+    setupSwipeListeners();
+    updateGamificationUI();
+  }, 500);
+}
+
+/**
+ * Handle undo button
+ */
+function handleUndoButton() {
+  if (swipeHistory.length === 0) {
+    return;
+  }
+  
+  // Get last swipe
+  const lastSwipe = swipeHistory.pop();
+  
+  // Restore counters
+  if (lastSwipe.action === 'superlike') {
+    superLikesRemaining++;
+    localStorage.setItem('superLikesRemaining', superLikesRemaining);
+  }
+  dailySwipesRemaining++;
+  localStorage.setItem('dailySwipesRemaining', dailySwipesRemaining);
+  
+  // Go back to previous movie
+  currentMovieIndex = lastSwipe.index;
+  renderCurrentMovie();
+  setupSwipeListeners();
+  updateGamificationUI();
+}
+
+/**
+ * Handle boost button
+ */
+function handleBoostButton() {
+  // Show boost modal/notification
+  alert('🚀 Profile Boost activated!\n\nYour profile will be shown to more potential matches in the next hour.');
+  
+  // In a real app, this would call an API to activate the boost
+  // For now, just show the message
+  console.log('Boost activated for user profile');
 }
 
 /**
@@ -379,6 +555,9 @@ if (typeof window !== 'undefined') {
     initializeSwipe,
     handleLikeButton,
     handleDislikeButton,
+    handleSuperLikeButton,
+    handleUndoButton,
+    handleBoostButton,
     loadMoreMovies
   };
 }

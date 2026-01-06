@@ -244,6 +244,102 @@
     }
 }
 
+/* Icebreaker Prompts Styles */
+.icebreaker-prompts {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease-out;
+}
+
+.icebreaker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #E50914;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.icebreaker-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    border-radius: 50%;
+}
+
+.icebreaker-close:hover {
+    background: rgba(229, 9, 20, 0.2);
+    color: #E50914;
+}
+
+.icebreaker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.icebreaker-btn {
+    background: rgba(229, 9, 20, 0.1);
+    border: 2px solid rgba(229, 9, 20, 0.3);
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: #fff;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+}
+
+.icebreaker-btn:hover {
+    background: rgba(229, 9, 20, 0.2);
+    border-color: rgba(229, 9, 20, 0.5);
+    transform: translateX(5px);
+}
+
+.icebreaker-toggle-btn {
+    background: linear-gradient(135deg, #E50914 0%, #B20710 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: white;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.icebreaker-toggle-btn:hover {
+    background: linear-gradient(135deg, #B20710 0%, #900a0d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .chat-container {
@@ -258,5 +354,14 @@
     
     .message {
         max-width: 85%;
+    }
+    
+    .icebreaker-prompts {
+        padding: 12px;
+    }
+    
+    .icebreaker-btn {
+        font-size: 0.85em;
+        padding: 10px 12px;
     }
 }
