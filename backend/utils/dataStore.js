@@ -53,6 +53,11 @@ class DataStore {
     return users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
   }
 
+  async findUserByUsername(username) {
+    const users = await this.loadUsers();
+    return users.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
+  }
+
   async updateUser(userId, updates) {
     await this.ensureDataDir();
     await this.ensureFile(this.usersFile);
@@ -119,6 +124,15 @@ class DataStore {
   async findMatchesForUser(userId) {
     const matches = await this.loadMatches();
     return matches.filter(m => m.user1Id === userId || m.user2Id === userId);
+  }
+
+  async matchExists(user1Id, user2Id) {
+    const matches = await this.loadMatches();
+    // Check if match exists in either direction
+    return matches.some(m => 
+      (m.user1Id === user1Id && m.user2Id === user2Id) ||
+      (m.user1Id === user2Id && m.user2Id === user1Id)
+    );
   }
 
   async loadMatches() {
