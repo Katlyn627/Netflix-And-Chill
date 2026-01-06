@@ -38,13 +38,27 @@
 
         <main>
             <!-- Swipe Feature Section -->
-            <section id="swipe-movies" class="card">
+            <section id="swipe-movies" class="card swipe-card-modern">
                 <div id="swipe-container">
                     <div class="swipe-header">
                         <h2>🎬 Discover Movies</h2>
                         <p>Swipe right to like, left to pass. We'll use your preferences to find great matches!</p>
                         <div class="swipe-stats">
-                            <p>Movies liked: <span id="total-likes-counter">0</span></p>
+                            <div class="stat-badge">
+                                <span class="stat-icon">❤️</span>
+                                <span class="stat-value" id="total-likes-counter">0</span>
+                                <span class="stat-label">Likes</span>
+                            </div>
+                            <div class="stat-badge">
+                                <span class="stat-icon">⚡</span>
+                                <span class="stat-value" id="super-likes-counter">3</span>
+                                <span class="stat-label">Super Likes</span>
+                            </div>
+                            <div class="stat-badge">
+                                <span class="stat-icon">🔥</span>
+                                <span class="stat-value" id="daily-swipes-counter">50</span>
+                                <span class="stat-label">Today</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -53,11 +67,20 @@
                     </div>
                     
                     <div class="swipe-actions">
-                        <button type="button" class="swipe-btn dislike-btn" onclick="window.SwipeModule.handleDislikeButton()" aria-label="Dislike">
+                        <button type="button" class="swipe-btn undo-btn" onclick="window.SwipeModule.handleUndoButton()" aria-label="Undo" title="Undo last swipe">
+                            ↶
+                        </button>
+                        <button type="button" class="swipe-btn dislike-btn" onclick="window.SwipeModule.handleDislikeButton()" aria-label="Dislike" title="Pass">
                             ✕
                         </button>
-                        <button type="button" class="swipe-btn like-btn" onclick="window.SwipeModule.handleLikeButton()" aria-label="Like">
+                        <button type="button" class="swipe-btn super-like-btn" onclick="window.SwipeModule.handleSuperLikeButton()" aria-label="Super Like" title="Super Like - Stand out!">
+                            ⭐
+                        </button>
+                        <button type="button" class="swipe-btn like-btn" onclick="window.SwipeModule.handleLikeButton()" aria-label="Like" title="Like">
                             ♥
+                        </button>
+                        <button type="button" class="swipe-btn boost-btn" onclick="window.SwipeModule.handleBoostButton()" aria-label="Boost" title="Boost your profile">
+                            ⚡
                         </button>
                     </div>
                     
