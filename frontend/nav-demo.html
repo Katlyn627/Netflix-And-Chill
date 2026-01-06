@@ -64,18 +64,20 @@
     <div class="demo-container">
         <header>
             <div class="nav-icons">
-                <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
-                <a href="swipe.html" class="nav-icon-btn swipe" title="Discover">🎬</a>
-                <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
-                <a href="chat.html" class="nav-icon-btn chat" title="Chat">💬</a>
-                <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
-                <a href="profile-view.html" class="nav-icon-btn profile" title="My Profile">
-                    <span>👤</span>
-                </a>
-                <button type="button" class="nav-icon-btn discover-btn" title="Discover More Movies" aria-label="Discover">
-                    🔍
-                </button>
-                <button type="button" class="nav-icon-btn logout" title="Logout" aria-label="Logout">🚪➡️</button>
+                <div class="nav-left">
+                    <a href="swipe.html" class="nav-icon-btn swipe" title="Discover Movies">🎬</a>
+                    <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
+                    <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
+                        <span id="profile-nav-icon">👤</span>
+                    </a>
+                    <button type="button" class="nav-icon-btn settings" id="settings-btn" title="Settings">⚙️</button>
+                </div>
+                <div class="nav-right">
+                    <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
+                    <a href="chat.html" class="nav-icon-btn chat" title="Chat">💬</a>
+                    <a href="matches.html" class="nav-icon-btn matches" title="Discover Matches">❤️</a>
+                    <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
+                </div>
             </div>
             <div class="logo-banner">
                 <img src="assets/images/logo.png" alt="Netflix & Chill Logo">
@@ -146,5 +148,10 @@
             <p>&copy; 2024 Netflix and Chill - Find your perfect streaming partner</p>
         </footer>
     </div>
+    
+    <script src="src/utils/errorHandler.js"></script>
+    <script src="src/utils/settings.js"></script>
+    <script src="src/services/api.js"></script>
+    <script src="src/utils/navigation.js"></script>
 </body>
 </html>

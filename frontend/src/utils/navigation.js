@@ -39,3 +39,33 @@ async function updateNavProfileIcon(userId) {
         console.error('Error updating nav profile icon:', error);
     }
 }
+
+/**
+ * Initialize the logout button handler
+ * Should be called when the page loads to set up the logout functionality
+ */
+function initLogoutButton() {
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear all user-related data from localStorage
+                localStorage.removeItem('currentUserId');
+                localStorage.removeItem('profileCreated');
+                localStorage.removeItem('initialSwipeComplete');
+                localStorage.removeItem('debateResponses');
+                localStorage.removeItem('promptResponses');
+                // Clear any other session-specific data
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        });
+    }
+}
+
+// Initialize logout button when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLogoutButton);
+} else {
+    initLogoutButton();
+}
