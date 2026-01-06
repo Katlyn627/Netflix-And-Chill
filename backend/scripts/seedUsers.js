@@ -48,9 +48,9 @@ const {
 const DEFAULT_USER_COUNT = 100;
 const DEFAULT_PASSWORD = 'password123'; // Simple password for testing
 
-// Age range preferences configuration
-const AGE_RANGE_MIN_OFFSET = 10; // Minimum years below user's age
-const AGE_RANGE_MAX_OFFSET = 15; // Maximum years above user's age
+// Age range preferences configuration - improved for better alignment
+const AGE_RANGE_MIN_OFFSET = 5; // Narrower minimum years below user's age for better matching
+const AGE_RANGE_MAX_OFFSET = 10; // Narrower maximum years above user's age for better matching
 const MINIMUM_LEGAL_AGE = 18;
 const MAXIMUM_AGE = 65;
 
@@ -121,13 +121,19 @@ async function fetchProviders() {
 /**
  * Calculate age range preferences based on user's age
  * Returns an age range that's relative to the user's age to increase match probability
+ * Uses consistent offsets instead of random values for better alignment between users
  * @param {number} userAge - The user's age
  * @returns {Object} Object with min and max age range
  */
 function calculateAgeRangePreferences(userAge) {
+  // Use consistent, age-appropriate ranges for better matching alignment
+  // Younger users tend to prefer slightly wider ranges
+  const minOffset = userAge < 30 ? AGE_RANGE_MIN_OFFSET : AGE_RANGE_MIN_OFFSET - 2;
+  const maxOffset = userAge < 30 ? AGE_RANGE_MAX_OFFSET : AGE_RANGE_MAX_OFFSET - 2;
+  
   return {
-    min: Math.max(MINIMUM_LEGAL_AGE, userAge - randomInt(AGE_RANGE_MIN_OFFSET, AGE_RANGE_MAX_OFFSET)),
-    max: Math.min(MAXIMUM_AGE, userAge + randomInt(AGE_RANGE_MIN_OFFSET, AGE_RANGE_MAX_OFFSET))
+    min: Math.max(MINIMUM_LEGAL_AGE, userAge - minOffset),
+    max: Math.min(MAXIMUM_AGE, userAge + maxOffset)
   };
 }
 
