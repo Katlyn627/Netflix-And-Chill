@@ -4,11 +4,16 @@
     box-sizing: border-box;
 }
 
+:root {
+    --bottom-nav-height: 90px;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #141414 0%, #000000 100%);
     min-height: 100vh;
     padding: 20px;
+    padding-bottom: var(--bottom-nav-height);
 }
 
 .container {
@@ -762,11 +767,6 @@ footer {
 
 .nav-icon-btn.settings {
     color: white;
-}
-
-/* Add padding to body for bottom navigation */
-body {
-    padding-bottom: 90px;
 }
 
 header {

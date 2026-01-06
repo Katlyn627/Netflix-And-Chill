@@ -4,7 +4,7 @@
  * Supports unlimited swiping with dynamic loading and gamification features
  */
 
-// Constants - Unlimited swipes enabled with gamification
+// Gamification Configuration - Consider moving to environment variables for A/B testing
 const UNLIMITED_SWIPES = true;
 const INITIAL_LOAD_COUNT = 50; // Load 50 movies initially
 const RELOAD_THRESHOLD = 10; // When stack has 10 or fewer movies, load more

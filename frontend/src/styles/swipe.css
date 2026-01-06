@@ -265,6 +265,21 @@
   50% { transform: translateX(-50%) scale(1.2); }
 }
 
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .swipe-super-like::before {
+    animation: none;
+  }
+  
+  .swipe-card {
+    transition: none;
+  }
+  
+  .swipe-btn {
+    transition: none;
+  }
+}
+
 .swipe-actions {
   display: flex;
   justify-content: center;
