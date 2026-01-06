@@ -30,9 +30,18 @@ class User {
     this.movieDebateTopics = data.movieDebateTopics || [];
     this.favoriteSnacks = data.favoriteSnacks || [];
     this.videoChatPreference = data.videoChatPreference || null; // 'facetime', 'zoom', 'either'
-    // Swipe preferences - movies liked/disliked through swipe feature
-    this.swipedMovies = data.swipedMovies || []; // Array of {tmdbId, title, posterPath, action: 'like'|'dislike', swipedAt, genreIds}
+    
+    // ========== SWIPE HISTORY & PREFERENCES ==========
+    // Comprehensive tracking system for movie/TV show discovery swipes
+    // Each swipe records: tmdbId, title, posterPath, genreIds, contentType, action, swipedAt
+    // This data persists across sessions and powers:
+    // 1. Filtering - prevents showing already-swiped content
+    // 2. Analytics - identifies genre preferences and viewing patterns
+    // 3. Recommendations - enhances content suggestions based on swipe behavior
+    this.swipedMovies = data.swipedMovies || []; // Array of {tmdbId, title, posterPath, action: 'like'|'dislike', swipedAt, genreIds, contentType}
     this.swipePreferences = data.swipePreferences || null; // Cached analytics: {genrePreferences, contentTypeBreakdown, topGenres, etc.}
+    // ================================================
+    
     // New fields for enhanced profile features
     this.favoriteMovies = data.favoriteMovies || []; // Array of movie objects with TMDB data
     this.favoriteTVShows = data.favoriteTVShows || []; // Array of TV show objects with TMDB data

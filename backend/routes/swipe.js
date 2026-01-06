@@ -5,6 +5,44 @@ const User = require('../models/User');
 const streamingAPIService = require('../services/streamingAPIService');
 const watchmodeAPIService = require('../services/watchmodeAPIService');
 
+/**
+ * SWIPE HISTORY & DISCOVERY ROUTES
+ * 
+ * This module implements a comprehensive movie/TV show swipe tracking system that:
+ * 
+ * 1. TRACKS SWIPE HISTORY
+ *    - Records every swipe with: movie ID, direction (like/dislike), timestamp, genre IDs, content type
+ *    - Stores data in user profile via database adapter (supports file, MongoDB, PostgreSQL)
+ *    - Data persists across all app sessions
+ * 
+ * 2. FILTERS ALREADY-SWIPED CONTENT
+ *    - Maintains a "seen content" list from swipe history
+ *    - Excludes swiped movies/TV shows from future discovery sessions
+ *    - Also filters out favorites and watchlist items
+ *    - Ensures users NEVER see the same content twice
+ * 
+ * 3. SMART RECOMMENDATIONS
+ *    - Analyzes swipe patterns via swipeAnalytics utility
+ *    - Identifies preferred genres, content types, and viewing patterns
+ *    - Updates recommendations based on like/dislike behavior
+ *    - Provides detailed analytics and insights
+ * 
+ * 4. USER EXPERIENCE
+ *    - Supports unlimited swiping with dynamic content loading
+ *    - Fetches diverse content from multiple TMDB sources
+ *    - Background loading for smooth, uninterrupted swiping
+ *    - Optional reset functionality to clear history
+ * 
+ * Available Endpoints:
+ * - GET    /movies/:userId       - Get personalized content for swiping (filtered by history)
+ * - POST   /action/:userId       - Record a swipe action (updates history + analytics)
+ * - GET    /liked/:userId        - Get user's liked content
+ * - GET    /stats/:userId        - Get swipe statistics
+ * - GET    /analytics/:userId    - Get detailed swipe analytics and insights
+ * - GET    /history/:userId      - Get full swipe history with filtering options
+ * - DELETE /history/:userId      - Reset swipe history (optional feature)
+ */
+
 // Constants
 const TMDB_PAGE_SIZE = 20; // TMDB API returns approximately 20 results per page
 const MAX_PAGES_TO_FETCH = 5; // Maximum number of pages to fetch from TMDB
@@ -319,9 +357,12 @@ router.get('/movies/:userId', async (req, res) => {
     const genreIds = user.preferences?.genres?.map(g => g.id).filter(Boolean) || [];
     const swipedMovieIds = (user.swipedMovies || []).map(m => m.tmdbId);
     
-    // Get genre IDs from favorite movies and watchlist to enhance recommendations
+    // Get all content IDs that should be excluded from recommendations
+    // This includes movies and TV shows the user has already interacted with
     const favoriteMovieIds = (user.favoriteMovies || []).map(m => m.tmdbId);
+    const favoriteTVIds = (user.favoriteTVShows || []).map(tv => tv.tmdbId);
     const watchlistMovieIds = (user.movieWatchlist || []).map(m => m.tmdbId);
+    const watchlistTVIds = (user.tvWatchlist || []).map(tv => tv.tmdbId);
     
     // Get genre IDs from user's watch history to enhance recommendations
     const watchHistoryGenres = [];
@@ -381,10 +422,17 @@ router.get('/movies/:userId', async (req, res) => {
       }
     }
 
-    // Filter out already swiped content, favorite movies, and watchlist movies
-    // This ensures fresh content based on what user hasn't explicitly added
-    const excludedMovieIds = new Set([...swipedMovieIds, ...favoriteMovieIds, ...watchlistMovieIds]);
-    const unseenContent = content.filter(item => !excludedMovieIds.has(item.id));
+    // Filter out already swiped content, favorite content, and watchlist items
+    // This ensures users never see the same content twice in discovery mode
+    // Includes: swiped movies/TV, favorites (movies & TV), and watchlists (movies & TV)
+    const excludedContentIds = new Set([
+      ...swipedMovieIds,
+      ...favoriteMovieIds,
+      ...favoriteTVIds,
+      ...watchlistMovieIds,
+      ...watchlistTVIds
+    ]);
+    const unseenContent = content.filter(item => !excludedContentIds.has(item.id));
 
     // Format content for swipe UI - handle both movies and TV shows
     const formattedContent = unseenContent.slice(0, parseInt(limit)).map(item => ({
@@ -604,6 +652,115 @@ router.get('/analytics/:userId', async (req, res) => {
     });
   } catch (error) {
     console.error('Error getting swipe analytics:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Get user's complete swipe history with optional filtering
+ * Supports filtering by action (like/dislike), content type, and date range
+ */
+router.get('/history/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { action, contentType, limit = 100, offset = 0 } = req.query;
+    
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    const user = new User(userData);
+    let swipeHistory = user.swipedMovies || [];
+    
+    // Filter by action if specified
+    if (action && ['like', 'dislike'].includes(action)) {
+      swipeHistory = swipeHistory.filter(item => item.action === action);
+    }
+    
+    // Filter by content type if specified
+    if (contentType && ['movie', 'tv'].includes(contentType)) {
+      swipeHistory = swipeHistory.filter(item => item.contentType === contentType);
+    }
+    
+    // Sort by most recent first
+    swipeHistory.sort((a, b) => new Date(b.swipedAt) - new Date(a.swipedAt));
+    
+    // Apply pagination
+    const total = swipeHistory.length;
+    const paginatedHistory = swipeHistory.slice(parseInt(offset), parseInt(offset) + parseInt(limit));
+
+    res.json({
+      success: true,
+      history: paginatedHistory,
+      total,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      hasMore: (parseInt(offset) + paginatedHistory.length) < total
+    });
+  } catch (error) {
+    console.error('Error getting swipe history:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Reset user's swipe history
+ * Optional feature to allow users to clear their swipe history and start fresh
+ * Can optionally preserve 'like' actions while clearing 'dislike' actions
+ */
+router.delete('/history/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { preserveLikes = false } = req.query;
+    
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    const user = new User(userData);
+    const previousCount = user.swipedMovies.length;
+    
+    if (preserveLikes === 'true') {
+      // Keep only liked content, remove dislikes
+      user.swipedMovies = user.swipedMovies.filter(item => item.action === 'like');
+    } else {
+      // Clear all swipe history
+      user.swipedMovies = [];
+    }
+    
+    // Reset cached analytics
+    user.swipePreferences = null;
+    
+    await dataStore.updateUser(userId, user);
+    
+    const clearedCount = previousCount - user.swipedMovies.length;
+
+    res.json({
+      success: true,
+      message: preserveLikes === 'true' 
+        ? 'Swipe history cleared (likes preserved)' 
+        : 'Swipe history completely reset',
+      clearedCount,
+      remainingCount: user.swipedMovies.length
+    });
+  } catch (error) {
+    console.error('Error resetting swipe history:', error);
     res.status(500).json({
       success: false,
       error: error.message
