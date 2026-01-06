@@ -4,6 +4,9 @@ let currentUserId = localStorage.getItem('currentUserId');
 // Constants
 const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
 
+// View state
+let currentView = 'carousel'; // 'carousel' or 'grid'
+
 // Load filter state from shared filters utility
 let currentFilters = window.SharedFilters ? window.SharedFilters.loadFilters() : {
     minMatchScore: 0,
@@ -85,6 +88,81 @@ function displayMatches(matches) {
     }
 }
 
+// Display matches in grid format
+function displayMatchesGrid(matches) {
+    const matchesContainer = document.getElementById('matches-container');
+    
+    if (matches && matches.length > 0) {
+        allMatches = matches;
+        
+        let html = `
+            <div class="carousel-header">
+                <h3>Found ${matches.length} match(es)!</h3>
+            </div>
+            <div class="matches-grid-view">
+                ${matches.map((match, index) => createGridMatchCard(match, index)).join('')}
+            </div>
+        `;
+        
+        matchesContainer.innerHTML = html;
+    } else {
+        matchesContainer.innerHTML = `
+            <div class="empty-state">
+                <p>No matches found yet.</p>
+                <p>Try adding more shows to your watch history to find better matches!</p>
+            </div>
+        `;
+    }
+}
+
+// Create individual match card for grid view
+function createGridMatchCard(match, index) {
+    const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
+    const username = escapeHtml(match.user.username);
+    const bio = escapeHtml(match.user.bio || 'No bio yet');
+    const location = escapeHtml(match.user.location || 'Not specified');
+    const age = match.user.age || 'N/A';
+    const matchScore = Math.round(match.matchScore);
+    
+    // Get unread message count
+    const unreadCount = unreadMessageCounts[match.user.id] || 0;
+    const hasUnreadMessages = unreadCount > 0;
+    
+    // Generate tags from user interests
+    const tags = [];
+    if (match.user.favoriteGenres && match.user.favoriteGenres.length > 0) {
+        tags.push(...match.user.favoriteGenres.slice(0, 3));
+    }
+    
+    return `
+        <div class="grid-match-card ${hasUnreadMessages ? 'has-unread-messages' : ''}" data-index="${index}">
+            <div class="grid-match-image" style="background-image: url('${profilePhotoUrl}');" onclick="showMatchDetails(${index})">
+                <div class="grid-match-score">${matchScore}%</div>
+                ${match.user.verified ? '<div class="grid-verification-badge">Verified</div>' : ''}
+                ${hasUnreadMessages ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+            </div>
+            <div class="grid-match-info">
+                <div class="grid-match-name">${username}, ${age}</div>
+                <div class="grid-match-details">📍 ${location}</div>
+                <div class="grid-match-bio">${bio}</div>
+                ${tags.length > 0 ? `
+                    <div class="grid-match-tags">
+                        ${tags.map(tag => `<span class="grid-tag">${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                ` : ''}
+                <div class="grid-match-actions">
+                    <button class="grid-action-btn grid-view-profile-btn" onclick="showMatchDetails(${index})">
+                        👤 View Profile
+                    </button>
+                    <button class="grid-action-btn grid-chat-btn ${hasUnreadMessages ? 'chat-has-new' : ''}" onclick="openChatWithMatch('${match.user.id}', '${username}')">
+                        💬 Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Create individual match card for carousel
 function createMatchCard(match, index) {
     const profilePhotoUrl = match.user.profilePicture || 'assets/images/default-profile.svg';
@@ -109,6 +187,8 @@ function createMatchCard(match, index) {
         <div class="carousel-card ${index === 0 ? 'active' : ''} ${hasUnreadMessages ? 'has-unread-messages' : ''}" data-index="${index}">
             <div class="match-image-container" onclick="showMatchDetails(${index})">
                 <img src="${profilePhotoUrl}" alt="${username}" class="match-main-photo" />
+                ${match.user.verified ? '<div class="verification-badge">Verified</div>' : ''}
+                <div class="safety-indicator">Safe Profile</div>
                 <div class="movie-ticket-overlay">
                     <div class="ticket-content">
                         <div class="ticket-score">${matchScore}%</div>
@@ -852,6 +932,27 @@ document.getElementById('filters-btn').addEventListener('click', showFiltersModa
 document.getElementById('close-filters').addEventListener('click', hideFiltersModal);
 document.getElementById('apply-filters-btn').addEventListener('click', applyFilters);
 document.getElementById('reset-filters-btn').addEventListener('click', resetFilters);
+
+// View toggle event listeners
+document.getElementById('carousel-view-btn').addEventListener('click', () => {
+    currentView = 'carousel';
+    document.getElementById('carousel-view-btn').classList.add('active');
+    document.getElementById('grid-view-btn').classList.remove('active');
+    // Redisplay matches in carousel view
+    if (allMatches.length > 0) {
+        displayMatches(allMatches);
+    }
+});
+
+document.getElementById('grid-view-btn').addEventListener('click', () => {
+    currentView = 'grid';
+    document.getElementById('grid-view-btn').classList.add('active');
+    document.getElementById('carousel-view-btn').classList.remove('active');
+    // Redisplay matches in grid view
+    if (allMatches.length > 0) {
+        displayMatchesGrid(allMatches);
+    }
+});
 
 // Update slider values in real-time
 document.getElementById('match-score-filter').addEventListener('input', function() {
