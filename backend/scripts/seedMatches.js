@@ -16,6 +16,10 @@ const MatchingEngine = require('../utils/matchingEngine');
 // Configuration
 const DEFAULT_MATCHES_PER_USER = 10;
 
+// Age range constants for fallback (match those in seedUsers.js)
+const MINIMUM_LEGAL_AGE = 18;
+const MAXIMUM_AGE = 100;
+
 /**
  * Generate matches for a specific user
  */
@@ -37,7 +41,7 @@ async function generateMatchesForUser(userId, allUsers, matchesPerUser, database
   const filters = { 
     minMatchScore: 0, // Accept all matches regardless of score for initial seeding
     // Use user's actual age range preferences if available, otherwise use wide range
-    ageRange: currentUser.preferences?.ageRange || { min: 18, max: 100 },
+    ageRange: currentUser.preferences?.ageRange || { min: MINIMUM_LEGAL_AGE, max: MAXIMUM_AGE },
     // Use user's actual location radius if available, otherwise global for testing
     locationRadius: currentUser.preferences?.locationRadius !== undefined 
       ? currentUser.preferences.locationRadius 
