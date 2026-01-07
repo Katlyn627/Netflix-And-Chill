@@ -261,8 +261,9 @@
             const page = this.currentPage;
             const bgStyle = this.settings.backgrounds[page];
             
-            // Remove all background classes
-            body.className = body.className.replace(/bg-\w+-\w+/g, '');
+            // Remove all background classes (more robust pattern matching)
+            const classesToRemove = Array.from(body.classList).filter(cls => cls.startsWith('bg-'));
+            classesToRemove.forEach(cls => body.classList.remove(cls));
             
             // Add current background class
             if (bgStyle) {
@@ -575,8 +576,13 @@
                 checkbox.addEventListener('change', () => {
                     const name = checkbox.name;
                     if (name.includes('.')) {
-                        const [parent, child] = name.split('.');
-                        this.settings[parent][child] = checkbox.checked;
+                        const parts = name.split('.');
+                        if (parts.length === 2) {
+                            const [parent, child] = parts;
+                            if (this.settings[parent] && typeof this.settings[parent] === 'object') {
+                                this.settings[parent][child] = checkbox.checked;
+                            }
+                        }
                     } else {
                         this.settings[name] = checkbox.checked;
                     }
