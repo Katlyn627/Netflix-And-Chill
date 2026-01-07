@@ -85,13 +85,16 @@ class MatchController {
 
       const matches = MatchingEngine.findMatches(currentUser, userObjects, limit, filters);
 
+      // Create boost status map for efficient sorting
+      const boostStatusMap = new Map();
+      userObjects.forEach(u => {
+        boostStatusMap.set(u.id, u.isBoostActive());
+      });
+
       // Prioritize boosted profiles by sorting them to the top
       matches.sort((a, b) => {
-        const userA = userObjects.find(u => u.id === a.user2Id);
-        const userB = userObjects.find(u => u.id === b.user2Id);
-        
-        const aIsBoosted = userA && userA.isBoostActive();
-        const bIsBoosted = userB && userB.isBoostActive();
+        const aIsBoosted = boostStatusMap.get(a.user2Id) || false;
+        const bIsBoosted = boostStatusMap.get(b.user2Id) || false;
         
         if (aIsBoosted && !bIsBoosted) return -1;
         if (!aIsBoosted && bIsBoosted) return 1;

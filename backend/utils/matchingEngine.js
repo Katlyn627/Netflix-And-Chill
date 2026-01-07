@@ -559,6 +559,12 @@ class MatchingEngine {
         // Apply minimum match score filter
         const minMatchScore = filters.minMatchScore || 0;
         if (matchResult.score >= minMatchScore) {
+          // Apply premium advanced score filter if present
+          const minAdvancedScore = filters.premium?.minAdvancedScore;
+          if (minAdvancedScore !== undefined && matchResult.score < minAdvancedScore) {
+            return; // Skip this match if it doesn't meet premium score threshold
+          }
+          
           matches.push(new Match(
             user.id,
             otherUser.id,
@@ -744,10 +750,7 @@ class MatchingEngine {
       }
 
       // Advanced compatibility threshold (premium feature)
-      if (filters.premium.minAdvancedScore !== undefined) {
-        // This would be checked after calculateMatch, so we'll note it for later processing
-        // For now, we allow it through and filter in findMatches
-      }
+      // Note: This is now implemented in findMatches method after score calculation
     }
 
     return true;
