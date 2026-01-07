@@ -738,7 +738,9 @@ footer {
     position: relative;
 }
 
-/* Sticky Bottom Navigation Bar - Follows Scroll */
+/* Sticky Bottom Navigation Bar - Follows Page Scroll for Better Accessibility */
+/* Note: sticky positioning keeps nav at bottom of viewport when scrolling down,
+   but allows it to scroll naturally with page content, unlike fixed positioning */
 .nav-icons {
     position: sticky;
     bottom: 0;
