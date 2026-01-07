@@ -622,7 +622,6 @@ footer {
 
     .profile-action-btn + .profile-action-btn {
         margin-left: 0;
-        margin-top: 0;
     }
     
     /* Navigation adjustments */
@@ -738,9 +737,9 @@ footer {
     position: relative;
 }
 
-/* Sticky Bottom Navigation Bar - Follows Page Scroll for Better Accessibility */
-/* Note: sticky positioning keeps nav at bottom of viewport when scrolling down,
-   but allows it to scroll naturally with page content, unlike fixed positioning */
+/* Sticky Bottom Navigation Bar - Follows Page Scroll for Easier Access */
+/* Sticky positioning keeps the navigation visible at the bottom of the viewport
+   as the user scrolls, providing easy access to navigation controls throughout the page */
 .nav-icons {
     position: sticky;
     bottom: 0;
