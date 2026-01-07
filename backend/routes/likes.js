@@ -74,7 +74,7 @@ router.get('/:userId', async (req, res) => {
 
 /**
  * GET /api/likes/:userId/received
- * Get all likes received by a user
+ * Get all likes received by a user (premium feature with full details)
  */
 router.get('/:userId/received', async (req, res) => {
   try {
@@ -88,10 +88,44 @@ router.get('/:userId/received', async (req, res) => {
 
     const likes = await dataStore.findLikesToUser(userId);
 
+    // For premium users, include full user details of who liked them
+    if (user.isPremium) {
+      const likesWithUserDetails = await Promise.all(
+        likes.map(async (like) => {
+          const fromUser = await dataStore.findUserById(like.fromUserId);
+          return {
+            ...like,
+            fromUser: fromUser ? {
+              id: fromUser.id,
+              username: fromUser.username,
+              age: fromUser.age,
+              location: fromUser.location,
+              bio: fromUser.bio,
+              profilePicture: fromUser.profilePicture,
+              gender: fromUser.gender,
+              sexualOrientation: fromUser.sexualOrientation,
+              streamingServices: fromUser.streamingServices,
+              archetype: fromUser.archetype
+            } : null
+          };
+        })
+      );
+
+      return res.json({
+        userId,
+        count: likes.length,
+        likes: likesWithUserDetails.filter(l => l.fromUser !== null),
+        isPremium: true
+      });
+    }
+
+    // For free users, only return count
     res.json({
       userId,
       count: likes.length,
-      likes
+      likes: [],
+      isPremium: false,
+      message: 'Upgrade to premium to see who liked you'
     });
   } catch (error) {
     console.error('Error getting received likes:', error);
