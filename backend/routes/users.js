@@ -84,4 +84,9 @@ router.get('/:userId/profile-frames', userController.getAvailableFrames.bind(use
 router.put('/:userId/profile-frames', userController.updateProfileFrame.bind(userController));
 router.delete('/:userId/profile-frames', userController.removeProfileFrame.bind(userController));
 
+// Premium profile routes
+router.get('/:userId/premium', userController.getPremiumStatus.bind(userController));
+router.put('/:userId/premium', userController.updatePremiumStatus.bind(userController));
+router.post('/:userId/premium/features', userController.addPremiumFeature.bind(userController));
+
 module.exports = router;

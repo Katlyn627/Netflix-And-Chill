@@ -1126,10 +1126,37 @@ window.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     if (currentUserId) {
         updateNavProfileIcon(currentUserId);
+        // Check premium status and show/hide premium filters
+        checkPremiumStatus();
         // Automatically find matches when page loads
         findMatches();
     }
 });
+
+// Check if user has premium status and show premium filters accordingly
+async function checkPremiumStatus() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`);
+        if (!response.ok) throw new Error('Failed to fetch user data');
+        
+        const userData = await response.json();
+        const isPremium = userData.isPremium || false;
+        
+        // Show/hide premium filters section based on premium status
+        const premiumSection = document.getElementById('premium-filters-section');
+        if (premiumSection) {
+            if (isPremium) {
+                premiumSection.style.display = 'block';
+                console.log('[Matches] Premium user - showing premium filters');
+            } else {
+                premiumSection.style.display = 'none';
+                console.log('[Matches] Free user - hiding premium filters');
+            }
+        }
+    } catch (error) {
+        console.error('[Matches] Error checking premium status:', error);
+    }
+}
 
 // Refresh unread counts when page becomes visible (e.g., returning from chat)
 document.addEventListener('visibilitychange', async () => {

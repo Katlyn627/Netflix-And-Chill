@@ -1062,6 +1062,109 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Premium profile management endpoints
+  async updatePremiumStatus(req, res) {
+    try {
+      const { userId } = req.params;
+      const { isPremium } = req.body;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      if (typeof isPremium !== 'boolean') {
+        return res.status(400).json({ error: 'isPremium must be a boolean value' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.setPremiumStatus(isPremium);
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: `Premium status updated successfully`,
+        isPremium: user.isPremium,
+        premiumSince: user.premiumSince,
+        premiumFeatures: user.premiumFeatures
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getPremiumStatus(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+
+      res.json({
+        isPremium: user.isPremium,
+        premiumSince: user.premiumSince,
+        premiumFeatures: user.premiumFeatures
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async addPremiumFeature(req, res) {
+    try {
+      const { userId } = req.params;
+      const { feature } = req.body;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      if (!feature || typeof feature !== 'string' || feature.trim() === '') {
+        return res.status(400).json({ error: 'Valid feature name is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      
+      if (!user.isPremium) {
+        return res.status(403).json({ error: 'User must have premium status to add features' });
+      }
+
+      user.addPremiumFeature(feature);
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Premium feature added successfully',
+        premiumFeatures: user.premiumFeatures
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();

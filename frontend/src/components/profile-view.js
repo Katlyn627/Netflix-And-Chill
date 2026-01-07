@@ -67,6 +67,9 @@ class ProfileView {
         // Photo gallery
         this.renderPhotoGallery();
 
+        // Premium status
+        this.renderPremiumStatus();
+
         // Extended profile details
         this.renderExtendedDetails();
 
@@ -197,6 +200,57 @@ class ProfileView {
         } else {
             showAddBtn.style.display = 'inline-block';
         }
+    }
+
+    renderPremiumStatus() {
+        const user = this.userData;
+        const isPremium = user.isPremium || false;
+        const premiumSince = user.premiumSince;
+        const premiumFeatures = user.premiumFeatures || [];
+
+        // Update badge
+        const badge = document.getElementById('premium-badge');
+        badge.textContent = isPremium ? 'Premium ⭐' : 'Free';
+        badge.className = isPremium ? 'badge badge-premium' : 'badge';
+
+        // Update description
+        const description = document.getElementById('premium-description');
+        description.textContent = isPremium 
+            ? 'You have premium access! Enjoy exclusive features and advanced filters.'
+            : 'Upgrade to premium for advanced filter options and exclusive features.';
+
+        // Show/hide premium date
+        const premiumSinceElement = document.getElementById('premium-since');
+        if (isPremium && premiumSince) {
+            premiumSinceElement.style.display = 'block';
+            const date = new Date(premiumSince);
+            document.getElementById('premium-date').textContent = date.toLocaleDateString();
+        } else {
+            premiumSinceElement.style.display = 'none';
+        }
+
+        // Show/hide features list
+        const featuresList = document.getElementById('premium-features-list');
+        const featuresUl = document.getElementById('features-list');
+        if (isPremium && premiumFeatures.length > 0) {
+            featuresList.style.display = 'block';
+            // Sanitize feature names to prevent XSS
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+            featuresUl.innerHTML = premiumFeatures.map(feature => 
+                `<li style="padding: 5px 0;">✓ ${escapeHtml(feature)}</li>`
+            ).join('');
+        } else {
+            featuresList.style.display = 'none';
+        }
+
+        // Update button text
+        const toggleBtn = document.getElementById('toggle-premium-btn');
+        toggleBtn.textContent = isPremium ? 'Deactivate Premium' : 'Activate Premium';
+        toggleBtn.className = isPremium ? 'btn btn-secondary' : 'btn btn-primary';
     }
 
     renderExtendedDetails() {
@@ -587,6 +641,11 @@ class ProfileView {
         // Delete profile button
         document.getElementById('delete-profile-btn').addEventListener('click', () => {
             this.deleteProfile();
+        });
+
+        // Premium toggle button
+        document.getElementById('toggle-premium-btn').addEventListener('click', () => {
+            this.togglePremiumStatus();
         });
 
         // Logout button
@@ -2114,6 +2173,41 @@ class ProfileView {
         } else {
             console.error('ProfileFrameSelector not loaded');
             document.getElementById('profile-frame-selector').innerHTML = '<p style="color: red;">Error: Frame selector component not loaded.</p>';
+        }
+    }
+
+    async togglePremiumStatus() {
+        try {
+            const currentStatus = this.userData.isPremium || false;
+            const newStatus = !currentStatus;
+
+            const response = await fetch(`${API_BASE_URL}/users/${this.userId}/premium`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isPremium: newStatus })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update premium status');
+            }
+
+            const data = await response.json();
+            
+            // Update local user data
+            this.userData.isPremium = data.isPremium;
+            this.userData.premiumSince = data.premiumSince;
+            this.userData.premiumFeatures = data.premiumFeatures;
+
+            // Re-render premium status
+            this.renderPremiumStatus();
+
+            alert(newStatus 
+                ? 'Premium activated! You now have access to advanced features.' 
+                : 'Premium deactivated.');
+        } catch (error) {
+            console.error('Error toggling premium status:', error);
+            alert('Failed to update premium status: ' + error.message);
         }
     }
 }
