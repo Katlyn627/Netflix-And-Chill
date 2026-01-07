@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const errorDiv = document.getElementById('error-message');
         
         if (!email) {
-            errorDiv.textContent = 'Please enter your email';
+            errorDiv.textContent = 'Please enter your username or email';
             errorDiv.style.display = 'block';
             return;
         }
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = 'profile-view.html';
                 }, 1500);
             } else {
-                errorDiv.textContent = result.error || 'Invalid credentials. Please check your email and password.';
+                errorDiv.textContent = result.error || 'Invalid credentials. Please check your username/email and password.';
                 errorDiv.style.display = 'block';
             }
         } catch (error) {
