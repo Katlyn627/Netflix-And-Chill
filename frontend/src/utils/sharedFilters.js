@@ -20,7 +20,7 @@ class SharedFilters {
             premiumDecades: [],
             premiumMinScore: 0,
             // Sorting options
-            sortBy: 'score' // score, archetype, compatibility
+            sortBy: 'score' // score, archetype, recent
         };
     }
 

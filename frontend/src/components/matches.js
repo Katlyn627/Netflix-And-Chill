@@ -1042,6 +1042,28 @@ if (premiumAdvancedScore) {
     });
 }
 
+// Sort by dropdown change listener
+const sortByFilter = document.getElementById('sort-by-filter');
+if (sortByFilter) {
+    sortByFilter.addEventListener('change', function() {
+        // Update current filters with new sort option
+        currentFilters.sortBy = this.value;
+        window.SharedFilters.saveFilters(currentFilters);
+        
+        // Re-sort and display current matches
+        if (allMatches.length > 0) {
+            const sortedMatches = sortMatches(allMatches, this.value);
+            if (currentView === 'carousel') {
+                displayMatches(sortedMatches);
+            } else {
+                displayMatchesGrid(sortedMatches);
+            }
+        }
+        
+        console.log('[Matches] Sort option changed to:', this.value);
+    });
+}
+
 // Logout functionality
 const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
