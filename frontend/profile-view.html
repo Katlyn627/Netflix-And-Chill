@@ -27,6 +27,7 @@
                     <a href="profile-view.html" class="nav-icon-btn profile active" id="profile-nav-btn" title="My Profile">
                         <span id="profile-nav-icon">👤</span>
                     </a>
+                    <button type="button" class="nav-icon-btn settings" id="open-settings-btn" title="Settings" aria-label="Open Settings">⚙️</button>
                     <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
                 </div>
             </div>
@@ -601,5 +602,14 @@
     <script src="src/components/swipeAnalytics.js"></script>
     <script src="src/components/profile-frame-selector.js"></script>
     <script src="src/components/profile-view.js"></script>
+    <script>
+        // Initialize settings button
+        const settingsBtn = document.getElementById('open-settings-btn');
+        if (settingsBtn && window.AdvancedSettingsManager) {
+            settingsBtn.addEventListener('click', () => {
+                window.AdvancedSettingsManager.openPanel();
+            });
+        }
+    </script>
 </body>
 </html>

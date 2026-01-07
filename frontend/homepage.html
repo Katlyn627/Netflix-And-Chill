@@ -15,6 +15,9 @@
 <body>
     <div class="container">
         <header class="hero-header">
+            <div style="position: absolute; top: 20px; right: 20px;">
+                <button type="button" class="nav-icon-btn settings" id="open-settings-btn" title="Settings" aria-label="Open Settings" style="background: rgba(229, 9, 20, 0.9); border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 10px 15px; border-radius: 8px; transition: all 0.2s;">⚙️</button>
+            </div>
             <div class="logo-banner">
                 <img src="assets/images/logo.png" alt="Netflix & Chill Logo" class="hero-logo-image">
                 <h1>NETFLIX & CHILL</h1>
@@ -102,6 +105,14 @@
             if (userId) {
                 // User is logged in, redirect to their profile
                 window.location.href = 'profile-view.html';
+            }
+            
+            // Initialize settings button
+            const settingsBtn = document.getElementById('open-settings-btn');
+            if (settingsBtn && window.AdvancedSettingsManager) {
+                settingsBtn.addEventListener('click', () => {
+                    window.AdvancedSettingsManager.openPanel();
+                });
             }
         });
     </script>
