@@ -33,7 +33,7 @@ app.use((req, res, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: http:",
-      "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com",
+      "connect-src 'self' http://localhost:* https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com",
       "frame-src 'self' https://*.firebaseapp.com",
       "object-src 'none'",
       "base-uri 'self'"
