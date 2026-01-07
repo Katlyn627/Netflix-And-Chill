@@ -612,9 +612,17 @@ footer {
         text-align: center;
     }
     
+    .profile-actions {
+        flex-direction: column;
+    }
+
+    .profile-action-btn {
+        width: 100%;
+    }
+
     .profile-action-btn + .profile-action-btn {
         margin-left: 0;
-        margin-top: 10px;
+        margin-top: 0;
     }
     
     /* Navigation adjustments */
@@ -730,9 +738,9 @@ footer {
     position: relative;
 }
 
-/* Fixed Bottom Navigation Bar */
+/* Sticky Bottom Navigation Bar - Follows Scroll */
 .nav-icons {
-    position: fixed;
+    position: sticky;
     bottom: 0;
     left: 0;
     right: 0;
@@ -1031,12 +1039,19 @@ header {
     font-style: italic;
 }
 
+.profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
 .profile-action-btn {
-    margin-top: 10px;
+    margin-top: 0;
 }
 
 .profile-action-btn + .profile-action-btn {
-    margin-left: 10px;
+    margin-left: 0;
 }
 
 .personality-bio {
