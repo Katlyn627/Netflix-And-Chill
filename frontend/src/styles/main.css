@@ -54,6 +54,8 @@ header {
 .logo-banner img {
     width: 50px;
     height: 50px;
+    max-width: 50px;
+    max-height: 50px;
     object-fit: contain;
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
@@ -630,6 +632,11 @@ footer {
         padding: 3px 6px;
     }
     
+    .nav-icon-btn #profile-nav-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
     .nav-icon-btn::after {
         font-size: 8px;
     }
@@ -642,6 +649,8 @@ footer {
     .logo-banner img {
         width: 40px;
         height: 40px;
+        max-width: 40px;
+        max-height: 40px;
     }
     
     .logo-banner h1 {
@@ -766,6 +775,23 @@ footer {
     color: rgba(255, 255, 255, 0.7);
     font-size: 20px;
     min-width: 55px;
+}
+
+/* Profile icon image sizing */
+.nav-icon-btn #profile-nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+}
+
+.nav-icon-btn #profile-nav-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .nav-icon-btn::after {
@@ -928,6 +954,11 @@ header {
         padding: 3px 5px;
     }
     
+    .nav-icon-btn #profile-nav-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
     .nav-icon-btn::after {
         font-size: 7px;
     }
@@ -940,6 +971,8 @@ header {
     .logo-banner img {
         width: 35px;
         height: 35px;
+        max-width: 35px;
+        max-height: 35px;
     }
     
     .logo-banner h1 {

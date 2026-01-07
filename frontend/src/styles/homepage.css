@@ -8,8 +8,11 @@
 .hero-logo-image {
     width: 120px;
     height: 120px;
+    max-width: 120px;
+    max-height: 120px;
     margin: 0 auto 15px;
     display: block;
+    object-fit: contain;
     filter: drop-shadow(0 0 20px rgba(229, 9, 20, 0.5));
     animation: fadeInDown 1s ease-in;
 }
@@ -197,6 +200,8 @@
     .hero-logo-image {
         width: 100px;
         height: 100px;
+        max-width: 100px;
+        max-height: 100px;
     }
 
     .hero-header h1 {
