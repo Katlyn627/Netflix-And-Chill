@@ -121,6 +121,29 @@ class NetflixAndChillAPI {
         if (filters.sexualOrientationPreference && filters.sexualOrientationPreference.length > 0) {
             url += `&sexualOrientationPreference=${encodeURIComponent(filters.sexualOrientationPreference.join(','))}`;
         }
+        if (filters.archetypePreference && filters.archetypePreference.length > 0) {
+            url += `&archetypePreference=${encodeURIComponent(filters.archetypePreference.join(','))}`;
+        }
+        
+        // Premium filters
+        if (filters.premiumGenres && filters.premiumGenres.length > 0) {
+            url += `&premiumGenres=${encodeURIComponent(filters.premiumGenres.join(','))}`;
+        }
+        if (filters.premiumBingeMin !== undefined) {
+            url += `&premiumBingeMin=${encodeURIComponent(filters.premiumBingeMin)}`;
+        }
+        if (filters.premiumBingeMax !== undefined) {
+            url += `&premiumBingeMax=${encodeURIComponent(filters.premiumBingeMax)}`;
+        }
+        if (filters.premiumServices && filters.premiumServices.length > 0) {
+            url += `&premiumServices=${encodeURIComponent(filters.premiumServices.join(','))}`;
+        }
+        if (filters.premiumDecades && filters.premiumDecades.length > 0) {
+            url += `&premiumDecades=${encodeURIComponent(filters.premiumDecades.join(','))}`;
+        }
+        if (filters.premiumMinScore) {
+            url += `&premiumMinScore=${encodeURIComponent(filters.premiumMinScore)}`;
+        }
         
         const response = await fetch(url);
         return await response.json();
