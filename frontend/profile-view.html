@@ -23,9 +23,6 @@
                     <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
                 </div>
                 <div class="nav-right">
-                    <button type="button" class="settings-trigger-btn" id="open-settings-btn" title="Settings" aria-label="Open Appearance Settings">
-                        ⚙️ Settings
-                    </button>
                     <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
                     <a href="profile-view.html" class="nav-icon-btn profile active" id="profile-nav-btn" title="My Profile">
                         <span id="profile-nav-icon">👤</span>
@@ -56,8 +53,13 @@
                         <p id="profile-details"><strong>Age:</strong> <span id="profile-age"></span> | <strong>Location:</strong> <span id="profile-location"></span></p>
                         <p id="profile-gender-orientation"><strong>Gender:</strong> <span id="profile-gender"></span> | <strong>Sexual Orientation:</strong> <span id="profile-sexual-orientation"></span></p>
                         <p id="profile-bio"></p>
-                        <button id="edit-basic-info-btn" class="btn btn-secondary profile-action-btn">Edit Basic Info</button>
-                        <button id="load-profile-view-btn" class="btn btn-primary profile-action-btn">Load Profile View</button>
+                        <div class="profile-actions">
+                            <button id="edit-basic-info-btn" class="btn btn-secondary profile-action-btn">Edit Basic Info</button>
+                            <button id="load-profile-view-btn" class="btn btn-primary profile-action-btn">Load Profile View</button>
+                            <button type="button" id="open-settings-btn" class="btn btn-secondary profile-action-btn" title="Appearance Settings" aria-label="Open Appearance Settings">
+                                ⚙️ Settings
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
