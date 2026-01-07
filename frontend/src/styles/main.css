@@ -613,11 +613,11 @@ footer {
     }
     
     .profile-actions {
-        flex-direction: column;
+        flex-direction: column; /* Stack buttons vertically on mobile, gap still applies */
     }
 
     .profile-action-btn {
-        width: 100%;
+        width: 100%; /* Full width buttons on mobile */
     }
     
     /* Navigation adjustments */
@@ -1039,12 +1039,12 @@ header {
 .profile-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 10px; /* Gap handles spacing in both row and column modes */
     margin-top: 15px;
 }
 
 .profile-action-btn {
-    margin-top: 0;
+    margin-top: 0; /* Reset any default margins, gap handles spacing */
 }
 
 .personality-bio {
