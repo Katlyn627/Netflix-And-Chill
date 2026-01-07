@@ -126,15 +126,15 @@
                     window.location.href = 'matches.html';
                 });
             }
-        });
 
-        // Initialize settings button
-        const settingsBtn = document.getElementById('open-settings-btn');
-        if (settingsBtn && window.AdvancedSettingsManager) {
-            settingsBtn.addEventListener('click', () => {
-                window.AdvancedSettingsManager.openPanel();
-            });
-        }
+            // Initialize settings button
+            const settingsBtn = document.getElementById('open-settings-btn');
+            if (settingsBtn && window.AdvancedSettingsManager) {
+                settingsBtn.addEventListener('click', () => {
+                    window.AdvancedSettingsManager.openPanel();
+                });
+            }
+        });
     </script>
 </body>
 </html>
