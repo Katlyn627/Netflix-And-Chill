@@ -168,7 +168,7 @@
                 // Silently fail - settings are saved locally and will sync when backend is available
                 // Only log in debug mode
                 if (window.debugMode) {
-                    console.log('Backend sync unavailable, settings saved locally:', e.message);
+                    console.debug('Backend sync unavailable, settings saved locally:', e.message);
                 }
             }
         }
@@ -190,7 +190,7 @@
                 // Silently fail - use local settings as fallback
                 // Only log in debug mode
                 if (window.debugMode) {
-                    console.log('Backend unavailable, using local settings:', e.message);
+                    console.debug('Backend unavailable, using local settings:', e.message);
                 }
             }
         }
