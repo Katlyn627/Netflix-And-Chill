@@ -160,6 +160,7 @@ class ChatComponent {
                 }
             } catch (historyError) {
                 console.log('[Chat] No saved match history found');
+                matches = [];
             }
             
             // Apply client-side filters

@@ -246,7 +246,7 @@ class SharedFilters {
         
         // Set premium filters
         document.querySelectorAll(`input[name="${formPrefix}premiumGenreFilter"]`).forEach(cb => {
-            cb.checked = filters.premiumGenres && filters.premiumGenres.includes(parseInt(cb.value, 10));
+            cb.checked = filters.premiumGenres?.includes(parseInt(cb.value, 10)) || false;
         });
         
         const premiumBingeMin = document.getElementById(`${formPrefix}premium-binge-min`);
