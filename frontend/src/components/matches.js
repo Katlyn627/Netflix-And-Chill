@@ -933,10 +933,10 @@ function applyFilters() {
         console.log('[Matches] Applied and saved filters:', currentFilters);
     } else {
         // Fallback to original implementation
-        currentFilters.minMatchScore = parseInt(document.getElementById('match-score-filter').value);
-        currentFilters.minAge = parseInt(document.getElementById('age-range-min-filter').value);
-        currentFilters.maxAge = parseInt(document.getElementById('age-range-max-filter').value);
-        currentFilters.locationRadius = parseInt(document.getElementById('distance-filter').value);
+        currentFilters.minMatchScore = parseInt(document.getElementById('match-score-filter').value, 10);
+        currentFilters.minAge = parseInt(document.getElementById('age-range-min-filter').value, 10);
+        currentFilters.maxAge = parseInt(document.getElementById('age-range-max-filter').value, 10);
+        currentFilters.locationRadius = parseInt(document.getElementById('distance-filter').value, 10);
         
         // Get gender preferences
         const genderCheckboxes = document.querySelectorAll('input[name="genderFilter"]:checked');
