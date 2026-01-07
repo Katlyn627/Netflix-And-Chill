@@ -234,8 +234,14 @@ class ProfileView {
         const featuresUl = document.getElementById('features-list');
         if (isPremium && premiumFeatures.length > 0) {
             featuresList.style.display = 'block';
+            // Sanitize feature names to prevent XSS
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
             featuresUl.innerHTML = premiumFeatures.map(feature => 
-                `<li style="padding: 5px 0;">✓ ${feature}</li>`
+                `<li style="padding: 5px 0;">✓ ${escapeHtml(feature)}</li>`
             ).join('');
         } else {
             featuresList.style.display = 'none';

@@ -1069,6 +1069,10 @@ class UserController {
       const { userId } = req.params;
       const { isPremium } = req.body;
 
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
       if (typeof isPremium !== 'boolean') {
         return res.status(400).json({ error: 'isPremium must be a boolean value' });
       }
@@ -1100,6 +1104,10 @@ class UserController {
     try {
       const { userId } = req.params;
 
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
       const dataStore = await getDatabase();
       const userData = await dataStore.findUserById(userId);
 
@@ -1124,8 +1132,12 @@ class UserController {
       const { userId } = req.params;
       const { feature } = req.body;
 
-      if (!feature) {
-        return res.status(400).json({ error: 'Feature name is required' });
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      if (!feature || typeof feature !== 'string' || feature.trim() === '') {
+        return res.status(400).json({ error: 'Valid feature name is required' });
       }
 
       const dataStore = await getDatabase();
