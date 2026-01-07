@@ -559,6 +559,12 @@ class MatchingEngine {
         // Apply minimum match score filter
         const minMatchScore = filters.minMatchScore || 0;
         if (matchResult.score >= minMatchScore) {
+          // Apply premium advanced score filter if present
+          const minAdvancedScore = filters.premium?.minAdvancedScore;
+          if (minAdvancedScore !== undefined && matchResult.score < minAdvancedScore) {
+            return; // Skip this match if it doesn't meet premium score threshold
+          }
+          
           matches.push(new Match(
             user.id,
             otherUser.id,
@@ -686,6 +692,65 @@ class MatchingEngine {
         // If archetype preference is specified but other user has no archetype, exclude them
         return false;
       }
+    }
+
+    // Premium Filters (only apply if user has premium)
+    if (user.isPremium && filters.premium) {
+      // Filter by specific genres (premium feature)
+      if (filters.premium.genreIds && filters.premium.genreIds.length > 0) {
+        const otherUserGenreIds = (otherUser.preferences?.genres || []).map(g => g.id);
+        const hasMatchingGenre = filters.premium.genreIds.some(genreId => 
+          otherUserGenreIds.includes(genreId)
+        );
+        if (!hasMatchingGenre) {
+          return false;
+        }
+      }
+
+      // Filter by binge patterns (premium feature)
+      if (filters.premium.bingeRange) {
+        const { min, max } = filters.premium.bingeRange;
+        const otherBingeCount = otherUser.preferences?.bingeWatchCount || 0;
+        if (otherBingeCount < min || otherBingeCount > max) {
+          return false;
+        }
+      }
+
+      // Filter by streaming services (premium feature)
+      if (filters.premium.streamingServices && filters.premium.streamingServices.length > 0) {
+        const otherServices = (otherUser.streamingServices || []).map(s => s.name || s.id);
+        const hasMatchingService = filters.premium.streamingServices.some(service =>
+          otherServices.includes(service)
+        );
+        if (!hasMatchingService) {
+          return false;
+        }
+      }
+
+      // Filter by movie decade preferences (premium feature)
+      if (filters.premium.decades && filters.premium.decades.length > 0) {
+        // Check if user has movies from preferred decades in their watch history or favorites
+        const userMovies = [
+          ...(otherUser.favoriteMovies || []),
+          ...(otherUser.watchHistory || [])
+        ];
+        
+        const hasMatchingDecade = userMovies.some(movie => {
+          if (movie.releaseDate || movie.release_date) {
+            const year = new Date(movie.releaseDate || movie.release_date).getFullYear();
+            const decade = Math.floor(year / 10) * 10;
+            return filters.premium.decades.includes(decade);
+          }
+          return false;
+        });
+        
+        if (userMovies.length > 0 && !hasMatchingDecade) {
+          return false;
+        }
+      }
+
+      // Advanced compatibility threshold (premium feature)
+      // Note: This is now implemented in findMatches method after score calculation
     }
 
     return true;

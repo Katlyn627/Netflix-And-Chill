@@ -89,4 +89,8 @@ router.get('/:userId/premium', userController.getPremiumStatus.bind(userControll
 router.put('/:userId/premium', userController.updatePremiumStatus.bind(userController));
 router.post('/:userId/premium/features', userController.addPremiumFeature.bind(userController));
 
+// Boost profile routes (premium feature)
+router.post('/:userId/boost', userController.activateBoost.bind(userController));
+router.get('/:userId/boost', userController.getBoostStatus.bind(userController));
+
 module.exports = router;

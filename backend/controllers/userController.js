@@ -1165,6 +1165,75 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async activateBoost(req, res) {
+    try {
+      const { userId } = req.params;
+      const { durationHours = 24 } = req.body;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      
+      if (!user.isPremium) {
+        return res.status(403).json({ error: 'Boost feature is only available for premium users' });
+      }
+
+      const success = user.activateBoost(durationHours);
+      
+      if (!success) {
+        return res.status(400).json({ error: 'Failed to activate boost' });
+      }
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Profile boost activated successfully',
+        profileBoosted: user.profileBoosted,
+        boostExpiresAt: user.boostExpiresAt,
+        durationHours
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getBoostStatus(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+
+      res.json({
+        profileBoosted: user.isBoostActive(),
+        boostExpiresAt: user.boostExpiresAt,
+        timeRemaining: user.getBoostTimeRemaining(),
+        boostHistory: user.boostHistory
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();

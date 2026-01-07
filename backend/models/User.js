@@ -60,6 +60,9 @@ class User {
     this.isPremium = data.isPremium || false; // Premium profile status
     this.premiumSince = data.premiumSince || null; // When premium was activated
     this.premiumFeatures = data.premiumFeatures || []; // Array of enabled premium features
+    this.profileBoosted = data.profileBoosted || false; // Profile boost status
+    this.boostExpiresAt = data.boostExpiresAt || null; // When boost expires
+    this.boostHistory = data.boostHistory || []; // Array of boost timestamps
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -334,6 +337,9 @@ class User {
       isPremium: this.isPremium,
       premiumSince: this.premiumSince,
       premiumFeatures: this.premiumFeatures,
+      profileBoosted: this.profileBoosted,
+      boostExpiresAt: this.boostExpiresAt,
+      boostHistory: this.boostHistory,
       createdAt: this.createdAt
     };
   }
@@ -372,6 +378,47 @@ class User {
 
   hasPremiumFeature(feature) {
     return this.isPremium && this.premiumFeatures.includes(feature);
+  }
+
+  // Boost profile methods
+  activateBoost(durationHours = 24) {
+    if (!this.isPremium) {
+      return false;
+    }
+    this.profileBoosted = true;
+    this.boostExpiresAt = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
+    this.boostHistory.push({
+      activatedAt: new Date().toISOString(),
+      expiresAt: this.boostExpiresAt
+    });
+    return true;
+  }
+
+  deactivateBoost() {
+    this.profileBoosted = false;
+    this.boostExpiresAt = null;
+  }
+
+  isBoostActive() {
+    if (!this.profileBoosted || !this.boostExpiresAt) {
+      return false;
+    }
+    const now = new Date();
+    const expiresAt = new Date(this.boostExpiresAt);
+    if (now >= expiresAt) {
+      this.deactivateBoost();
+      return false;
+    }
+    return true;
+  }
+
+  getBoostTimeRemaining() {
+    if (!this.isBoostActive()) {
+      return 0;
+    }
+    const now = new Date();
+    const expiresAt = new Date(this.boostExpiresAt);
+    return Math.max(0, expiresAt - now);
   }
 }
 

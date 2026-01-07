@@ -38,6 +38,41 @@ class MatchController {
           : req.query.archetypePreference.split(',');
       }
 
+      // Premium filters
+      if (req.query.premiumGenres || req.query.premiumBingeMin || req.query.premiumServices || 
+          req.query.premiumDecades || req.query.premiumMinScore) {
+        filters.premium = {};
+        
+        if (req.query.premiumGenres) {
+          filters.premium.genreIds = Array.isArray(req.query.premiumGenres)
+            ? req.query.premiumGenres.map(id => parseInt(id))
+            : req.query.premiumGenres.split(',').map(id => parseInt(id));
+        }
+        
+        if (req.query.premiumBingeMin !== undefined || req.query.premiumBingeMax !== undefined) {
+          filters.premium.bingeRange = {
+            min: parseInt(req.query.premiumBingeMin) || 0,
+            max: parseInt(req.query.premiumBingeMax) || 100
+          };
+        }
+        
+        if (req.query.premiumServices) {
+          filters.premium.streamingServices = Array.isArray(req.query.premiumServices)
+            ? req.query.premiumServices
+            : req.query.premiumServices.split(',');
+        }
+        
+        if (req.query.premiumDecades) {
+          filters.premium.decades = Array.isArray(req.query.premiumDecades)
+            ? req.query.premiumDecades.map(d => parseInt(d))
+            : req.query.premiumDecades.split(',').map(d => parseInt(d));
+        }
+        
+        if (req.query.premiumMinScore !== undefined) {
+          filters.premium.minAdvancedScore = parseInt(req.query.premiumMinScore);
+        }
+      }
+
       const dataStore = await getDatabase();
       const user = await dataStore.findUserById(userId);
       if (!user) {
@@ -50,6 +85,24 @@ class MatchController {
 
       const matches = MatchingEngine.findMatches(currentUser, userObjects, limit, filters);
 
+      // Create boost status map for efficient sorting
+      const boostStatusMap = new Map();
+      userObjects.forEach(u => {
+        boostStatusMap.set(u.id, u.isBoostActive());
+      });
+
+      // Prioritize boosted profiles by sorting them to the top
+      matches.sort((a, b) => {
+        const aIsBoosted = boostStatusMap.get(a.user2Id) || false;
+        const bIsBoosted = boostStatusMap.get(b.user2Id) || false;
+        
+        if (aIsBoosted && !bIsBoosted) return -1;
+        if (!aIsBoosted && bIsBoosted) return 1;
+        
+        // If both boosted or both not boosted, sort by match score
+        return b.matchScore - a.matchScore;
+      });
+
       // Save matches to database
       for (const match of matches) {
         await dataStore.addMatch(match);
@@ -59,6 +112,7 @@ class MatchController {
       const matchesWithDetails = await Promise.all(
         matches.map(async (match) => {
           const matchedUser = await dataStore.findUserById(match.user2Id);
+          const matchedUserObj = new User(matchedUser);
           return {
             matchId: match.id,
             matchScore: match.matchScore,
@@ -68,6 +122,7 @@ class MatchController {
             snackCompatibility: match.snackCompatibility,
             debateCompatibility: match.debateCompatibility,
             emotionalToneCompatibility: match.emotionalToneCompatibility,
+            isBoosted: matchedUserObj.isBoostActive(),
             user: {
               id: matchedUser.id,
               username: matchedUser.username,
