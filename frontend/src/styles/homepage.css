@@ -1,36 +1,36 @@
 .hero-header {
     text-align: center;
     color: white;
-    padding: 60px 20px;
-    margin-bottom: 40px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
 }
 
 .hero-logo-image {
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 20px;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px;
     display: block;
     filter: drop-shadow(0 0 20px rgba(229, 9, 20, 0.5));
     animation: fadeInDown 1s ease-in;
 }
 
 .hero-header h1 {
-    font-size: 4em;
-    margin-bottom: 20px;
+    font-size: 2.5em;
+    margin-bottom: 15px;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
     animation: fadeInDown 1s ease-in;
 }
 
 .hero-tagline {
-    font-size: 1.8em;
-    margin-bottom: 15px;
+    font-size: 1.3em;
+    margin-bottom: 12px;
     opacity: 0.95;
 }
 
 .hero-description {
-    font-size: 1.2em;
+    font-size: 1em;
     max-width: 700px;
-    margin: 0 auto 40px;
+    margin: 0 auto 30px;
     opacity: 0.9;
     line-height: 1.6;
 }
@@ -195,20 +195,20 @@
 
 @media (max-width: 768px) {
     .hero-logo-image {
-        width: 150px;
-        height: 150px;
+        width: 100px;
+        height: 100px;
     }
 
     .hero-header h1 {
-        font-size: 2.5em;
+        font-size: 2em;
     }
 
     .hero-tagline {
-        font-size: 1.3em;
+        font-size: 1.1em;
     }
 
     .hero-description {
-        font-size: 1em;
+        font-size: 0.95em;
     }
 
     .cta-buttons {
