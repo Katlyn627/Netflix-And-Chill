@@ -174,11 +174,8 @@ class SharedFilters {
         filters.archetypePreference = archetypePrefs.includes('any') ? [] : archetypePrefs;
         
         // Premium filters
-        const premiumGenreSelect = document.getElementById(`${formPrefix}premium-genre-filter`);
-        if (premiumGenreSelect) {
-            const selectedOptions = Array.from(premiumGenreSelect.selectedOptions);
-            filters.premiumGenres = selectedOptions.map(option => parseInt(option.value, 10));
-        }
+        const premiumGenreCheckboxes = document.querySelectorAll(`input[name="${formPrefix}premiumGenreFilter"]:checked`);
+        filters.premiumGenres = Array.from(premiumGenreCheckboxes).map(cb => parseInt(cb.value, 10));
         
         const premiumBingeMin = document.getElementById(`${formPrefix}premium-binge-min`);
         const premiumBingeMax = document.getElementById(`${formPrefix}premium-binge-max`);
@@ -248,12 +245,9 @@ class SharedFilters {
         });
         
         // Set premium filters
-        const premiumGenreSelect = document.getElementById(`${formPrefix}premium-genre-filter`);
-        if (premiumGenreSelect && filters.premiumGenres) {
-            Array.from(premiumGenreSelect.options).forEach(option => {
-                option.selected = filters.premiumGenres.includes(parseInt(option.value, 10));
-            });
-        }
+        document.querySelectorAll(`input[name="${formPrefix}premiumGenreFilter"]`).forEach(cb => {
+            cb.checked = filters.premiumGenres?.includes(parseInt(cb.value, 10)) || false;
+        });
         
         const premiumBingeMin = document.getElementById(`${formPrefix}premium-binge-min`);
         const premiumBingeMax = document.getElementById(`${formPrefix}premium-binge-max`);

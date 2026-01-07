@@ -147,7 +147,7 @@ class ChatComponent {
             
             let matches = [];
             
-            // Try to load saved matches from history
+            // Load only actual saved matches from history (not potential matches)
             try {
                 const historyResponse = await fetch(
                     `${window.API_BASE_URL || 'http://localhost:3000/api'}/matches/${encodeURIComponent(this.currentUserId)}/history`
@@ -155,17 +155,12 @@ class ChatComponent {
                 const historyData = await historyResponse.json();
                 
                 if (historyData.success && historyData.matches && historyData.matches.length > 0) {
-                    console.log(`[Chat] Loaded ${historyData.matches.length} saved matches from history`);
+                    console.log(`[Chat] Loaded ${historyData.matches.length} actual matches from history`);
                     matches = historyData.matches;
                 }
             } catch (historyError) {
-                console.log('[Chat] No saved match history found, will use find matches');
-            }
-            
-            // If no saved matches, find new ones
-            if (matches.length === 0) {
-                console.log('[Chat] Finding new matches...');
-                matches = await window.SharedFilters?.loadFilteredMatches(this.currentUserId, filters) || [];
+                console.log('[Chat] No saved match history found');
+                matches = [];
             }
             
             // Apply client-side filters
@@ -173,10 +168,13 @@ class ChatComponent {
                 matches = this.filterMatches(matches, filters);
             }
             
+            // Sort by match percentage from highest to lowest
+            matches.sort((a, b) => b.matchScore - a.matchScore);
+            
             // Fetch unread message counts
             await this.loadUnreadCounts();
             
-            console.log(`[Chat] Displaying ${matches.length} matches`);
+            console.log(`[Chat] Displaying ${matches.length} actual matches sorted by match percentage`);
             this.displayMatchesList(matches);
         } catch (error) {
             console.error('[Chat] Error loading matches:', error);
