@@ -11,7 +11,16 @@ class SharedFilters {
             locationRadius: 100,
             genderPreference: [],
             sexualOrientationPreference: [],
-            archetypePreference: []
+            archetypePreference: [],
+            // Premium filters
+            premiumGenres: [],
+            premiumBingeMin: 0,
+            premiumBingeMax: 20,
+            premiumServices: [],
+            premiumDecades: [],
+            premiumMinScore: 0,
+            // Sorting options
+            sortBy: 'score' // score, archetype, compatibility
         };
     }
 
@@ -76,6 +85,26 @@ class SharedFilters {
         }
         if (filters.archetypePreference && filters.archetypePreference.length > 0) {
             url += `&archetypePreference=${filters.archetypePreference.join(',')}`;
+        }
+        
+        // Premium filters
+        if (filters.premiumGenres && filters.premiumGenres.length > 0) {
+            url += `&premiumGenres=${filters.premiumGenres.join(',')}`;
+        }
+        if (filters.premiumBingeMin !== undefined) {
+            url += `&premiumBingeMin=${filters.premiumBingeMin}`;
+        }
+        if (filters.premiumBingeMax !== undefined) {
+            url += `&premiumBingeMax=${filters.premiumBingeMax}`;
+        }
+        if (filters.premiumServices && filters.premiumServices.length > 0) {
+            url += `&premiumServices=${filters.premiumServices.join(',')}`;
+        }
+        if (filters.premiumDecades && filters.premiumDecades.length > 0) {
+            url += `&premiumDecades=${filters.premiumDecades.join(',')}`;
+        }
+        if (filters.premiumMinScore) {
+            url += `&premiumMinScore=${filters.premiumMinScore}`;
         }
         
         console.log('[SharedFilters] Built URL with filters:', url);
@@ -144,6 +173,31 @@ class SharedFilters {
         }
         filters.archetypePreference = archetypePrefs.includes('any') ? [] : archetypePrefs;
         
+        // Premium filters
+        const premiumGenreSelect = document.getElementById(`${formPrefix}premium-genre-filter`);
+        if (premiumGenreSelect) {
+            const selectedOptions = Array.from(premiumGenreSelect.selectedOptions);
+            filters.premiumGenres = selectedOptions.map(option => parseInt(option.value));
+        }
+        
+        const premiumBingeMin = document.getElementById(`${formPrefix}premium-binge-min`);
+        const premiumBingeMax = document.getElementById(`${formPrefix}premium-binge-max`);
+        if (premiumBingeMin) filters.premiumBingeMin = parseInt(premiumBingeMin.value) || 0;
+        if (premiumBingeMax) filters.premiumBingeMax = parseInt(premiumBingeMax.value) || 20;
+        
+        const premiumServiceCheckboxes = document.querySelectorAll(`input[name="${formPrefix}premiumServiceFilter"]:checked`);
+        filters.premiumServices = Array.from(premiumServiceCheckboxes).map(cb => cb.value);
+        
+        const premiumDecadeCheckboxes = document.querySelectorAll(`input[name="${formPrefix}premiumDecadeFilter"]:checked`);
+        filters.premiumDecades = Array.from(premiumDecadeCheckboxes).map(cb => parseInt(cb.value));
+        
+        const premiumAdvancedScore = document.getElementById(`${formPrefix}premium-advanced-score`);
+        if (premiumAdvancedScore) filters.premiumMinScore = parseInt(premiumAdvancedScore.value) || 0;
+        
+        // Sorting option
+        const sortBySelect = document.getElementById(`${formPrefix}sort-by-filter`);
+        if (sortBySelect) filters.sortBy = sortBySelect.value || 'score';
+        
         console.log('[SharedFilters] Extracted filters from form:', filters);
         return filters;
     }
@@ -192,6 +246,38 @@ class SharedFilters {
                 ? cb.value === 'any'
                 : filters.archetypePreference.includes(cb.value);
         });
+        
+        // Set premium filters
+        const premiumGenreSelect = document.getElementById(`${formPrefix}premium-genre-filter`);
+        if (premiumGenreSelect && filters.premiumGenres) {
+            Array.from(premiumGenreSelect.options).forEach(option => {
+                option.selected = filters.premiumGenres.includes(parseInt(option.value));
+            });
+        }
+        
+        const premiumBingeMin = document.getElementById(`${formPrefix}premium-binge-min`);
+        const premiumBingeMax = document.getElementById(`${formPrefix}premium-binge-max`);
+        if (premiumBingeMin) premiumBingeMin.value = filters.premiumBingeMin || 0;
+        if (premiumBingeMax) premiumBingeMax.value = filters.premiumBingeMax || 20;
+        
+        document.querySelectorAll(`input[name="${formPrefix}premiumServiceFilter"]`).forEach(cb => {
+            cb.checked = filters.premiumServices && filters.premiumServices.includes(cb.value);
+        });
+        
+        document.querySelectorAll(`input[name="${formPrefix}premiumDecadeFilter"]`).forEach(cb => {
+            cb.checked = filters.premiumDecades && filters.premiumDecades.includes(parseInt(cb.value));
+        });
+        
+        const premiumAdvancedScore = document.getElementById(`${formPrefix}premium-advanced-score`);
+        const premiumAdvancedScoreValue = document.getElementById(`${formPrefix}premium-advanced-score-value`);
+        if (premiumAdvancedScore) {
+            premiumAdvancedScore.value = filters.premiumMinScore || 0;
+            if (premiumAdvancedScoreValue) premiumAdvancedScoreValue.textContent = `${filters.premiumMinScore || 0}%`;
+        }
+        
+        // Set sort by dropdown
+        const sortBySelect = document.getElementById(`${formPrefix}sort-by-filter`);
+        if (sortBySelect) sortBySelect.value = filters.sortBy || 'score';
         
         console.log('[SharedFilters] Applied filters to form');
     }

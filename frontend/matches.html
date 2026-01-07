@@ -89,6 +89,15 @@
                 </div>
                 <div class="filters-body">
                     <div class="filter-group">
+                        <label for="sort-by-filter">Sort Matches By:</label>
+                        <select id="sort-by-filter" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #555; background: #1a1a1a; color: white;">
+                            <option value="score">Match Score (Highest First)</option>
+                            <option value="archetype">Movie Personality</option>
+                            <option value="recent">Recently Active</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
                         <label for="match-score-filter">Match Score (minimum):</label>
                         <input type="range" id="match-score-filter" min="0" max="100" value="0" step="5">
                         <span id="match-score-value">0%</span>

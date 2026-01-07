@@ -732,8 +732,11 @@ async function findMatches() {
             unreadMessageCounts = {};
         }
         
+        // Sort matches based on current filter preference
+        const sortedMatches = sortMatches(matchResult.matches, currentFilters.sortBy || 'score');
+        
         loadingDiv.style.display = 'none';
-        displayMatches(matchResult.matches);
+        displayMatches(sortedMatches);
     } catch (error) {
         loadingDiv.style.display = 'none';
         matchesContainer.innerHTML = `
@@ -742,6 +745,64 @@ async function findMatches() {
             </div>
         `;
     }
+}
+
+// Sort matches based on selected criteria
+function sortMatches(matches, sortBy) {
+    if (!matches || matches.length === 0) return matches;
+    
+    const sorted = [...matches]; // Create a copy to avoid mutating original
+    
+    switch(sortBy) {
+        case 'archetype':
+            // Sort by archetype match first, then by score
+            sorted.sort((a, b) => {
+                const aHasArchetype = a.user && a.user.archetype ? 1 : 0;
+                const bHasArchetype = b.user && b.user.archetype ? 1 : 0;
+                
+                // Prioritize users with archetypes
+                if (aHasArchetype !== bHasArchetype) {
+                    return bHasArchetype - aHasArchetype;
+                }
+                
+                // If both have archetypes or both don't, sort by match score
+                return b.matchScore - a.matchScore;
+            });
+            break;
+            
+        case 'recent':
+            // Sort by created date (most recent first), then by score
+            sorted.sort((a, b) => {
+                const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                
+                if (aDate !== bDate) {
+                    return bDate - aDate;
+                }
+                
+                return b.matchScore - a.matchScore;
+            });
+            break;
+            
+        case 'score':
+        default:
+            // Sort by match score (highest first) - default behavior
+            sorted.sort((a, b) => {
+                // Check for boosted profiles
+                const aIsBoosted = a.isBoosted || false;
+                const bIsBoosted = b.isBoosted || false;
+                
+                if (aIsBoosted && !bIsBoosted) return -1;
+                if (!aIsBoosted && bIsBoosted) return 1;
+                
+                // If both boosted or both not boosted, sort by match score
+                return b.matchScore - a.matchScore;
+            });
+            break;
+    }
+    
+    console.log(`[Matches] Sorted ${sorted.length} matches by ${sortBy}`);
+    return sorted;
 }
 
 // Load match history (existing matches)
@@ -776,7 +837,9 @@ async function loadMatchHistory() {
         
         loadingDiv.style.display = 'none';
         if (matchResult.matches && matchResult.matches.length > 0) {
-            displayMatches(matchResult.matches);
+            // Sort matches based on current filter preference
+            const sortedMatches = sortMatches(matchResult.matches, currentFilters.sortBy || 'score');
+            displayMatches(sortedMatches);
         } else {
             // If no history, show empty state
             matchesContainer.innerHTML = `
@@ -943,9 +1006,10 @@ document.getElementById('carousel-view-btn').addEventListener('click', () => {
     currentView = 'carousel';
     document.getElementById('carousel-view-btn').classList.add('active');
     document.getElementById('grid-view-btn').classList.remove('active');
-    // Redisplay matches in carousel view
+    // Redisplay matches in carousel view with current sort
     if (allMatches.length > 0) {
-        displayMatches(allMatches);
+        const sortedMatches = sortMatches(allMatches, currentFilters.sortBy || 'score');
+        displayMatches(sortedMatches);
     }
 });
 
@@ -953,9 +1017,10 @@ document.getElementById('grid-view-btn').addEventListener('click', () => {
     currentView = 'grid';
     document.getElementById('grid-view-btn').classList.add('active');
     document.getElementById('carousel-view-btn').classList.remove('active');
-    // Redisplay matches in grid view
+    // Redisplay matches in grid view with current sort
     if (allMatches.length > 0) {
-        displayMatchesGrid(allMatches);
+        const sortedMatches = sortMatches(allMatches, currentFilters.sortBy || 'score');
+        displayMatchesGrid(sortedMatches);
     }
 });
 
