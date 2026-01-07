@@ -15,6 +15,10 @@ app.use(express.json());
 // Security Headers - Content Security Policy
 app.use((req, res, next) => {
   // Set Content Security Policy header to prevent eval() and inline scripts
+  // In development, allow connections to localhost for API calls
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+  const localhostSources = isDevelopment ? 'http://localhost:3000 http://localhost:4000 http://localhost:5000 http://localhost:5001' : '';
+  
   res.setHeader(
     'Content-Security-Policy',
     [
@@ -23,7 +27,7 @@ app.use((req, res, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: http:",
-      "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com",
+      `connect-src 'self' ${localhostSources} https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com`.trim(),
       "frame-src 'self' https://*.firebaseapp.com",
       "object-src 'none'",
       "base-uri 'self'"
