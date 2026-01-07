@@ -612,12 +612,9 @@ footer {
         text-align: center;
     }
     
-    .profile-actions {
-        flex-direction: column; /* Stack buttons vertically on mobile, gap still applies */
-    }
-
-    .profile-action-btn {
-        width: 100%; /* Full width buttons on mobile */
+    .profile-action-btn + .profile-action-btn {
+        margin-left: 0;
+        margin-top: 10px;
     }
     
     /* Navigation adjustments */
@@ -733,11 +730,9 @@ footer {
     position: relative;
 }
 
-/* Sticky Bottom Navigation Bar - Follows Page Scroll for Easier Access */
-/* Sticky positioning keeps the navigation visible at the bottom of the viewport
-   as the user scrolls, providing easy access to navigation controls throughout the page */
+/* Fixed Bottom Navigation Bar */
 .nav-icons {
-    position: sticky;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
@@ -1036,15 +1031,12 @@ header {
     font-style: italic;
 }
 
-.profile-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Gap handles spacing in both row and column modes */
-    margin-top: 15px;
+.profile-action-btn {
+    margin-top: 10px;
 }
 
-.profile-action-btn {
-    margin-top: 0; /* Reset any default margins, gap handles spacing */
+.profile-action-btn + .profile-action-btn {
+    margin-left: 10px;
 }
 
 .personality-bio {

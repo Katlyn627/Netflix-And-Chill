@@ -8,8 +8,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
-    <link rel="stylesheet" href="src/styles/advancedSettings.css">
-    <link rel="stylesheet" href="src/styles/themes.css">
     <link rel="stylesheet" href="src/styles/watch-together.css">
 </head>
 <body>
@@ -26,7 +24,6 @@
                     <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
                         <span id="profile-nav-icon">👤</span>
                     </a>
-                    <button type="button" class="nav-icon-btn settings" id="open-settings-btn" title="Settings" aria-label="Open Settings">⚙️</button>
                     <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
                 </div>
             </div>
@@ -145,21 +142,10 @@
     </div>
 
     <script src="src/utils/errorHandler.js"></script>
-    <script src="src/utils/advancedSettings.js"></script>
+    <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
     <script src="src/utils/sharedFilters.js"></script>
     <script src="src/components/watch-together.js"></script>
-    <script>
-        // Initialize settings button
-        document.addEventListener('DOMContentLoaded', () => {
-            const settingsBtn = document.getElementById('open-settings-btn');
-            if (settingsBtn && window.AdvancedSettingsManager) {
-                settingsBtn.addEventListener('click', () => {
-                    window.AdvancedSettingsManager.openPanel();
-                });
-            }
-        });
-    </script>
 </body>
 </html>

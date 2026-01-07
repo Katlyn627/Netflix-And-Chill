@@ -1234,58 +1234,6 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
-
-  // Update user appearance preferences
-  async updateAppearancePreferences(req, res) {
-    try {
-      const { userId } = req.params;
-      const { appearancePreferences } = req.body;
-
-      const dataStore = await getDatabase();
-      const userData = await dataStore.findUserById(userId);
-
-      if (!userData) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      // Update appearance preferences
-      userData.appearancePreferences = {
-        ...userData.appearancePreferences,
-        ...appearancePreferences
-      };
-
-      await dataStore.updateUser(userId, userData);
-
-      res.json({
-        message: 'Appearance preferences updated successfully',
-        appearancePreferences: userData.appearancePreferences
-      });
-    } catch (error) {
-      console.error('Error updating appearance preferences:', error);
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  // Get user appearance preferences
-  async getAppearancePreferences(req, res) {
-    try {
-      const { userId } = req.params;
-
-      const dataStore = await getDatabase();
-      const userData = await dataStore.findUserById(userId);
-
-      if (!userData) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json({
-        appearancePreferences: userData.appearancePreferences || {}
-      });
-    } catch (error) {
-      console.error('Error fetching appearance preferences:', error);
-      res.status(500).json({ error: error.message });
-    }
-  }
 }
 
 module.exports = new UserController();

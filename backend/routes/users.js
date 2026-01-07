@@ -93,8 +93,4 @@ router.post('/:userId/premium/features', userController.addPremiumFeature.bind(u
 router.post('/:userId/boost', userController.activateBoost.bind(userController));
 router.get('/:userId/boost', userController.getBoostStatus.bind(userController));
 
-// Appearance preferences routes
-router.put('/:userId/appearance', userController.updateAppearancePreferences.bind(userController));
-router.get('/:userId/appearance', userController.getAppearancePreferences.bind(userController));
-
 module.exports = router;

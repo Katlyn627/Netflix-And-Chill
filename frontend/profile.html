@@ -9,8 +9,6 @@
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
     <link rel="stylesheet" href="src/styles/swipe.css">
-    <link rel="stylesheet" href="src/styles/advancedSettings.css">
-    <link rel="stylesheet" href="src/styles/themes.css">
 </head>
 <body>
     <div class="container">
@@ -20,9 +18,8 @@
                 <h1>NETFLIX & CHILL</h1>
             </div>
             <p class="tagline">Find your perfect binge-watching partner</p>
-            <div style="text-align: center; margin-top: 10px; display: flex; gap: 15px; justify-content: center; align-items: center;">
+            <div style="text-align: center; margin-top: 10px;">
                 <a href="homepage.html" style="color: white; text-decoration: underline;">← Back to Home</a>
-                <button type="button" class="nav-icon-btn settings" id="open-settings-btn" title="Settings" aria-label="Open Settings" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px 10px;">⚙️</button>
             </div>
         </header>
 
@@ -292,20 +289,9 @@
     </div>
 
     <script src="src/utils/errorHandler.js"></script>
-    <script src="src/utils/advancedSettings.js"></script>
+    <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
     <script src="src/components/swipe.js"></script>
     <script src="src/components/app.js"></script>
-    <script>
-        // Initialize settings button
-        document.addEventListener('DOMContentLoaded', () => {
-            const settingsBtn = document.getElementById('open-settings-btn');
-            if (settingsBtn && window.AdvancedSettingsManager) {
-                settingsBtn.addEventListener('click', () => {
-                    window.AdvancedSettingsManager.openPanel();
-                });
-            }
-        });
-    </script>
 </body>
 </html>
