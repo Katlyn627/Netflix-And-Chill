@@ -637,13 +637,6 @@ footer {
         height: 20px;
     }
     
-    .nav-icon-btn #profile-nav-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-    }
-    
     .nav-icon-btn::after {
         font-size: 8px;
     }
@@ -964,13 +957,6 @@ header {
     .nav-icon-btn #profile-nav-icon {
         width: 18px;
         height: 18px;
-    }
-    
-    .nav-icon-btn #profile-nav-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
     }
     
     .nav-icon-btn::after {
