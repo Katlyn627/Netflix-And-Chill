@@ -149,24 +149,79 @@
                         </div>
                     </div>
                     
-                    <!-- Premium Filters Section (Placeholder for Future) -->
+                    <!-- Premium Filters Section -->
                     <div class="filter-group premium-filters-section" id="premium-filters-section" style="display: none;">
                         <div style="padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; margin-bottom: 15px;">
                             <h4 style="color: white; margin: 0 0 10px 0;">⭐ Premium Filters</h4>
-                            <p style="color: white; margin: 0; font-size: 0.9em;">Advanced filtering options available with premium membership</p>
+                            <p style="color: white; margin: 0; font-size: 0.9em;">Advanced filtering options for premium members</p>
                         </div>
                         
-                        <div class="premium-filter-placeholder">
-                            <p style="text-align: center; padding: 20px; color: #666; font-style: italic;">
-                                Premium filter options coming soon! Upgrade your profile to access advanced filters including:
-                            </p>
-                            <ul style="list-style: none; padding: 0 20px; color: #555;">
-                                <li>✓ Filter by specific genre preferences</li>
-                                <li>✓ Filter by viewing habits and binge patterns</li>
-                                <li>✓ Filter by favorite streaming services</li>
-                                <li>✓ Filter by movie decade preferences</li>
-                                <li>✓ Advanced compatibility scoring options</li>
-                            </ul>
+                        <div class="premium-filter-controls">
+                            <!-- Genre Filter -->
+                            <div class="premium-filter-item">
+                                <label>Favorite Genres:</label>
+                                <select id="premium-genre-filter" multiple size="6" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #555;">
+                                    <option value="28">Action</option>
+                                    <option value="12">Adventure</option>
+                                    <option value="16">Animation</option>
+                                    <option value="35">Comedy</option>
+                                    <option value="80">Crime</option>
+                                    <option value="99">Documentary</option>
+                                    <option value="18">Drama</option>
+                                    <option value="10751">Family</option>
+                                    <option value="14">Fantasy</option>
+                                    <option value="27">Horror</option>
+                                    <option value="9648">Mystery</option>
+                                    <option value="10749">Romance</option>
+                                    <option value="878">Science Fiction</option>
+                                    <option value="53">Thriller</option>
+                                </select>
+                                <small style="color: #aaa;">Hold Ctrl/Cmd to select multiple</small>
+                            </div>
+
+                            <!-- Binge Patterns Filter -->
+                            <div class="premium-filter-item">
+                                <label>Binge-Watching Pattern (episodes per session):</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="number" id="premium-binge-min" min="0" max="50" value="0" style="width: 80px; padding: 8px; border-radius: 5px; border: 1px solid #555;">
+                                    <span>to</span>
+                                    <input type="number" id="premium-binge-max" min="0" max="50" value="20" style="width: 80px; padding: 8px; border-radius: 5px; border: 1px solid #555;">
+                                </div>
+                            </div>
+
+                            <!-- Streaming Services Filter -->
+                            <div class="premium-filter-item">
+                                <label>Must Have Streaming Service:</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox" name="premiumServiceFilter" value="Netflix"> Netflix</label>
+                                    <label><input type="checkbox" name="premiumServiceFilter" value="Amazon Prime Video"> Amazon Prime</label>
+                                    <label><input type="checkbox" name="premiumServiceFilter" value="Disney+"> Disney+</label>
+                                    <label><input type="checkbox" name="premiumServiceFilter" value="Hulu"> Hulu</label>
+                                    <label><input type="checkbox" name="premiumServiceFilter" value="HBO Max"> HBO Max</label>
+                                    <label><input type="checkbox" name="premiumServiceFilter" value="Apple TV+"> Apple TV+</label>
+                                </div>
+                            </div>
+
+                            <!-- Movie Decade Filter -->
+                            <div class="premium-filter-item">
+                                <label>Favorite Movie Decades:</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="2020"> 2020s</label>
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="2010"> 2010s</label>
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="2000"> 2000s</label>
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="1990"> 1990s</label>
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="1980"> 1980s</label>
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="1970"> 1970s</label>
+                                    <label><input type="checkbox" name="premiumDecadeFilter" value="1960"> 1960s & Earlier</label>
+                                </div>
+                            </div>
+
+                            <!-- Advanced Compatibility Score -->
+                            <div class="premium-filter-item">
+                                <label for="premium-advanced-score">Advanced Compatibility Score (minimum):</label>
+                                <input type="range" id="premium-advanced-score" min="0" max="100" value="0" step="5">
+                                <span id="premium-advanced-score-value">0%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
