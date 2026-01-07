@@ -63,6 +63,39 @@ class User {
     this.profileBoosted = data.profileBoosted || false; // Profile boost status
     this.boostExpiresAt = data.boostExpiresAt || null; // When boost expires
     this.boostHistory = data.boostHistory || []; // Array of boost timestamps
+    // Appearance preferences - comprehensive settings for visual customization
+    this.appearancePreferences = data.appearancePreferences || {
+      // Global Visual Settings
+      theme: 'cinematic-red', // cinematic-red, noir, warm-cinema, minimal-monochrome, auto
+      contrastMode: 'standard', // standard, high, soft
+      motionLevel: 'full', // full, reduced, static
+      // Background Style per Page
+      backgrounds: {
+        home: 'film-grain', // film-grain, theater-seats, velvet-curtain, matte-black, rotating-gradients
+        profile: 'spotlight-fade', // spotlight-fade, film-strip, spotlight-halo, minimal-matte, poster-style
+        chat: 'dark-blur', // dark-blur, soft-gradient, aisle-bokeh, solid-color
+        watchTogether: 'theater-dim' // theater-dim, projection-glow, letterbox, popcorn-grain
+      },
+      // Background Behavior
+      dynamicResponses: {
+        matchWarmth: true,
+        messagePulse: true,
+        typingDim: true,
+        sessionSpotlight: true
+      },
+      timeBasedChanges: true,
+      // Personalization
+      matchBasedAdjustments: true,
+      emotionalTone: 'cozy', // cozy, romantic, playful, dramatic, minimal
+      // Accessibility & Comfort
+      eyeStrainReduction: false,
+      reducedRedSaturation: false,
+      fontBackgroundSpacing: 'normal', // compact, normal, comfortable, spacious
+      focusMode: false,
+      // Performance
+      staticBackgroundFallback: false,
+      lazyLoadTextures: true
+    };
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 

@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="src/styles/main.css">
     <link rel="stylesheet" href="src/styles/analytics.css">
     <link rel="stylesheet" href="src/styles/profile-frames.css">
+    <link rel="stylesheet" href="src/styles/advancedSettings.css">
+    <link rel="stylesheet" href="src/styles/themes.css">
 </head>
 <body>
     <div class="container">
@@ -21,6 +23,9 @@
                     <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
                 </div>
                 <div class="nav-right">
+                    <button type="button" class="settings-trigger-btn" id="open-settings-btn" title="Settings" aria-label="Open Appearance Settings">
+                        ⚙️ Settings
+                    </button>
                     <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
                     <a href="profile-view.html" class="nav-icon-btn profile active" id="profile-nav-btn" title="My Profile">
                         <span id="profile-nav-icon">👤</span>
@@ -590,12 +595,23 @@
     </div>
 
     <script src="src/utils/errorHandler.js"></script>
-    <script src="src/utils/settings.js"></script>
+    <script src="src/utils/advancedSettings.js"></script>
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
     <script src="src/components/quiz.js"></script>
     <script src="src/components/swipeAnalytics.js"></script>
     <script src="src/components/profile-frame-selector.js"></script>
     <script src="src/components/profile-view.js"></script>
+    <script>
+        // Initialize settings button click handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const settingsBtn = document.getElementById('open-settings-btn');
+            if (settingsBtn && window.AdvancedSettingsManager) {
+                settingsBtn.addEventListener('click', () => {
+                    window.AdvancedSettingsManager.openPanel();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,414 @@
+/**
+ * Advanced Settings Panel Styles
+ * Comprehensive styling for the left-side popout settings panel
+ */
+
+/* Settings Panel Container */
+#advanced-settings-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+#advanced-settings-panel.open {
+    pointer-events: all;
+}
+
+/* Overlay */
+.settings-panel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.3s ease;
+}
+
+#advanced-settings-panel.open .settings-panel-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Panel Content */
+.settings-panel-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 420px;
+    max-width: 90vw;
+    height: 100%;
+    background: #1a1a1a;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#advanced-settings-panel.open .settings-panel-content {
+    transform: translateX(0);
+}
+
+/* Settings Header */
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #E50914;
+    color: white;
+    flex-shrink: 0;
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.close-settings-panel {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.close-settings-panel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Settings Body */
+.settings-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    color: white;
+}
+
+.settings-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.settings-body::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+.settings-body::-webkit-scrollbar-thumb {
+    background: #E50914;
+    border-radius: 4px;
+}
+
+.settings-body::-webkit-scrollbar-thumb:hover {
+    background: #b50710;
+}
+
+/* Settings Section */
+.settings-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #E50914;
+}
+
+.settings-section h4 {
+    margin: 15px 0 8px 0;
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+.section-description {
+    margin: 0 0 15px 0;
+    font-size: 0.9rem;
+    color: #b3b3b3;
+}
+
+/* Theme Selector */
+.theme-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.theme-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-option.active {
+    border-color: #E50914;
+    background: rgba(229, 9, 20, 0.1);
+}
+
+.theme-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    flex-shrink: 0;
+}
+
+.theme-preview-auto {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #000000 50%, #000000 100%);
+}
+
+.theme-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.theme-info strong {
+    font-size: 1rem;
+    color: white;
+}
+
+.theme-info small {
+    font-size: 0.85rem;
+    color: #b3b3b3;
+}
+
+/* Radio and Checkbox Groups */
+.radio-group,
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.radio-option,
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.radio-option:hover,
+.checkbox-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.radio-option input,
+.checkbox-option input {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.radio-option span,
+.checkbox-option span {
+    font-size: 0.95rem;
+    color: white;
+}
+
+/* Select Dropdowns */
+.background-select,
+.tone-select,
+.spacing-select {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.background-select:hover,
+.tone-select:hover,
+.spacing-select:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #E50914;
+}
+
+.background-select:focus,
+.tone-select:focus,
+.spacing-select:focus {
+    outline: none;
+    border-color: #E50914;
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+}
+
+.background-select option,
+.tone-select option,
+.spacing-select option {
+    background: #1a1a1a;
+    color: white;
+}
+
+.background-page-section {
+    margin-bottom: 15px;
+}
+
+.emotional-tone-section,
+.spacing-section {
+    margin-top: 15px;
+}
+
+/* Settings Footer */
+.settings-footer {
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    background: #0a0a0a;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.btn-reset-settings,
+.btn-save-settings {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-reset-settings {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.btn-reset-settings:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-save-settings {
+    background: #E50914;
+    color: white;
+}
+
+.btn-save-settings:hover {
+    background: #b50710;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+/* Settings Notification */
+.settings-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: #E50914;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.settings-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Settings Button in Profile */
+.settings-trigger-btn {
+    background: rgba(229, 9, 20, 0.9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.settings-trigger-btn:hover {
+    background: #E50914;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+.settings-trigger-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .settings-panel-content {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .settings-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .theme-option {
+        padding: 10px;
+    }
+    
+    .theme-preview {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .settings-footer {
+        flex-direction: column;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .settings-panel-content,
+    .settings-panel-overlay,
+    .theme-option,
+    .radio-option,
+    .checkbox-option,
+    .btn-reset-settings,
+    .btn-save-settings,
+    .settings-notification {
+        transition: none;
+    }
+}
