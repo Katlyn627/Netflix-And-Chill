@@ -56,9 +56,6 @@
                         <div class="profile-actions">
                             <button id="edit-basic-info-btn" class="btn btn-secondary profile-action-btn">Edit Basic Info</button>
                             <button id="load-profile-view-btn" class="btn btn-primary profile-action-btn">Load Profile View</button>
-                            <button type="button" id="open-settings-btn" class="btn btn-secondary profile-action-btn" title="Appearance Settings" aria-label="Open Appearance Settings">
-                                ⚙️ Settings
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -604,16 +601,5 @@
     <script src="src/components/swipeAnalytics.js"></script>
     <script src="src/components/profile-frame-selector.js"></script>
     <script src="src/components/profile-view.js"></script>
-    <script>
-        // Initialize settings button click handler
-        document.addEventListener('DOMContentLoaded', () => {
-            const settingsBtn = document.getElementById('open-settings-btn');
-            if (settingsBtn && window.AdvancedSettingsManager) {
-                settingsBtn.addEventListener('click', () => {
-                    window.AdvancedSettingsManager.openPanel();
-                });
-            }
-        });
-    </script>
 </body>
 </html>

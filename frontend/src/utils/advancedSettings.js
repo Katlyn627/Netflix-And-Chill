@@ -330,8 +330,9 @@
                     </div>
                     
                     <div class="settings-footer">
+                        <p style="color: #b3b3b3; font-size: 0.9em; margin: 0 0 10px 0; text-align: center;">Settings are saved automatically as you make changes</p>
                         <button class="btn-reset-settings">Reset to Defaults</button>
-                        <button class="btn-save-settings">Save Settings</button>
+                        <button class="btn-save-settings">Done</button>
                     </div>
                 </div>
             `;
@@ -539,6 +540,7 @@
                     option.classList.add('active');
                     this.settings.theme = option.dataset.theme;
                     this.applyTheme();
+                    this.saveSettings(this.settings);
                 });
             });
 
@@ -547,6 +549,7 @@
                 input.addEventListener('change', () => {
                     this.settings.contrastMode = input.value;
                     this.applyContrastMode();
+                    this.saveSettings(this.settings);
                 });
             });
 
@@ -555,6 +558,7 @@
                 input.addEventListener('change', () => {
                     this.settings.motionLevel = input.value;
                     this.applyMotionLevel();
+                    this.saveSettings(this.settings);
                 });
             });
 
@@ -567,6 +571,7 @@
                         if (this.currentPage === page) {
                             this.applyBackground();
                         }
+                        this.saveSettings(this.settings);
                     });
                 }
             });
@@ -587,6 +592,7 @@
                         this.settings[name] = checkbox.checked;
                     }
                     this.applyAllSettings();
+                    this.saveSettings(this.settings);
                 });
             });
 
@@ -596,6 +602,7 @@
                 toneSelect.addEventListener('change', () => {
                     this.settings.emotionalTone = toneSelect.value;
                     this.applyEmotionalTone();
+                    this.saveSettings(this.settings);
                 });
             }
 
@@ -605,6 +612,7 @@
                 spacingSelect.addEventListener('change', () => {
                     this.settings.fontBackgroundSpacing = spacingSelect.value;
                     this.applyAccessibilitySettings();
+                    this.saveSettings(this.settings);
                 });
             }
 
@@ -619,10 +627,9 @@
                 }
             });
 
-            // Save button
+            // Save button (now just closes, as settings save in real-time)
             panel.querySelector('.btn-save-settings').addEventListener('click', () => {
-                this.saveSettings(this.settings);
-                this.showNotification('Settings saved successfully!');
+                this.showNotification('All settings have been saved!');
                 this.closePanel();
             });
         }
