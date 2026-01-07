@@ -36,26 +36,18 @@ header {
     justify-content: center;
     gap: 10px;
     background: #E50914;
-    padding: 8px 20px;
+    padding: 15px 30px;
     border-radius: 8px;
     margin-bottom: 10px;
     box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5);
     flex-wrap: wrap;
 }
 
-.logo-banner h1 {
-    font-size: 1.8em;
-    margin: 0;
-    font-weight: 900;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
 .logo-banner img {
-    width: 50px;
-    height: 50px;
-    max-width: 50px;
-    max-height: 50px;
+    width: 80px;
+    height: 80px;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
@@ -642,19 +634,15 @@ footer {
     }
     
     .logo-banner {
-        padding: 6px 15px;
+        padding: 10px 20px;
         gap: 8px;
     }
     
     .logo-banner img {
-        width: 40px;
-        height: 40px;
-        max-width: 40px;
-        max-height: 40px;
-    }
-    
-    .logo-banner h1 {
-        font-size: 1.5em;
+        width: 60px;
+        height: 60px;
+        max-width: 100%;
+        max-height: 100%;
     }
     
     #quiz-questions-container {
@@ -964,20 +952,15 @@ header {
     }
     
     .logo-banner {
-        padding: 5px 12px;
+        padding: 8px 15px;
         gap: 6px;
     }
     
     .logo-banner img {
-        width: 35px;
-        height: 35px;
-        max-width: 35px;
-        max-height: 35px;
-    }
-    
-    .logo-banner h1 {
-        font-size: 1.2em;
-        letter-spacing: 1px;
+        width: 50px;
+        height: 50px;
+        max-width: 100%;
+        max-height: 100%;
     }
     
     /* Profile details responsive */
