@@ -177,22 +177,22 @@ class SharedFilters {
         const premiumGenreSelect = document.getElementById(`${formPrefix}premium-genre-filter`);
         if (premiumGenreSelect) {
             const selectedOptions = Array.from(premiumGenreSelect.selectedOptions);
-            filters.premiumGenres = selectedOptions.map(option => parseInt(option.value));
+            filters.premiumGenres = selectedOptions.map(option => parseInt(option.value, 10));
         }
         
         const premiumBingeMin = document.getElementById(`${formPrefix}premium-binge-min`);
         const premiumBingeMax = document.getElementById(`${formPrefix}premium-binge-max`);
-        if (premiumBingeMin) filters.premiumBingeMin = parseInt(premiumBingeMin.value) || 0;
-        if (premiumBingeMax) filters.premiumBingeMax = parseInt(premiumBingeMax.value) || 20;
+        if (premiumBingeMin) filters.premiumBingeMin = parseInt(premiumBingeMin.value, 10) || 0;
+        if (premiumBingeMax) filters.premiumBingeMax = parseInt(premiumBingeMax.value, 10) || 20;
         
         const premiumServiceCheckboxes = document.querySelectorAll(`input[name="${formPrefix}premiumServiceFilter"]:checked`);
         filters.premiumServices = Array.from(premiumServiceCheckboxes).map(cb => cb.value);
         
         const premiumDecadeCheckboxes = document.querySelectorAll(`input[name="${formPrefix}premiumDecadeFilter"]:checked`);
-        filters.premiumDecades = Array.from(premiumDecadeCheckboxes).map(cb => parseInt(cb.value));
+        filters.premiumDecades = Array.from(premiumDecadeCheckboxes).map(cb => parseInt(cb.value, 10));
         
         const premiumAdvancedScore = document.getElementById(`${formPrefix}premium-advanced-score`);
-        if (premiumAdvancedScore) filters.premiumMinScore = parseInt(premiumAdvancedScore.value) || 0;
+        if (premiumAdvancedScore) filters.premiumMinScore = parseInt(premiumAdvancedScore.value, 10) || 0;
         
         // Sorting option
         const sortBySelect = document.getElementById(`${formPrefix}sort-by-filter`);
@@ -251,7 +251,7 @@ class SharedFilters {
         const premiumGenreSelect = document.getElementById(`${formPrefix}premium-genre-filter`);
         if (premiumGenreSelect && filters.premiumGenres) {
             Array.from(premiumGenreSelect.options).forEach(option => {
-                option.selected = filters.premiumGenres.includes(parseInt(option.value));
+                option.selected = filters.premiumGenres.includes(parseInt(option.value, 10));
             });
         }
         
@@ -265,7 +265,7 @@ class SharedFilters {
         });
         
         document.querySelectorAll(`input[name="${formPrefix}premiumDecadeFilter"]`).forEach(cb => {
-            cb.checked = filters.premiumDecades && filters.premiumDecades.includes(parseInt(cb.value));
+            cb.checked = filters.premiumDecades && filters.premiumDecades.includes(parseInt(cb.value, 10));
         });
         
         const premiumAdvancedScore = document.getElementById(`${formPrefix}premium-advanced-score`);

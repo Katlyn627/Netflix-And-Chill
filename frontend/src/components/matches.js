@@ -15,7 +15,14 @@ let currentFilters = window.SharedFilters ? window.SharedFilters.loadFilters() :
     locationRadius: 100,
     genderPreference: [],
     sexualOrientationPreference: [],
-    archetypePreference: []
+    archetypePreference: [],
+    premiumGenres: [],
+    premiumBingeMin: 0,
+    premiumBingeMax: 20,
+    premiumServices: [],
+    premiumDecades: [],
+    premiumMinScore: 0,
+    sortBy: 'score'
 };
 
 // Helper function to escape HTML to prevent XSS
