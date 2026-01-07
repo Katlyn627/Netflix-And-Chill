@@ -619,10 +619,6 @@ footer {
     .profile-action-btn {
         width: 100%;
     }
-
-    .profile-action-btn + .profile-action-btn {
-        margin-left: 0;
-    }
     
     /* Navigation adjustments */
     .nav-icons {
@@ -1049,10 +1045,6 @@ header {
 
 .profile-action-btn {
     margin-top: 0;
-}
-
-.profile-action-btn + .profile-action-btn {
-    margin-left: 0;
 }
 
 .personality-bio {
