@@ -584,10 +584,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-    header {
-        padding-top: 10px;
-    }
-    
     header h1 {
         font-size: 2em;
     }
@@ -743,7 +739,7 @@ footer {
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
     border-top: 2px solid rgba(229, 9, 20, 0.3);
     z-index: 1000;
-    height: var(--bottom-nav-height);
+    min-height: var(--bottom-nav-height);
 }
 
 .nav-left,
