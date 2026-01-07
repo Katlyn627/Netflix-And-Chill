@@ -77,7 +77,7 @@ function displayMatches(matches) {
             // Add click listeners to indicators
             document.querySelectorAll('.indicator').forEach(indicator => {
                 indicator.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.dataset.index);
+                    const index = parseInt(e.target.dataset.index, 10);
                     goToMatch(index);
                 });
             });

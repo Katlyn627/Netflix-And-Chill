@@ -144,10 +144,10 @@ class SharedFilters {
         const ageMaxInput = document.getElementById(`${formPrefix}age-range-max-filter`);
         const distanceInput = document.getElementById(`${formPrefix}distance-filter`);
         
-        if (matchScoreInput) filters.minMatchScore = parseInt(matchScoreInput.value);
-        if (ageMinInput) filters.minAge = parseInt(ageMinInput.value);
-        if (ageMaxInput) filters.maxAge = parseInt(ageMaxInput.value);
-        if (distanceInput) filters.locationRadius = parseInt(distanceInput.value);
+        if (matchScoreInput) filters.minMatchScore = parseInt(matchScoreInput.value, 10);
+        if (ageMinInput) filters.minAge = parseInt(ageMinInput.value, 10);
+        if (ageMaxInput) filters.maxAge = parseInt(ageMaxInput.value, 10);
+        if (distanceInput) filters.locationRadius = parseInt(distanceInput.value, 10);
         
         // Get gender preferences
         const genderCheckboxes = document.querySelectorAll(`input[name="${formPrefix}genderFilter"]:checked`);
