@@ -1389,3 +1389,69 @@ body.font-size-xlarge {
         width: 100%;
     }
 }
+
+/* Premium Profile Styles */
+.premium-status-container {
+    margin: 15px 0;
+}
+
+.premium-status {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9em;
+    background: #6c757d;
+    color: white;
+}
+
+.badge-premium {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.premium-features ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.premium-features li {
+    padding: 5px 0;
+    color: #28a745;
+    font-weight: 500;
+}
+
+.premium-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.premium-info h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.premium-info ul {
+    margin-left: 20px;
+    color: #555;
+}
+
+.premium-info li {
+    margin-bottom: 8px;
+}

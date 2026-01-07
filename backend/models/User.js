@@ -56,6 +56,10 @@ class User {
     this.lastQuizCompletedAt = data.lastQuizCompletedAt || null; // Timestamp of last quiz completion
     // Profile frame customization based on archetype
     this.profileFrame = data.profileFrame || null; // Selected profile frame theme {archetypeType, isActive, selectedAt}
+    // Premium profile features
+    this.isPremium = data.isPremium || false; // Premium profile status
+    this.premiumSince = data.premiumSince || null; // When premium was activated
+    this.premiumFeatures = data.premiumFeatures || []; // Array of enabled premium features
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
@@ -327,6 +331,9 @@ class User {
       archetype: this.archetype,
       lastQuizCompletedAt: this.lastQuizCompletedAt,
       profileFrame: this.profileFrame,
+      isPremium: this.isPremium,
+      premiumSince: this.premiumSince,
+      premiumFeatures: this.premiumFeatures,
       createdAt: this.createdAt
     };
   }
@@ -340,6 +347,31 @@ class User {
   updatePassword(newPassword) {
     // In production, this should hash the password
     this.password = newPassword;
+  }
+
+  // Premium profile methods
+  setPremiumStatus(isPremium) {
+    this.isPremium = isPremium;
+    if (isPremium && !this.premiumSince) {
+      this.premiumSince = new Date().toISOString();
+    } else if (!isPremium) {
+      this.premiumSince = null;
+      this.premiumFeatures = [];
+    }
+  }
+
+  addPremiumFeature(feature) {
+    if (this.isPremium && !this.premiumFeatures.includes(feature)) {
+      this.premiumFeatures.push(feature);
+    }
+  }
+
+  removePremiumFeature(feature) {
+    this.premiumFeatures = this.premiumFeatures.filter(f => f !== feature);
+  }
+
+  hasPremiumFeature(feature) {
+    return this.isPremium && this.premiumFeatures.includes(feature);
   }
 }
 
