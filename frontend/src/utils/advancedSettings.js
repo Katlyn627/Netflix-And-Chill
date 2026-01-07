@@ -8,7 +8,7 @@
     'use strict';
 
     const SETTINGS_KEY = 'netflixAndChillAppearanceSettings';
-    const API_BASE_URL = window.API_BASE_URL || 'http://localhost:5001/api';
+    const API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
 
     // Default settings matching User model structure
     const defaultSettings = {
@@ -165,7 +165,11 @@
                     body: JSON.stringify({ appearancePreferences: this.settings })
                 });
             } catch (e) {
-                console.error('Error syncing settings with backend:', e);
+                // Silently fail - settings are saved locally and will sync when backend is available
+                // Only log in debug mode
+                if (window.debugMode) {
+                    console.log('Backend sync unavailable, settings saved locally:', e.message);
+                }
             }
         }
 
@@ -183,7 +187,11 @@
                     }
                 }
             } catch (e) {
-                console.error('Error loading settings from backend:', e);
+                // Silently fail - use local settings as fallback
+                // Only log in debug mode
+                if (window.debugMode) {
+                    console.log('Backend unavailable, using local settings:', e.message);
+                }
             }
         }
 
