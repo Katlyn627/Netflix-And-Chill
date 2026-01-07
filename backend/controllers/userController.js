@@ -1242,7 +1242,7 @@ class UserController {
       const { appearancePreferences } = req.body;
 
       const dataStore = await getDatabase();
-      const userData = await dataStore.getUser(userId);
+      const userData = await dataStore.findUserById(userId);
 
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
@@ -1272,7 +1272,7 @@ class UserController {
       const { userId } = req.params;
 
       const dataStore = await getDatabase();
-      const userData = await dataStore.getUser(userId);
+      const userData = await dataStore.findUserById(userId);
 
       if (!userData) {
         return res.status(404).json({ error: 'User not found' });
