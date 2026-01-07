@@ -43,14 +43,6 @@ header {
     flex-wrap: wrap;
 }
 
-.logo-banner h1 {
-    font-size: 1.8em;
-    margin: 0;
-    font-weight: 900;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
 .logo-banner img {
     width: 80px;
     height: 80px;
@@ -653,10 +645,6 @@ footer {
         max-height: 100%;
     }
     
-    .logo-banner h1 {
-        font-size: 1.5em;
-    }
-    
     #quiz-questions-container {
         max-height: 500px;
         padding: 15px;
@@ -973,11 +961,6 @@ header {
         height: 50px;
         max-width: 100%;
         max-height: 100%;
-    }
-    
-    .logo-banner h1 {
-        font-size: 1.2em;
-        letter-spacing: 1px;
     }
     
     /* Profile details responsive */
