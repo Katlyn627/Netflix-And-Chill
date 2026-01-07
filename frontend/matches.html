@@ -26,6 +26,7 @@
                     <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
                         <span id="profile-nav-icon">👤</span>
                     </a>
+                    <button type="button" class="nav-icon-btn settings" id="open-settings-btn" title="Settings" aria-label="Open Settings">⚙️</button>
                     <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
                 </div>
             </div>
@@ -252,5 +253,16 @@
     <script src="src/utils/navigation.js"></script>
     <script src="src/utils/sharedFilters.js"></script>
     <script src="src/components/matches.js"></script>
+    <script>
+        // Initialize settings button
+        document.addEventListener('DOMContentLoaded', () => {
+            const settingsBtn = document.getElementById('open-settings-btn');
+            if (settingsBtn && window.AdvancedSettingsManager) {
+                settingsBtn.addEventListener('click', () => {
+                    window.AdvancedSettingsManager.openPanel();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
