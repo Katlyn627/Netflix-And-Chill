@@ -96,6 +96,23 @@ class User {
       staticBackgroundFallback: false,
       lazyLoadTextures: true
     };
+    // Ensure nested objects are properly initialized
+    if (!this.appearancePreferences.backgrounds) {
+      this.appearancePreferences.backgrounds = {
+        home: 'film-grain',
+        profile: 'spotlight-fade',
+        chat: 'dark-blur',
+        watchTogether: 'theater-dim'
+      };
+    }
+    if (!this.appearancePreferences.dynamicResponses) {
+      this.appearancePreferences.dynamicResponses = {
+        matchWarmth: true,
+        messagePulse: true,
+        typingDim: true,
+        sessionSpotlight: true
+      };
+    }
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
