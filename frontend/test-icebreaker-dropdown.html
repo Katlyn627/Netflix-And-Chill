@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Icebreaker Dropdown - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/chat.css">
+    <style>
+        body {
+            background: #0a0a0a;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+        }
+        h1 {
+            color: #E50914;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+        }
+        .demo-section h2 {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .demo-section p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        .test-input-container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .test-input-container form {
+            display: flex;
+            gap: 10px;
+        }
+        .test-input-container input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 1em;
+        }
+        .test-input-container input:focus {
+            outline: none;
+            border-color: #E50914;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎬 Icebreaker Dropdown Test</h1>
+        
+        <div class="demo-section">
+            <h2>New Dropdown UI</h2>
+            <p>Click the button below to show the icebreaker dropdown menu. Select an option and click "Use Icebreaker" to insert it into the message box.</p>
+            
+            <button class="icebreaker-toggle-btn" onclick="toggleIcebreakers()">
+                💡 Icebreakers
+            </button>
+            
+            <div class="icebreaker-dropdown-container" id="icebreaker-dropdown-container" style="display: none;">
+                <select id="icebreaker-select" class="icebreaker-dropdown">
+                    <option value="">💬 Select a conversation starter...</option>
+                    <option value="What's your favorite movie or show right now?">🎬 What's your favorite movie or show right now?</option>
+                    <option value="What streaming service do you use the most?">📺 What streaming service do you use the most?</option>
+                    <option value="Binge-watching marathon or one episode per night?">🍿 Binge-watching marathon or one episode per night?</option>
+                    <option value="Want to have a watch party together?">🎉 Want to have a watch party together?</option>
+                    <option value="What genre are you in the mood for today?">🎭 What genre are you in the mood for today?</option>
+                    <option value="Favorite comfort food while watching?">🍕 Favorite comfort food while watching?</option>
+                    <option value="Most overrated show everyone loves?">🤔 Most overrated show everyone loves?</option>
+                    <option value="Documentary or fiction? Why?">📚 Documentary or fiction? Why?</option>
+                </select>
+                <button class="use-icebreaker-btn" id="use-icebreaker-btn" disabled>Use Icebreaker</button>
+                <button class="create-own-btn">✨ Create Your Own</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Message Input</h2>
+            <p>The selected icebreaker will appear in the input box below:</p>
+            
+            <div class="test-input-container">
+                <form id="test-form" onsubmit="return false;">
+                    <input 
+                        type="text" 
+                        id="message-input" 
+                        placeholder="Type a message or use an icebreaker..." 
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Benefits of Dropdown UI</h2>
+            <ul style="color: #aaa; line-height: 1.8;">
+                <li>✅ More compact - takes up less vertical space</li>
+                <li>✅ Better fits within the chat interface</li>
+                <li>✅ Cleaner, more professional look</li>
+                <li>✅ Easy to scan all options at once</li>
+                <li>✅ Familiar UI pattern for users</li>
+                <li>✅ Works great on mobile devices</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Custom Icebreaker Modal -->
+    <div class="custom-icebreaker-modal" id="custom-icebreaker-modal" style="display: none;">
+        <div class="custom-icebreaker-content">
+            <div class="custom-icebreaker-header">
+                <h3>✨ Create Your Own Icebreaker</h3>
+                <button class="close-custom-modal" id="close-custom-modal">&times;</button>
+            </div>
+            <div class="custom-icebreaker-body">
+                <p>Create a question that both of you will answer!</p>
+                <textarea 
+                    id="custom-icebreaker-input" 
+                    placeholder="Type your icebreaker question here..." 
+                    maxlength="200"
+                ></textarea>
+                <div class="char-counter">
+                    <span id="char-count">0</span>/200
+                </div>
+            </div>
+            <div class="custom-icebreaker-footer">
+                <button class="btn btn-secondary" id="cancel-custom-icebreaker">Cancel</button>
+                <button class="btn btn-primary" id="send-custom-icebreaker">Use This Icebreaker</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div class="icebreaker-notification" id="icebreaker-notification" style="display: none;">
+        ✅ Icebreaker selected!
+    </div>
+
+    <script>
+        // Icebreaker toggle
+        function toggleIcebreakers() {
+            const container = document.getElementById('icebreaker-dropdown-container');
+            if (container) {
+                const isHidden = container.style.display === 'none';
+                container.style.display = isHidden ? 'flex' : 'none';
+            }
+        }
+
+        function hideIcebreakers() {
+            const container = document.getElementById('icebreaker-dropdown-container');
+            if (container) {
+                container.style.display = 'none';
+            }
+        }
+
+        // Dropdown functionality
+        const dropdown = document.getElementById('icebreaker-select');
+        const useButton = document.getElementById('use-icebreaker-btn');
+        const messageInput = document.getElementById('message-input');
+        const createOwnBtn = document.querySelector('.create-own-btn');
+        const modal = document.getElementById('custom-icebreaker-modal');
+
+        // Enable/disable use button based on selection
+        if (dropdown && useButton) {
+            dropdown.addEventListener('change', () => {
+                useButton.disabled = !dropdown.value;
+            });
+
+            useButton.addEventListener('click', () => {
+                const selectedValue = dropdown.value;
+                if (selectedValue && messageInput) {
+                    messageInput.value = selectedValue;
+                    messageInput.focus();
+                    hideIcebreakers();
+                    dropdown.value = '';
+                    useButton.disabled = true;
+                    
+                    // Show notification
+                    const notification = document.getElementById('icebreaker-notification');
+                    if (notification) {
+                        notification.style.display = 'block';
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                        }, 2000);
+                    }
+                }
+            });
+        }
+
+        // Custom icebreaker modal
+        if (createOwnBtn) {
+            createOwnBtn.addEventListener('click', () => {
+                if (modal) {
+                    modal.style.display = 'flex';
+                    const textarea = document.getElementById('custom-icebreaker-input');
+                    const charCount = document.getElementById('char-count');
+                    if (textarea) {
+                        textarea.value = '';
+                        textarea.focus();
+                    }
+                    if (charCount) {
+                        charCount.textContent = '0';
+                    }
+                }
+            });
+        }
+
+        // Close modal
+        const closeModal = () => {
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        document.getElementById('close-custom-modal')?.addEventListener('click', closeModal);
+        document.getElementById('cancel-custom-icebreaker')?.addEventListener('click', closeModal);
+
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Character counter
+        const textarea = document.getElementById('custom-icebreaker-input');
+        const charCount = document.getElementById('char-count');
+        if (textarea && charCount) {
+            textarea.addEventListener('input', () => {
+                const length = textarea.value.length;
+                charCount.textContent = length;
+                
+                if (length >= 180) {
+                    charCount.style.color = '#E50914';
+                } else if (length >= 150) {
+                    charCount.style.color = '#FFA500';
+                } else {
+                    charCount.style.color = '#888';
+                }
+            });
+        }
+
+        // Send custom icebreaker
+        document.getElementById('send-custom-icebreaker')?.addEventListener('click', () => {
+            const question = textarea.value.trim();
+            
+            if (!question) {
+                alert('Please enter a question for your icebreaker!');
+                return;
+            }
+
+            if (question.length < 10) {
+                alert('Please enter a longer question (at least 10 characters).');
+                return;
+            }
+
+            const formattedMessage = `🎯 ICEBREAKER CHALLENGE 🎯\n\n${question}\n\n💭 Both of us must answer this!`;
+            
+            if (messageInput) {
+                messageInput.value = formattedMessage;
+                messageInput.focus();
+            }
+            
+            closeModal();
+            hideIcebreakers();
+            
+            const notification = document.getElementById('icebreaker-notification');
+            if (notification) {
+                notification.innerHTML = '✅ Custom icebreaker created!';
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                    notification.innerHTML = '✅ Icebreaker selected!';
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

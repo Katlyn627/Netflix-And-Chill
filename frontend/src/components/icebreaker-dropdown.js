@@ -64,7 +64,11 @@ class IcebreakerDropdown {
         if (messageInput) {
             messageInput.value = text;
             messageInput.focus();
-            hideIcebreakers();
+            
+            // Use safe function call
+            if (typeof window.hideIcebreakers === 'function') {
+                window.hideIcebreakers();
+            }
             
             // Reset dropdown
             if (this.dropdown) {
@@ -167,8 +171,8 @@ class IcebreakerDropdown {
                     closeModal();
                     this.showSuccessNotification();
                     
-                    // Hide icebreaker panel
-                    if (window.hideIcebreakers) {
+                    // Hide icebreaker panel - safe function call
+                    if (typeof window.hideIcebreakers === 'function') {
                         window.hideIcebreakers();
                     }
                 } else {
