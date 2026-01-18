@@ -78,17 +78,67 @@
         loadInvitations();
         loadQuickTemplates(); // NEW: Load quick templates
         setupEventListeners();
-        setMinDate();
+        populateDateTimeDropdown();
         checkForConflictingExtensions();
         
         // Handle URL parameters for direct links
         handleURLParameters();
     });
 
-    function setMinDate() {
-        const dateInput = document.getElementById('watch-date');
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today;
+    function populateDateTimeDropdown() {
+        const dropdown = document.getElementById('watch-datetime');
+        if (!dropdown) return;
+
+        // Clear existing options except the first one
+        dropdown.innerHTML = '<option value="">Select date and time...</option>';
+
+        const now = new Date();
+        const options = [];
+
+        // Generate options for the next 14 days
+        for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
+            const date = new Date(now);
+            date.setDate(date.getDate() + dayOffset);
+            
+            // Skip past times for today
+            const startHour = (dayOffset === 0) ? Math.max(now.getHours() + 1, 0) : 8;
+            
+            // Generate time slots for each day (8 AM to 11 PM in 1-hour increments)
+            for (let hour = startHour; hour <= 23; hour++) {
+                const dateTimeValue = new Date(date);
+                dateTimeValue.setHours(hour, 0, 0, 0);
+                
+                // Skip if this time has already passed
+                if (dateTimeValue < now) continue;
+                
+                const dateStr = dateTimeValue.toISOString().split('T')[0];
+                const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+                const value = `${dateStr}T${timeStr}`;
+                
+                // Format display text
+                const dayName = dayOffset === 0 ? 'Today' : 
+                               dayOffset === 1 ? 'Tomorrow' : 
+                               dateTimeValue.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                const timeDisplay = dateTimeValue.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+                
+                const optionText = `📅 ${dayName} at ${timeDisplay}`;
+                
+                options.push({ value, text: optionText });
+            }
+        }
+
+        // Add all options to dropdown
+        options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.text;
+            dropdown.appendChild(option);
+        });
     }
 
     function handleURLParameters() {
@@ -378,14 +428,16 @@
         const matchId = document.getElementById('invite-match').value;
         const platform = document.getElementById('watch-platform').value;
         const movieSelection = document.getElementById('movie-selection').value;
-        const date = document.getElementById('watch-date').value;
-        const time = document.getElementById('watch-time').value;
+        const dateTimeValue = document.getElementById('watch-datetime').value;
         const joinLink = document.getElementById('join-link').value;
 
-        if (!matchId || !platform || !date || !time) {
+        if (!matchId || !platform || !dateTimeValue) {
             alert('Please fill in all required fields');
             return;
         }
+
+        // Parse the combined datetime value
+        const [date, time] = dateTimeValue.split('T');
 
         const movie = movieSelection ? JSON.parse(movieSelection) : null;
 
