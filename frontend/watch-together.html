@@ -92,10 +92,36 @@
 
                     <div class="form-group">
                         <label for="watch-datetime">Date & Time:</label>
-                        <div class="datetime-dropdown-container">
-                            <select id="watch-datetime" required class="datetime-dropdown">
-                                <option value="">Select date and time...</option>
-                            </select>
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <button type="button" class="calendar-nav-btn" id="prev-month" aria-label="Previous month">‹</button>
+                                <div class="calendar-title">
+                                    <span id="calendar-month-year"></span>
+                                </div>
+                                <button type="button" class="calendar-nav-btn" id="next-month" aria-label="Next month">›</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div>Sun</div>
+                                <div>Mon</div>
+                                <div>Tue</div>
+                                <div>Wed</div>
+                                <div>Thu</div>
+                                <div>Fri</div>
+                                <div>Sat</div>
+                            </div>
+                            <div class="calendar-days" id="calendar-days">
+                                <!-- Days will be generated dynamically -->
+                            </div>
+                            <div class="calendar-time-picker" id="calendar-time-picker" style="display: none;">
+                                <label>Select Time:</label>
+                                <div class="time-slots" id="time-slots">
+                                    <!-- Time slots will be generated dynamically -->
+                                </div>
+                            </div>
+                            <input type="hidden" id="watch-datetime" required>
+                            <div class="calendar-selected-display" id="calendar-selected-display">
+                                <span class="placeholder-text">Select a date and time...</span>
+                            </div>
                         </div>
                         <p class="input-hint">Choose when you want to watch together</p>
                     </div>
