@@ -94,17 +94,22 @@
 
         const now = new Date();
         const options = [];
+        
+        // Configuration constants
+        const DAYS_TO_GENERATE = 14;
+        const START_HOUR = 8;  // 8 AM
+        const END_HOUR = 23;   // 11 PM
 
         // Generate options for the next 14 days
-        for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
+        for (let dayOffset = 0; dayOffset < DAYS_TO_GENERATE; dayOffset++) {
             const date = new Date(now);
             date.setDate(date.getDate() + dayOffset);
             
             // Skip past times for today
-            const startHour = (dayOffset === 0) ? Math.max(now.getHours() + 1, 8) : 8;
+            const startHour = (dayOffset === 0) ? Math.max(now.getHours() + 1, START_HOUR) : START_HOUR;
             
             // Generate time slots for each day (8 AM to 11 PM in 1-hour increments)
-            for (let hour = startHour; hour <= 23; hour++) {
+            for (let hour = startHour; hour <= END_HOUR; hour++) {
                 const dateTimeValue = new Date(date);
                 dateTimeValue.setHours(hour, 0, 0, 0);
                 
