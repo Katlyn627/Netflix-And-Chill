@@ -30,14 +30,20 @@ class DiscoverPage {
             // Fetch matches
             const matchesResponse = await fetch(`http://localhost:3000/api/matches/find/${this.userId}`);
             if (matchesResponse.ok) {
-                this.allMatches = await matchesResponse.json();
+                const matchesData = await matchesResponse.json();
+                // Handle both array and object responses
+                this.allMatches = Array.isArray(matchesData) ? matchesData : (matchesData.matches || []);
+            } else {
+                this.allMatches = [];
             }
 
             // Fetch liked users
             const likesResponse = await fetch(`http://localhost:3000/api/likes/${this.userId}`);
             if (likesResponse.ok) {
                 const likesData = await likesResponse.json();
-                this.likedUsers = new Set(likesData.map(like => like.toUserId));
+                // Handle both array and object responses
+                const likesArray = Array.isArray(likesData) ? likesData : (likesData.likes || []);
+                this.likedUsers = new Set(likesArray.map(like => like.toUserId));
             }
         } catch (error) {
             console.error('Error loading discover data:', error);
@@ -47,6 +53,12 @@ class DiscoverPage {
     }
 
     renderCategories() {
+        // Ensure allMatches is an array
+        if (!Array.isArray(this.allMatches)) {
+            console.warn('allMatches is not an array:', this.allMatches);
+            this.allMatches = [];
+        }
+
         // Sort matches by score
         const sortedMatches = [...this.allMatches].sort((a, b) => b.score - a.score);
 

@@ -9,8 +9,18 @@
     <meta name="theme-color" content="#E50914">
     <script>
         // Pass through any query parameters (e.g., ?reset=true)
+        // Redirect to swipe page (center tab - main interface) instead of splash
         const params = window.location.search;
-        window.location.href = 'splash.html' + params;
+        
+        // Check if user is logged in
+        const userId = localStorage.getItem('currentUserId');
+        if (userId) {
+            // Logged in - go to swipe page (main interface)
+            window.location.href = 'swipe.html' + params;
+        } else {
+            // Not logged in - go to splash/onboarding
+            window.location.href = 'splash.html' + params;
+        }
     </script>
 </head>
 <body>
