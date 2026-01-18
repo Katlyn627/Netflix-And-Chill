@@ -256,11 +256,16 @@ class CustomSocialConnectionService {
   generateFetchUserProfileScript(provider) {
     const mapping = provider.profileMapping;
     
-    // Helper function to generate field access code
+    // Helper function to generate field access code with validation
     const getFieldAccess = (path) => {
+      // Validate field path to prevent injection
+      if (!/^[a-zA-Z0-9._]+$/.test(path)) {
+        throw new Error(`Invalid field path: ${path}. Only alphanumeric characters, dots, and underscores are allowed.`);
+      }
+      
       return path.includes('.') 
         ? `body.${path}`
-        : `body['${path}']`;
+        : `body['${path.replace(/'/g, "\\'")}']`;
     };
     
     return `function(accessToken, context, callback) {
