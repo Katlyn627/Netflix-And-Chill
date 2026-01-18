@@ -563,6 +563,11 @@ class ChatComponent {
                 }
             }
             
+            // Update global notification manager if available
+            if (window.notificationManager) {
+                await window.notificationManager.fetchAndUpdate();
+            }
+            
             console.log('[Chat] Marked messages as read from:', senderId);
         } catch (error) {
             console.error('[Chat] Error marking messages as read:', error);

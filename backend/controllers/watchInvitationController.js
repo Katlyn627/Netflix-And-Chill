@@ -218,10 +218,88 @@ async function deleteInvitation(req, res) {
   }
 }
 
+// Get unread invitation counts for a user
+async function getUnreadInvitationCounts(req, res) {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const invitationsFile = path.join(__dirname, '../../data/watchInvitations.json');
+    let invitations = [];
+    
+    try {
+      const data = await fs.readFile(invitationsFile, 'utf8');
+      invitations = JSON.parse(data);
+    } catch (error) {
+      invitations = [];
+    }
+    
+    // Count unread invitations where user is the receiver
+    const unreadCount = invitations.filter(inv => 
+      inv.toUserId === userId && !inv.read && inv.status === 'pending'
+    ).length;
+
+    res.json({
+      success: true,
+      userId,
+      unreadCount
+    });
+  } catch (error) {
+    console.error('Error getting unread invitation counts:', error);
+    res.status(500).json({ error: 'Failed to get unread counts' });
+  }
+}
+
+// Mark invitation as read
+async function markInvitationAsRead(req, res) {
+  try {
+    const { invitationId } = req.params;
+
+    if (!invitationId) {
+      return res.status(400).json({ error: 'Invitation ID is required' });
+    }
+
+    const invitationsFile = path.join(__dirname, '../../data/watchInvitations.json');
+    let invitations = [];
+    
+    try {
+      const data = await fs.readFile(invitationsFile, 'utf8');
+      invitations = JSON.parse(data);
+    } catch (error) {
+      invitations = [];
+    }
+    
+    const invitationIndex = invitations.findIndex(inv => inv.id === invitationId);
+
+    if (invitationIndex === -1) {
+      return res.status(404).json({ error: 'Invitation not found' });
+    }
+
+    // Mark as read
+    invitations[invitationIndex].read = true;
+    invitations[invitationIndex].updatedAt = new Date().toISOString();
+
+    await fs.writeFile(invitationsFile, JSON.stringify(invitations, null, 2));
+
+    res.json({
+      success: true,
+      invitation: invitations[invitationIndex]
+    });
+  } catch (error) {
+    console.error('Error marking invitation as read:', error);
+    res.status(500).json({ error: 'Failed to mark invitation as read' });
+  }
+}
+
 module.exports = {
   createWatchInvitation,
   getUserInvitations,
   getInvitation,
   updateInvitationStatus,
-  deleteInvitation
+  deleteInvitation,
+  getUnreadInvitationCounts,
+  markInvitationAsRead
 };

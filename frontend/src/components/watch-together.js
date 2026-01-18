@@ -453,6 +453,21 @@
             }
         }
 
+        // Mark invitation as read if current user is the receiver
+        if (selectedInvitation.toUserId === currentUserId && !selectedInvitation.read) {
+            try {
+                await API.markInvitationAsRead(selectedInvitation.id);
+                selectedInvitation.read = true;
+                
+                // Update global notification manager if available
+                if (window.notificationManager) {
+                    await window.notificationManager.fetchAndUpdate();
+                }
+            } catch (error) {
+                console.error('Error marking invitation as read:', error);
+            }
+        }
+
         // Get other user info
         const otherUserId = selectedInvitation.fromUserId === currentUserId ? 
             selectedInvitation.toUserId : selectedInvitation.fromUserId;

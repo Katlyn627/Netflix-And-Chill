@@ -392,6 +392,19 @@ class NetflixAndChillAPI {
         }
         return await response.json();
     }
+
+    async markInvitationAsRead(invitationId) {
+        const response = await fetch(`${API_BASE_URL}/watch-invitations/${invitationId}/read`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to mark invitation as read');
+        }
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();

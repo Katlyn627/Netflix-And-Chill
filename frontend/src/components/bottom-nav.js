@@ -10,6 +10,8 @@ class BottomNavigation {
         this.isPremium = false;
         this.likedYouCount = 0;
         this.unreadMessagesCount = 0;
+        this.unreadInvitationsCount = 0;
+        this.notificationPollInterval = null;
         this.init();
     }
 
@@ -28,9 +30,11 @@ class BottomNavigation {
         // Fetch user data to check premium status
         if (this.userId) {
             await this.fetchUserData();
+            await this.fetchNotificationCounts();
         }
         this.render();
         this.attachEventListeners();
+        this.startNotificationPolling();
     }
 
     async fetchUserData() {
@@ -49,6 +53,58 @@ class BottomNavigation {
             }
         } catch (error) {
             console.error('Error fetching user data:', error);
+        }
+    }
+
+    async fetchNotificationCounts() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/chat/notifications/${this.userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                this.unreadMessagesCount = data.totalUnreadMessages || 0;
+                this.unreadInvitationsCount = data.unreadInvitations || 0;
+            }
+        } catch (error) {
+            console.error('Error fetching notification counts:', error);
+        }
+    }
+
+    startNotificationPolling() {
+        // Poll for notifications every 5 seconds
+        this.notificationPollInterval = setInterval(async () => {
+            await this.fetchNotificationCounts();
+            this.updateNotificationBadges();
+        }, 5000);
+    }
+
+    stopNotificationPolling() {
+        if (this.notificationPollInterval) {
+            clearInterval(this.notificationPollInterval);
+            this.notificationPollInterval = null;
+        }
+    }
+
+    updateNotificationBadges() {
+        // Update chat badge
+        const chatBadge = document.querySelector('.bottom-nav-item[data-page="chats"] .bottom-nav-badge');
+        if (chatBadge) {
+            if (this.unreadMessagesCount > 0) {
+                chatBadge.textContent = this.unreadMessagesCount;
+                chatBadge.style.display = '';
+            } else {
+                chatBadge.style.display = 'none';
+            }
+        }
+
+        // Update watch together badge
+        const watchBadge = document.querySelector('.bottom-nav-item[data-page="watch-together"] .bottom-nav-badge');
+        if (watchBadge) {
+            if (this.unreadInvitationsCount > 0) {
+                watchBadge.textContent = this.unreadInvitationsCount;
+                watchBadge.style.display = '';
+            } else {
+                watchBadge.style.display = 'none';
+            }
         }
     }
 
@@ -91,6 +147,7 @@ class BottomNavigation {
                 <a href="watch-together.html" class="bottom-nav-item ${this.currentPage === 'watch-together' ? 'active' : ''}" data-page="watch-together">
                     <div class="bottom-nav-icon">📺</div>
                     <div class="bottom-nav-label">Watch</div>
+                    ${this.unreadInvitationsCount > 0 ? `<span class="bottom-nav-badge">${this.unreadInvitationsCount}</span>` : ''}
                 </a>
             </nav>
         `;
