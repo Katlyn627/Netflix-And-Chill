@@ -1,4 +1,5 @@
 const API_BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'http://localhost:3000';
 
 class NetflixAndChillAPI {
     async createUser(userData) {
@@ -421,7 +422,7 @@ class NetflixAndChillAPI {
 
     // Generic HTTP methods
     async get(endpoint) {
-        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL.replace('/api', '')}${endpoint}`;
+        const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -430,7 +431,7 @@ class NetflixAndChillAPI {
     }
 
     async post(endpoint, data) {
-        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL.replace('/api', '')}${endpoint}`;
+        const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: {

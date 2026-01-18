@@ -96,7 +96,10 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     if (error) {
       console.error('OAuth error:', error, error_description);
       const userId = req.query.userId || stateStore.get(state)?.userId;
-      const redirectUrl = userId ? `/streaming-services.html?userId=${userId}` : '/profile';
+      // Validate userId format before using in redirect
+      const isValidUserId = userId && /^user_[0-9]+_[a-z0-9]+$/.test(userId);
+      const safeUserId = isValidUserId ? encodeURIComponent(userId) : '';
+      const redirectUrl = safeUserId ? `/streaming-services.html?userId=${safeUserId}` : '/profile';
       return res.redirect(`${redirectUrl}?error=${encodeURIComponent(error_description || error)}`);
     }
 
@@ -123,22 +126,49 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Store OAuth token
     user.setStreamingOAuthToken(provider, tokenData);
 
-    // Add service to user's streaming services list
-    const providerNames = {
-      netflix: 'Netflix',
-      hulu: 'Hulu',
-      disney: 'Disney+',
-      prime: 'Amazon Prime Video',
-      hbo: 'HBO Max',
-      appletv: 'Apple TV+'
+    // Add service to user's streaming services list with proper mapping
+    const providerMapping = {
+      netflix: { 
+        name: 'Netflix', 
+        id: 8,
+        logoPath: '/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg'
+      },
+      hulu: { 
+        name: 'Hulu', 
+        id: 15,
+        logoPath: '/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg'
+      },
+      disney: { 
+        name: 'Disney+', 
+        id: 337,
+        logoPath: '/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg'
+      },
+      prime: { 
+        name: 'Amazon Prime Video', 
+        id: 9,
+        logoPath: '/emthp39XA2YScoYL1p0sdbAH2WA.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg'
+      },
+      hbo: { 
+        name: 'HBO Max', 
+        id: 384,
+        logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg'
+      },
+      appletv: { 
+        name: 'Apple TV+', 
+        id: 350,
+        logoPath: '/6uhKBfmtzFqOcLousHwZuzcrScK.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/6uhKBfmtzFqOcLousHwZuzcrScK.jpg'
+      }
     };
     
-    const serviceName = providerNames[provider];
-    if (serviceName) {
-      user.addStreamingService({
-        name: serviceName,
-        logoUrl: null // Could be fetched from a mapping
-      });
+    const serviceInfo = providerMapping[provider];
+    if (serviceInfo) {
+      user.addStreamingService(serviceInfo);
     }
 
     // Try to sync watch history
@@ -164,11 +194,14 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     await database.updateUser(userId, user);
 
     // Redirect to success page - update to redirect to streaming-services page
-    res.redirect(`/streaming-services.html?userId=${userId}&connected=${provider}&success=true`);
+    res.redirect(`/streaming-services.html?userId=${encodeURIComponent(userId)}&connected=${encodeURIComponent(provider)}&success=true`);
   } catch (error) {
     console.error('Error in OAuth callback:', error);
     const userId = req.query.userId || stateStore.get(state)?.userId;
-    const redirectUrl = userId ? `/streaming-services.html?userId=${userId}` : '/profile';
+    // Validate userId format before using in redirect
+    const isValidUserId = userId && /^user_[0-9]+_[a-z0-9]+$/.test(userId);
+    const safeUserId = isValidUserId ? encodeURIComponent(userId) : '';
+    const redirectUrl = safeUserId ? `/streaming-services.html?userId=${safeUserId}` : '/profile';
     res.redirect(`${redirectUrl}?error=${encodeURIComponent('Failed to connect streaming platform')}`);
   }
 });

@@ -382,18 +382,25 @@
             const card = document.createElement('div');
             card.className = `service-card ${isConnected ? 'connected' : ''}`;
             
+            // Escape HTML to prevent XSS
+            const escapedName = document.createTextNode(provider.name).textContent;
+            const escapedId = document.createTextNode(provider.id).textContent;
+            
             card.innerHTML = `
                 ${isConnected ? '<div class="checkmark">✓</div>' : ''}
-                <div style="font-size: 40px; margin-bottom: 10px;">${provider.icon}</div>
-                <div class="service-name">${provider.name}</div>
+                <div style="font-size: 40px; margin-bottom: 10px;">${document.createTextNode(provider.icon).textContent}</div>
+                <div class="service-name">${escapedName}</div>
                 <div class="service-status ${isConnected ? 'status-connected' : 'status-oauth'}">
                     ${isConnected ? 'Connected' : 'OAuth Available'}
                 </div>
-                <button class="connect-button ${isConnected ? 'disconnect' : ''}" 
-                        onclick="handleOAuthAction('${provider.id}', ${isConnected})">
-                    ${isConnected ? 'Disconnect' : 'Connect'}
-                </button>
             `;
+
+            // Use addEventListener instead of inline onclick for security
+            const button = document.createElement('button');
+            button.className = `connect-button ${isConnected ? 'disconnect' : ''}`;
+            button.textContent = isConnected ? 'Disconnect' : 'Connect';
+            button.addEventListener('click', () => handleOAuthAction(escapedId, isConnected));
+            card.appendChild(button);
 
             return card;
         }
@@ -409,16 +416,37 @@
             const card = document.createElement('div');
             card.className = `service-card ${isSelected ? 'selected' : ''} ${isConnected ? 'connected' : ''}`;
             
-            card.innerHTML = `
-                ${isSelected ? '<div class="checkmark">✓</div>' : ''}
-                ${provider.logoUrl ? `<img src="${provider.logoUrl}" alt="${provider.name}" class="service-logo">` : ''}
-                <div class="service-name">${provider.name}</div>
-                <div class="service-status ${isSelected ? 'status-connected' : 'status-available'}">
-                    ${isSelected ? 'Selected' : 'Click to select'}
-                </div>
-            `;
+            // Sanitize and validate logoUrl
+            const logoUrl = provider.logoUrl && provider.logoUrl.startsWith('https://') ? provider.logoUrl : '';
+            const escapedName = document.createTextNode(provider.name).textContent;
+            
+            if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = escapedName;
+                img.className = 'service-logo';
+                img.onerror = function() { this.style.display = 'none'; }; // Hide if image fails to load
+                card.appendChild(img);
+            }
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'service-name';
+            nameDiv.textContent = escapedName;
+            card.appendChild(nameDiv);
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `service-status ${isSelected ? 'status-connected' : 'status-available'}`;
+            statusDiv.textContent = isSelected ? 'Selected' : 'Click to select';
+            card.appendChild(statusDiv);
 
-            card.onclick = () => toggleService(provider, card);
+            if (isSelected) {
+                const checkmark = document.createElement('div');
+                checkmark.className = 'checkmark';
+                checkmark.textContent = '✓';
+                card.insertBefore(checkmark, card.firstChild);
+            }
+
+            card.addEventListener('click', () => toggleService(provider, card));
 
             return card;
         }
@@ -453,11 +481,17 @@
 
         // Handle OAuth action
         async function handleOAuthAction(providerId, isConnected) {
+            // Validate providerId format (alphanumeric and basic punctuation only)
+            if (!/^[a-z0-9_-]+$/i.test(providerId)) {
+                showMessage('Invalid provider ID', 'error');
+                return;
+            }
+            
             if (isConnected) {
                 // Disconnect
                 if (confirm('Are you sure you want to disconnect this service?')) {
                     try {
-                        await api.post(`/api/auth/${providerId}/disconnect`, {
+                        await api.post(`/api/auth/${encodeURIComponent(providerId)}/disconnect`, {
                             userId: currentUserId
                         });
                         showMessage('Service disconnected successfully');
@@ -468,8 +502,10 @@
                     }
                 }
             } else {
-                // Connect via OAuth
-                window.location.href = `/api/auth/${providerId}/connect?userId=${currentUserId}`;
+                // Connect via OAuth - validate and encode URL parameters
+                const encodedProvider = encodeURIComponent(providerId);
+                const encodedUserId = encodeURIComponent(currentUserId);
+                window.location.href = `/api/auth/${encodedProvider}/connect?userId=${encodedUserId}`;
             }
         }
 
