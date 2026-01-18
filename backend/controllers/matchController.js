@@ -140,7 +140,9 @@ class MatchController {
               movieDebateResponses: matchedUser.movieDebateResponses,
               moviePromptResponses: matchedUser.moviePromptResponses,
               archetype: matchedUser.archetype,
-              personalityBio: matchedUser.personalityBio
+              personalityBio: matchedUser.personalityBio,
+              preferences: matchedUser.preferences,
+              swipedMovies: matchedUser.swipedMovies
             }
           };
         })
@@ -205,7 +207,9 @@ class MatchController {
               movieDebateResponses: matchedUser.movieDebateResponses,
               moviePromptResponses: matchedUser.moviePromptResponses,
               archetype: matchedUser.archetype,
-              personalityBio: matchedUser.personalityBio
+              personalityBio: matchedUser.personalityBio,
+              preferences: matchedUser.preferences,
+              swipedMovies: matchedUser.swipedMovies
             }
           };
         })
