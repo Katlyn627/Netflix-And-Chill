@@ -31,7 +31,7 @@ async function initAuth0() {
             domain: domain,
             clientId: clientId,
             authorizationParams: {
-                redirect_uri: window.location.origin + '/callback.html',
+                redirect_uri: window.AUTH0_CALLBACK_URL || (window.location.origin + '/callback.html'),
                 audience: audience,
                 scope: 'openid profile email read:current_user update:current_user_metadata'
             },
@@ -58,7 +58,7 @@ async function login() {
         
         await auth0Client.loginWithRedirect({
             authorizationParams: {
-                redirect_uri: window.location.origin + '/callback.html'
+                redirect_uri: window.AUTH0_CALLBACK_URL || (window.location.origin + '/callback.html')
             }
         });
     } catch (error) {
@@ -83,7 +83,7 @@ async function logout() {
         // Logout from Auth0
         await auth0Client.logout({
             logoutParams: {
-                returnTo: window.location.origin + '/login.html'
+                returnTo: window.AUTH0_LOGOUT_URL || (window.location.origin + '/login.html')
             }
         });
     } catch (error) {

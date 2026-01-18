@@ -16,7 +16,9 @@ router.get('/auth0', (req, res) => {
     const auth0Config = {
       domain: config.auth0.domain || 'YOUR_AUTH0_DOMAIN.auth0.com',
       clientId: config.auth0.clientId || 'YOUR_AUTH0_CLIENT_ID',
-      audience: config.auth0.audience || 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/'
+      audience: config.auth0.audience || 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/',
+      callbackUrl: config.auth0.callbackUrl,
+      logoutUrl: config.auth0.logoutUrl
     };
 
     res.json(auth0Config);

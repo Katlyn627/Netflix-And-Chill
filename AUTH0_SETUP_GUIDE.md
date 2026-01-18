@@ -81,11 +81,23 @@ AUTH0_DOMAIN=your-tenant.auth0.com
 AUTH0_CLIENT_ID=your_auth0_client_id_here
 AUTH0_CLIENT_SECRET=your_auth0_client_secret_here
 AUTH0_CALLBACK_URL=http://localhost:3000/callback.html
+AUTH0_LOGOUT_URL=http://localhost:3000/login.html
 AUTH0_AUDIENCE=https://your-tenant.auth0.com/api/v2/
+
+# BASE_URL should match your application's URL
+# For development: http://localhost:3000
+# For production: https://your-production-domain.com
+BASE_URL=http://localhost:3000
 
 # JWT Secret for Token Generation
 JWT_SECRET=generate_a_strong_random_secret_here
 ```
+
+**Important Notes:**
+- The `AUTH0_CALLBACK_URL` must exactly match one of the URLs configured in Auth0 Dashboard
+- The `AUTH0_LOGOUT_URL` must exactly match one of the logout URLs configured in Auth0 Dashboard
+- If `BASE_URL` is set, it will be used as the base for callback and logout URLs
+- For production, update `BASE_URL` to your production domain (e.g., `https://your-app.com`)
 
 ### Step 2: Generate JWT Secret
 
@@ -369,9 +381,35 @@ fetch('/api/users/me', {
 
 ## Troubleshooting
 
+### Issue: "Callback URL mismatch" or "The provided redirect_uri is not in the list of allowed callback URLs"
+
+**Cause**: The callback URL sent by your application doesn't match any URL in Auth0's allowed list.
+
+**Solution**: 
+1. **Check your environment variables**: Ensure `AUTH0_CALLBACK_URL` and `BASE_URL` in your `.env` file match your actual application URL
+   - For local development: `AUTH0_CALLBACK_URL=http://localhost:3000/callback.html`
+   - For production: `AUTH0_CALLBACK_URL=https://your-domain.com/callback.html`
+
+2. **Update Auth0 Dashboard**: Go to your Auth0 application settings and add the callback URL to the "Allowed Callback URLs" list:
+   - Navigate to [Auth0 Dashboard](https://manage.auth0.com/)
+   - Go to Applications > Your Application
+   - Find "Application URIs" section
+   - Add your callback URL to "Allowed Callback URLs" (e.g., `http://localhost:3000/callback.html, https://your-domain.com/callback.html`)
+   - Click "Save Changes"
+
+3. **Verify consistency**: The URL in your `.env` file must exactly match one of the URLs in Auth0's "Allowed Callback URLs" list
+   - Protocol must match (http vs https)
+   - Domain must match exactly (including port numbers)
+   - Path must match exactly (/callback.html)
+
+4. **For production deployments**: Make sure to:
+   - Set `BASE_URL` environment variable to your production domain
+   - Update `AUTH0_CALLBACK_URL` and `AUTH0_LOGOUT_URL` to use production URLs
+   - Add production URLs to Auth0's allowed lists
+
 ### Issue: "Invalid Callback URL"
 
-**Solution**: Make sure callback URLs are added to Auth0 application settings
+**Solution**: Make sure callback URLs are added to Auth0 application settings (see above)
 
 ### Issue: "Token Validation Failed"
 

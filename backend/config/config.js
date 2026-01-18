@@ -74,7 +74,8 @@ module.exports = {
     clientId: process.env.AUTH0_CLIENT_ID || null,
     clientSecret: process.env.AUTH0_CLIENT_SECRET || null,
     audience: process.env.AUTH0_AUDIENCE || null,
-    callbackUrl: process.env.AUTH0_CALLBACK_URL || `${process.env.BASE_URL || 'http://localhost:3000'}/callback.html`
+    callbackUrl: process.env.AUTH0_CALLBACK_URL || `${process.env.BASE_URL || 'http://localhost:3000'}/callback.html`,
+    logoutUrl: process.env.AUTH0_LOGOUT_URL || `${process.env.BASE_URL || 'http://localhost:3000'}/login.html`
   },
 
   // Streaming Platform OAuth Configuration
