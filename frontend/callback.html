@@ -66,6 +66,18 @@
         // Handle Auth0 callback
         async function handleAuthCallback() {
             try {
+                // Wait for Auth0 config to load
+                if (window.auth0ConfigReady) {
+                    await window.auth0ConfigReady;
+                }
+                
+                // Check if Auth0 is configured
+                if (!window.AUTH0_CONFIGURED) {
+                    console.warn('Auth0 not configured. Redirecting to login.');
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
                 // Handle the redirect callback
                 const result = await Auth0Manager.handleCallback();
                 
