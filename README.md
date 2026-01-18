@@ -345,12 +345,19 @@ Netflix and Chill integrates with various external APIs and services to provide 
 
 **⚠️ Note:** Most streaming platforms have highly restricted API access. See [API_KEYS_GUIDE.md](docs/guides/API_KEYS_GUIDE.md#streaming-platform-oauth-integration) for details on alternatives.
 
+**🔧 Custom Social Connections:** For providers not in Auth0's marketplace, use Auth0's extensibility points. See [AUTH0_CUSTOM_SOCIAL_CONNECTIONS.md](AUTH0_CUSTOM_SOCIAL_CONNECTIONS.md) for implementation guide.
+
 ### Authentication (Choose One)
 
 | Service | Purpose | Required | Cost | Get API Key |
 |---------|---------|----------|------|-------------|
 | **Firebase Auth** | User authentication, social login | 🟡 Optional | FREE | [Get Key](https://console.firebase.google.com/) |
 | **Auth0** | Secure authentication platform | 🟡 Optional | FREE tier | [Get Key](https://auth0.com/) |
+
+**Auth0 Resources:**
+- [AUTH0_SETUP_GUIDE.md](AUTH0_SETUP_GUIDE.md) - Basic Auth0 setup
+- [AUTH0_CUSTOM_SOCIAL_CONNECTIONS.md](AUTH0_CUSTOM_SOCIAL_CONNECTIONS.md) - Custom OAuth2 providers guide
+- [AUTH0_CUSTOM_SOCIAL_CONNECTIONS_QUICK_REFERENCE.md](AUTH0_CUSTOM_SOCIAL_CONNECTIONS_QUICK_REFERENCE.md) - Quick reference
 
 ### Chat & Messaging (Choose One)
 
