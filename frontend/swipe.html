@@ -15,6 +15,9 @@
     <div class="container">
         <header class="swipe-header-bumble">
             <div class="header-top">
+                <button class="icon-btn" id="history-btn" title="Swipe History">
+                    <span class="icon">📊</span>
+                </button>
                 <h1>🎬 Swipe</h1>
                 <button class="icon-btn" id="settings-btn" title="Settings">
                     <span class="icon">⚙️</span>
@@ -111,6 +114,14 @@
             if (settingsBtn) {
                 settingsBtn.addEventListener('click', () => {
                     window.location.href = 'profile-view.html';
+                });
+            }
+
+            // History button
+            const historyBtn = document.getElementById('history-btn');
+            if (historyBtn) {
+                historyBtn.addEventListener('click', () => {
+                    window.location.href = 'swipe-history.html';
                 });
             }
         });
