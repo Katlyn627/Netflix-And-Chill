@@ -58,7 +58,8 @@ class BottomNavigation {
 
     async fetchNotificationCounts() {
         try {
-            const response = await fetch(`http://localhost:3000/api/chat/notifications/${this.userId}`);
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/chat/notifications/${this.userId}`);
             if (response.ok) {
                 const data = await response.json();
                 this.unreadMessagesCount = data.totalUnreadMessages || 0;
@@ -70,11 +71,32 @@ class BottomNavigation {
     }
 
     startNotificationPolling() {
+        // Don't start polling if there's already a global notification manager
+        if (window.notificationManager) {
+            // Use the global notification manager's data instead
+            this.syncWithGlobalManager();
+            return;
+        }
+        
         // Poll for notifications every 5 seconds
         this.notificationPollInterval = setInterval(async () => {
             await this.fetchNotificationCounts();
             this.updateNotificationBadges();
         }, 5000);
+    }
+
+    syncWithGlobalManager() {
+        // Subscribe to the global notification manager updates
+        const syncInterval = setInterval(() => {
+            if (window.notificationManager) {
+                this.unreadMessagesCount = window.notificationManager.unreadMessagesCount || 0;
+                this.unreadInvitationsCount = window.notificationManager.unreadInvitationsCount || 0;
+                this.updateNotificationBadges();
+            }
+        }, 1000); // Sync every second
+        
+        // Store for cleanup
+        this.notificationPollInterval = syncInterval;
     }
 
     stopNotificationPolling() {
@@ -196,6 +218,11 @@ class BottomNavigation {
         this.unreadMessagesCount = unreadMessagesCount || 0;
         this.render();
     }
+
+    destroy() {
+        // Clean up polling interval
+        this.stopNotificationPolling();
+    }
 }
 
 // Initialize bottom navigation on page load
@@ -204,5 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const userId = localStorage.getItem('currentUserId');
     if (userId) {
         window.bottomNav = new BottomNavigation();
+    }
+});
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+    if (window.bottomNav) {
+        window.bottomNav.destroy();
     }
 });
