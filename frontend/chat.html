@@ -58,20 +58,43 @@
                             <span>💬 Conversation Starters</span>
                             <button class="icebreaker-close" onclick="hideIcebreakers()">×</button>
                         </div>
-                        <div class="icebreaker-list">
-                            <button class="icebreaker-btn" data-prompt="What's your favorite movie or show right now?">
-                                🎬 What's your favorite movie or show right now?
-                            </button>
-                            <button class="icebreaker-btn" data-prompt="What streaming service do you use the most?">
-                                📺 What streaming service do you use the most?
-                            </button>
-                            <button class="icebreaker-btn" data-prompt="Binge-watching marathon or one episode per night?">
-                                🍿 Binge-watching marathon or one episode per night?
-                            </button>
-                            <button class="icebreaker-btn" data-prompt="Want to have a watch party together?">
-                                🎉 Want to have a watch party together?
-                            </button>
+                        <!-- Carousel with navigation -->
+                        <div class="icebreaker-carousel">
+                            <button class="carousel-nav prev">‹</button>
+                            <div class="icebreaker-list-wrapper">
+                                <div class="icebreaker-list">
+                                    <button class="icebreaker-btn" data-prompt="What's your favorite movie or show right now?">
+                                        🎬 What's your favorite movie or show right now?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="What streaming service do you use the most?">
+                                        📺 What streaming service do you use the most?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="Binge-watching marathon or one episode per night?">
+                                        🍿 Binge-watching marathon or one episode per night?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="Want to have a watch party together?">
+                                        🎉 Want to have a watch party together?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="What genre are you in the mood for today?">
+                                        🎭 What genre are you in the mood for today?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="Favorite comfort food while watching?">
+                                        🍕 Favorite comfort food while watching?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="Most overrated show everyone loves?">
+                                        🤔 Most overrated show everyone loves?
+                                    </button>
+                                    <button class="icebreaker-btn" data-prompt="Documentary or fiction? Why?">
+                                        📚 Documentary or fiction? Why?
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="carousel-nav next">›</button>
                         </div>
+                        <!-- Indicators -->
+                        <div class="carousel-indicators"></div>
+                        <!-- Create Your Own button -->
+                        <button class="create-own-btn">✨ Create Your Own Icebreaker</button>
                     </div>
 
                     <div class="chat-input-container" id="chat-input-container" style="display: none;">
@@ -159,6 +182,36 @@
         </footer>
     </div>
 
+    <!-- Custom Icebreaker Modal -->
+    <div class="custom-icebreaker-modal" id="custom-icebreaker-modal" style="display: none;">
+        <div class="custom-icebreaker-content">
+            <div class="custom-icebreaker-header">
+                <h3>✨ Create Your Own Icebreaker</h3>
+                <button class="close-custom-modal" id="close-custom-modal">&times;</button>
+            </div>
+            <div class="custom-icebreaker-body">
+                <p>Create a question that both of you will answer!</p>
+                <textarea 
+                    id="custom-icebreaker-input" 
+                    placeholder="Type your icebreaker question here..." 
+                    maxlength="200"
+                ></textarea>
+                <div class="char-counter">
+                    <span id="char-count">0</span>/200
+                </div>
+            </div>
+            <div class="custom-icebreaker-footer">
+                <button class="btn btn-secondary" id="cancel-custom-icebreaker">Cancel</button>
+                <button class="btn btn-primary" id="send-custom-icebreaker">Send Challenge</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div class="icebreaker-notification" id="icebreaker-notification" style="display: none;">
+        ✅ Icebreaker challenge sent!
+    </div>
+
     <script src="src/utils/errorHandler.js"></script>
     <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
@@ -167,5 +220,6 @@
     <script src="src/services/streamChatClient.js"></script>
     <script src="src/components/bottom-nav.js"></script>
     <script src="src/components/chat.js"></script>
+    <script src="src/components/icebreaker-carousel.js"></script>
 </body>
 </html>

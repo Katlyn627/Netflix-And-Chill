@@ -363,5 +363,285 @@
     .icebreaker-btn {
         font-size: 0.85em;
         padding: 10px 12px;
+        min-width: 100%;
+        flex-shrink: 0;
+    }
+
+    .icebreaker-list {
+        gap: 0;
+    }
+
+    .carousel-nav {
+        display: none;
+    }
+
+    .carousel-indicators {
+        display: none;
+    }
+
+    .custom-icebreaker-content {
+        width: 95%;
+        margin: 10px;
+    }
+}
+
+/* Carousel Styles */
+.icebreaker-carousel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.icebreaker-list-wrapper {
+    overflow: hidden;
+    flex: 1;
+}
+
+.icebreaker-list {
+    display: flex;
+    gap: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.icebreaker-btn {
+    min-width: 33.333%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.carousel-nav {
+    background: rgba(229, 9, 20, 0.2);
+    border: 2px solid rgba(229, 9, 20, 0.4);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.carousel-nav:hover:not(:disabled) {
+    background: rgba(229, 9, 20, 0.4);
+    border-color: rgba(229, 9, 20, 0.6);
+    transform: scale(1.1);
+}
+
+.carousel-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Carousel Indicators */
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(229, 9, 20, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0;
+}
+
+.indicator:hover {
+    background: rgba(229, 9, 20, 0.5);
+}
+
+.indicator.active {
+    width: 24px;
+    border-radius: 4px;
+    background: rgba(229, 9, 20, 0.8);
+}
+
+/* Create Your Own Button */
+.create-own-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #6B46C1 0%, #9333EA 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: white;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 12px;
+}
+
+.create-own-btn:hover {
+    background: linear-gradient(135deg, #9333EA 0%, #6B46C1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+}
+
+/* Custom Icebreaker Modal */
+.custom-icebreaker-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.custom-icebreaker-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+}
+
+.custom-icebreaker-header {
+    background: linear-gradient(135deg, #6B46C1 0%, #9333EA 100%);
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-icebreaker-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.2em;
+}
+
+.close-custom-modal {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.close-custom-modal:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.custom-icebreaker-body {
+    padding: 20px;
+}
+
+.custom-icebreaker-body p {
+    color: #aaa;
+    margin: 0 0 15px 0;
+}
+
+#custom-icebreaker-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 2px solid #444;
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: white;
+    font-size: 1em;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+#custom-icebreaker-input:focus {
+    outline: none;
+    border-color: #9333EA;
+}
+
+.char-counter {
+    text-align: right;
+    color: #888;
+    font-size: 0.9em;
+    margin-top: 8px;
+}
+
+.custom-icebreaker-footer {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Success Notification */
+.icebreaker-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    z-index: 1001;
+    font-weight: 600;
+    animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100px);
     }
 }
