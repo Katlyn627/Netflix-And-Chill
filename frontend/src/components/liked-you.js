@@ -82,7 +82,8 @@ class LikedYouPage {
         
         // Also update bottom nav if available
         if (window.bottomNav) {
-            await window.bottomNav.fetchUserData();
+            await window.bottomNav.fetchNotificationCounts();
+            window.bottomNav.updateNotificationBadges();
         }
     }
 
