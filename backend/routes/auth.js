@@ -95,7 +95,12 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Check for OAuth errors
     if (error) {
       console.error('OAuth error:', error, error_description);
-      return res.redirect(`/profile?error=${encodeURIComponent(error_description || error)}`);
+      const userId = req.query.userId || stateStore.get(state)?.userId;
+      // Validate userId format before using in redirect
+      const isValidUserId = userId && /^user_[0-9]+_[a-z0-9]+$/.test(userId);
+      const safeUserId = isValidUserId ? encodeURIComponent(userId) : '';
+      const redirectUrl = safeUserId ? `/streaming-services.html?userId=${safeUserId}` : '/profile';
+      return res.redirect(`${redirectUrl}?error=${encodeURIComponent(error_description || error)}`);
     }
 
     // Verify state token
@@ -121,6 +126,51 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Store OAuth token
     user.setStreamingOAuthToken(provider, tokenData);
 
+    // Add service to user's streaming services list with proper mapping
+    const providerMapping = {
+      netflix: { 
+        name: 'Netflix', 
+        id: 8,
+        logoPath: '/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg'
+      },
+      hulu: { 
+        name: 'Hulu', 
+        id: 15,
+        logoPath: '/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/zxrVdFjIjLqkfnwyghnfywTn3Lh.jpg'
+      },
+      disney: { 
+        name: 'Disney+', 
+        id: 337,
+        logoPath: '/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg'
+      },
+      prime: { 
+        name: 'Amazon Prime Video', 
+        id: 9,
+        logoPath: '/emthp39XA2YScoYL1p0sdbAH2WA.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg'
+      },
+      hbo: { 
+        name: 'HBO Max', 
+        id: 384,
+        logoPath: '/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/aS2zvJWn9mwiCOeaaCkIh4wleZS.jpg'
+      },
+      appletv: { 
+        name: 'Apple TV+', 
+        id: 350,
+        logoPath: '/6uhKBfmtzFqOcLousHwZuzcrScK.jpg',
+        logoUrl: 'https://image.tmdb.org/t/p/original/6uhKBfmtzFqOcLousHwZuzcrScK.jpg'
+      }
+    };
+    
+    const serviceInfo = providerMapping[provider];
+    if (serviceInfo) {
+      user.addStreamingService(serviceInfo);
+    }
+
     // Try to sync watch history
     try {
       const watchHistory = await streamingOAuthService.getWatchHistory(
@@ -143,11 +193,16 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Save user
     await database.updateUser(userId, user);
 
-    // Redirect to success page
-    res.redirect(`/profile?connected=${provider}&success=true`);
+    // Redirect to success page - update to redirect to streaming-services page
+    res.redirect(`/streaming-services.html?userId=${encodeURIComponent(userId)}&connected=${encodeURIComponent(provider)}&success=true`);
   } catch (error) {
     console.error('Error in OAuth callback:', error);
-    res.redirect(`/profile?error=${encodeURIComponent('Failed to connect streaming platform')}`);
+    const userId = req.query.userId || stateStore.get(state)?.userId;
+    // Validate userId format before using in redirect
+    const isValidUserId = userId && /^user_[0-9]+_[a-z0-9]+$/.test(userId);
+    const safeUserId = isValidUserId ? encodeURIComponent(userId) : '';
+    const redirectUrl = safeUserId ? `/streaming-services.html?userId=${safeUserId}` : '/profile';
+    res.redirect(`${redirectUrl}?error=${encodeURIComponent('Failed to connect streaming platform')}`);
   }
 });
 
@@ -294,6 +349,59 @@ router.get('/:provider/status', rateLimiters.api, async (req, res) => {
   } catch (error) {
     console.error('Error checking provider status:', error);
     res.status(500).json({ error: 'Failed to check provider status' });
+  }
+});
+
+/**
+ * GET /api/auth/providers/status
+ * Get connection status for all providers for a specific user
+ */
+router.get('/providers/status', rateLimiters.api, async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+
+    // Get user
+    const user = await database.getUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const enabledProviders = streamingOAuthService.getEnabledProviders();
+    const providerInfo = {
+      netflix: { name: 'Netflix', icon: '🎬', color: '#E50914' },
+      hulu: { name: 'Hulu', icon: '🎭', color: '#1CE783' },
+      disney: { name: 'Disney+', icon: '🏰', color: '#113CCF' },
+      prime: { name: 'Amazon Prime Video', icon: '📦', color: '#00A8E1' },
+      hbo: { name: 'HBO Max', icon: '👑', color: '#B300F0' },
+      appletv: { name: 'Apple TV+', icon: '🍎', color: '#000000' }
+    };
+
+    const statuses = enabledProviders.map(provider => {
+      const connected = user.isStreamingProviderConnected(provider);
+      const token = user.getStreamingOAuthToken(provider);
+      
+      return {
+        id: provider,
+        ...providerInfo[provider],
+        connected,
+        connectedAt: token?.connectedAt || null,
+        expiresAt: token?.expiresAt || null,
+        expired: token ? user.isStreamingOAuthTokenExpired(provider) : null
+      };
+    });
+
+    res.json({
+      userId,
+      providers: statuses,
+      count: statuses.length
+    });
+  } catch (error) {
+    console.error('Error getting provider statuses:', error);
+    res.status(500).json({ error: 'Failed to get provider statuses' });
   }
 });
 
