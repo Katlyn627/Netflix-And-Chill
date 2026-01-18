@@ -268,11 +268,16 @@ class ChatController {
         unreadInvitations = 0;
       }
 
+      // Get unread likes count
+      const likes = await dataStore.findLikesToUser(userId);
+      const unreadLikes = likes.filter(like => !like.read).length;
+
       res.json({
         success: true,
         userId,
         totalUnreadMessages,
         unreadInvitations,
+        unreadLikes,
         unreadCounts
       });
     } catch (error) {

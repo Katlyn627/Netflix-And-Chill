@@ -8,6 +8,7 @@ class NotificationManager {
         this.userId = localStorage.getItem('currentUserId');
         this.unreadMessagesCount = 0;
         this.unreadInvitationsCount = 0;
+        this.unreadLikesCount = 0;
         this.pollInterval = null;
         this.apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
     }
@@ -26,9 +27,11 @@ class NotificationManager {
                 const data = await response.json();
                 this.unreadMessagesCount = data.totalUnreadMessages || 0;
                 this.unreadInvitationsCount = data.unreadInvitations || 0;
+                this.unreadLikesCount = data.unreadLikes || 0;
                 return {
                     messages: this.unreadMessagesCount,
-                    invitations: this.unreadInvitationsCount
+                    invitations: this.unreadInvitationsCount,
+                    likes: this.unreadLikesCount
                 };
             } else {
                 console.warn(`[NotificationManager] Failed to fetch notifications: ${response.status}`);
@@ -109,7 +112,7 @@ class NotificationManager {
         
         // Notify any listeners that counts have been updated
         if (this.onUpdate && typeof this.onUpdate === 'function') {
-            this.onUpdate(this.unreadMessagesCount, this.unreadInvitationsCount);
+            this.onUpdate(this.unreadMessagesCount, this.unreadInvitationsCount, this.unreadLikesCount);
         }
     }
 
