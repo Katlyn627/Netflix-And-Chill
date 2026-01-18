@@ -49,13 +49,17 @@ class MatchingEngine {
     score += sharedWatchlistMovies.length * 15; // Medium weight for watchlist overlap
     sharedContent.push(...sharedWatchlistMovies);
 
-    // Bonus for similar binge-watching patterns
-    const bingeDifference = Math.abs(
-      (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
-    );
-    if (bingeDifference <= 2) {
-      score += 15;
-    }
+    // Bonus for similar binge-watching patterns (enhanced with analytics)
+    const bingeCompatibility = this.calculateBingeWatchingCompatibility(user1, user2);
+    score += bingeCompatibility;
+
+    // Genre compatibility based on swipe analytics data
+    const swipeGenreCompatibility = this.calculateSwipeGenreCompatibility(user1, user2);
+    score += swipeGenreCompatibility;
+
+    // Content type preference compatibility (movies vs TV shows) from swipe data
+    const contentTypeCompatibility = this.calculateContentTypeCompatibility(user1, user2);
+    score += contentTypeCompatibility;
 
     // Snack preferences compatibility
     const snackCompatibility = this.calculateSnackCompatibility(user1, user2);
@@ -116,6 +120,9 @@ class MatchingEngine {
       diversityCompatibility,
       rewatchCompatibility,
       spontaneityCompatibility,
+      bingeCompatibility,
+      swipeGenreCompatibility,
+      contentTypeCompatibility,
       user1,
       user2
     });
@@ -131,6 +138,9 @@ class MatchingEngine {
       snackCompatibility: snackCompatibility,
       emotionalToneCompatibility: emotionalToneCompatibility,
       quizCompatibility: quizCompatibility,
+      bingeCompatibility: bingeCompatibility,
+      swipeGenreCompatibility: swipeGenreCompatibility,
+      contentTypeCompatibility: contentTypeCompatibility,
       matchDescription: matchDescription
     };
   }
@@ -532,11 +542,36 @@ class MatchingEngine {
       descriptions.push('share the same emotional vibe');
     }
     
-    // Check for binge-watching patterns
-    const bingeDiff = Math.abs(
-      (user1.preferences.bingeWatchCount || 0) - (user2.preferences.bingeWatchCount || 0)
-    );
-    if (bingeDiff <= 2 && user1.preferences.bingeWatchCount > 0 && user2.preferences.bingeWatchCount > 0) {
+    // Check for swipe-based genre compatibility
+    const swipeGenreCompatibility = matchData.swipeGenreCompatibility || 0;
+    if (swipeGenreCompatibility >= 15) {
+      descriptions.push('have similar taste in movies from your swipes');
+    }
+    
+    // Check for content type compatibility (movies vs TV shows)
+    const contentTypeCompatibility = matchData.contentTypeCompatibility || 0;
+    if (contentTypeCompatibility >= 8) {
+      const swipeAnalytics = require('./swipeAnalytics');
+      try {
+        const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
+        const u2Analytics = swipeAnalytics.analyzeSwipePreferences(user2.swipedMovies || []);
+        
+        const u1MoviePref = u1Analytics.contentTypeBreakdown.moviePercentage || 0;
+        const u1TvPref = u1Analytics.contentTypeBreakdown.tvShowPercentage || 0;
+        
+        if (u1MoviePref > 60 && u2Analytics.contentTypeBreakdown.moviePercentage > 60) {
+          descriptions.push('both prefer movies over TV shows');
+        } else if (u1TvPref > 60 && u2Analytics.contentTypeBreakdown.tvShowPercentage > 60) {
+          descriptions.push('both love binge-watching TV series');
+        }
+      } catch (error) {
+        // Skip if analytics fails
+      }
+    }
+    
+    // Check for binge-watching patterns (using enhanced compatibility)
+    const bingeCompatibility = matchData.bingeCompatibility || 0;
+    if (bingeCompatibility >= 12) {
       descriptions.push('are both binge-watchers');
     }
     
@@ -602,6 +637,9 @@ class MatchingEngine {
               quizCompatibility: matchResult.quizCompatibility,
               snackCompatibility: matchResult.snackCompatibility,
               emotionalToneCompatibility: matchResult.emotionalToneCompatibility,
+              bingeCompatibility: matchResult.bingeCompatibility,
+              swipeGenreCompatibility: matchResult.swipeGenreCompatibility,
+              contentTypeCompatibility: matchResult.contentTypeCompatibility,
               sharedLikedMovies: matchResult.sharedLikedMovies,
               sharedWatchlistMovies: matchResult.sharedWatchlistMovies
             }
@@ -901,6 +939,167 @@ class MatchingEngine {
     
     // Both are planners or both are spontaneous
     return u1Planner === u2Planner ? 6 : 2;
+  }
+
+  /**
+   * Calculate enhanced binge-watching compatibility
+   * Uses both explicit preferences and inferred patterns from swipe data
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score (0-20 points)
+   */
+  static calculateBingeWatchingCompatibility(user1, user2) {
+    const u1Binge = user1.preferences?.bingeWatchCount || 0;
+    const u2Binge = user2.preferences?.bingeWatchCount || 0;
+    
+    // Calculate base compatibility based on binge count difference
+    const difference = Math.abs(u1Binge - u2Binge);
+    let score = 0;
+    
+    if (difference === 0 && u1Binge > 0) {
+      score = 15; // Perfect match in binge-watching habits
+    } else if (difference <= 1) {
+      score = 12; // Very close binge-watching habits
+    } else if (difference <= 2) {
+      score = 10; // Similar binge-watching habits
+    } else if (difference <= 3) {
+      score = 7; // Somewhat similar
+    } else if (difference <= 5) {
+      score = 4; // Moderately different
+    } else {
+      score = 1; // Very different binge-watching habits
+    }
+    
+    // Bonus points if both users show evidence of binge-watching behavior in swipe data
+    // Analyze if they liked TV shows (which are typically binge-watched)
+    const swipeAnalytics = require('./swipeAnalytics');
+    
+    try {
+      const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
+      const u2Analytics = swipeAnalytics.analyzeSwipePreferences(user2.swipedMovies || []);
+      
+      const u1TvPreference = u1Analytics.contentTypeBreakdown.tvShowPercentage || 0;
+      const u2TvPreference = u2Analytics.contentTypeBreakdown.tvShowPercentage || 0;
+      
+      // If both users show preference for TV shows (>40%), add bonus
+      if (u1TvPreference > 40 && u2TvPreference > 40) {
+        score += 5; // Both likely enjoy binge-watching TV series
+      }
+    } catch (error) {
+      // If analytics fails, just use the base score
+      console.debug('Could not analyze swipe data for binge compatibility:', error.message);
+    }
+    
+    return Math.min(20, score); // Cap at 20 points
+  }
+
+  /**
+   * Calculate genre compatibility based on swipe analytics
+   * Uses genre preferences derived from liked movies in swipe data
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score (0-25 points)
+   */
+  static calculateSwipeGenreCompatibility(user1, user2) {
+    const swipeAnalytics = require('./swipeAnalytics');
+    
+    try {
+      // Get swipe analytics for both users
+      const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
+      const u2Analytics = swipeAnalytics.analyzeSwipePreferences(user2.swipedMovies || []);
+      
+      // If either user has no swipe data, return 0
+      if (u1Analytics.totalLikes === 0 || u2Analytics.totalLikes === 0) {
+        return 0;
+      }
+      
+      // Get top genre preferences from swipe data
+      const u1Genres = u1Analytics.genrePreferences; // {Action: 5, Comedy: 3, ...}
+      const u2Genres = u2Analytics.genrePreferences;
+      
+      // Calculate genre overlap similarity
+      const allGenres = new Set([...Object.keys(u1Genres), ...Object.keys(u2Genres)]);
+      
+      if (allGenres.size === 0) {
+        return 0;
+      }
+      
+      // Calculate cosine similarity between genre preference vectors
+      let dotProduct = 0;
+      let u1Magnitude = 0;
+      let u2Magnitude = 0;
+      
+      allGenres.forEach(genre => {
+        const u1Count = u1Genres[genre] || 0;
+        const u2Count = u2Genres[genre] || 0;
+        
+        dotProduct += u1Count * u2Count;
+        u1Magnitude += u1Count * u1Count;
+        u2Magnitude += u2Count * u2Count;
+      });
+      
+      u1Magnitude = Math.sqrt(u1Magnitude);
+      u2Magnitude = Math.sqrt(u2Magnitude);
+      
+      if (u1Magnitude === 0 || u2Magnitude === 0) {
+        return 0;
+      }
+      
+      const cosineSimilarity = dotProduct / (u1Magnitude * u2Magnitude);
+      
+      // Convert similarity (0-1) to score (0-25)
+      const score = Math.round(cosineSimilarity * 25);
+      
+      return score;
+    } catch (error) {
+      console.debug('Could not calculate swipe genre compatibility:', error.message);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate content type preference compatibility (movies vs TV shows)
+   * Based on swipe analytics data
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score (0-10 points)
+   */
+  static calculateContentTypeCompatibility(user1, user2) {
+    const swipeAnalytics = require('./swipeAnalytics');
+    
+    try {
+      // Get swipe analytics for both users
+      const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
+      const u2Analytics = swipeAnalytics.analyzeSwipePreferences(user2.swipedMovies || []);
+      
+      // If either user has no swipe data, return 0
+      if (u1Analytics.totalLikes === 0 || u2Analytics.totalLikes === 0) {
+        return 0;
+      }
+      
+      const u1MoviePref = u1Analytics.contentTypeBreakdown.moviePercentage || 0;
+      const u2MoviePref = u2Analytics.contentTypeBreakdown.moviePercentage || 0;
+      
+      const u1TvPref = u1Analytics.contentTypeBreakdown.tvShowPercentage || 0;
+      const u2TvPref = u2Analytics.contentTypeBreakdown.tvShowPercentage || 0;
+      
+      // Calculate similarity in content type preference
+      // Use absolute difference in percentages
+      const movieDiff = Math.abs(u1MoviePref - u2MoviePref);
+      const tvDiff = Math.abs(u1TvPref - u2TvPref);
+      
+      // Average the differences and convert to similarity score
+      const avgDiff = (movieDiff + tvDiff) / 2;
+      const similarity = 100 - avgDiff; // 0-100 scale
+      
+      // Convert to 0-10 point score
+      const score = Math.round((similarity / 100) * 10);
+      
+      return Math.max(0, score);
+    } catch (error) {
+      console.debug('Could not calculate content type compatibility:', error.message);
+      return 0;
+    }
   }
 }
 

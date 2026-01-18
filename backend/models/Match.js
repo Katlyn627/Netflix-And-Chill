@@ -10,6 +10,9 @@ class Match {
     this.snackCompatibility = compatibilityScores.snackCompatibility || 0;
     this.debateCompatibility = compatibilityScores.debateCompatibility || 0;
     this.emotionalToneCompatibility = compatibilityScores.emotionalToneCompatibility || 0;
+    this.bingeCompatibility = compatibilityScores.bingeCompatibility || 0;
+    this.swipeGenreCompatibility = compatibilityScores.swipeGenreCompatibility || 0;
+    this.contentTypeCompatibility = compatibilityScores.contentTypeCompatibility || 0;
     this.createdAt = new Date().toISOString();
   }
 
@@ -29,6 +32,9 @@ class Match {
       snackCompatibility: this.snackCompatibility,
       debateCompatibility: this.debateCompatibility,
       emotionalToneCompatibility: this.emotionalToneCompatibility,
+      bingeCompatibility: this.bingeCompatibility,
+      swipeGenreCompatibility: this.swipeGenreCompatibility,
+      contentTypeCompatibility: this.contentTypeCompatibility,
       createdAt: this.createdAt
     };
   }
