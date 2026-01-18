@@ -44,7 +44,7 @@
                         <div style="border-top: 1px solid #ddd; position: absolute; top: 50%; left: 0; right: 0; z-index: 0;"></div>
                     </div>
                     
-                    <button id="auth0-login-btn" class="btn btn-secondary btn-large" style="width: 100%; margin-bottom: 10px;">
+                    <button id="auth0-login-btn" class="btn btn-secondary btn-large" style="width: 100%; margin-bottom: 10px; display: none;">
                         🔐 Login with Auth0
                     </button>
                     
@@ -80,17 +80,38 @@
     <script src="src/components/login.js"></script>
     
     <script>
-        // Add Auth0 login handler
-        document.getElementById('auth0-login-btn').addEventListener('click', async () => {
-            try {
-                await Auth0Manager.login();
-            } catch (error) {
-                console.error('Auth0 login error:', error);
-                const errorDiv = document.getElementById('error-message');
-                errorDiv.textContent = 'Failed to login with Auth0. Please try again.';
-                errorDiv.style.display = 'block';
+        // Add Auth0 login handler after config is loaded
+        (async function setupAuth0Login() {
+            // Wait for Auth0 configuration to be loaded
+            if (window.auth0ConfigReady) {
+                await window.auth0ConfigReady;
             }
-        });
+            
+            const auth0Button = document.getElementById('auth0-login-btn');
+            const divider = document.querySelector('.auth-divider');
+            
+            // Only show and enable Auth0 button if it's configured
+            if (window.AUTH0_CONFIGURED) {
+                auth0Button.style.display = 'block';
+                auth0Button.addEventListener('click', async () => {
+                    try {
+                        await Auth0Manager.login();
+                    } catch (error) {
+                        console.error('Auth0 login error:', error);
+                        const errorDiv = document.getElementById('error-message');
+                        errorDiv.textContent = 'Failed to login with Auth0. Please try again or use traditional login.';
+                        errorDiv.style.display = 'block';
+                    }
+                });
+            } else {
+                // Hide Auth0 button and divider if Auth0 is not configured
+                auth0Button.style.display = 'none';
+                if (divider) {
+                    divider.style.display = 'none';
+                }
+                console.info('Auth0 login is not available. Please use traditional login.');
+            }
+        })();
     </script>
 </body>
 </html>
