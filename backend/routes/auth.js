@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const streamingOAuthService = require('../services/streamingOAuthService');
 const database = require('../utils/database');
+const { rateLimiters } = require('../middleware/rateLimiter');
 
 // Store for CSRF state tokens
 // NOTE: In production with multiple server instances, use Redis or database storage
@@ -26,8 +27,9 @@ setInterval(() => {
 /**
  * GET /api/auth/:provider/connect
  * Initiate OAuth flow for streaming platform
+ * Rate limited to 10 requests per 15 minutes per user
  */
-router.get('/:provider/connect', async (req, res) => {
+router.get('/:provider/connect', rateLimiters.auth, async (req, res) => {
   try {
     const { provider } = req.params;
     const { userId } = req.query;
@@ -151,8 +153,9 @@ router.get('/:provider/callback', async (req, res) => {
 /**
  * POST /api/auth/:provider/disconnect
  * Disconnect streaming platform
+ * Rate limited to 10 requests per 15 minutes per user
  */
-router.post('/:provider/disconnect', async (req, res) => {
+router.post('/:provider/disconnect', rateLimiters.auth, async (req, res) => {
   try {
     const { provider } = req.params;
     const { userId } = req.body;
@@ -211,8 +214,9 @@ router.post('/:provider/disconnect', async (req, res) => {
 /**
  * POST /api/auth/:provider/refresh
  * Refresh OAuth access token
+ * Rate limited to 10 requests per 15 minutes per user
  */
-router.post('/:provider/refresh', async (req, res) => {
+router.post('/:provider/refresh', rateLimiters.auth, async (req, res) => {
   try {
     const { provider } = req.params;
     const { userId } = req.body;
@@ -327,8 +331,9 @@ router.get('/providers', (req, res) => {
 /**
  * POST /api/auth/:provider/sync-history
  * Manually sync watch history from streaming platform
+ * Rate limited to 10 requests per 15 minutes per user
  */
-router.post('/:provider/sync-history', async (req, res) => {
+router.post('/:provider/sync-history', rateLimiters.auth, async (req, res) => {
   try {
     const { provider } = req.params;
     const { userId } = req.body;
