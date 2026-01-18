@@ -382,24 +382,35 @@
             const card = document.createElement('div');
             card.className = `service-card ${isConnected ? 'connected' : ''}`;
             
-            // Escape HTML to prevent XSS
-            const escapedName = document.createTextNode(provider.name).textContent;
-            const escapedId = document.createTextNode(provider.id).textContent;
+            // Create all elements securely without innerHTML
+            if (isConnected) {
+                const checkmark = document.createElement('div');
+                checkmark.className = 'checkmark';
+                checkmark.textContent = '✓';
+                card.appendChild(checkmark);
+            }
             
-            card.innerHTML = `
-                ${isConnected ? '<div class="checkmark">✓</div>' : ''}
-                <div style="font-size: 40px; margin-bottom: 10px;">${document.createTextNode(provider.icon).textContent}</div>
-                <div class="service-name">${escapedName}</div>
-                <div class="service-status ${isConnected ? 'status-connected' : 'status-oauth'}">
-                    ${isConnected ? 'Connected' : 'OAuth Available'}
-                </div>
-            `;
+            const iconDiv = document.createElement('div');
+            iconDiv.style.fontSize = '40px';
+            iconDiv.style.marginBottom = '10px';
+            iconDiv.textContent = provider.icon;
+            card.appendChild(iconDiv);
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'service-name';
+            nameDiv.textContent = provider.name;
+            card.appendChild(nameDiv);
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `service-status ${isConnected ? 'status-connected' : 'status-oauth'}`;
+            statusDiv.textContent = isConnected ? 'Connected' : 'OAuth Available';
+            card.appendChild(statusDiv);
 
             // Use addEventListener instead of inline onclick for security
             const button = document.createElement('button');
             button.className = `connect-button ${isConnected ? 'disconnect' : ''}`;
             button.textContent = isConnected ? 'Disconnect' : 'Connect';
-            button.addEventListener('click', () => handleOAuthAction(escapedId, isConnected));
+            button.addEventListener('click', () => handleOAuthAction(provider.id, isConnected));
             card.appendChild(button);
 
             return card;
