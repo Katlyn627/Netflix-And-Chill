@@ -701,6 +701,7 @@ class UserController {
       await this.saveUserData(userId, user);
 
       res.json({
+        success: true,
         message: 'Movie added to favorites successfully',
         favoriteMovies: user.favoriteMovies
       });
@@ -747,6 +748,80 @@ class UserController {
         userId,
         count: userData.favoriteMovies?.length || 0,
         favoriteMovies: userData.favoriteMovies || []
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async addFavoriteTVShow(req, res) {
+    try {
+      const { userId } = req.params;
+      const { tmdbId, title, posterPath, overview, firstAirDate } = req.body;
+
+      if (!tmdbId || !title) {
+        return res.status(400).json({ error: 'TMDB ID and title are required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.addFavoriteTVShow({ tmdbId, title, posterPath, overview, firstAirDate });
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        success: true,
+        message: 'TV show added to favorites successfully',
+        favoriteTVShows: user.favoriteTVShows
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async removeFavoriteTVShow(req, res) {
+    try {
+      const { userId, tvShowId } = req.params;
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      user.removeFavoriteTVShow(tvShowId);
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'TV show removed from favorites successfully',
+        favoriteTVShows: user.favoriteTVShows
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getFavoriteTVShows(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json({
+        userId,
+        count: userData.favoriteTVShows?.length || 0,
+        favoriteTVShows: userData.favoriteTVShows || []
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

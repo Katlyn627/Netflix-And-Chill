@@ -474,7 +474,7 @@ function handleDislikeButton() {
 /**
  * Handle super like button
  */
-function handleSuperLikeButton() {
+async function handleSuperLikeButton() {
   if (superLikesRemaining <= 0) {
     alert('No Super Likes remaining today! Come back tomorrow for more.');
     return;
@@ -497,9 +497,12 @@ function handleSuperLikeButton() {
   card.style.transition = 'transform 0.5s ease';
   card.style.transform = 'translateY(-100vh) scale(0.8)';
   
-  setTimeout(() => {
+  setTimeout(async () => {
     // Record super like
-    recordSwipeAction('superlike', movie);
+    await recordSwipeAction('superlike', movie);
+    
+    // Add to favorite movies on profile
+    await addToFavorites(movie);
     
     // Save to history for undo
     swipeHistory.push({
@@ -549,6 +552,43 @@ function handleUndoButton() {
 }
 
 
+
+/**
+ * Add movie/TV show to favorites
+ */
+async function addToFavorites(movie) {
+  const userId = window.currentUserId || localStorage.getItem('currentUserId');
+  if (!userId) return;
+
+  try {
+    const movieData = {
+      tmdbId: movie.tmdbId,
+      title: movie.title,
+      posterPath: movie.posterPath,
+      overview: movie.overview,
+      releaseDate: movie.releaseDate
+    };
+
+    const endpoint = movie.contentType === 'tv' 
+      ? `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-tv-shows`
+      : `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-movies`;
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(movieData)
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      console.log(`${movie.contentType === 'tv' ? 'TV show' : 'Movie'} added to favorites:`, movie.title);
+    }
+  } catch (error) {
+    console.error('Error adding to favorites:', error);
+  }
+}
 
 /**
  * Record swipe action to backend
