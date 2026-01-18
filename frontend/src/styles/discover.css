@@ -168,7 +168,21 @@
 .card-user-details {
     font-size: 14px;
     color: #767676;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.card-personality {
+    font-size: 13px;
+    color: #E50914;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.card-binge {
+    font-size: 13px;
+    color: #0066FF;
+    font-weight: 500;
+    margin-bottom: 8px;
 }
 
 .card-match-score {
