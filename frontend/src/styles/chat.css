@@ -364,6 +364,11 @@
         font-size: 0.85em;
         padding: 10px 12px;
         min-width: 100%;
+        flex-shrink: 0;
+    }
+
+    .icebreaker-list {
+        gap: 0;
     }
 
     .carousel-nav {

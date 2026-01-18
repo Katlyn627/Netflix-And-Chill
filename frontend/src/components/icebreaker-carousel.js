@@ -311,12 +311,12 @@ class IcebreakerCarousel {
                 const question = textarea.value.trim();
                 
                 if (!question) {
-                    alert('Please enter a question for your icebreaker!');
+                    this.showErrorNotification('Please enter a question for your icebreaker!');
                     return;
                 }
 
                 if (question.length < 10) {
-                    alert('Please enter a longer question (at least 10 characters).');
+                    this.showErrorNotification('Please enter a longer question (at least 10 characters).');
                     return;
                 }
 
@@ -334,7 +334,7 @@ class IcebreakerCarousel {
                         window.hideIcebreakers();
                     }
                 } else {
-                    alert('Please select a match to send the icebreaker to!');
+                    this.showErrorNotification('Please select a match to send the icebreaker to!');
                 }
             });
         }
@@ -345,6 +345,12 @@ class IcebreakerCarousel {
      */
     async sendCustomIcebreaker(message) {
         try {
+            // Add null checks for window.chatComponent
+            if (!window.chatComponent || !window.chatComponent.currentUserId || !window.chatComponent.selectedMatchId) {
+                this.showErrorNotification('Please select a match first!');
+                return;
+            }
+
             const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/chat/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -360,11 +366,11 @@ class IcebreakerCarousel {
                 await window.chatComponent.loadMessages();
             } else {
                 console.error('[IcebreakerCarousel] Failed to send custom icebreaker');
-                alert('Failed to send icebreaker. Please try again.');
+                this.showErrorNotification('Failed to send icebreaker. Please try again.');
             }
         } catch (error) {
             console.error('[IcebreakerCarousel] Error sending custom icebreaker:', error);
-            alert('Failed to send icebreaker. Please try again.');
+            this.showErrorNotification('Failed to send icebreaker. Please try again.');
         }
     }
 
@@ -383,6 +389,34 @@ class IcebreakerCarousel {
             notification.style.animation = 'slideOutToRight 0.3s ease-out';
             setTimeout(() => {
                 notification.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+
+    /**
+     * Show error notification
+     */
+    showErrorNotification(message) {
+        const notification = document.getElementById('icebreaker-notification');
+        if (!notification) return;
+
+        // Store original content and style
+        const originalContent = notification.innerHTML;
+        const originalBackground = notification.style.background;
+
+        // Update to error style
+        notification.innerHTML = `⚠️ ${message}`;
+        notification.style.background = 'linear-gradient(135deg, #E50914 0%, #B20710 100%)';
+        notification.style.display = 'block';
+        notification.style.animation = 'slideInFromRight 0.3s ease-out';
+
+        // Auto-hide and restore after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOutToRight 0.3s ease-out';
+            setTimeout(() => {
+                notification.style.display = 'none';
+                notification.innerHTML = originalContent;
+                notification.style.background = originalBackground;
             }, 300);
         }, 3000);
     }
