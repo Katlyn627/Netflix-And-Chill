@@ -224,7 +224,7 @@ class UserController {
   async addWatchHistory(req, res) {
     try {
       const { userId } = req.params;
-      const { title, type, genre, service, episodesWatched, posterPath, tmdbId } = req.body;
+      const { title, type, genre, service, episodesWatched, posterPath, tmdbId, watchDuration, sessionDate } = req.body;
 
       if (!title || !type) {
         return res.status(400).json({ error: 'Title and type are required' });
@@ -237,7 +237,17 @@ class UserController {
       }
 
       const user = new User(userData);
-      user.addToWatchHistory({ title, type, genre, service, episodesWatched, posterPath, tmdbId });
+      user.addToWatchHistory({ 
+        title, 
+        type, 
+        genre, 
+        service, 
+        episodesWatched, 
+        posterPath, 
+        tmdbId,
+        watchDuration, // Optional: duration in minutes
+        sessionDate // Optional: when the content was watched
+      });
 
       await this.saveUserData(userId, user);
 
@@ -1229,6 +1239,137 @@ class UserController {
         boostExpiresAt: user.boostExpiresAt,
         timeRemaining: user.getBoostTimeRemaining(),
         boostHistory: user.boostHistory
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ========== STREAMING SERVICE USAGE TRACKING METHODS ==========
+
+  /**
+   * Get comprehensive viewing statistics for a user
+   * GET /api/users/:userId/viewing-stats
+   */
+  async getViewingStatistics(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      const viewingStats = user.getViewingStatistics();
+
+      res.json({
+        userId: user.id,
+        username: user.username,
+        viewingStatistics: viewingStats
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  /**
+   * Get usage statistics for a specific streaming service
+   * GET /api/users/:userId/streaming-services/:serviceName/stats
+   */
+  async getServiceUsageStats(req, res) {
+    try {
+      const { userId, serviceName } = req.params;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      if (!serviceName || typeof serviceName !== 'string' || serviceName.trim() === '') {
+        return res.status(400).json({ error: 'Valid serviceName is required' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      const serviceStats = user.getServiceUsageStats(serviceName);
+
+      if (!serviceStats) {
+        return res.status(404).json({ error: 'Streaming service not found for this user' });
+      }
+
+      res.json({
+        userId: user.id,
+        serviceStats
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  /**
+   * Update usage statistics for a streaming service
+   * PUT /api/users/:userId/streaming-services/:serviceName/usage
+   * Body: { watchDuration, episodesWatched }
+   */
+  async updateServiceUsage(req, res) {
+    try {
+      const { userId, serviceName } = req.params;
+      const { watchDuration, episodesWatched } = req.body;
+
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        return res.status(400).json({ error: 'Valid userId is required' });
+      }
+
+      if (!serviceName || typeof serviceName !== 'string' || serviceName.trim() === '') {
+        return res.status(400).json({ error: 'Valid serviceName is required' });
+      }
+
+      if (watchDuration !== undefined && (typeof watchDuration !== 'number' || watchDuration < 0)) {
+        return res.status(400).json({ error: 'watchDuration must be a non-negative number' });
+      }
+
+      if (episodesWatched !== undefined && (typeof episodesWatched !== 'number' || episodesWatched < 0)) {
+        return res.status(400).json({ error: 'episodesWatched must be a non-negative number' });
+      }
+
+      const dataStore = await getDatabase();
+      const userData = await dataStore.findUserById(userId);
+
+      if (!userData) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = new User(userData);
+      
+      // Check if service exists
+      const service = user.streamingServices.find(s => s.name === serviceName);
+      if (!service) {
+        return res.status(404).json({ error: 'Streaming service not found for this user' });
+      }
+
+      // Update service usage stats
+      user.updateServiceUsageStats(serviceName, {
+        watchDuration: watchDuration || 0,
+        episodesWatched: episodesWatched || 0
+      });
+
+      await this.saveUserData(userId, user);
+
+      res.json({
+        message: 'Service usage updated successfully',
+        serviceStats: user.getServiceUsageStats(serviceName)
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

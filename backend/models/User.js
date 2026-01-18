@@ -78,7 +78,12 @@ class User {
         logoPath: service.logoPath || null,
         logoUrl: service.logoUrl || null,
         connected: true,
-        connectedAt: new Date().toISOString()
+        connectedAt: new Date().toISOString(),
+        // Usage tracking metrics
+        lastUsed: null,
+        totalWatchTime: 0, // Total minutes watched on this service
+        watchCount: 0, // Number of times content from this service was watched
+        totalEpisodes: 0 // Total episodes watched from this service
       });
     }
   }
@@ -90,18 +95,27 @@ class User {
   }
 
   updateStreamingServices(services) {
-    this.streamingServices = services.map(service => ({
-      id: service.id || null,
-      name: service.name,
-      logoPath: service.logoPath || null,
-      logoUrl: service.logoUrl || null,
-      connected: true,
-      connectedAt: new Date().toISOString()
-    }));
+    this.streamingServices = services.map(service => {
+      // Preserve existing usage stats if service already exists
+      const existing = this.streamingServices.find(s => s.id === service.id || s.name === service.name);
+      return {
+        id: service.id || null,
+        name: service.name,
+        logoPath: service.logoPath || null,
+        logoUrl: service.logoUrl || null,
+        connected: true,
+        connectedAt: existing?.connectedAt || new Date().toISOString(),
+        // Preserve usage tracking metrics
+        lastUsed: existing?.lastUsed || null,
+        totalWatchTime: existing?.totalWatchTime || 0,
+        watchCount: existing?.watchCount || 0,
+        totalEpisodes: existing?.totalEpisodes || 0
+      };
+    });
   }
 
   addToWatchHistory(item) {
-    this.watchHistory.push({
+    const watchEntry = {
       title: item.title,
       type: item.type, // 'movie', 'tvshow', 'series'
       genre: item.genre,
@@ -109,8 +123,21 @@ class User {
       episodesWatched: item.episodesWatched || 1,
       posterPath: item.posterPath || null,
       tmdbId: item.tmdbId || null,
-      watchedAt: new Date().toISOString()
-    });
+      watchedAt: new Date().toISOString(),
+      // Enhanced tracking metrics
+      watchDuration: item.watchDuration || null, // Duration in minutes
+      sessionDate: item.sessionDate || new Date().toISOString()
+    };
+    
+    this.watchHistory.push(watchEntry);
+    
+    // Update streaming service usage stats if service is specified
+    if (item.service) {
+      this.updateServiceUsageStats(item.service, {
+        watchDuration: item.watchDuration || 0,
+        episodesWatched: item.episodesWatched || 1
+      });
+    }
   }
 
   removeFromWatchHistory(watchedAt) {
@@ -299,6 +326,165 @@ class User {
       return swipedUTC === todayUTC;
     });
   }
+
+  // ========== STREAMING SERVICE USAGE TRACKING ==========
+  // Methods for tracking and analyzing streaming service usage patterns
+  
+  /**
+   * Update usage statistics for a streaming service
+   * @param {string} serviceName - Name of the streaming service
+   * @param {Object} stats - Usage stats {watchDuration, episodesWatched}
+   */
+  updateServiceUsageStats(serviceName, stats) {
+    const service = this.streamingServices.find(s => s.name === serviceName);
+    if (service) {
+      service.lastUsed = new Date().toISOString();
+      service.watchCount = (service.watchCount || 0) + 1;
+      service.totalWatchTime = (service.totalWatchTime || 0) + (stats.watchDuration || 0);
+      service.totalEpisodes = (service.totalEpisodes || 0) + (stats.episodesWatched || 0);
+    }
+  }
+
+  /**
+   * Get viewing statistics across all streaming services
+   * @returns {Object} Comprehensive viewing statistics
+   */
+  getViewingStatistics() {
+    const stats = {
+      totalWatchTime: 0,
+      totalWatchCount: 0,
+      totalEpisodes: 0,
+      serviceBreakdown: [],
+      mostUsedService: null,
+      averageSessionDuration: 0,
+      viewingFrequency: this.calculateViewingFrequency(),
+      recentActivity: this.getRecentViewingActivity(7) // Last 7 days
+    };
+
+    // Calculate totals and service breakdown
+    this.streamingServices.forEach(service => {
+      const serviceStats = {
+        name: service.name,
+        logoUrl: service.logoUrl,
+        watchCount: service.watchCount || 0,
+        totalWatchTime: service.totalWatchTime || 0,
+        totalEpisodes: service.totalEpisodes || 0,
+        lastUsed: service.lastUsed,
+        percentageOfTotal: 0
+      };
+
+      stats.totalWatchTime += serviceStats.totalWatchTime;
+      stats.totalWatchCount += serviceStats.watchCount;
+      stats.totalEpisodes += serviceStats.totalEpisodes;
+      stats.serviceBreakdown.push(serviceStats);
+    });
+
+    // Calculate percentages and find most used service
+    if (stats.totalWatchTime > 0) {
+      stats.serviceBreakdown.forEach(service => {
+        service.percentageOfTotal = Math.round((service.totalWatchTime / stats.totalWatchTime) * 100);
+      });
+      
+      // Sort by watch time and get most used
+      stats.serviceBreakdown.sort((a, b) => b.totalWatchTime - a.totalWatchTime);
+      if (stats.serviceBreakdown.length > 0) {
+        stats.mostUsedService = stats.serviceBreakdown[0].name;
+      }
+    }
+
+    // Calculate average session duration
+    if (stats.totalWatchCount > 0) {
+      stats.averageSessionDuration = Math.round(stats.totalWatchTime / stats.totalWatchCount);
+    }
+
+    return stats;
+  }
+
+  /**
+   * Calculate viewing frequency (how often user watches content)
+   * @returns {Object} Frequency statistics
+   */
+  calculateViewingFrequency() {
+    if (!this.watchHistory || this.watchHistory.length === 0) {
+      return {
+        frequency: 'inactive',
+        watchesPerWeek: 0,
+        daysSinceLastWatch: null
+      };
+    }
+
+    const now = new Date();
+    const sortedHistory = [...this.watchHistory].sort((a, b) => 
+      new Date(b.watchedAt) - new Date(a.watchedAt)
+    );
+
+    const lastWatchDate = new Date(sortedHistory[0].watchedAt);
+    const daysSinceLastWatch = Math.floor((now - lastWatchDate) / (1000 * 60 * 60 * 24));
+
+    // Calculate watches in last 30 days
+    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const recentWatches = this.watchHistory.filter(item => 
+      new Date(item.watchedAt) >= thirtyDaysAgo
+    );
+
+    const watchesPerWeek = (recentWatches.length / 30) * 7;
+
+    let frequency = 'inactive';
+    if (daysSinceLastWatch <= 1) {
+      frequency = 'daily';
+    } else if (watchesPerWeek >= 3) {
+      frequency = 'frequent';
+    } else if (watchesPerWeek >= 1) {
+      frequency = 'weekly';
+    } else if (watchesPerWeek > 0) {
+      frequency = 'occasional';
+    }
+
+    return {
+      frequency,
+      watchesPerWeek: Math.round(watchesPerWeek * 10) / 10,
+      daysSinceLastWatch
+    };
+  }
+
+  /**
+   * Get recent viewing activity for a specified number of days
+   * @param {number} days - Number of days to look back
+   * @returns {Array} Recent watch history
+   */
+  getRecentViewingActivity(days = 7) {
+    const cutoffDate = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
+    return this.watchHistory
+      .filter(item => new Date(item.watchedAt) >= cutoffDate)
+      .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
+  }
+
+  /**
+   * Get usage stats for a specific streaming service
+   * @param {string} serviceName - Name of the streaming service
+   * @returns {Object|null} Service usage stats or null if not found
+   */
+  getServiceUsageStats(serviceName) {
+    const service = this.streamingServices.find(s => s.name === serviceName);
+    if (!service) return null;
+
+    const serviceWatchHistory = this.watchHistory.filter(item => item.service === serviceName);
+
+    return {
+      name: service.name,
+      logoUrl: service.logoUrl,
+      connected: service.connected,
+      connectedAt: service.connectedAt,
+      lastUsed: service.lastUsed,
+      totalWatchTime: service.totalWatchTime || 0,
+      watchCount: service.watchCount || 0,
+      totalEpisodes: service.totalEpisodes || 0,
+      recentWatches: serviceWatchHistory
+        .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
+        .slice(0, 10) // Last 10 watches on this service
+    };
+  }
+  // ====================================================
 
   toJSON() {
     return {
