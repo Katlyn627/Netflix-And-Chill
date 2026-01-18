@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Discover Carousel - Netflix and Chill</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/discover.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .demo-header {
+            background: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 3px solid #E50914;
+        }
+        .demo-header h1 {
+            margin: 0;
+            color: #E50914;
+        }
+        .benefits-section {
+            background: #1a1a1a;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 12px;
+            color: white;
+        }
+        .benefits-section h2 {
+            color: #E50914;
+            margin-bottom: 20px;
+        }
+        .benefits-section ul {
+            color: #aaa;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🎬 Discover Page Carousel</h1>
+        <p>Showing ALL potential matches in scrollable carousels</p>
+    </div>
+
+    <main class="discover-content">
+        <!-- Recommended for You Section -->
+        <section class="discovery-section">
+            <div class="section-header">
+                <h2>Recommended for you</h2>
+                <p class="section-subtitle">Based on your movie swipe data - All matches shown</p>
+            </div>
+            <div class="carousel-container">
+                <button class="carousel-nav-btn prev-btn" data-carousel="recommended">‹</button>
+                <div class="horizontal-scroll-container" id="recommended-scroll">
+                    <div id="recommended-cards" class="profile-cards-horizontal">
+                        <!-- Sample Cards -->
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 1" onerror="this.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Action</span>
+                                        <span class="movie-tag">Sci-Fi</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Alex, 28</h3>
+                                </div>
+                                <div class="card-user-details">New York, NY</div>
+                                <div class="card-personality">🎬 Binge Warrior</div>
+                                <div class="card-binge">📺 8 eps/session</div>
+                                <div class="card-match-score">92% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 2" onerror="this.style.background='linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Comedy</span>
+                                        <span class="movie-tag">Netflix</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Jordan, 25</h3>
+                                </div>
+                                <div class="card-user-details">Los Angeles, CA</div>
+                                <div class="card-personality">🌙 Casual Viewer</div>
+                                <div class="card-binge">📺 2 eps/session</div>
+                                <div class="card-match-score">88% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 3" onerror="this.style.background='linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Drama</span>
+                                        <span class="movie-tag">HBO Max</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Sam, 30</h3>
+                                </div>
+                                <div class="card-user-details">Chicago, IL</div>
+                                <div class="card-personality">🎭 The Critic</div>
+                                <div class="card-binge">📺 3 eps/session</div>
+                                <div class="card-match-score">85% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 4" onerror="this.style.background='linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Horror</span>
+                                        <span class="movie-tag">Thriller</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Taylor, 27</h3>
+                                </div>
+                                <div class="card-user-details">Seattle, WA</div>
+                                <div class="card-personality">🗺️ Genre Explorer</div>
+                                <div class="card-binge">📺 5 eps/session</div>
+                                <div class="card-match-score">83% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 5" onerror="this.style.background='linear-gradient(135deg, #fa709a 0%, #fee140 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Romance</span>
+                                        <span class="movie-tag">Disney+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Riley, 26</h3>
+                                </div>
+                                <div class="card-user-details">Austin, TX</div>
+                                <div class="card-personality">☕ Comfort Watcher</div>
+                                <div class="card-binge">📺 4 eps/session</div>
+                                <div class="card-match-score">80% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-nav-btn next-btn" data-carousel="recommended">›</button>
+            </div>
+        </section>
+
+        <!-- Similar Genres Section -->
+        <section class="discovery-section">
+            <div class="section-header">
+                <h2>Similar genres</h2>
+                <p class="section-subtitle">Users who love your favorite genres - All shown</p>
+            </div>
+            <div class="carousel-container">
+                <button class="carousel-nav-btn prev-btn" data-carousel="genres">‹</button>
+                <div class="horizontal-scroll-container" id="genres-scroll">
+                    <div id="similar-genres-cards" class="profile-cards-horizontal">
+                        <!-- More sample cards would be here -->
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 6" onerror="this.style.background='linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Action</span>
+                                        <span class="movie-tag">Adventure</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Morgan, 29</h3>
+                                </div>
+                                <div class="card-user-details">Boston, MA</div>
+                                <div class="card-personality">⭐ Loyal Fan</div>
+                                <div class="card-binge">📺 6 eps/session</div>
+                                <div class="card-match-score">87% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-nav-btn next-btn" data-carousel="genres">›</button>
+            </div>
+        </section>
+
+        <!-- Similar Binge Amounts Section -->
+        <section class="discovery-section">
+            <div class="section-header">
+                <h2>Similar binge amounts</h2>
+                <p class="section-subtitle">People with similar watching habits - All shown</p>
+            </div>
+            <div class="carousel-container">
+                <button class="carousel-nav-btn prev-btn" data-carousel="binge">‹</button>
+                <div class="horizontal-scroll-container" id="binge-scroll">
+                    <div id="similar-binge-cards" class="profile-cards-horizontal">
+                        <!-- More sample cards would be here -->
+                        <div class="discover-profile-card">
+                            <div class="discover-card-image">
+                                <img src="assets/images/default-avatar.png" alt="User 7" onerror="this.style.background='linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'">
+                                <div class="card-image-overlay">
+                                    <div class="movie-preferences-tags">
+                                        <span class="movie-tag">Documentary</span>
+                                        <span class="movie-tag">Hulu</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="discover-card-info">
+                                <div class="card-user-name">
+                                    <h3>Casey, 31</h3>
+                                </div>
+                                <div class="card-user-details">Portland, OR</div>
+                                <div class="card-personality">🎬 Indie Lover</div>
+                                <div class="card-binge">📺 8 eps/session</div>
+                                <div class="card-match-score">89% Match</div>
+                                <div class="card-actions">
+                                    <button class="heart-btn">🤍</button>
+                                    <button class="info-btn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-nav-btn next-btn" data-carousel="binge">›</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="benefits-section">
+        <h2>✨ Carousel UI Improvements</h2>
+        <ul>
+            <li>✅ Navigation buttons to easily browse through ALL users</li>
+            <li>✅ Smooth scroll behavior with visual feedback</li>
+            <li>✅ Shows unlimited matches instead of limiting to 10</li>
+            <li>✅ Better user experience on both desktop and mobile</li>
+            <li>✅ Disabled state for nav buttons at carousel ends</li>
+            <li>✅ Professional appearance matching modern dating apps</li>
+        </ul>
+
+        <h2>🎯 Enhanced Filtering</h2>
+        <ul>
+            <li>✅ "Recommended for you" shows ALL users based on swipe data</li>
+            <li>✅ "Similar genres" shows ALL users with matching favorite genres</li>
+            <li>✅ "Similar binge amounts" shows ALL users with similar watch patterns</li>
+            <li>✅ Extensive swipe histories (50-100 swipes per user) for better matching</li>
+        </ul>
+    </div>
+
+    <script>
+        // Carousel navigation functionality
+        function setupCarouselNavigation() {
+            const carouselButtons = document.querySelectorAll('.carousel-nav-btn');
+            
+            carouselButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const carouselType = button.dataset.carousel;
+                    const isPrev = button.classList.contains('prev-btn');
+                    const scrollContainer = document.getElementById(`${carouselType}-scroll`);
+                    
+                    if (scrollContainer) {
+                        const scrollAmount = 320; // Width of card + gap
+                        const direction = isPrev ? -1 : 1;
+                        
+                        scrollContainer.scrollBy({
+                            left: scrollAmount * direction,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Update button states after scroll
+                        setTimeout(() => {
+                            updateCarouselButtons(carouselType);
+                        }, 100);
+                    }
+                });
+            });
+
+            // Update button states on scroll
+            ['recommended', 'genres', 'binge'].forEach(type => {
+                const scrollContainer = document.getElementById(`${type}-scroll`);
+                if (scrollContainer) {
+                    scrollContainer.addEventListener('scroll', () => {
+                        updateCarouselButtons(type);
+                    });
+                }
+            });
+
+            // Initial update
+            setTimeout(() => {
+                ['recommended', 'genres', 'binge'].forEach(type => {
+                    updateCarouselButtons(type);
+                });
+            }, 100);
+        }
+
+        function updateCarouselButtons(carouselType) {
+            const scrollContainer = document.getElementById(`${carouselType}-scroll`);
+            if (!scrollContainer) return;
+
+            const prevBtn = document.querySelector(`.prev-btn[data-carousel="${carouselType}"]`);
+            const nextBtn = document.querySelector(`.next-btn[data-carousel="${carouselType}"]`);
+
+            if (!prevBtn || !nextBtn) return;
+
+            const scrollLeft = scrollContainer.scrollLeft;
+            const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+            // Disable prev button at start
+            prevBtn.disabled = scrollLeft <= 5;
+            
+            // Disable next button at end
+            nextBtn.disabled = scrollLeft >= maxScroll - 5;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupCarouselNavigation();
+        });
+
+        // Heart button functionality
+        document.querySelectorAll('.heart-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (btn.textContent === '🤍') {
+                    btn.textContent = '❤️';
+                    btn.classList.add('liked');
+                } else {
+                    btn.textContent = '🤍';
+                    btn.classList.remove('liked');
+                }
+            });
+        });
+
+        // Info button functionality
+        document.querySelectorAll('.info-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                alert('User profile details would appear here in the full app!');
+            });
+        });
+    </script>
+</body>
+</html>

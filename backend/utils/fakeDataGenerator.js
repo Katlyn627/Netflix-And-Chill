@@ -462,8 +462,8 @@ function generateSexualOrientationPreference() {
 function generateSwipedMovies(movies, tvShows) {
   if (!movies || movies.length === 0) return [];
   
-  // Generate 10-30 swiped movies per user (realistic swipe activity)
-  const count = randomInt(10, 30);
+  // Generate 50-100 swiped movies per user for extensive swipe history
+  const count = randomInt(50, 100);
   
   // Use weighted selection - 70% probability from top 50% popular content
   const popularMovies = movies.slice(0, Math.ceil(movies.length / 2));
@@ -492,8 +492,8 @@ function generateSwipedMovies(movies, tvShows) {
     // Avoid duplicates
     if (selected.some(s => s.tmdbId === item.id)) continue;
     
-    // 60% like, 40% dislike (biased towards likes for better matches)
-    const action = Math.random() > 0.4 ? 'like' : 'dislike';
+    // 65% like, 35% dislike (biased towards likes for better matches)
+    const action = Math.random() > 0.35 ? 'like' : 'dislike';
     
     selected.push({
       tmdbId: item.id,
