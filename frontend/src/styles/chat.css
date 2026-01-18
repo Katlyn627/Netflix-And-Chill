@@ -285,12 +285,6 @@
     color: #E50914;
 }
 
-.icebreaker-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 .icebreaker-btn {
     background: rgba(229, 9, 20, 0.1);
     border: 2px solid rgba(229, 9, 20, 0.3);
@@ -363,12 +357,10 @@
     .icebreaker-btn {
         font-size: 0.85em;
         padding: 10px 12px;
-        min-width: 100%;
-        flex-shrink: 0;
     }
 
     .icebreaker-list {
-        gap: 0;
+        gap: 6px;
     }
 
     .carousel-nav {
