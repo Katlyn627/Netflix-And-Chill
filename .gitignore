@@ -15,8 +15,6 @@ frontend/assets/uploads/*
 TEST_CREDENTIALS.md
 TEST_CREDENTIALS.json
 
-test-*.js
-
 # Next.js
 .next/
 out/
