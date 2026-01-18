@@ -565,9 +565,15 @@ async function addToFavorites(movie) {
       tmdbId: movie.tmdbId,
       title: movie.title,
       posterPath: movie.posterPath,
-      overview: movie.overview,
-      releaseDate: movie.releaseDate
+      overview: movie.overview
     };
+
+    // Add appropriate date field based on content type
+    if (movie.contentType === 'tv') {
+      movieData.firstAirDate = movie.releaseDate;
+    } else {
+      movieData.releaseDate = movie.releaseDate;
+    }
 
     const endpoint = movie.contentType === 'tv' 
       ? `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-tv-shows`

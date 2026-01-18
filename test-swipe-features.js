@@ -93,7 +93,11 @@ async function testSuperLikeToFavorites() {
         }
 
         // 6. Verify favorite was added
-        const verifyResponse = await fetch(endpoint.replace('/favorite-tv-shows', '/favorite-tv-shows').replace('/favorite-movies', '/favorite-movies'));
+        const verifyEndpoint = testMovie.contentType === 'tv' 
+            ? `${API_BASE_URL}/users/${userId}/favorite-tv-shows`
+            : `${API_BASE_URL}/users/${userId}/favorite-movies`;
+        
+        const verifyResponse = await fetch(verifyEndpoint);
         const verifyData = await verifyResponse.json();
         const finalCount = verifyData.favoriteTVShows?.length || verifyData.favoriteMovies?.length || 0;
         

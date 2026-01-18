@@ -364,6 +364,13 @@
                 return;
             }
 
+            // Helper function to escape HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
             const cardsHtml = history.map(item => {
                 const badgeClass = item.action === 'superlike' ? 'badge-superlike' : 
                                    item.action === 'like' ? 'badge-like' : 'badge-dislike';
@@ -371,16 +378,20 @@
                                   item.action === 'like' ? '❤️ LIKE' : '✕ PASS';
                 const contentType = item.contentType === 'tv' ? '📺' : '🎬';
                 const date = new Date(item.swipedAt).toLocaleDateString();
+                
+                // Escape user-provided content
+                const safeTitle = escapeHtml(item.title);
+                const safePosterPath = item.posterPath ? escapeHtml(item.posterPath) : 'assets/images/no-poster.png';
 
                 return `
                     <div class="history-card" data-action="${item.action}" data-type="${item.contentType}">
-                        <img src="${item.posterPath || 'assets/images/no-poster.png'}" 
-                             alt="${item.title}" 
+                        <img src="${safePosterPath}" 
+                             alt="${safeTitle}" 
                              class="history-card-image"
                              onerror="this.src='assets/images/no-poster.png'">
                         <div class="history-card-badge ${badgeClass}">${badgeText}</div>
                         <div class="history-card-info">
-                            <div class="history-card-title">${contentType} ${item.title}</div>
+                            <div class="history-card-title">${contentType} ${safeTitle}</div>
                             <div class="history-card-date">${date}</div>
                         </div>
                     </div>
