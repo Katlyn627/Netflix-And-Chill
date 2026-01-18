@@ -547,23 +547,26 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     
     // Populate likes and superLikes arrays for users
     console.log('\n💕 Populating likes and super likes...');
-    const { randomInt, randomItems } = require('../utils/fakeDataGenerator');
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
       
       // Get other user IDs (excluding self)
       const otherUserIds = users.filter(u => u.id !== user.id).map(u => u.id);
       
-      // Generate 2-8 likes per user
-      const likesCount = randomInt(2, 8);
+      // If there are very few users, ensure we reserve at least 1 for superLikes
+      const minUsersForLikes = Math.max(1, otherUserIds.length - 1);
+      
+      // Generate 2-8 likes per user (cap at available users, leaving room for superLikes)
+      const likesCount = Math.min(randomInt(2, 8), minUsersForLikes);
       const likedUserIds = randomItems(otherUserIds, likesCount);
       
       // Generate 1-2 super likes per user (at least 1 for testing)
-      const superLikesCount = randomInt(1, 2);
-      const superLikedUserIds = randomItems(
-        otherUserIds.filter(id => !likedUserIds.includes(id)),
-        superLikesCount
-      );
+      // Filter out already liked users and ensure we have enough available
+      const availableForSuperLikes = otherUserIds.filter(id => !likedUserIds.includes(id));
+      const superLikesCount = Math.min(randomInt(1, 2), availableForSuperLikes.length);
+      const superLikedUserIds = superLikesCount > 0 
+        ? randomItems(availableForSuperLikes, superLikesCount)
+        : [];
       
       // Update user with likes and superLikes
       user.likes = likedUserIds;
