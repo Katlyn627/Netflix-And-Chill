@@ -70,7 +70,7 @@ class DiscoverPage {
         }
 
         // Sort matches by score
-        const sortedMatches = [...this.allMatches].sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+        const sortedMatches = [...this.allMatches].sort((a, b) => (b.matchScore || b.score || 0) - (a.matchScore || a.score || 0));
 
         // Recommended for you (based on swipe data)
         const recommended = this.filterBySwipeData(sortedMatches).slice(0, 10);
@@ -221,9 +221,10 @@ class DiscoverPage {
 
         // Get streaming services
         const streamingServices = user.streamingServices || [];
-        const serviceTags = streamingServices.slice(0, 2).map(service => 
-            `<span class="movie-tag">${service.name || service}</span>`
-        ).join('');
+        const serviceTags = streamingServices.filter(s => s && (s.name || s)).slice(0, 2).map(service => {
+            const serviceName = service.name || service;
+            return `<span class="movie-tag">${serviceName}</span>`;
+        }).join('');
 
         // Get binge count
         const bingeCount = user.preferences?.bingeWatchCount || user.preferences?.bingeCount || 0;
@@ -398,7 +399,10 @@ class DiscoverPage {
                 <div style="margin-bottom: 15px;">
                     <strong>Streaming Services:</strong>
                     <div style="margin-top: 8px;">
-                        ${streamingServices.map(service => `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(service.name || service))}</span>`).join('')}
+                        ${streamingServices.filter(s => s && (s.name || s)).map(service => {
+                            const serviceName = service.name || service;
+                            return `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(serviceName))}</span>`;
+                        }).join('')}
                     </div>
                 </div>
                 ` : ''}
