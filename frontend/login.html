@@ -39,6 +39,15 @@
                         <button type="submit" class="btn btn-primary btn-large">Login</button>
                     </form>
                     
+                    <div class="auth-divider" style="margin: 20px 0; text-align: center; position: relative;">
+                        <span style="background: white; padding: 0 10px; position: relative; z-index: 1;">OR</span>
+                        <div style="border-top: 1px solid #ddd; position: absolute; top: 50%; left: 0; right: 0; z-index: 0;"></div>
+                    </div>
+                    
+                    <button id="auth0-login-btn" class="btn btn-secondary btn-large" style="width: 100%; margin-bottom: 10px;">
+                        🔐 Login with Auth0
+                    </button>
+                    
                     <div class="login-footer">
                         <p><a href="forgot-password.html">Forgot Password?</a></p>
                         <p>Don't have an account? <a href="profile.html">Create Profile</a></p>
@@ -57,6 +66,35 @@
 
     <script src="src/utils/errorHandler.js"></script>
     <script src="src/services/api.js"></script>
+    
+    <!-- Auth0 SPA SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    
+    <!-- Auth0 Configuration -->
+    <script>
+        // ⚠️ IMPORTANT: Replace these placeholder values with your actual Auth0 credentials
+        // See FRONTEND_AUTH0_CONFIG.md for setup instructions
+        // DO NOT commit actual credentials to public repositories
+        window.AUTH0_DOMAIN = 'YOUR_AUTH0_DOMAIN.auth0.com';
+        window.AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
+        window.AUTH0_AUDIENCE = 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/';
+    </script>
+    <script src="src/utils/auth0-config.js"></script>
+    
     <script src="src/components/login.js"></script>
+    
+    <script>
+        // Add Auth0 login handler
+        document.getElementById('auth0-login-btn').addEventListener('click', async () => {
+            try {
+                await Auth0Manager.login();
+            } catch (error) {
+                console.error('Auth0 login error:', error);
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.textContent = 'Failed to login with Auth0. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>

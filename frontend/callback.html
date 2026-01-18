@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Login - Netflix and Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        .callback-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #E50914;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .callback-message {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .callback-error {
+            color: #E50914;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="spinner"></div>
+        <div class="callback-message">Processing your login...</div>
+        <div id="error-message" class="callback-error" style="display: none;"></div>
+    </div>
+
+    <!-- Auth0 SPA SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    
+    <!-- Auth0 Configuration -->
+    <script src="src/utils/auth0-config.js"></script>
+    
+    <!-- API Configuration -->
+    <script src="src/services/api.js"></script>
+    
+    <script>
+        // Handle Auth0 callback
+        async function handleAuthCallback() {
+            try {
+                // Handle the redirect callback
+                const result = await Auth0Manager.handleCallback();
+                
+                // Get or create user in our backend
+                const token = await Auth0Manager.getToken();
+                const auth0User = result.user;
+                
+                // Map Auth0 user to our user model
+                const userData = {
+                    email: auth0User.email,
+                    username: auth0User.nickname || auth0User.name,
+                    auth0Id: auth0User.sub,
+                    profilePicture: auth0User.picture
+                };
+                
+                // Create or update user in backend
+                const response = await fetch(`${API_BASE_URL}/users/auth0`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to create/update user in backend');
+                }
+                
+                const backendUser = await response.json();
+                
+                // Store user ID in localStorage for compatibility with existing code
+                localStorage.setItem('currentUserId', backendUser.id);
+                localStorage.setItem('auth0User', JSON.stringify(auth0User));
+                
+                // Redirect to profile or intended page
+                const redirectUrl = result.appState?.returnTo || '/profile-view.html?userId=' + backendUser.id;
+                window.location.href = redirectUrl;
+                
+            } catch (error) {
+                console.error('Error during authentication callback:', error);
+                document.getElementById('error-message').textContent = 
+                    'Authentication failed. Please try again.';
+                document.getElementById('error-message').style.display = 'block';
+                
+                // Redirect to login after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 3000);
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if we're handling a callback
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('code') && params.has('state')) {
+                handleAuthCallback();
+            } else {
+                // No callback parameters, redirect to login
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
+</body>
+</html>

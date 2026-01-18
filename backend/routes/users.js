@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/userController');
+const { rateLimiters } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -97,5 +98,8 @@ router.get('/:userId/boost', userController.getBoostStatus.bind(userController))
 router.get('/:userId/viewing-stats', userController.getViewingStatistics.bind(userController));
 router.get('/:userId/streaming-services/:serviceName/stats', userController.getServiceUsageStats.bind(userController));
 router.put('/:userId/streaming-services/:serviceName/usage', userController.updateServiceUsage.bind(userController));
+
+// Auth0 integration route (with rate limiting for security)
+router.post('/auth0', rateLimiters.auth, userController.createOrUpdateAuth0User.bind(userController));
 
 module.exports = router;
