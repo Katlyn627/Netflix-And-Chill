@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bottom Navigation</title>
+    <!-- NOTE: This test file must be in frontend root directory for relative paths to work -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/bottom-nav.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .test-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #E50914;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-content">
+        <h1>Bottom Navigation Test</h1>
+        <div class="test-section">
+            <h2>Test Instructions</h2>
+            <p>This page tests the bottom navigation bar:</p>
+            <ul>
+                <li>Check if all buttons are visible and properly aligned</li>
+                <li>Click the logout button to test functionality</li>
+                <li>Verify that badges appear correctly on items with notifications</li>
+                <li>Test hover effects on all navigation items</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>Expected Behavior</h2>
+            <ul>
+                <li><strong>Logout Button:</strong> Should be clickable and show confirmation dialog</li>
+                <li><strong>All Items:</strong> Should have consistent styling and spacing</li>
+                <li><strong>Badges:</strong> Should appear in top-right of items with notifications</li>
+                <li><strong>Active State:</strong> Current page should be highlighted</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // FOR LOCAL TESTING ONLY - Set a test user ID to enable navigation
+        // DO NOT deploy this file to production with hardcoded test credentials
+        localStorage.setItem('currentUserId', 'test-user-123');
+    </script>
+    <script src="src/utils/errorHandler.js"></script>
+    <script src="src/utils/settings.js"></script>
+    <script src="src/services/api.js"></script>
+    <script src="src/components/bottom-nav.js"></script>
+</body>
+</html>
