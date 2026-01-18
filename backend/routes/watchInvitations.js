@@ -7,14 +7,22 @@ const {
   updateInvitationStatus,
   deleteInvitation,
   getUnreadInvitationCounts,
-  markInvitationAsRead
+  markInvitationAsRead,
+  getInvitationTemplates,
+  suggestAlternativeTime
 } = require('../controllers/watchInvitationController');
 
 // TODO: Add rate limiting to all routes for production deployment
 // Consider using express-rate-limit middleware to prevent abuse
 
+// Get quick invitation templates
+router.get('/templates', getInvitationTemplates);
+
 // Create a new watch invitation
 router.post('/', createWatchInvitation);
+
+// Suggest alternative time for an invitation
+router.post('/suggest-alternative', suggestAlternativeTime);
 
 // Get unread invitation counts for a user
 router.get('/unread/:userId', getUnreadInvitationCounts);
