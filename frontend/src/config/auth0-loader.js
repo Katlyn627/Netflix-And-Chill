@@ -3,6 +3,10 @@
 // Configuration is stored in environment variables on the server
 // This ensures sensitive values are not hardcoded in the frontend
 
+// Placeholder values that indicate Auth0 is not configured
+const AUTH0_PLACEHOLDER_DOMAIN = 'YOUR_AUTH0_DOMAIN.auth0.com';
+const AUTH0_PLACEHOLDER_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
+
 // Promise that resolves when Auth0 configuration is loaded
 window.auth0ConfigReady = (async function loadAuth0Config() {
     try {
@@ -24,10 +28,12 @@ window.auth0ConfigReady = (async function loadAuth0Config() {
         // Check if Auth0 is actually configured (not using placeholder values)
         const isConfigured = config.domain && 
                             config.clientId && 
-                            config.domain !== 'YOUR_AUTH0_DOMAIN.auth0.com' &&
-                            config.clientId !== 'YOUR_AUTH0_CLIENT_ID' &&
+                            config.domain !== AUTH0_PLACEHOLDER_DOMAIN &&
+                            config.clientId !== AUTH0_PLACEHOLDER_CLIENT_ID &&
                             config.domain !== 'null' &&
-                            config.clientId !== 'null';
+                            config.domain !== null &&
+                            config.clientId !== 'null' &&
+                            config.clientId !== null;
         
         if (isConfigured) {
             // Set Auth0 configuration globally
