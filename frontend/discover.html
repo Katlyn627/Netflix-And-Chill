@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover - Netflix and Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E50914">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/bottom-nav.css">
+    <link rel="stylesheet" href="src/styles/discover.css">
+</head>
+<body>
+    <div class="container">
+        <header class="discover-header">
+            <div class="header-top">
+                <h1>Discover</h1>
+                <div class="header-actions">
+                    <button class="icon-btn" id="notifications-btn" title="Notifications">
+                        <span class="icon">🔔</span>
+                    </button>
+                    <button class="icon-btn" id="settings-btn" title="Settings">
+                        <span class="icon">⚙️</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="discover-content">
+            <!-- Recommended for You Section -->
+            <section class="discovery-section">
+                <div class="section-header">
+                    <h2>Recommended for you</h2>
+                    <p class="section-subtitle">Based on your profile and past matches</p>
+                </div>
+                <div class="horizontal-scroll-container">
+                    <div id="recommended-cards" class="profile-cards-horizontal">
+                        <!-- Cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Similar Interests Section -->
+            <section class="discovery-section">
+                <div class="section-header">
+                    <h2>Similar interests</h2>
+                    <p class="section-subtitle">People who like the same movies as you</p>
+                </div>
+                <div class="horizontal-scroll-container">
+                    <div id="similar-interests-cards" class="profile-cards-horizontal">
+                        <!-- Cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Similar Genres Section -->
+            <section class="discovery-section">
+                <div class="section-header">
+                    <h2>Similar genres</h2>
+                    <p class="section-subtitle">Users who love your favorite genres</p>
+                </div>
+                <div class="horizontal-scroll-container">
+                    <div id="similar-genres-cards" class="profile-cards-horizontal">
+                        <!-- Cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Similar Binge Amounts Section -->
+            <section class="discovery-section">
+                <div class="section-header">
+                    <h2>Similar binge amounts</h2>
+                    <p class="section-subtitle">People with similar watching habits</p>
+                </div>
+                <div class="horizontal-scroll-container">
+                    <div id="similar-binge-cards" class="profile-cards-horizontal">
+                        <!-- Cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <div id="discover-loading" style="display: none;">
+                <p class="loading-text">🔍 Finding recommendations...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="src/utils/errorHandler.js"></script>
+    <script src="src/utils/settings.js"></script>
+    <script src="src/services/api.js"></script>
+    <script src="src/components/bottom-nav.js"></script>
+    <script src="src/components/discover.js"></script>
+</body>
+</html>

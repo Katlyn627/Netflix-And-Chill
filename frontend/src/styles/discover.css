@@ -1,0 +1,282 @@
+/* Discover Page - Bumble Style */
+
+.discover-header {
+    background: #FFFFFF;
+    padding: 20px;
+    border-bottom: 1px solid #E0E0E0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.discover-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 24px;
+    transition: opacity 0.3s ease;
+}
+
+.icon-btn:hover {
+    opacity: 0.7;
+}
+
+.discover-content {
+    background: #FAFAFA;
+    min-height: calc(100vh - 160px);
+    padding: 20px;
+}
+
+.discovery-section {
+    margin-bottom: 40px;
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 5px 0;
+}
+
+.section-subtitle {
+    font-size: 14px;
+    color: #767676;
+    margin: 0;
+}
+
+.horizontal-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.profile-cards-horizontal {
+    display: flex;
+    gap: 15px;
+    padding-bottom: 10px;
+}
+
+.discover-profile-card {
+    flex: 0 0 300px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.discover-profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.discover-card-image {
+    width: 100%;
+    height: 350px;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    padding: 20px;
+    color: white;
+}
+
+.movie-preferences-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.movie-tag {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.discover-card-info {
+    padding: 15px;
+}
+
+.card-user-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.card-user-name h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0;
+}
+
+.verification-badge {
+    color: #0066FF;
+    font-size: 16px;
+}
+
+.card-user-details {
+    font-size: 14px;
+    color: #767676;
+    margin-bottom: 10px;
+}
+
+.card-match-score {
+    font-size: 14px;
+    font-weight: 600;
+    color: #E50914;
+    margin-bottom: 10px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.heart-btn {
+    flex: 1;
+    background: #FFFFFF;
+    border: 2px solid #000000;
+    border-radius: 24px;
+    padding: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.heart-btn:hover {
+    background: #000000;
+    transform: scale(1.05);
+}
+
+.heart-btn.liked {
+    background: #E50914;
+    border-color: #E50914;
+    color: white;
+}
+
+.info-btn {
+    width: 45px;
+    height: 45px;
+    background: #FFFFFF;
+    border: 2px solid #E0E0E0;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.info-btn:hover {
+    background: #F5F5F5;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 18px;
+    color: #767676;
+    padding: 40px;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: #767676;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .discover-header {
+        padding: 15px;
+    }
+    
+    .discover-header h1 {
+        font-size: 28px;
+    }
+    
+    .discover-content {
+        padding: 15px;
+    }
+    
+    .section-header h2 {
+        font-size: 20px;
+    }
+    
+    .discover-profile-card {
+        flex: 0 0 280px;
+    }
+    
+    .discover-card-image {
+        height: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .discover-profile-card {
+        flex: 0 0 260px;
+    }
+    
+    .discover-card-image {
+        height: 300px;
+    }
+}
