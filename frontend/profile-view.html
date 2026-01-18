@@ -625,15 +625,9 @@
     <!-- Auth0 SPA SDK -->
     <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
     
-    <!-- Auth0 Configuration -->
-    <script>
-        // ⚠️ IMPORTANT: Replace these placeholder values with your actual Auth0 credentials
-        // See FRONTEND_AUTH0_CONFIG.md for setup instructions
-        // DO NOT commit actual credentials to public repositories
-        window.AUTH0_DOMAIN = 'YOUR_AUTH0_DOMAIN.auth0.com';
-        window.AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
-        window.AUTH0_AUDIENCE = 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/';
-    </script>
+    <!-- Auth0 Configuration Loader -->
+    <!-- This script loads Auth0 configuration from the backend API -->
+    <script src="src/config/auth0-loader.js"></script>
     <script src="src/utils/auth0-config.js"></script>
     
     <script src="src/utils/navigation.js"></script>

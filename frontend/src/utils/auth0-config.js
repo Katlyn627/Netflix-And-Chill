@@ -9,6 +9,11 @@ let auth0Client = null;
  */
 async function initAuth0() {
     try {
+        // Wait for Auth0 configuration to be loaded from backend
+        if (window.auth0ConfigReady) {
+            await window.auth0ConfigReady;
+        }
+        
         // Get Auth0 configuration from environment
         const domain = window.AUTH0_DOMAIN;
         const clientId = window.AUTH0_CLIENT_ID;
@@ -16,11 +21,11 @@ async function initAuth0() {
         
         // Validate required configuration
         if (!domain || domain === 'YOUR_AUTH0_DOMAIN.auth0.com') {
-            throw new Error('Auth0 domain not configured. Please update AUTH0_DOMAIN in your configuration.');
+            throw new Error('Auth0 domain not configured. Please set AUTH0_DOMAIN environment variable on the server.');
         }
         
         if (!clientId || clientId === 'YOUR_AUTH0_CLIENT_ID') {
-            throw new Error('Auth0 client ID not configured. Please update AUTH0_CLIENT_ID in your configuration.');
+            throw new Error('Auth0 client ID not configured. Please set AUTH0_CLIENT_ID environment variable on the server.');
         }
         
         // Import Auth0 SDK dynamically
