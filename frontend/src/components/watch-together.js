@@ -101,7 +101,7 @@
             date.setDate(date.getDate() + dayOffset);
             
             // Skip past times for today
-            const startHour = (dayOffset === 0) ? Math.max(now.getHours() + 1, 0) : 8;
+            const startHour = (dayOffset === 0) ? Math.max(now.getHours() + 1, 8) : 8;
             
             // Generate time slots for each day (8 AM to 11 PM in 1-hour increments)
             for (let hour = startHour; hour <= 23; hour++) {
@@ -224,8 +224,10 @@
 
         // Fill in the form with template values
         document.getElementById('watch-platform').value = template.platform;
-        document.getElementById('watch-date').value = template.scheduledDate;
-        document.getElementById('watch-time').value = template.scheduledTime;
+        
+        // Combine date and time for the new dropdown format
+        const dateTimeValue = `${template.scheduledDate}T${template.scheduledTime}`;
+        document.getElementById('watch-datetime').value = dateTimeValue;
 
         // Trigger platform info display
         const platformSelect = document.getElementById('watch-platform');
