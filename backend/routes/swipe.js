@@ -365,19 +365,18 @@ router.get('/movies/:userId', async (req, res) => {
     const watchlistTVIds = (user.tvWatchlist || []).map(tv => tv.tmdbId);
     
     // ENHANCED: Analyze swipe history to identify preferred genres from liked content
-    const likedGenres = [];
+    const likedGenresSet = new Set();
     if (user.swipedMovies && user.swipedMovies.length > 0) {
       const likedMovies = user.swipedMovies.filter(m => m.action === 'like' || m.action === 'superlike');
       likedMovies.forEach(movie => {
         if (movie.genreIds && Array.isArray(movie.genreIds)) {
           movie.genreIds.forEach(genreId => {
-            if (!likedGenres.includes(genreId)) {
-              likedGenres.push(genreId);
-            }
+            likedGenresSet.add(genreId);
           });
         }
       });
     }
+    const likedGenres = Array.from(likedGenresSet);
     
     // Get genre IDs from user's watch history to enhance recommendations
     const watchHistoryGenres = [];

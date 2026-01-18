@@ -703,7 +703,7 @@ class UserController {
       res.json({
         success: true,
         message: 'Movie added to favorites successfully',
-        movie: user.favoriteMovies[user.favoriteMovies.length - 1],
+        favoriteMovies: user.favoriteMovies,
         count: user.favoriteMovies.length
       });
     } catch (error) {
@@ -778,7 +778,7 @@ class UserController {
       res.json({
         success: true,
         message: 'TV show added to favorites successfully',
-        tvShow: user.favoriteTVShows[user.favoriteTVShows.length - 1],
+        favoriteTVShows: user.favoriteTVShows,
         count: user.favoriteTVShows.length
       });
     } catch (error) {

@@ -555,6 +555,8 @@ function handleUndoButton() {
 
 /**
  * Add movie/TV show to favorites
+ * Note: Backend swipe route unifies date fields - both movies (release_date) and 
+ * TV shows (first_air_date) are returned as 'releaseDate' for simplified frontend handling
  */
 async function addToFavorites(content) {
   const userId = window.currentUserId || localStorage.getItem('currentUserId');
@@ -568,7 +570,8 @@ async function addToFavorites(content) {
       overview: content.overview
     };
 
-    // Add appropriate date field based on content type
+    // Backend expects different field names for movies vs TV shows
+    // The unified 'releaseDate' from swipe route is mapped to the appropriate field
     if (content.contentType === 'tv') {
       favoriteData.firstAirDate = content.releaseDate;
     } else {
