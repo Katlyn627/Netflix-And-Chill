@@ -26,7 +26,8 @@ window.auth0ConfigReady = (async function loadAuth0Config() {
                             config.clientId && 
                             config.domain !== 'YOUR_AUTH0_DOMAIN.auth0.com' &&
                             config.clientId !== 'YOUR_AUTH0_CLIENT_ID' &&
-                            !config.domain.includes('null');
+                            config.domain !== 'null' &&
+                            config.clientId !== 'null';
         
         if (isConfigured) {
             // Set Auth0 configuration globally
