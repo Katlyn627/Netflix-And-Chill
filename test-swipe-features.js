@@ -72,16 +72,24 @@ async function testSuperLikeToFavorites() {
             ? `${API_BASE_URL}/users/${userId}/favorite-tv-shows`
             : `${API_BASE_URL}/users/${userId}/favorite-movies`;
 
+        const favoriteData = {
+            tmdbId: testMovie.tmdbId,
+            title: testMovie.title,
+            posterPath: testMovie.posterPath,
+            overview: testMovie.overview
+        };
+
+        // Add appropriate date field based on content type
+        if (testMovie.contentType === 'tv') {
+            favoriteData.firstAirDate = testMovie.releaseDate;
+        } else {
+            favoriteData.releaseDate = testMovie.releaseDate;
+        }
+
         const addFavResponse = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                tmdbId: testMovie.tmdbId,
-                title: testMovie.title,
-                posterPath: testMovie.posterPath,
-                overview: testMovie.overview,
-                releaseDate: testMovie.releaseDate
-            })
+            body: JSON.stringify(favoriteData)
         });
         const addFavData = await addFavResponse.json();
         

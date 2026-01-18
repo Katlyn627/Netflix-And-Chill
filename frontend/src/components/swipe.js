@@ -556,26 +556,26 @@ function handleUndoButton() {
 /**
  * Add movie/TV show to favorites
  */
-async function addToFavorites(movie) {
+async function addToFavorites(content) {
   const userId = window.currentUserId || localStorage.getItem('currentUserId');
   if (!userId) return;
 
   try {
-    const movieData = {
-      tmdbId: movie.tmdbId,
-      title: movie.title,
-      posterPath: movie.posterPath,
-      overview: movie.overview
+    const favoriteData = {
+      tmdbId: content.tmdbId,
+      title: content.title,
+      posterPath: content.posterPath,
+      overview: content.overview
     };
 
     // Add appropriate date field based on content type
-    if (movie.contentType === 'tv') {
-      movieData.firstAirDate = movie.releaseDate;
+    if (content.contentType === 'tv') {
+      favoriteData.firstAirDate = content.releaseDate;
     } else {
-      movieData.releaseDate = movie.releaseDate;
+      favoriteData.releaseDate = content.releaseDate;
     }
 
-    const endpoint = movie.contentType === 'tv' 
+    const endpoint = content.contentType === 'tv' 
       ? `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-tv-shows`
       : `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-movies`;
 
@@ -584,12 +584,12 @@ async function addToFavorites(movie) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(movieData)
+      body: JSON.stringify(favoriteData)
     });
 
     const data = await response.json();
     if (data.success) {
-      console.log(`${movie.contentType === 'tv' ? 'TV show' : 'Movie'} added to favorites:`, movie.title);
+      console.log(`${content.contentType === 'tv' ? 'TV show' : 'Movie'} added to favorites:`, content.title);
     }
   } catch (error) {
     console.error('Error adding to favorites:', error);
