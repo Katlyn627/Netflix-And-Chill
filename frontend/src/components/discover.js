@@ -226,11 +226,21 @@ class DiscoverPage {
         const archetype = user.archetype;
         const personalityText = archetype ? `${archetype.name || archetype.type || 'Movie Lover'}` : '';
         
-        // Get movie preferences/genres as tags
-        const genres = user.preferences?.genres || [];
-        const genreTags = genres.slice(0, 3).map(genre => 
-            `<span class="movie-tag">${genre.name || genre}</span>`
-        ).join('');
+        // Get favorite genres from swipe analytics (preferred) or fall back to preferences
+        let genreTags = '';
+        if (user.swipePreferences && user.swipePreferences.topGenres && user.swipePreferences.topGenres.length > 0) {
+            // Use favorite genres from swipe analytics - shows actual behavior
+            const favoriteGenres = user.swipePreferences.topGenres.slice(0, 3);
+            genreTags = favoriteGenres.map(genreObj => 
+                `<span class="movie-tag">❤️ ${genreObj.genre}</span>`
+            ).join('');
+        } else {
+            // Fallback to preference genres if no swipe data
+            const genres = user.preferences?.genres || [];
+            genreTags = genres.slice(0, 3).map(genre => 
+                `<span class="movie-tag">${genre.name || genre}</span>`
+            ).join('');
+        }
 
         // Get streaming services
         const streamingServices = user.streamingServices || [];
@@ -356,7 +366,21 @@ class DiscoverPage {
         const location = escapeHtml(user.location || 'Not specified');
         const bio = escapeHtml(user.bio || 'No bio available');
         const username = escapeHtml(user.username || 'Unknown');
-        const genres = user.preferences?.genres || [];
+        
+        // Get favorite genres from swipe analytics (preferred) or fall back to preferences
+        let favoriteGenres = [];
+        let genreSource = '';
+        if (user.swipePreferences && user.swipePreferences.topGenres && user.swipePreferences.topGenres.length > 0) {
+            // Use favorite genres from swipe analytics - shows actual behavior
+            favoriteGenres = user.swipePreferences.topGenres.slice(0, 5);
+            genreSource = 'Based on viewing activity';
+        } else {
+            // Fallback to preference genres if no swipe data
+            const prefGenres = user.preferences?.genres || [];
+            favoriteGenres = prefGenres.map(g => ({ genre: g.name || g, count: 0, percentage: 0 }));
+            genreSource = prefGenres.length > 0 ? 'Preferences' : '';
+        }
+        
         const streamingServices = user.streamingServices || [];
         const archetype = user.archetype;
         const personalityBio = user.personalityBio;
@@ -399,11 +423,16 @@ class DiscoverPage {
                 </div>
                 ` : ''}
                 
-                ${genres.length > 0 ? `
+                ${favoriteGenres.length > 0 ? `
                 <div style="margin-bottom: 15px;">
-                    <strong>Favorite Genres:</strong>
+                    <strong>❤️ Favorite Genres:</strong> ${genreSource ? `<small style="color: #999;">(${genreSource})</small>` : ''}
                     <div style="margin-top: 8px;">
-                        ${genres.map(genre => `<span style="display: inline-block; background: #E50914; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(genre))}</span>`).join('')}
+                        ${favoriteGenres.map(genreObj => {
+                            const genreName = typeof genreObj === 'string' ? genreObj : genreObj.genre;
+                            const percentage = genreObj.percentage || 0;
+                            const showPercentage = percentage > 0 ? ` ${percentage}%` : '';
+                            return `<span style="display: inline-block; background: #E50914; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(genreName))}${showPercentage}</span>`;
+                        }).join('')}
                     </div>
                 </div>
                 ` : ''}
