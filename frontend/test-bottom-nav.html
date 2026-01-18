@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Bottom Navigation</title>
+    <!-- NOTE: This test file must be in frontend root directory for relative paths to work -->
     <link rel="stylesheet" href="src/styles/main.css">
     <link rel="stylesheet" href="src/styles/bottom-nav.css">
     <style>
@@ -54,7 +55,8 @@
     </div>
 
     <script>
-        // Set a test user ID to enable navigation
+        // FOR LOCAL TESTING ONLY - Set a test user ID to enable navigation
+        // DO NOT deploy this file to production with hardcoded test credentials
         localStorage.setItem('currentUserId', 'test-user-123');
     </script>
     <script src="src/utils/errorHandler.js"></script>
