@@ -28,6 +28,15 @@ class DiscoverPage {
         if (loading) loading.style.display = 'block';
 
         try {
+            // Fetch current user data first
+            const userResponse = await fetch(`http://localhost:3000/api/users/${this.userId}`);
+            if (userResponse.ok) {
+                this.currentUser = await userResponse.json();
+            } else {
+                console.error('Failed to load current user');
+                this.currentUser = null;
+            }
+
             // Fetch matches
             const matchesResponse = await fetch(`http://localhost:3000/api/matches/find/${this.userId}`);
             if (matchesResponse.ok) {
@@ -61,45 +70,117 @@ class DiscoverPage {
         }
 
         // Sort matches by score
-        const sortedMatches = [...this.allMatches].sort((a, b) => b.score - a.score);
+        const sortedMatches = [...this.allMatches].sort((a, b) => (b.matchScore || b.score || 0) - (a.matchScore || a.score || 0));
 
-        // Recommended for you (top matches)
-        const recommended = sortedMatches.slice(0, 10);
+        // Recommended for you (based on swipe data)
+        const recommended = this.filterBySwipeData(sortedMatches).slice(0, 10);
         this.renderCards('recommended-cards', recommended);
 
-        // Similar interests (users with shared favorite genres)
-        const similarInterests = this.filterBySharedGenres(sortedMatches).slice(0, 10);
-        this.renderCards('similar-interests-cards', similarInterests);
-
         // Similar genres (users with matching genre preferences)
-        const similarGenres = this.filterByGenrePreferences(sortedMatches).slice(0, 10);
+        const similarGenres = this.filterByGenreMatch(sortedMatches).slice(0, 10);
         this.renderCards('similar-genres-cards', similarGenres);
 
         // Similar binge amounts (users with similar binge patterns)
-        const similarBinge = this.filterByBingePatterns(sortedMatches).slice(0, 10);
+        const similarBinge = this.filterByBingeAmount(sortedMatches).slice(0, 10);
         this.renderCards('similar-binge-cards', similarBinge);
     }
 
-    filterBySharedGenres(matches) {
-        // Filter matches that have shared favorite movies/genres
+    filterBySwipeData(matches) {
+        // Filter based on swipe data - users who liked similar movies
+        if (!this.currentUser || !this.currentUser.swipedMovies || this.currentUser.swipedMovies.length === 0) {
+            // If no swipe data, fall back to top matches
+            return matches;
+        }
+
+        // Get user's liked movies
+        const userLikedMovies = this.currentUser.swipedMovies.filter(m => m.action === 'like');
+        if (userLikedMovies.length === 0) {
+            return matches;
+        }
+
+        // Get user's liked genres from swiped movies
+        const userGenres = new Set();
+        userLikedMovies.forEach(movie => {
+            if (movie.genreIds && Array.isArray(movie.genreIds)) {
+                movie.genreIds.forEach(genreId => userGenres.add(genreId));
+            }
+        });
+
+        // Score matches based on genre overlap from swipe data
+        return matches.map(match => {
+            let swipeScore = 0;
+            const user = match.user;
+            
+            // Check if user has swiped movies with similar genres
+            if (user && user.swipedMovies) {
+                const matchLikedMovies = user.swipedMovies.filter(m => m.action === 'like');
+                matchLikedMovies.forEach(movie => {
+                    if (movie.genreIds && Array.isArray(movie.genreIds)) {
+                        movie.genreIds.forEach(genreId => {
+                            if (userGenres.has(genreId)) {
+                                swipeScore += 1;
+                            }
+                        });
+                    }
+                });
+            }
+
+            return { ...match, swipeScore };
+        }).sort((a, b) => b.swipeScore - a.swipeScore);
+    }
+
+    filterByGenreMatch(matches) {
+        // Filter by matching genre preferences - exact genre matches
+        if (!this.currentUser || !this.currentUser.preferences || !this.currentUser.preferences.genres) {
+            return matches;
+        }
+
+        const userGenres = new Set(this.currentUser.preferences.genres);
+        
+        // Only include matches that have at least one matching genre
         return matches.filter(match => {
-            const sharedContent = match.sharedContent || [];
-            return sharedContent.length > 0;
+            const user = match.user;
+            if (!user || !user.preferences || !user.preferences.genres) {
+                return false;
+            }
+
+            // Check if user has any matching genres
+            return user.preferences.genres.some(genre => userGenres.has(genre));
+        }).sort((a, b) => {
+            // Sort by number of matching genres
+            const aGenres = a.user.preferences.genres || [];
+            const bGenres = b.user.preferences.genres || [];
+            
+            const aMatches = aGenres.filter(g => userGenres.has(g)).length;
+            const bMatches = bGenres.filter(g => userGenres.has(g)).length;
+            
+            return bMatches - aMatches;
         });
     }
 
-    filterByGenrePreferences(matches) {
-        // Filter by matching genre preferences
-        return matches.filter(match => {
-            return match.user && match.user.preferences && match.user.preferences.genres;
-        });
-    }
+    filterByBingeAmount(matches) {
+        // Filter by similar binge patterns (bingeWatchCount)
+        if (!this.currentUser || !this.currentUser.preferences) {
+            return matches;
+        }
 
-    filterByBingePatterns(matches) {
-        // Filter by similar binge patterns
-        return matches.filter(match => {
-            return match.user && match.user.preferences && match.user.preferences.bingeCount;
-        });
+        const userBingeCount = this.currentUser.preferences.bingeWatchCount || 0;
+        
+        // Calculate binge similarity and sort by it
+        return matches.map(match => {
+            const user = match.user;
+            let bingeSimilarity = 0;
+            
+            if (user && user.preferences && user.preferences.bingeWatchCount !== undefined) {
+                const matchBingeCount = user.preferences.bingeWatchCount;
+                const difference = Math.abs(userBingeCount - matchBingeCount);
+                // Lower difference = higher similarity
+                bingeSimilarity = Math.max(0, 10 - difference);
+            }
+            
+            return { ...match, bingeSimilarity };
+        }).filter(match => match.bingeSimilarity > 0)
+          .sort((a, b) => b.bingeSimilarity - a.bingeSimilarity);
     }
 
     renderCards(containerId, matches) {
@@ -126,7 +207,11 @@ class DiscoverPage {
         const profilePicture = user.profilePicture || user.photos?.[0]?.url || 'assets/images/default-avatar.png';
         const age = user.age || '?';
         const location = user.location || 'Location not set';
-        const matchScore = Math.round(match.score || 0);
+        const matchScore = Math.round(match.matchScore || 0);
+        
+        // Get movie personality (archetype)
+        const archetype = user.archetype;
+        const personalityText = archetype ? `${archetype.name || archetype.type || 'Movie Lover'}` : '';
         
         // Get movie preferences/genres as tags
         const genres = user.preferences?.genres || [];
@@ -136,9 +221,14 @@ class DiscoverPage {
 
         // Get streaming services
         const streamingServices = user.streamingServices || [];
-        const serviceTags = streamingServices.slice(0, 2).map(service => 
-            `<span class="movie-tag">${service}</span>`
-        ).join('');
+        const serviceTags = streamingServices.filter(s => s && (s.name || s)).slice(0, 2).map(service => {
+            const serviceName = service.name || service;
+            return `<span class="movie-tag">${serviceName}</span>`;
+        }).join('');
+
+        // Get binge count
+        const bingeCount = user.preferences?.bingeWatchCount || user.preferences?.bingeCount || 0;
+        const bingeText = bingeCount > 0 ? `${bingeCount} eps/session` : '';
 
         return `
             <div class="discover-profile-card" data-user-id="${user.id}">
@@ -157,6 +247,8 @@ class DiscoverPage {
                         ${user.verified ? '<span class="verification-badge">✓</span>' : ''}
                     </div>
                     <div class="card-user-details">${location}</div>
+                    ${personalityText ? `<div class="card-personality">🎬 ${personalityText}</div>` : ''}
+                    ${bingeText ? `<div class="card-binge">📺 ${bingeText}</div>` : ''}
                     <div class="card-match-score">${matchScore}% Match</div>
                     <div class="card-actions">
                         <button class="heart-btn ${isLiked ? 'liked' : ''}" data-user-id="${user.id}" onclick="window.discoverPage.handleLike('${user.id}')">
@@ -253,6 +345,9 @@ class DiscoverPage {
         const username = escapeHtml(user.username || 'Unknown');
         const genres = user.preferences?.genres || [];
         const streamingServices = user.streamingServices || [];
+        const archetype = user.archetype;
+        const personalityBio = user.personalityBio;
+        const bingeCount = user.preferences?.bingeWatchCount || user.preferences?.bingeCount || 0;
         
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px;">
@@ -278,6 +373,19 @@ class DiscoverPage {
                     <p style="font-style: italic; color: #888;">"${bio}"</p>
                 </div>
                 
+                ${archetype ? `
+                <div style="margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                    <strong>🎬 Movie Personality:</strong> ${escapeHtml(archetype.name || archetype.type || 'Movie Lover')}
+                    ${archetype.description ? `<p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">${escapeHtml(archetype.description)}</p>` : ''}
+                </div>
+                ` : ''}
+                
+                ${personalityBio ? `
+                <div style="margin-bottom: 15px;">
+                    <p style="color: #666; font-size: 0.95em;">${escapeHtml(personalityBio)}</p>
+                </div>
+                ` : ''}
+                
                 ${genres.length > 0 ? `
                 <div style="margin-bottom: 15px;">
                     <strong>Favorite Genres:</strong>
@@ -291,14 +399,17 @@ class DiscoverPage {
                 <div style="margin-bottom: 15px;">
                     <strong>Streaming Services:</strong>
                     <div style="margin-top: 8px;">
-                        ${streamingServices.map(service => `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(service))}</span>`).join('')}
+                        ${streamingServices.filter(s => s && (s.name || s)).map(service => {
+                            const serviceName = service.name || service;
+                            return `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(serviceName))}</span>`;
+                        }).join('')}
                     </div>
                 </div>
                 ` : ''}
                 
-                ${user.preferences?.bingeCount ? `
+                ${bingeCount > 0 ? `
                 <div style="margin-bottom: 15px;">
-                    <p style="color: #666;"><strong>Binge Watch Episodes:</strong> ${escapeHtml(String(user.preferences.bingeCount))} per session</p>
+                    <p style="color: #666;"><strong>Binge Watch Episodes:</strong> ${escapeHtml(String(bingeCount))} per session</p>
                 </div>
                 ` : ''}
             </div>
