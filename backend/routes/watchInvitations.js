@@ -5,7 +5,9 @@ const {
   getUserInvitations,
   getInvitation,
   updateInvitationStatus,
-  deleteInvitation
+  deleteInvitation,
+  getUnreadInvitationCounts,
+  markInvitationAsRead
 } = require('../controllers/watchInvitationController');
 
 // TODO: Add rate limiting to all routes for production deployment
@@ -13,6 +15,9 @@ const {
 
 // Create a new watch invitation
 router.post('/', createWatchInvitation);
+
+// Get unread invitation counts for a user
+router.get('/unread/:userId', getUnreadInvitationCounts);
 
 // Get all invitations for a user (sent and received)
 router.get('/user/:userId', getUserInvitations);
@@ -22,6 +27,9 @@ router.get('/:invitationId', getInvitation);
 
 // Update invitation status or join link
 router.put('/:invitationId', updateInvitationStatus);
+
+// Mark invitation as read
+router.put('/:invitationId/read', markInvitationAsRead);
 
 // Delete an invitation
 router.delete('/:invitationId', deleteInvitation);

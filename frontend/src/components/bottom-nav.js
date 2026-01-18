@@ -10,6 +10,8 @@ class BottomNavigation {
         this.isPremium = false;
         this.likedYouCount = 0;
         this.unreadMessagesCount = 0;
+        this.unreadInvitationsCount = 0;
+        this.notificationPollInterval = null;
         this.init();
     }
 
@@ -28,9 +30,11 @@ class BottomNavigation {
         // Fetch user data to check premium status
         if (this.userId) {
             await this.fetchUserData();
+            await this.fetchNotificationCounts();
         }
         this.render();
         this.attachEventListeners();
+        this.startNotificationPolling();
     }
 
     async fetchUserData() {
@@ -49,6 +53,78 @@ class BottomNavigation {
             }
         } catch (error) {
             console.error('Error fetching user data:', error);
+        }
+    }
+
+    async fetchNotificationCounts() {
+        try {
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/chat/notifications/${this.userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                this.unreadMessagesCount = data.totalUnreadMessages || 0;
+                this.unreadInvitationsCount = data.unreadInvitations || 0;
+            }
+        } catch (error) {
+            console.error('[BottomNav] Error fetching notification counts:', error);
+        }
+    }
+
+    startNotificationPolling() {
+        // If there's already a global notification manager, subscribe to its updates
+        if (window.notificationManager) {
+            window.notificationManager.setUpdateCallback((messages, invitations) => {
+                this.unreadMessagesCount = messages;
+                this.unreadInvitationsCount = invitations;
+                this.updateNotificationBadges();
+            });
+            // Initial sync
+            this.unreadMessagesCount = window.notificationManager.unreadMessagesCount || 0;
+            this.unreadInvitationsCount = window.notificationManager.unreadInvitationsCount || 0;
+            this.updateNotificationBadges();
+            return;
+        }
+        
+        // Otherwise, poll independently every 5 seconds
+        this.notificationPollInterval = setInterval(async () => {
+            await this.fetchNotificationCounts();
+            this.updateNotificationBadges();
+        }, 5000);
+    }
+
+    stopNotificationPolling() {
+        if (this.notificationPollInterval) {
+            clearInterval(this.notificationPollInterval);
+            this.notificationPollInterval = null;
+        }
+        
+        // Unsubscribe from global notification manager if we were using it
+        if (window.notificationManager && window.notificationManager.onUpdate) {
+            window.notificationManager.onUpdate = null;
+        }
+    }
+
+    updateNotificationBadges() {
+        // Update chat badge
+        const chatBadge = document.querySelector('.bottom-nav-item[data-page="chats"] .bottom-nav-badge');
+        if (chatBadge) {
+            if (this.unreadMessagesCount > 0) {
+                chatBadge.textContent = this.unreadMessagesCount;
+                chatBadge.style.display = '';
+            } else {
+                chatBadge.style.display = 'none';
+            }
+        }
+
+        // Update watch together badge
+        const watchBadge = document.querySelector('.bottom-nav-item[data-page="watch-together"] .bottom-nav-badge');
+        if (watchBadge) {
+            if (this.unreadInvitationsCount > 0) {
+                watchBadge.textContent = this.unreadInvitationsCount;
+                watchBadge.style.display = '';
+            } else {
+                watchBadge.style.display = 'none';
+            }
         }
     }
 
@@ -91,6 +167,7 @@ class BottomNavigation {
                 <a href="watch-together.html" class="bottom-nav-item ${this.currentPage === 'watch-together' ? 'active' : ''}" data-page="watch-together">
                     <div class="bottom-nav-icon">📺</div>
                     <div class="bottom-nav-label">Watch</div>
+                    ${this.unreadInvitationsCount > 0 ? `<span class="bottom-nav-badge">${this.unreadInvitationsCount}</span>` : ''}
                 </a>
             </nav>
         `;
@@ -139,6 +216,11 @@ class BottomNavigation {
         this.unreadMessagesCount = unreadMessagesCount || 0;
         this.render();
     }
+
+    destroy() {
+        // Clean up polling interval
+        this.stopNotificationPolling();
+    }
 }
 
 // Initialize bottom navigation on page load
@@ -147,5 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const userId = localStorage.getItem('currentUserId');
     if (userId) {
         window.bottomNav = new BottomNavigation();
+    }
+});
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+    if (window.bottomNav) {
+        window.bottomNav.destroy();
     }
 });

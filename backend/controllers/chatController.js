@@ -224,6 +224,61 @@ class ChatController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Get all notification counts (messages and invitations)
+  async getAllNotificationCounts(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+
+      const dataStore = await getDatabase();
+      
+      // Get unread messages count
+      const allMessages = await dataStore.loadChats();
+      let totalUnreadMessages = 0;
+      const unreadCounts = {};
+      
+      allMessages.forEach(msg => {
+        if (msg.receiverId === userId && !msg.read) {
+          if (!unreadCounts[msg.senderId]) {
+            unreadCounts[msg.senderId] = 0;
+          }
+          unreadCounts[msg.senderId]++;
+          totalUnreadMessages++;
+        }
+      });
+
+      // Get unread watch invitations count
+      const fs = require('fs').promises;
+      const path = require('path');
+      const invitationsFile = path.join(__dirname, '../../data/watchInvitations.json');
+      let unreadInvitations = 0;
+      
+      try {
+        const data = await fs.readFile(invitationsFile, 'utf8');
+        const invitations = JSON.parse(data);
+        unreadInvitations = invitations.filter(inv => 
+          inv.toUserId === userId && !inv.read && inv.status === 'pending'
+        ).length;
+      } catch (error) {
+        // File doesn't exist or error reading, default to 0
+        unreadInvitations = 0;
+      }
+
+      res.json({
+        success: true,
+        userId,
+        totalUnreadMessages,
+        unreadInvitations,
+        unreadCounts
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new ChatController();

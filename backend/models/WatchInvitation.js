@@ -11,6 +11,7 @@ class WatchInvitation {
     this.scheduledTime = data.scheduledTime; // Time string (e.g., "19:30")
     this.joinLink = data.joinLink || null; // Platform-specific join link
     this.status = data.status || 'pending'; // 'pending', 'accepted', 'declined', 'cancelled'
+    this.read = data.read || false; // Whether the recipient has viewed the invitation
     this.instructions = data.instructions || this.generateInstructions();
     this.createdAt = data.createdAt || new Date().toISOString();
     this.updatedAt = data.updatedAt || new Date().toISOString();
@@ -96,6 +97,7 @@ class WatchInvitation {
       scheduledTime: this.scheduledTime,
       joinLink: this.joinLink,
       status: this.status,
+      read: this.read,
       instructions: this.instructions,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
