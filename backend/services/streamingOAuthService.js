@@ -323,9 +323,28 @@ class StreamingOAuthService {
    */
   isProviderEnabled(provider) {
     const providerConfig = this.providers[provider];
-    return providerConfig && providerConfig.enabled && 
-           providerConfig.clientId && 
-           providerConfig.clientId !== `YOUR_${provider.toUpperCase()}_CLIENT_ID`;
+    if (!providerConfig) {
+      return false;
+    }
+    
+    // Check if explicitly enabled
+    if (!providerConfig.enabled) {
+      return false;
+    }
+    
+    // Check if client credentials are configured (not null/undefined/empty)
+    if (!providerConfig.clientId || !providerConfig.clientSecret) {
+      return false;
+    }
+    
+    // Ensure credentials are not placeholder values by checking length and format
+    // Placeholder typically starts with "YOUR_" - real credentials don't
+    if (providerConfig.clientId.startsWith('YOUR_') || 
+        providerConfig.clientSecret.startsWith('YOUR_')) {
+      return false;
+    }
+    
+    return true;
   }
 
   /**

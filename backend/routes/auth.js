@@ -4,8 +4,24 @@ const crypto = require('crypto');
 const streamingOAuthService = require('../services/streamingOAuthService');
 const database = require('../utils/database');
 
-// Store for CSRF state tokens (in production, use Redis or database)
+// Store for CSRF state tokens
+// NOTE: In production with multiple server instances, use Redis or database storage
+// This in-memory store is suitable for development/single-instance deployments
 const stateStore = new Map();
+
+// Clean up expired state tokens every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  const expiredStates = [];
+  
+  for (const [state, data] of stateStore.entries()) {
+    if (now - data.createdAt > 10 * 60 * 1000) { // 10 minutes
+      expiredStates.push(state);
+    }
+  }
+  
+  expiredStates.forEach(state => stateStore.delete(state));
+}, 5 * 60 * 1000);
 
 /**
  * GET /api/auth/:provider/connect

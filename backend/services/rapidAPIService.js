@@ -15,10 +15,17 @@ class RapidAPIService {
    * @returns {boolean}
    */
   isConfigured() {
-    return this.clientKey && 
-           this.clientKey !== 'YOUR_RAPIDAPI_CLIENT_KEY_HERE' &&
-           this.clientHost &&
-           this.clientHost !== 'YOUR_RAPIDAPI_CLIENT_HOST_HERE';
+    // Check if credentials exist and are not null/undefined
+    if (!this.clientKey || !this.clientHost) {
+      return false;
+    }
+    
+    // Ensure credentials are not placeholder values by checking if they start with "YOUR_"
+    if (this.clientKey.startsWith('YOUR_') || this.clientHost.startsWith('YOUR_')) {
+      return false;
+    }
+    
+    return true;
   }
 
   /**

@@ -4,6 +4,32 @@
  */
 
 const config = require('../config/config');
+const crypto = require('crypto');
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ * @param {string} a - First string
+ * @param {string} b - Second string
+ * @returns {boolean} True if strings are equal
+ */
+function constantTimeCompare(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') {
+    return false;
+  }
+  
+  // Convert to buffers for constant-time comparison
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  
+  // Use crypto.timingSafeEqual for constant-time comparison
+  // Returns true only if buffers are equal length and content
+  try {
+    return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+  } catch (e) {
+    // Lengths don't match, return false
+    return false;
+  }
+}
 
 /**
  * Middleware to validate RapidAPI key in request headers
@@ -29,10 +55,12 @@ const validateRapidApiKey = (req, res, next) => {
     });
   }
 
-  // Validate the API key against configured keys
+  // Validate the API key against configured keys using constant-time comparison
   const validKeys = config.rapidapi.apiKeys || [];
   
-  if (!validKeys.includes(apiKey)) {
+  const isValid = validKeys.some(validKey => constantTimeCompare(apiKey, validKey));
+  
+  if (!isValid) {
     return res.status(403).json({
       error: 'Forbidden',
       message: 'Invalid API key'
