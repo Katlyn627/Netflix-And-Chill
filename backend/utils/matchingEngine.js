@@ -784,16 +784,36 @@ class MatchingEngine {
 
   /**
    * Calculate viewing time compatibility (night owl vs early bird)
-   * Based on watch history patterns and quiz responses
+   * Based on streaming service preferences and genre choices
+   * Night owls tend to prefer certain genres like horror, thriller
+   * Early birds might prefer news, documentary, family content
    */
   static calculateViewingTimeCompatibility(user1, user2) {
-    // This would ideally use actual viewing timestamp data
-    // For now, we'll use a simplified heuristic based on binge count and quiz data
-    const u1NightOwl = (user1.preferences?.bingeWatchCount || 0) > 5;
-    const u2NightOwl = (user2.preferences?.bingeWatchCount || 0) > 5;
+    // Define genre preferences that suggest night owl vs early bird
+    const nightOwlGenres = ['horror', 'thriller', 'mystery', 'sci-fi', 'action'];
+    const earlyBirdGenres = ['documentary', 'news', 'family', 'animation', 'comedy'];
     
-    // Award points if both are night owls or both are not
-    return u1NightOwl === u2NightOwl ? 8 : 3;
+    const u1Genres = (user1.preferences?.genres || []).map(g => 
+      typeof g === 'string' ? g.toLowerCase() : (g.name || g.id || '').toLowerCase()
+    );
+    const u2Genres = (user2.preferences?.genres || []).map(g => 
+      typeof g === 'string' ? g.toLowerCase() : (g.name || g.id || '').toLowerCase()
+    );
+    
+    // Calculate night owl tendency (0-1 scale)
+    const u1NightOwlScore = u1Genres.filter(g => nightOwlGenres.some(ng => g.includes(ng))).length / Math.max(u1Genres.length, 1);
+    const u2NightOwlScore = u2Genres.filter(g => nightOwlGenres.some(ng => g.includes(ng))).length / Math.max(u2Genres.length, 1);
+    
+    // Calculate early bird tendency (0-1 scale)
+    const u1EarlyBirdScore = u1Genres.filter(g => earlyBirdGenres.some(eg => g.includes(eg))).length / Math.max(u1Genres.length, 1);
+    const u2EarlyBirdScore = u2Genres.filter(g => earlyBirdGenres.some(eg => g.includes(eg))).length / Math.max(u2Genres.length, 1);
+    
+    // Calculate similarity in viewing time preference
+    const nightOwlSimilarity = 1 - Math.abs(u1NightOwlScore - u2NightOwlScore);
+    const earlyBirdSimilarity = 1 - Math.abs(u1EarlyBirdScore - u2EarlyBirdScore);
+    
+    // Return average similarity score scaled to 0-8 points
+    return Math.round((nightOwlSimilarity + earlyBirdSimilarity) / 2 * 8);
   }
 
   /**

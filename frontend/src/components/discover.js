@@ -215,7 +215,8 @@ class DiscoverPage {
     async viewProfile(userId) {
         // Show modal with basic user info instead of navigating to profile-view.html
         try {
-            const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/users/${userId}`);
             if (!response.ok) throw new Error('Failed to load user');
             
             const user = await response.json();
@@ -233,6 +234,13 @@ class DiscoverPage {
             existingModal.remove();
         }
 
+        // Helper function to escape HTML
+        const escapeHtml = (text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+
         const modal = document.createElement('div');
         modal.id = 'user-info-modal';
         modal.className = 'modal';
@@ -240,10 +248,12 @@ class DiscoverPage {
         
         const profilePicture = user.profilePicture || user.photos?.[0]?.url || 'assets/images/default-avatar.png';
         const age = user.age || 'N/A';
-        const location = user.location || 'Not specified';
-        const bio = user.bio || 'No bio available';
+        const location = escapeHtml(user.location || 'Not specified');
+        const bio = escapeHtml(user.bio || 'No bio available');
+        const username = escapeHtml(user.username || 'Unknown');
         const genres = user.preferences?.genres || [];
         const streamingServices = user.streamingServices || [];
+        const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
         
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px;">
@@ -253,16 +263,16 @@ class DiscoverPage {
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="${profilePicture}" alt="${user.username}" 
+                    <img src="${escapeHtml(profilePicture)}" alt="${username}" 
                          style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover;"
                          onerror="this.src='assets/images/default-avatar.png'">
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                    <h3 style="margin: 0 0 10px 0;">${user.username}, ${age}</h3>
+                    <h3 style="margin: 0 0 10px 0;">${username}, ${escapeHtml(String(age))}</h3>
                     <p style="color: #666; margin: 5px 0;"><strong>Location:</strong> ${location}</p>
-                    ${user.gender ? `<p style="color: #666; margin: 5px 0;"><strong>Gender:</strong> ${user.gender.charAt(0).toUpperCase() + user.gender.slice(1)}</p>` : ''}
-                    ${user.sexualOrientation ? `<p style="color: #666; margin: 5px 0;"><strong>Orientation:</strong> ${user.sexualOrientation.charAt(0).toUpperCase() + user.sexualOrientation.slice(1)}</p>` : ''}
+                    ${user.gender ? `<p style="color: #666; margin: 5px 0;"><strong>Gender:</strong> ${escapeHtml(user.gender.charAt(0).toUpperCase() + user.gender.slice(1))}</p>` : ''}
+                    ${user.sexualOrientation ? `<p style="color: #666; margin: 5px 0;"><strong>Orientation:</strong> ${escapeHtml(user.sexualOrientation.charAt(0).toUpperCase() + user.sexualOrientation.slice(1))}</p>` : ''}
                 </div>
                 
                 <div style="margin-bottom: 15px;">
@@ -273,7 +283,7 @@ class DiscoverPage {
                 <div style="margin-bottom: 15px;">
                     <strong>Favorite Genres:</strong>
                     <div style="margin-top: 8px;">
-                        ${genres.map(genre => `<span style="display: inline-block; background: #E50914; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${genre}</span>`).join('')}
+                        ${genres.map(genre => `<span style="display: inline-block; background: #E50914; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(genre))}</span>`).join('')}
                     </div>
                 </div>
                 ` : ''}
@@ -282,14 +292,14 @@ class DiscoverPage {
                 <div style="margin-bottom: 15px;">
                     <strong>Streaming Services:</strong>
                     <div style="margin-top: 8px;">
-                        ${streamingServices.map(service => `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${service}</span>`).join('')}
+                        ${streamingServices.map(service => `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(String(service))}</span>`).join('')}
                     </div>
                 </div>
                 ` : ''}
                 
                 ${user.preferences?.bingeCount ? `
                 <div style="margin-bottom: 15px;">
-                    <p style="color: #666;"><strong>Binge Watch Episodes:</strong> ${user.preferences.bingeCount} per session</p>
+                    <p style="color: #666;"><strong>Binge Watch Episodes:</strong> ${escapeHtml(String(user.preferences.bingeCount))} per session</p>
                 </div>
                 ` : ''}
             </div>
