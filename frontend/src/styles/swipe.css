@@ -529,3 +529,91 @@
   box-shadow: 0 2px 4px rgba(229, 9, 20, 0.3);
 }
 
+/* Enhanced Movie Card Styles */
+.movie-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.movie-rating-detailed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-stars {
+  font-size: 0.95rem;
+  color: #E50914;
+  font-weight: 700;
+}
+
+.movie-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.genre-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.streaming-availability {
+  margin: 12px 0;
+  padding: 10px;
+  background: rgba(229, 9, 20, 0.05);
+  border-radius: 10px;
+  border-left: 3px solid #E50914;
+}
+
+.streaming-availability .streaming-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.streaming-services {
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.content-type-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+.movie-badge {
+  background: linear-gradient(135deg, #E50914 0%, #831010 100%);
+  color: white;
+}
+
+.tv-badge {
+  background: linear-gradient(135deg, #4A90E2 0%, #2E5D8F 100%);
+  color: white;
+}
+
+
