@@ -170,6 +170,212 @@ const data = await rapidAPIService.get(
 
 ---
 
+## Streaming Platform OAuth Integration
+
+### Connecting Streaming Services - **OPTIONAL**
+
+**Purpose:** Connect users' streaming accounts (Netflix, Hulu, Disney+, Prime Video, HBO Max, Apple TV+) to:
+- Automatically sync watch history
+- Import viewing preferences
+- Enable better matching based on actual viewing behavior
+- Provide personalized recommendations
+
+#### Important Notes
+
+**⚠️ API Access Restrictions:**
+Most major streaming platforms have highly restricted API access and do not offer public OAuth APIs. This feature requires:
+- Applying to each platform's developer/partner program
+- Enterprise-level agreements in most cases
+- Strict compliance with terms of service
+- Often requires significant business justification
+
+**Alternative Approaches:**
+1. **Manual Entry**: Users manually add their favorite shows/movies (current default)
+2. **Third-Party Services**: Use services like Watchmode API for availability data
+3. **Browser Extensions**: Build browser extensions that can extract watch history
+4. **Email Parsing**: Parse confirmation emails from streaming services
+5. **Partnership**: Establish official partnerships with streaming platforms
+
+#### Netflix OAuth (Not Publicly Available)
+
+Netflix currently does **not** offer a public OAuth API. Access requires:
+- Enterprise partnership agreements
+- Membership in Netflix Partner Program
+- Specific business use cases
+
+**If you have access:**
+
+1. Contact Netflix Partner Program at https://partner.netflix.com/
+2. Apply for API access through their partner portal
+3. Once approved, you'll receive:
+   - Client ID
+   - Client Secret
+   - API documentation
+4. Add to `.env` file:
+   ```
+   NETFLIX_OAUTH_ENABLED=true
+   NETFLIX_CLIENT_ID=your_netflix_client_id
+   NETFLIX_CLIENT_SECRET=your_netflix_client_secret
+   NETFLIX_REDIRECT_URI=http://localhost:3000/api/auth/netflix/callback
+   ```
+
+**Features:**
+- Access to user's viewing history
+- Profile information
+- Watch progress data
+- Viewing preferences
+
+#### Hulu OAuth (Partner Access Only)
+
+Hulu's API is restricted to partners and advertisers.
+
+**Contact:** https://www.hulu.com/advertising
+
+Configuration:
+```
+HULU_OAUTH_ENABLED=true
+HULU_CLIENT_ID=your_hulu_client_id
+HULU_CLIENT_SECRET=your_hulu_client_secret
+HULU_REDIRECT_URI=http://localhost:3000/api/auth/hulu/callback
+```
+
+#### Disney+ OAuth (Not Publicly Available)
+
+Disney+ does not currently offer public API access.
+
+**Alternative:** Use TMDB API for Disney content metadata.
+
+Configuration (if you have access):
+```
+DISNEY_OAUTH_ENABLED=true
+DISNEY_CLIENT_ID=your_disney_client_id
+DISNEY_CLIENT_SECRET=your_disney_client_secret
+DISNEY_REDIRECT_URI=http://localhost:3000/api/auth/disney/callback
+```
+
+#### Amazon Prime Video OAuth
+
+Prime Video access is part of Amazon's broader API ecosystem.
+
+**Setup:**
+1. Go to https://developer.amazon.com/
+2. Create a developer account
+3. Register a new Security Profile
+4. Request access to Prime Video APIs (if available)
+5. Add to `.env`:
+   ```
+   PRIME_OAUTH_ENABLED=true
+   PRIME_CLIENT_ID=your_prime_client_id
+   PRIME_CLIENT_SECRET=your_prime_client_secret
+   PRIME_REDIRECT_URI=http://localhost:3000/api/auth/prime/callback
+   ```
+
+**Documentation:** https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html
+
+#### HBO Max OAuth (Warner Bros. Discovery)
+
+HBO Max API access is restricted.
+
+Configuration (if available):
+```
+HBO_OAUTH_ENABLED=true
+HBO_CLIENT_ID=your_hbo_client_id
+HBO_CLIENT_SECRET=your_hbo_client_secret
+HBO_REDIRECT_URI=http://localhost:3000/api/auth/hbo/callback
+```
+
+#### Apple TV+ OAuth
+
+Apple TV+ uses Apple's Sign In with Apple system.
+
+**Setup:**
+1. Go to https://developer.apple.com/
+2. Enroll in Apple Developer Program ($99/year)
+3. Create an App ID with "Sign in with Apple" capability
+4. Create a Services ID for web authentication
+5. Configure domains and redirect URLs
+6. Generate a private key for authentication
+7. Add to `.env`:
+   ```
+   APPLETV_OAUTH_ENABLED=true
+   APPLETV_CLIENT_ID=your_services_id
+   APPLETV_CLIENT_SECRET=generated_jwt_token
+   APPLETV_REDIRECT_URI=http://localhost:3000/api/auth/appletv/callback
+   ```
+
+**Documentation:** https://developer.apple.com/sign-in-with-apple/
+
+#### Using the OAuth Integration
+
+Once configured, users can connect their streaming accounts through:
+
+1. **Profile Settings Page:**
+   - Click "Connect Streaming Services"
+   - Select platform (e.g., Netflix, Hulu)
+   - Redirected to platform's login page
+   - Authorize the app
+   - Redirected back with watch history synced
+
+2. **API Endpoints:**
+
+```javascript
+// Initiate OAuth flow
+GET /api/auth/:provider/connect?userId=user123
+
+// Check connection status
+GET /api/auth/:provider/status?userId=user123
+
+// Manually sync watch history
+POST /api/auth/:provider/sync-history
+Body: { userId: "user123" }
+
+// Disconnect platform
+POST /api/auth/:provider/disconnect
+Body: { userId: "user123" }
+
+// Refresh expired token
+POST /api/auth/:provider/refresh
+Body: { userId: "user123" }
+```
+
+3. **Available Providers:**
+```javascript
+// Get list of enabled providers
+GET /api/auth/providers
+```
+
+#### Security Considerations
+
+- **OAuth Tokens:** Stored encrypted in user profile
+- **Token Expiry:** Automatically handled with refresh tokens
+- **CSRF Protection:** State tokens prevent cross-site attacks
+- **Scope Limiting:** Request only necessary permissions
+- **Token Revocation:** Users can disconnect anytime
+- **Data Privacy:** Watch history stored locally, not shared
+
+#### Troubleshooting
+
+**"OAuth not configured" error:**
+- Verify environment variables are set
+- Check `ENABLED` flag is `true`
+- Ensure client ID/secret are valid
+
+**"Token expired" error:**
+- Use the refresh endpoint to get new tokens
+- Some platforms require users to reconnect periodically
+
+**"Failed to sync watch history":**
+- Check platform's API status
+- Verify OAuth scopes include history access
+- Some platforms limit historical data (e.g., last 90 days)
+
+**No watch history returned:**
+- Platform may not provide history via API
+- User may have privacy settings enabled
+- API access may be limited to specific data types
+
+---
+
 ## Authentication Services
 
 ### Option 1: Firebase Authentication (Recommended)

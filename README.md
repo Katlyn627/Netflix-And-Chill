@@ -9,6 +9,7 @@ A modern dating application that matches users based on their streaming preferen
 - **Profile Pictures & Photo Galleries**: Upload profile pictures and up to 6 photos
 - **Favorite Movies**: Search and add your favorite movies from TMDB to your profile
 - **Profile Watch History Management**: Add and update your watch history directly from your profile page
+- **Streaming Platform OAuth Integration**: Connect your Netflix, Hulu, Disney+, Prime Video, HBO Max, or Apple TV+ accounts to automatically sync watch history (requires platform API access)
 - **Viewing Preferences**: Set your favorite genres and binge-watching count for better matches
 - **Streaming Service Integration**: Connect multiple streaming platforms (Netflix, Hulu, Disney+, Amazon Prime, HBO Max, Apple TV+)
 - **Real Streaming API Integration**: Get real movie/TV show data from TMDB API
@@ -330,6 +331,19 @@ Netflix and Chill integrates with various external APIs and services to provide 
 - **Client Mode**: Access thousands of APIs from RapidAPI marketplace
 - Standardized authentication with `X-RapidAPI-Key` headers
 - Built-in rate limiting and usage tracking
+
+### Streaming Platform OAuth (Beta)
+
+| Service | Purpose | Required | API Access | Get API Key |
+|---------|---------|----------|------------|-------------|
+| **Netflix** | Auto-sync watch history, preferences | 🟡 Optional | Partner Only | [Partner Program](https://partner.netflix.com/) |
+| **Hulu** | Auto-sync watch history, preferences | 🟡 Optional | Partner Only | [Advertising](https://www.hulu.com/advertising) |
+| **Disney+** | Auto-sync watch history, preferences | 🟡 Optional | Restricted | Contact Disney |
+| **Prime Video** | Auto-sync watch history, preferences | 🟡 Optional | Limited | [Amazon Dev](https://developer.amazon.com/) |
+| **HBO Max** | Auto-sync watch history, preferences | 🟡 Optional | Restricted | Contact WBD |
+| **Apple TV+** | Auto-sync watch history, preferences | 🟡 Optional | Sign In with Apple | [Apple Dev](https://developer.apple.com/) |
+
+**⚠️ Note:** Most streaming platforms have highly restricted API access. See [API_KEYS_GUIDE.md](docs/guides/API_KEYS_GUIDE.md#streaming-platform-oauth-integration) for details on alternatives.
 
 ### Authentication (Choose One)
 

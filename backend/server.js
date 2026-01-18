@@ -13,6 +13,7 @@ const uploadRoutes = require('./routes/uploads');
 const chatRoutes = require('./routes/chat');
 const swipeRoutes = require('./routes/swipe');
 const watchInvitationRoutes = require('./routes/watchInvitations');
+const authRoutes = require('./routes/auth');
 const { validateRapidApiKey } = require('./middleware/rapidApiAuth');
 
 const app = express();
@@ -67,6 +68,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/swipe', swipeRoutes);
 app.use('/api/watch-invitations', watchInvitationRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
