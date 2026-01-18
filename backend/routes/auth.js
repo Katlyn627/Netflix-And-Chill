@@ -85,8 +85,9 @@ router.get('/:provider/connect', rateLimiters.auth, async (req, res) => {
 /**
  * GET /api/auth/:provider/callback
  * OAuth callback endpoint
+ * Rate limited to prevent callback abuse
  */
-router.get('/:provider/callback', async (req, res) => {
+router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
   try {
     const { provider } = req.params;
     const { code, state, error, error_description } = req.query;
@@ -263,8 +264,9 @@ router.post('/:provider/refresh', rateLimiters.auth, async (req, res) => {
 /**
  * GET /api/auth/:provider/status
  * Check connection status for streaming platform
+ * Rate limited to prevent status polling abuse
  */
-router.get('/:provider/status', async (req, res) => {
+router.get('/:provider/status', rateLimiters.api, async (req, res) => {
   try {
     const { provider } = req.params;
     const { userId } = req.query;
