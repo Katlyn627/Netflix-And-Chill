@@ -142,7 +142,8 @@ class MatchController {
               archetype: matchedUser.archetype,
               personalityBio: matchedUser.personalityBio,
               preferences: matchedUser.preferences,
-              swipedMovies: matchedUser.swipedMovies
+              swipedMovies: matchedUser.swipedMovies,
+              swipePreferences: matchedUser.swipePreferences
             }
           };
         })
@@ -209,7 +210,8 @@ class MatchController {
               archetype: matchedUser.archetype,
               personalityBio: matchedUser.personalityBio,
               preferences: matchedUser.preferences,
-              swipedMovies: matchedUser.swipedMovies
+              swipedMovies: matchedUser.swipedMovies,
+              swipePreferences: matchedUser.swipePreferences
             }
           };
         })
