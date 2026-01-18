@@ -22,6 +22,34 @@ let currentPage = 1;
 let isLoadingMore = false;
 let superLikesRemaining = MAX_SUPER_LIKES_PER_DAY;
 let dailySwipesRemaining = MAX_DAILY_SWIPES;
+let genresMap = {}; // Store genre ID to name mapping
+
+/**
+ * Fetch and cache genre names
+ */
+async function fetchGenres() {
+  try {
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/streaming/genres`);
+    const data = await response.json();
+    
+    if (data && data.genres) {
+      // Create a map of genre ID to genre name
+      data.genres.forEach(genre => {
+        genresMap[genre.id] = genre.name;
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching genres:', error);
+  }
+}
+
+/**
+ * Get genre names from genre IDs
+ */
+function getGenreNames(genreIds) {
+  if (!genreIds || genreIds.length === 0) return [];
+  return genreIds.map(id => genresMap[id] || 'Unknown').filter(name => name !== 'Unknown');
+}
 
 /**
  * Initialize gamification counters from localStorage
@@ -86,6 +114,9 @@ async function initializeSwipe(userId) {
     // Initialize gamification state
     initializeGamificationState();
     
+    // Fetch genres for display
+    await fetchGenres();
+    
     // Update likes counter if available
     const statsResponse = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/stats/${userId}`);
     const statsData = await statsResponse.json();
@@ -97,9 +128,9 @@ async function initializeSwipe(userId) {
       }
     }
 
-    // Fetch movies for swiping - unlimited
+    // Fetch movies for swiping - with streaming availability
     currentPage = 1;
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}`);
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}&includeStreaming=true`);
     const data = await response.json();
 
     if (data.success && data.movies) {
@@ -126,7 +157,7 @@ async function loadMoreMoviesInBackground(userId) {
   isLoadingMore = true;
   try {
     currentPage++;
-    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}`);
+    const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3000/api'}/swipe/movies/${userId}?limit=${INITIAL_LOAD_COUNT}&page=${currentPage}&includeStreaming=true`);
     const data = await response.json();
 
     if (data.success && data.movies && data.movies.length > 0) {
@@ -171,15 +202,59 @@ function renderCurrentMovie() {
 
   const movie = movieStack[currentMovieIndex];
   
+  // Get genre names
+  const genreNames = getGenreNames(movie.genreIds);
+  const genresHtml = genreNames.length > 0 
+    ? `<div class="movie-genres">${genreNames.slice(0, 3).map(g => `<span class="genre-tag">${g}</span>`).join('')}</div>` 
+    : '';
+  
+  // Format rating with vote count
+  const ratingHtml = movie.rating 
+    ? `<div class="movie-rating-detailed">
+         <span class="rating-stars">⭐ ${movie.rating.toFixed(1)}/10</span>
+       </div>` 
+    : '';
+  
+  // Format streaming availability
+  let streamingHtml = '';
+  if (movie.streamingAvailability && movie.streamingAvailability.available) {
+    const sources = movie.streamingAvailability.sources;
+    const subscriptionServices = sources.subscription || [];
+    const freeServices = sources.free || [];
+    
+    if (subscriptionServices.length > 0 || freeServices.length > 0) {
+      const allServices = [...subscriptionServices, ...freeServices];
+      const serviceNames = allServices.slice(0, 3).map(s => s.name).join(', ');
+      const moreCount = allServices.length > 3 ? ` +${allServices.length - 3} more` : '';
+      
+      streamingHtml = `
+        <div class="streaming-availability">
+          <div class="streaming-label">📺 Available on:</div>
+          <div class="streaming-services">${serviceNames}${moreCount}</div>
+        </div>
+      `;
+    }
+  }
+  
+  // Show content type badge
+  const contentTypeBadge = movie.contentType === 'tv' 
+    ? '<span class="content-type-badge tv-badge">TV Show</span>' 
+    : '<span class="content-type-badge movie-badge">Movie</span>';
+  
   container.innerHTML = `
     <div class="swipe-card" id="current-swipe-card" data-movie-id="${movie.tmdbId}">
       <div class="swipe-card-image" style="background-image: url('${movie.posterPath || ''}');">
         ${!movie.posterPath ? '<div class="no-image">No Image Available</div>' : ''}
+        ${contentTypeBadge}
       </div>
       <div class="swipe-card-content">
         <h3 class="movie-title">${movie.title}</h3>
-        ${movie.releaseDate ? `<p class="movie-year">${new Date(movie.releaseDate).getFullYear()}</p>` : ''}
-        ${movie.rating ? `<p class="movie-rating">${movie.rating.toFixed(1)}/10</p>` : ''}
+        <div class="movie-meta">
+          ${movie.releaseDate ? `<span class="movie-year">${new Date(movie.releaseDate).getFullYear()}</span>` : ''}
+          ${ratingHtml}
+        </div>
+        ${genresHtml}
+        ${streamingHtml}
         <p class="movie-overview">${movie.overview || 'No description available.'}</p>
       </div>
       <div class="swipe-overlay swipe-like">LIKE</div>
@@ -473,17 +548,7 @@ function handleUndoButton() {
   updateGamificationUI();
 }
 
-/**
- * Handle boost button
- */
-function handleBoostButton() {
-  // Show boost modal/notification
-  alert('🚀 Profile Boost activated!\n\nYour profile will be shown to more potential matches in the next hour.');
-  
-  // In a real app, this would call an API to activate the boost
-  // For now, just show the message
-  console.log('Boost activated for user profile');
-}
+
 
 /**
  * Record swipe action to backend
@@ -557,7 +622,6 @@ if (typeof window !== 'undefined') {
     handleDislikeButton,
     handleSuperLikeButton,
     handleUndoButton,
-    handleBoostButton,
     loadMoreMovies
   };
 }
