@@ -561,6 +561,8 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
       
       if (otherUserIds.length === 1) {
         // With only 1 other user, put them in likes and also in superLikes for testing
+        // NOTE: This is intentional overlap for testing purposes with minimal data
+        // In production with realistic user counts, likes and superLikes would be separate
         likedUserIds = [otherUserIds[0]];
         superLikedUserIds = [otherUserIds[0]];
       } else if (otherUserIds.length === 2) {
