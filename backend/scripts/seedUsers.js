@@ -553,20 +553,32 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
       // Get other user IDs (excluding self)
       const otherUserIds = users.filter(u => u.id !== user.id).map(u => u.id);
       
-      // If there are very few users, ensure we reserve at least 1 for superLikes
-      const minUsersForLikes = Math.max(1, otherUserIds.length - 1);
+      // If there's only 1 other user, they get both a like and superlike
+      // If there are 2 other users, split them between likes and superLikes
+      // If there are 3+ other users, use normal distribution
+      let likedUserIds = [];
+      let superLikedUserIds = [];
       
-      // Generate 2-8 likes per user (cap at available users, leaving room for superLikes)
-      const likesCount = Math.min(randomInt(2, 8), minUsersForLikes);
-      const likedUserIds = randomItems(otherUserIds, likesCount);
-      
-      // Generate 1-2 super likes per user (at least 1 for testing)
-      // Filter out already liked users and ensure we have enough available
-      const availableForSuperLikes = otherUserIds.filter(id => !likedUserIds.includes(id));
-      const superLikesCount = Math.min(randomInt(1, 2), availableForSuperLikes.length);
-      const superLikedUserIds = superLikesCount > 0 
-        ? randomItems(availableForSuperLikes, superLikesCount)
-        : [];
+      if (otherUserIds.length === 1) {
+        // With only 1 other user, put them in likes and also in superLikes for testing
+        likedUserIds = [otherUserIds[0]];
+        superLikedUserIds = [otherUserIds[0]];
+      } else if (otherUserIds.length === 2) {
+        // With 2 other users, give one to likes and one to superLikes
+        likedUserIds = [otherUserIds[0]];
+        superLikedUserIds = [otherUserIds[1]];
+      } else {
+        // Normal case: 3+ other users
+        // Reserve at least 1 user for superLikes
+        const maxLikes = Math.max(1, otherUserIds.length - 1);
+        const likesCount = Math.min(randomInt(2, 8), maxLikes);
+        likedUserIds = randomItems(otherUserIds, likesCount);
+        
+        // Get remaining users for superLikes (ensuring at least 1)
+        const availableForSuperLikes = otherUserIds.filter(id => !likedUserIds.includes(id));
+        const superLikesCount = Math.min(randomInt(1, 2), availableForSuperLikes.length);
+        superLikedUserIds = randomItems(availableForSuperLikes, superLikesCount);
+      }
       
       // Update user with likes and superLikes
       user.likes = likedUserIds;
