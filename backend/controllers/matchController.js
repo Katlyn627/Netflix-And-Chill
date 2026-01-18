@@ -122,6 +122,9 @@ class MatchController {
             snackCompatibility: match.snackCompatibility,
             debateCompatibility: match.debateCompatibility,
             emotionalToneCompatibility: match.emotionalToneCompatibility,
+            bingeCompatibility: match.bingeCompatibility,
+            swipeGenreCompatibility: match.swipeGenreCompatibility,
+            contentTypeCompatibility: match.contentTypeCompatibility,
             isBoosted: matchedUserObj.isBoostActive(),
             user: {
               id: matchedUser.id,
@@ -184,6 +187,9 @@ class MatchController {
             snackCompatibility: match.snackCompatibility,
             debateCompatibility: match.debateCompatibility,
             emotionalToneCompatibility: match.emotionalToneCompatibility,
+            bingeCompatibility: match.bingeCompatibility,
+            swipeGenreCompatibility: match.swipeGenreCompatibility,
+            contentTypeCompatibility: match.contentTypeCompatibility,
             createdAt: match.createdAt,
             user: {
               id: matchedUser.id,
