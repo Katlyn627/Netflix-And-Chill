@@ -15,7 +15,9 @@
     "seed:all": "npm run seed && npm run seed:matches",
     "seed:all:mongodb": "npm run seed:mongodb && npm run seed:matches:mongodb",
     "verify:matches": "node backend/scripts/verifySeededMatches.js",
-    "verify:matches:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/verifySeededMatches.js"
+    "verify:matches:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/verifySeededMatches.js",
+    "update:analytics": "node backend/scripts/updateSwipeAnalytics.js",
+    "update:analytics:mongodb": "cross-env DB_TYPE=mongodb node backend/scripts/updateSwipeAnalytics.js"
   },
   "keywords": [
     "dating",
