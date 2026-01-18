@@ -1,4 +1,5 @@
 const Match = require('../models/Match');
+const swipeAnalytics = require('./swipeAnalytics');
 
 class MatchingEngine {
   // Scoring constants
@@ -551,7 +552,6 @@ class MatchingEngine {
     // Check for content type compatibility (movies vs TV shows)
     const contentTypeCompatibility = matchData.contentTypeCompatibility || 0;
     if (contentTypeCompatibility >= 8) {
-      const swipeAnalytics = require('./swipeAnalytics');
       try {
         const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
         const u2Analytics = swipeAnalytics.analyzeSwipePreferences(user2.swipedMovies || []);
@@ -972,8 +972,6 @@ class MatchingEngine {
     
     // Bonus points if both users show evidence of binge-watching behavior in swipe data
     // Analyze if they liked TV shows (which are typically binge-watched)
-    const swipeAnalytics = require('./swipeAnalytics');
-    
     try {
       const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
       const u2Analytics = swipeAnalytics.analyzeSwipePreferences(user2.swipedMovies || []);
@@ -987,7 +985,7 @@ class MatchingEngine {
       }
     } catch (error) {
       // If analytics fails, just use the base score
-      console.debug('Could not analyze swipe data for binge compatibility:', error.message);
+      console.error('Could not analyze swipe data for binge compatibility:', error.message);
     }
     
     return Math.min(20, score); // Cap at 20 points
@@ -1001,8 +999,6 @@ class MatchingEngine {
    * @returns {number} Compatibility score (0-25 points)
    */
   static calculateSwipeGenreCompatibility(user1, user2) {
-    const swipeAnalytics = require('./swipeAnalytics');
-    
     try {
       // Get swipe analytics for both users
       const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
@@ -1052,7 +1048,7 @@ class MatchingEngine {
       
       return score;
     } catch (error) {
-      console.debug('Could not calculate swipe genre compatibility:', error.message);
+      console.error('Could not calculate swipe genre compatibility:', error.message);
       return 0;
     }
   }
@@ -1065,8 +1061,6 @@ class MatchingEngine {
    * @returns {number} Compatibility score (0-10 points)
    */
   static calculateContentTypeCompatibility(user1, user2) {
-    const swipeAnalytics = require('./swipeAnalytics');
-    
     try {
       // Get swipe analytics for both users
       const u1Analytics = swipeAnalytics.analyzeSwipePreferences(user1.swipedMovies || []);
@@ -1097,7 +1091,7 @@ class MatchingEngine {
       
       return Math.max(0, score);
     } catch (error) {
-      console.debug('Could not calculate content type compatibility:', error.message);
+      console.error('Could not calculate content type compatibility:', error.message);
       return 0;
     }
   }
