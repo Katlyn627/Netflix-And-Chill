@@ -130,7 +130,7 @@ async function runTests() {
       service: 'Amazon Prime Video',
       episodesWatched: 4
     });
-    log('✓ Added Bob\'s watch history: Stranger Things, The Mandalorian, Jack Ryan\n', 'green');
+    log(`✓ Added Bob's watch history: Stranger Things, The Mandalorian, Jack Ryan\n`, 'green');
     
     // Test 5: Set viewing preferences
     log('Test 5: Setting viewing preferences...', 'blue');
@@ -212,7 +212,7 @@ async function runTests() {
     log('1. Server is running on port 3000', 'yellow');
     log('2. TMDB_API_KEY is set in .env file', 'yellow');
     log('3. Database is accessible', 'yellow');
-    process.exit(1);
+    throw error; // Re-throw for proper error handling by caller
   }
 }
 
@@ -331,10 +331,14 @@ async function findMatches(userId) {
 
 // Run the tests
 if (require.main === module) {
-  runTests().catch(error => {
-    log(`\n❌ Unexpected error: ${error.message}`, 'red');
-    throw error; // Let Node.js handle the error naturally
-  });
+  runTests()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(error => {
+      // Error already logged by runTests
+      process.exit(1);
+    });
 }
 
 module.exports = { runTests };
