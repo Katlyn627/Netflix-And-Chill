@@ -364,11 +364,28 @@
                 return;
             }
 
-            // Helper function to escape HTML
+            // Robust HTML escaping function
             function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+                if (!text) return '';
+                return String(text).replace(/[&<>"']/g, (match) => {
+                    const escapeMap = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#x27;'
+                    };
+                    return escapeMap[match];
+                });
+            }
+
+            // URL validation function
+            function validateUrl(url) {
+                if (!url) return 'assets/images/no-poster.png';
+                if (typeof url === 'string' && /^https?:\/\//.test(url)) {
+                    return url;
+                }
+                return 'assets/images/no-poster.png';
             }
 
             const cardsHtml = history.map(item => {
@@ -379,9 +396,9 @@
                 const contentType = item.contentType === 'tv' ? '📺' : '🎬';
                 const date = new Date(item.swipedAt).toLocaleDateString();
                 
-                // Escape user-provided content
+                // Escape user-provided content and validate URLs
                 const safeTitle = escapeHtml(item.title);
-                const safePosterPath = item.posterPath ? escapeHtml(item.posterPath) : 'assets/images/no-poster.png';
+                const safePosterPath = validateUrl(item.posterPath);
 
                 return `
                     <div class="history-card" data-action="${item.action}" data-type="${item.contentType}">

@@ -365,16 +365,12 @@ router.get('/movies/:userId', async (req, res) => {
     const watchlistTVIds = (user.tvWatchlist || []).map(tv => tv.tmdbId);
     
     // ENHANCED: Analyze swipe history to identify preferred genres from liked content
+    // Using Set-based approach for O(n) complexity instead of O(n²)
     const likedGenresSet = new Set();
     if (user.swipedMovies && user.swipedMovies.length > 0) {
       const likedMovies = user.swipedMovies.filter(m => m.action === 'like' || m.action === 'superlike');
-      likedMovies.forEach(movie => {
-        if (movie.genreIds && Array.isArray(movie.genreIds)) {
-          movie.genreIds.forEach(genreId => {
-            likedGenresSet.add(genreId);
-          });
-        }
-      });
+      const allGenreIds = likedMovies.flatMap(m => m.genreIds || []);
+      allGenreIds.forEach(genreId => likedGenresSet.add(genreId));
     }
     const likedGenres = Array.from(likedGenresSet);
     

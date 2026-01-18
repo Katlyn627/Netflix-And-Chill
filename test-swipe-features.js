@@ -5,6 +5,7 @@
  * Tests super like adds to favorites and swipe recommendations
  */
 
+const fs = require('fs');
 const API_BASE_URL = 'http://localhost:3000/api';
 
 async function testSuperLikeToFavorites() {
@@ -13,7 +14,6 @@ async function testSuperLikeToFavorites() {
 
     try {
         // 1. Read test user from data file
-        const fs = require('fs');
         const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf-8'));
         
         if (usersData.length === 0) {
@@ -132,7 +132,6 @@ async function testSwipeRecommendations() {
 
     try {
         // 1. Read test user from data file
-        const fs = require('fs');
         const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf-8'));
         
         if (usersData.length === 0) {
@@ -205,7 +204,6 @@ async function testSwipeHistoryAPI() {
 
     try {
         // Read test user from data file
-        const fs = require('fs');
         const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf-8'));
         
         if (usersData.length === 0) {
