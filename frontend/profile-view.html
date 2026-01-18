@@ -8,37 +8,74 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/bottom-nav.css">
+    <link rel="stylesheet" href="src/styles/profile-bumble.css">
     <link rel="stylesheet" href="src/styles/analytics.css">
     <link rel="stylesheet" href="src/styles/profile-frames.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="nav-icons">
-                <div class="nav-left">
-                    <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
-                    <a href="chat.html" class="nav-icon-btn chat" title="Chat">💬</a>
-                    <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
-                </div>
-                <div class="nav-right">
-                    <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
-                    <a href="profile-view.html" class="nav-icon-btn profile active" id="profile-nav-btn" title="My Profile">
-                        <span id="profile-nav-icon">👤</span>
-                    </a>
-                    <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
+        <header class="profile-header-bumble">
+            <div class="header-top">
+                <h1>Profile</h1>
+                <div class="settings-icons" style="display: flex; gap: 10px;">
+                    <button class="icon-btn" id="help-btn" title="Help">
+                        <span class="icon">❓</span>
+                    </button>
+                    <button class="icon-btn" id="settings-btn" title="Settings">
+                        <span class="icon">⚙️</span>
+                    </button>
                 </div>
             </div>
-            <div class="logo-banner">
-                <a href="swipe.html">
-                    <img src="assets/images/logo.png" alt="Netflix & Chill Logo">
-                </a>
-            </div>
-            <p class="tagline">Your Profile</p>
         </header>
 
-        <main>
-            <!-- Profile Header Section -->
-            <section id="profile-header" class="card">
+        <main class="profile-content-bumble">
+            <!-- Profile Hero Section (Bumble Style) -->
+            <section class="profile-hero">
+                <div class="profile-photo-circle">
+                    <img id="profile-picture-hero" src="" alt="Profile" style="display: none;">
+                    <div id="no-photo-hero" class="no-photo">
+                        👤
+                    </div>
+                </div>
+                <div class="profile-name-section">
+                    <h2>
+                        <span id="profile-username-hero">Username</span>, 
+                        <span id="profile-age-hero">28</span>
+                        <span class="verification-badge" id="verification-badge" style="display: none;">✓</span>
+                    </h2>
+                </div>
+                <button id="edit-profile-btn-hero" class="edit-profile-btn">Edit profile</button>
+            </section>
+
+            <!-- Premium Section (Bumble Style) -->
+            <section class="premium-section" id="premium-section" style="display: none;">
+                <div class="premium-badge">PREMIUM</div>
+                <h3>Your Premium details</h3>
+                <div class="premium-details">
+                    <button class="subscription-details-btn" id="subscription-details-btn">Subscription details</button>
+                    <ul class="premium-features-checklist">
+                        <li>Unlimited likes</li>
+                        <li>See who liked you</li>
+                        <li>Advanced filters</li>
+                    </ul>
+                </div>
+                <div class="premium-upgrade-options">
+                    <div class="upgrade-option-card">
+                        <h4>⚡ Spotlight</h4>
+                        <p>Be one of the top profiles in your area for 30 minutes</p>
+                        <button class="upgrade-option-btn" onclick="window.profileView && window.profileView.activateSpotlight()">Get Spotlight</button>
+                    </div>
+                    <div class="upgrade-option-card">
+                        <h4>⭐ SuperSwipe</h4>
+                        <p>Let someone know you really like them</p>
+                        <button class="upgrade-option-btn" onclick="window.profileView && window.profileView.buySuperSwipe()">Buy SuperSwipe</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original Profile Header Section (Hidden by default, shown for detailed editing) -->
+            <section id="profile-header" class="card" style="display: none;">
                 <div class="profile-header-container">
                     <div id="profile-photo-container">
                         <img id="profile-picture" src="" alt="Profile">
@@ -593,9 +630,87 @@
     <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
+    <script src="src/components/bottom-nav.js"></script>
     <script src="src/components/quiz.js"></script>
     <script src="src/components/swipeAnalytics.js"></script>
     <script src="src/components/profile-frame-selector.js"></script>
     <script src="src/components/profile-view.js"></script>
+    <script>
+        // Additional initialization for Bumble-style profile
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sync profile data to hero section
+            setTimeout(() => {
+                const username = document.getElementById('profile-username')?.textContent;
+                const age = document.getElementById('profile-age')?.textContent;
+                const picture = document.getElementById('profile-picture')?.src;
+                
+                if (username) {
+                    const usernameHero = document.getElementById('profile-username-hero');
+                    if (usernameHero) usernameHero.textContent = username;
+                }
+                
+                if (age) {
+                    const ageHero = document.getElementById('profile-age-hero');
+                    if (ageHero) ageHero.textContent = age;
+                }
+                
+                if (picture && picture !== '') {
+                    const pictureHero = document.getElementById('profile-picture-hero');
+                    const noPhotoHero = document.getElementById('no-photo-hero');
+                    if (pictureHero && noPhotoHero) {
+                        pictureHero.src = picture;
+                        pictureHero.style.display = 'block';
+                        noPhotoHero.style.display = 'none';
+                    }
+                }
+
+                // Check premium status and show/hide premium section
+                const userId = localStorage.getItem('currentUserId');
+                if (userId) {
+                    fetch(`http://localhost:3000/api/users/${userId}`)
+                        .then(res => res.json())
+                        .then(user => {
+                            const premiumSection = document.getElementById('premium-section');
+                            if (premiumSection && user.isPremium) {
+                                premiumSection.style.display = 'block';
+                            }
+                        })
+                        .catch(err => console.error('Error loading user data:', err));
+                }
+            }, 500);
+
+            // Edit profile button
+            const editProfileBtn = document.getElementById('edit-profile-btn-hero');
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', () => {
+                    // Show original profile header for editing
+                    const profileHeader = document.getElementById('profile-header');
+                    if (profileHeader) {
+                        profileHeader.style.display = 'block';
+                        profileHeader.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+
+            // Help and Settings buttons
+            const helpBtn = document.getElementById('help-btn');
+            if (helpBtn) {
+                helpBtn.addEventListener('click', () => {
+                    alert('Help & Support\n\nFor help with your account, please visit our support center or contact support@netflixandchill.com');
+                });
+            }
+
+            const settingsBtn = document.getElementById('settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    // Show account settings section
+                    const settingsSection = document.getElementById('account-settings-section');
+                    if (settingsSection) {
+                        settingsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

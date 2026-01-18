@@ -1,0 +1,297 @@
+/* Liked You Page - Bumble Style */
+
+.liked-you-header {
+    background: #FFFFFF;
+    padding: 20px;
+    border-bottom: 1px solid #E0E0E0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.liked-you-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+}
+
+.liked-you-content {
+    background: #FAFAFA;
+    min-height: calc(100vh - 160px);
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Premium Upsell Banner */
+.premium-upsell-banner {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.upsell-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.upsell-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.premium-upsell-banner h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 10px 0;
+}
+
+.premium-upsell-banner p {
+    font-size: 16px;
+    color: #333333;
+    margin: 0 0 20px 0;
+}
+
+.premium-features-list {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #000000;
+}
+
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+.checkmark {
+    color: #00AA00;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.btn-upgrade {
+    background: #000000;
+    color: #FFFFFF;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-upgrade:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Likes Counter */
+.likes-counter {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #FFFFFF;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.counter-icon {
+    font-size: 32px;
+}
+
+.counter-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+}
+
+.counter-text span {
+    color: #E50914;
+}
+
+/* Likes Grid */
+.likes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.liked-profile-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.liked-profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.liked-card-image {
+    width: 100%;
+    height: 240px;
+    position: relative;
+    overflow: hidden;
+}
+
+.liked-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Blur effect for free users */
+.liked-profile-card.blurred .liked-card-image img {
+    filter: blur(20px);
+}
+
+.blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 36px;
+}
+
+.liked-card-info {
+    padding: 12px;
+}
+
+.liked-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.liked-card-details {
+    font-size: 13px;
+    color: #767676;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Premium Badge */
+.premium-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #FFD700;
+    color: #000000;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading State */
+.loading-text {
+    text-align: center;
+    font-size: 18px;
+    color: #767676;
+    padding: 40px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 10px 0;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: #767676;
+    margin: 0 0 20px 0;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .liked-you-header {
+        padding: 15px;
+    }
+    
+    .liked-you-header h1 {
+        font-size: 28px;
+    }
+    
+    .liked-you-content {
+        padding: 15px;
+    }
+    
+    .premium-upsell-banner {
+        padding: 20px;
+    }
+    
+    .premium-upsell-banner h2 {
+        font-size: 24px;
+    }
+    
+    .likes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    
+    .liked-card-image {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .likes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

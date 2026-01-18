@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liked You - Netflix and Chill</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E50914">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/bottom-nav.css">
+    <link rel="stylesheet" href="src/styles/liked-you.css">
+</head>
+<body>
+    <div class="container">
+        <header class="liked-you-header">
+            <div class="header-top">
+                <h1>Liked You</h1>
+                <button class="icon-btn" id="settings-btn" title="Settings">
+                    <span class="icon">⚙️</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="liked-you-content">
+            <!-- Premium Upsell Banner (for free users) -->
+            <div id="premium-upsell" class="premium-upsell-banner" style="display: none;">
+                <div class="upsell-content">
+                    <div class="upsell-icon">⭐</div>
+                    <h2>See Who Likes You</h2>
+                    <p>Upgrade to Premium to see who's interested in you and never miss a match!</p>
+                    <div class="premium-features-list">
+                        <div class="feature-item">
+                            <span class="checkmark">✓</span>
+                            <span>See who liked you</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="checkmark">✓</span>
+                            <span>Unlimited likes</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="checkmark">✓</span>
+                            <span>Advanced filters</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="checkmark">✓</span>
+                            <span>Profile boost</span>
+                        </div>
+                    </div>
+                    <button class="btn-upgrade" onclick="window.likedYouPage.upgradeToPremium()">
+                        Upgrade to Premium
+                    </button>
+                </div>
+            </div>
+
+            <!-- Likes Counter -->
+            <div class="likes-counter">
+                <div class="counter-icon">❤️</div>
+                <div class="counter-text">
+                    <span id="likes-count">0</span> people liked you
+                </div>
+            </div>
+
+            <!-- Likes Grid -->
+            <div id="likes-grid" class="likes-grid">
+                <!-- Profile cards will be rendered here -->
+            </div>
+
+            <!-- Loading State -->
+            <div id="liked-you-loading" style="display: none;">
+                <p class="loading-text">Loading...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">💔</div>
+                <h3>No likes yet</h3>
+                <p>Keep swiping to get more matches!</p>
+                <a href="swipe.html" class="btn btn-primary">Start Swiping</a>
+            </div>
+        </main>
+    </div>
+
+    <script src="src/utils/errorHandler.js"></script>
+    <script src="src/utils/settings.js"></script>
+    <script src="src/services/api.js"></script>
+    <script src="src/components/bottom-nav.js"></script>
+    <script src="src/components/liked-you.js"></script>
+</body>
+</html>

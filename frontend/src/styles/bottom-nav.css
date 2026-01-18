@@ -1,0 +1,111 @@
+/* Bottom Navigation Bar - Bumble Style */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border-top: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 70px;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #767676;
+    transition: color 0.3s ease;
+    padding: 8px 0;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+}
+
+.bottom-nav-item:hover {
+    color: #333333;
+}
+
+.bottom-nav-item.active {
+    color: #000000;
+}
+
+.bottom-nav-item.center {
+    transform: scale(1.1);
+}
+
+.bottom-nav-icon {
+    font-size: 28px;
+    margin-bottom: 2px;
+}
+
+.bottom-nav-item.center .bottom-nav-icon {
+    font-size: 32px;
+}
+
+.bottom-nav-label {
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: 8px;
+    right: calc(50% - 20px);
+    background: #E50914;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Main content adjustment for bottom nav */
+.container {
+    padding-bottom: 90px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .bottom-nav {
+        height: 65px;
+    }
+    
+    .bottom-nav-icon {
+        font-size: 24px;
+    }
+    
+    .bottom-nav-item.center .bottom-nav-icon {
+        font-size: 28px;
+    }
+    
+    .bottom-nav-label {
+        font-size: 10px;
+    }
+}
+
+/* Hide old navigation */
+.nav-icons {
+    display: none;
+}
+
+/* Ensure main content doesn't overlap bottom nav */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    margin-bottom: 20px;
+}

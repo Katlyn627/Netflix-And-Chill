@@ -8,46 +8,30 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/bottom-nav.css">
     <link rel="stylesheet" href="src/styles/swipe.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="nav-icons">
-                <div class="nav-left">
-                    <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
-                    <a href="chat.html" class="nav-icon-btn chat" title="Chat">💬</a>
-                    <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
-                </div>
-                <div class="nav-right">
-                    <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
-                    <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
-                        <span id="profile-nav-icon">👤</span>
-                    </a>
-                    <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
-                </div>
+        <header class="swipe-header-bumble">
+            <div class="header-top">
+                <h1>🎬 Swipe</h1>
+                <button class="icon-btn" id="settings-btn" title="Settings">
+                    <span class="icon">⚙️</span>
+                </button>
             </div>
-            <div class="logo-banner">
-                <a href="swipe.html">
-                    <img src="assets/images/logo.png" alt="Netflix & Chill Logo">
-                </a>
-            </div>
-            <p class="tagline">Discover Your Next Favorite Movie</p>
         </header>
 
         <main>
             <!-- Swipe Feature Section -->
             <section id="swipe-movies" class="card swipe-card-modern">
                 <div id="swipe-container">
-                    <div class="swipe-header">
-                        <h2>🎬 Discover Movies</h2>
-                        <p>Swipe right to like, left to pass. We'll use your preferences to find great matches!</p>
-                        <div class="swipe-stats">
-                            <div class="stat-badge">
-                                <span class="stat-icon">❤️</span>
-                                <span class="stat-value" id="total-likes-counter">0</span>
-                                <span class="stat-label">Likes</span>
-                            </div>
+                    <div class="swipe-stats">
+                        <div class="stat-badge">
+                            <span class="stat-icon">❤️</span>
+                            <span class="stat-value" id="total-likes-counter">0</span>
+                            <span class="stat-label">Likes</span>
+                        </div>
                             <div class="stat-badge">
                                 <span class="stat-icon">⚡</span>
                                 <span class="stat-value" id="super-likes-counter">3</span>
@@ -99,6 +83,7 @@
     <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
+    <script src="src/components/bottom-nav.js"></script>
     <script src="src/components/swipe.js"></script>
     <script>
         // Initialize swipe feature when page loads
@@ -120,7 +105,15 @@
                     // Mark that initial profile setup is complete
                     localStorage.setItem('profileCreated', 'true');
                     localStorage.setItem('initialSwipeComplete', 'true');
-                    window.location.href = 'matches.html';
+                    window.location.href = 'discover.html';
+                });
+            }
+
+            // Settings button
+            const settingsBtn = document.getElementById('settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    window.location.href = 'profile-view.html';
                 });
             }
         });
