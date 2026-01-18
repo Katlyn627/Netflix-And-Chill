@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Social Connections Demo - Netflix and Chill</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h2 {
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .provider-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .provider-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .provider-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .provider-icon {
+            font-size: 1.5em;
+        }
+
+        .provider-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-configured {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .status-not-configured {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .response-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Custom Social Connections Demo</h1>
+        <p class="subtitle">Auth0 Extensibility Points for Custom OAuth2 Providers</p>
+
+        <div class="info-box">
+            <h2>📚 About This Demo</h2>
+            <p>This page demonstrates how to:</p>
+            <ul>
+                <li><strong>Get Auth0 Permissions:</strong> Obtain Management API access</li>
+                <li><strong>Build Custom Social Connections:</strong> Use Auth0's extensibility points</li>
+                <li><strong>Fetch User Profile:</strong> Retrieve user info from provider's userinfo endpoint (JSON format)</li>
+            </ul>
+            <p style="margin-top: 10px;">
+                <strong>📖 Documentation:</strong> See <code>AUTH0_CUSTOM_SOCIAL_CONNECTIONS.md</code> for complete guide
+            </p>
+        </div>
+
+        <!-- Available Providers Section -->
+        <div class="section">
+            <h2>Available Custom Providers</h2>
+            <div id="providersGrid" class="provider-grid">
+                <div class="provider-card">
+                    <p style="text-align: center; color: #999;">Loading providers...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup Section -->
+        <div class="section">
+            <h2>Setup Custom Connection</h2>
+            <p>Click the "Setup Connection" button on any provider card above to create or update the Auth0 custom social connection.</p>
+            <p style="margin-top: 10px; color: #666;">
+                <strong>Note:</strong> Requires provider OAuth credentials (CLIENT_ID and CLIENT_SECRET) to be set in environment variables.
+            </p>
+        </div>
+
+        <!-- Configured Connections Section -->
+        <div class="section">
+            <h2>Configured Connections</h2>
+            <button class="btn" onclick="loadConnections()">
+                <span id="connectionsLoading"></span>
+                Refresh Connections
+            </button>
+            <div id="connectionsResponse" class="response-box" style="display: none;"></div>
+        </div>
+
+        <!-- Usage Example Section -->
+        <div class="section">
+            <h2>Frontend Integration Example</h2>
+            <p>Once a custom connection is configured, use it in your frontend:</p>
+            <div class="code-block">
+                <code>// Initialize Auth0 client
+const auth0Client = await createAuth0Client({
+  domain: 'your-domain.auth0.com',
+  clientId: 'your-client-id'
+});
+
+// Login with custom Netflix connection
+await auth0Client.loginWithRedirect({
+  authorizationParams: {
+    connection: 'netflix-custom',  // Connection name
+    redirect_uri: window.location.origin + '/callback.html'
+  }
+});
+
+// After callback, get user with custom metadata
+const user = await auth0Client.getUser();
+console.log('Netflix User:', user);
+console.log('Watch History:', user.user_metadata?.watch_history);</code>
+            </div>
+        </div>
+
+        <!-- API Documentation Section -->
+        <div class="section">
+            <h2>API Documentation</h2>
+            <button class="btn btn-secondary" onclick="loadDocumentation()">
+                View API Documentation
+            </button>
+            <div id="docsResponse" class="response-box" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load available providers on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProviders();
+        });
+
+        async function loadProviders() {
+            try {
+                const response = await fetch('/api/custom-social/providers');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayProviders(data.providers);
+                } else {
+                    showAlert('error', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading providers:', error);
+                showAlert('error', 'Failed to load providers: ' + error.message);
+            }
+        }
+
+        function displayProviders(providers) {
+            const grid = document.getElementById('providersGrid');
+            grid.innerHTML = '';
+
+            providers.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = 'provider-card';
+                card.innerHTML = `
+                    <h3>
+                        <span class="provider-icon">${getProviderIcon(provider.id)}</span>
+                        ${provider.name}
+                    </h3>
+                    <p><strong>ID:</strong> ${provider.id}</p>
+                    <div id="status-${provider.id}" class="provider-status status-not-configured">
+                        Checking...
+                    </div>
+                    <div>
+                        <button class="btn" onclick="validateProvider('${provider.id}')">
+                            Validate Credentials
+                        </button>
+                        <button class="btn" onclick="setupConnection('${provider.id}')">
+                            Setup Connection
+                        </button>
+                    </div>
+                    <div id="response-${provider.id}" class="response-box" style="display: none;"></div>
+                `;
+                grid.appendChild(card);
+
+                // Validate credentials automatically
+                validateProvider(provider.id, true);
+            });
+        }
+
+        function getProviderIcon(providerId) {
+            const icons = {
+                netflix: '🎬',
+                hulu: '🎭',
+                disney: '🏰'
+            };
+            return icons[providerId] || '📺';
+        }
+
+        async function validateProvider(providerId, silent = false) {
+            const statusEl = document.getElementById(`status-${providerId}`);
+            const responseEl = document.getElementById(`response-${providerId}`);
+
+            if (!silent) {
+                statusEl.innerHTML = '<span class="loading"></span> Validating...';
+                responseEl.style.display = 'none';
+            }
+
+            try {
+                const response = await fetch(`/api/custom-social/validate/${providerId}`);
+                const data = await response.json();
+
+                if (data.success && data.ready) {
+                    statusEl.className = 'provider-status status-configured';
+                    statusEl.textContent = '✓ Configured';
+                    if (!silent) {
+                        responseEl.textContent = JSON.stringify(data, null, 2);
+                        responseEl.style.display = 'block';
+                    }
+                } else {
+                    statusEl.className = 'provider-status status-not-configured';
+                    statusEl.textContent = '⚠ Not Configured';
+                    if (!silent) {
+                        responseEl.textContent = JSON.stringify(data, null, 2);
+                        responseEl.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error validating provider:', error);
+                statusEl.className = 'provider-status status-not-configured';
+                statusEl.textContent = '✗ Error';
+                if (!silent) {
+                    responseEl.textContent = 'Error: ' + error.message;
+                    responseEl.style.display = 'block';
+                }
+            }
+        }
+
+        async function setupConnection(providerId) {
+            const responseEl = document.getElementById(`response-${providerId}`);
+            responseEl.textContent = 'Setting up connection...';
+            responseEl.style.display = 'block';
+
+            try {
+                const response = await fetch(`/api/custom-social/setup/${providerId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+
+                responseEl.textContent = JSON.stringify(data, null, 2);
+
+                if (data.success) {
+                    responseEl.className = 'response-box alert-success';
+                    // Re-validate to update status
+                    setTimeout(() => validateProvider(providerId, true), 1000);
+                } else {
+                    responseEl.className = 'response-box alert-error';
+                }
+            } catch (error) {
+                console.error('Error setting up connection:', error);
+                responseEl.textContent = 'Error: ' + error.message;
+                responseEl.className = 'response-box alert-error';
+            }
+        }
+
+        async function loadConnections() {
+            const loadingEl = document.getElementById('connectionsLoading');
+            const responseEl = document.getElementById('connectionsResponse');
+
+            loadingEl.innerHTML = '<span class="loading"></span> ';
+            responseEl.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/custom-social/connections');
+                const data = await response.json();
+
+                responseEl.textContent = JSON.stringify(data, null, 2);
+                responseEl.style.display = 'block';
+                responseEl.className = 'response-box';
+            } catch (error) {
+                console.error('Error loading connections:', error);
+                responseEl.textContent = 'Error: ' + error.message;
+                responseEl.style.display = 'block';
+                responseEl.className = 'response-box alert-error';
+            } finally {
+                loadingEl.innerHTML = '';
+            }
+        }
+
+        async function loadDocumentation() {
+            const responseEl = document.getElementById('docsResponse');
+            responseEl.textContent = 'Loading documentation...';
+            responseEl.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/custom-social/documentation');
+                const data = await response.json();
+
+                responseEl.textContent = JSON.stringify(data, null, 2);
+                responseEl.className = 'response-box';
+            } catch (error) {
+                console.error('Error loading documentation:', error);
+                responseEl.textContent = 'Error: ' + error.message;
+                responseEl.className = 'response-box alert-error';
+            }
+        }
+
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.querySelector('.container').insertBefore(
+                alertDiv,
+                document.querySelector('.section')
+            );
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+    </script>
+</body>
+</html>
