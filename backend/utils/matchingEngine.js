@@ -104,6 +104,14 @@ class MatchingEngine {
     const spontaneityCompatibility = this.calculateSpontaneityCompatibility(user1, user2);
     score += spontaneityCompatibility;
 
+    // 6. Viewing frequency compatibility (how often they watch)
+    const viewingFrequencyCompatibility = this.calculateViewingFrequencyCompatibility(user1, user2);
+    score += viewingFrequencyCompatibility;
+
+    // 7. Active streaming service usage compatibility
+    const activeServiceCompatibility = this.calculateActiveServiceCompatibility(user1, user2);
+    score += activeServiceCompatibility;
+
     // Normalize score to 0-100 range
     const normalizedScore = Math.min(100, score);
 
@@ -124,6 +132,8 @@ class MatchingEngine {
       bingeCompatibility,
       swipeGenreCompatibility,
       contentTypeCompatibility,
+      viewingFrequencyCompatibility,
+      activeServiceCompatibility,
       user1,
       user2
     });
@@ -142,6 +152,8 @@ class MatchingEngine {
       bingeCompatibility: bingeCompatibility,
       swipeGenreCompatibility: swipeGenreCompatibility,
       contentTypeCompatibility: contentTypeCompatibility,
+      viewingFrequencyCompatibility: viewingFrequencyCompatibility,
+      activeServiceCompatibility: activeServiceCompatibility,
       matchDescription: matchDescription
     };
   }
@@ -1093,6 +1105,104 @@ class MatchingEngine {
       return Math.max(0, score);
     } catch (error) {
       console.error('Could not calculate content type compatibility:', error.message);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate viewing frequency compatibility
+   * Matches users based on how often they watch content
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score (0-12 points)
+   */
+  static calculateViewingFrequencyCompatibility(user1, user2) {
+    try {
+      // Get viewing frequency for both users
+      const u1Frequency = user1.calculateViewingFrequency ? user1.calculateViewingFrequency() : null;
+      const u2Frequency = user2.calculateViewingFrequency ? user2.calculateViewingFrequency() : null;
+
+      // If either user has no frequency data, return minimal score
+      if (!u1Frequency || !u2Frequency) {
+        return 2;
+      }
+
+      // Define frequency hierarchy: inactive < occasional < weekly < frequent < daily
+      const frequencyHierarchy = {
+        'inactive': 0,
+        'occasional': 1,
+        'weekly': 2,
+        'frequent': 3,
+        'daily': 4
+      };
+
+      const u1Level = frequencyHierarchy[u1Frequency.frequency] || 0;
+      const u2Level = frequencyHierarchy[u2Frequency.frequency] || 0;
+      const difference = Math.abs(u1Level - u2Level);
+
+      // Score based on similarity
+      if (difference === 0) {
+        return 12; // Perfect match - same viewing frequency
+      } else if (difference === 1) {
+        return 8; // Close match - adjacent frequency levels
+      } else if (difference === 2) {
+        return 5; // Moderate match
+      } else {
+        return 2; // Different viewing frequencies
+      }
+    } catch (error) {
+      console.error('Could not calculate viewing frequency compatibility:', error.message);
+      return 2;
+    }
+  }
+
+  /**
+   * Calculate active service usage compatibility
+   * Prioritizes matches where both users actively use shared streaming services
+   * @param {User} user1 
+   * @param {User} user2 
+   * @returns {number} Compatibility score (0-10 points)
+   */
+  static calculateActiveServiceCompatibility(user1, user2) {
+    try {
+      const sharedServices = this.findSharedServices(user1, user2);
+      
+      if (sharedServices.length === 0) {
+        return 0;
+      }
+
+      let activeSharedServices = 0;
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+
+      // Check each shared service to see if both users have used it recently
+      sharedServices.forEach(serviceName => {
+        const u1Service = user1.streamingServices.find(s => s.name === serviceName);
+        const u2Service = user2.streamingServices.find(s => s.name === serviceName);
+
+        if (u1Service && u2Service) {
+          const u1Active = u1Service.lastUsed && new Date(u1Service.lastUsed) >= thirtyDaysAgo;
+          const u2Active = u2Service.lastUsed && new Date(u2Service.lastUsed) >= thirtyDaysAgo;
+
+          // Both users actively use this service
+          if (u1Active && u2Active) {
+            activeSharedServices++;
+          }
+        }
+      });
+
+      // Award points based on number of actively shared services
+      if (activeSharedServices >= 3) {
+        return 10; // Multiple actively shared services
+      } else if (activeSharedServices === 2) {
+        return 7; // Two actively shared services
+      } else if (activeSharedServices === 1) {
+        return 4; // One actively shared service
+      } else {
+        return 1; // Shared services but not actively used by both
+      }
+    } catch (error) {
+      console.error('Could not calculate active service compatibility:', error.message);
       return 0;
     }
   }
