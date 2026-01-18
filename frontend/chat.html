@@ -53,48 +53,20 @@
                         </div>
                     </div>
 
-                    <div class="icebreaker-prompts" id="icebreaker-prompts" style="display: none;">
-                        <div class="icebreaker-header">
-                            <span>💬 Conversation Starters</span>
-                            <button class="icebreaker-close" onclick="hideIcebreakers()">×</button>
-                        </div>
-                        <!-- Carousel with navigation -->
-                        <div class="icebreaker-carousel">
-                            <button class="carousel-nav prev">‹</button>
-                            <div class="icebreaker-list-wrapper">
-                                <div class="icebreaker-list">
-                                    <button class="icebreaker-btn" data-prompt="What's your favorite movie or show right now?">
-                                        🎬 What's your favorite movie or show right now?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="What streaming service do you use the most?">
-                                        📺 What streaming service do you use the most?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="Binge-watching marathon or one episode per night?">
-                                        🍿 Binge-watching marathon or one episode per night?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="Want to have a watch party together?">
-                                        🎉 Want to have a watch party together?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="What genre are you in the mood for today?">
-                                        🎭 What genre are you in the mood for today?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="Favorite comfort food while watching?">
-                                        🍕 Favorite comfort food while watching?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="Most overrated show everyone loves?">
-                                        🤔 Most overrated show everyone loves?
-                                    </button>
-                                    <button class="icebreaker-btn" data-prompt="Documentary or fiction? Why?">
-                                        📚 Documentary or fiction? Why?
-                                    </button>
-                                </div>
-                            </div>
-                            <button class="carousel-nav next">›</button>
-                        </div>
-                        <!-- Indicators -->
-                        <div class="carousel-indicators"></div>
-                        <!-- Create Your Own button -->
-                        <button class="create-own-btn">✨ Create Your Own Icebreaker</button>
+                    <div class="icebreaker-dropdown-container" id="icebreaker-dropdown-container" style="display: none;">
+                        <select id="icebreaker-select" class="icebreaker-dropdown">
+                            <option value="">💬 Select a conversation starter...</option>
+                            <option value="What's your favorite movie or show right now?">🎬 What's your favorite movie or show right now?</option>
+                            <option value="What streaming service do you use the most?">📺 What streaming service do you use the most?</option>
+                            <option value="Binge-watching marathon or one episode per night?">🍿 Binge-watching marathon or one episode per night?</option>
+                            <option value="Want to have a watch party together?">🎉 Want to have a watch party together?</option>
+                            <option value="What genre are you in the mood for today?">🎭 What genre are you in the mood for today?</option>
+                            <option value="Favorite comfort food while watching?">🍕 Favorite comfort food while watching?</option>
+                            <option value="Most overrated show everyone loves?">🤔 Most overrated show everyone loves?</option>
+                            <option value="Documentary or fiction? Why?">📚 Documentary or fiction? Why?</option>
+                        </select>
+                        <button class="use-icebreaker-btn" id="use-icebreaker-btn">Use Icebreaker</button>
+                        <button class="create-own-btn">✨ Create Your Own</button>
                     </div>
 
                     <div class="chat-input-container" id="chat-input-container" style="display: none;">
@@ -221,6 +193,6 @@
     <script src="src/services/streamChatClient.js"></script>
     <script src="src/components/bottom-nav.js"></script>
     <script src="src/components/chat.js"></script>
-    <script src="src/components/icebreaker-carousel.js"></script>
+    <script src="src/components/icebreaker-dropdown.js"></script>
 </body>
 </html>

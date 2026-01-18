@@ -21,6 +21,7 @@ class DiscoverPage {
         await this.loadAllData();
         this.renderCategories();
         this.attachEventListeners();
+        this.setupCarouselNavigation();
     }
 
     async loadAllData() {
@@ -72,16 +73,16 @@ class DiscoverPage {
         // Sort matches by score
         const sortedMatches = [...this.allMatches].sort((a, b) => (b.matchScore || b.score || 0) - (a.matchScore || a.score || 0));
 
-        // Recommended for you (based on swipe data)
-        const recommended = this.filterBySwipeData(sortedMatches).slice(0, 10);
+        // Recommended for you (based on swipe data) - show ALL matches
+        const recommended = this.filterBySwipeData(sortedMatches);
         this.renderCards('recommended-cards', recommended);
 
-        // Similar genres (users with matching genre preferences)
-        const similarGenres = this.filterByGenreMatch(sortedMatches).slice(0, 10);
+        // Similar genres (users with matching genre preferences) - show ALL with matching genres
+        const similarGenres = this.filterByGenreMatch(sortedMatches);
         this.renderCards('similar-genres-cards', similarGenres);
 
-        // Similar binge amounts (users with similar binge patterns)
-        const similarBinge = this.filterByBingeAmount(sortedMatches).slice(0, 10);
+        // Similar binge amounts (users with similar binge patterns) - show ALL with similar binge
+        const similarBinge = this.filterByBingeAmount(sortedMatches);
         this.renderCards('similar-binge-cards', similarBinge);
     }
 
@@ -449,6 +450,75 @@ class DiscoverPage {
                 alert('Notifications feature coming soon!');
             });
         }
+    }
+
+    /**
+     * Set up carousel navigation
+     */
+    setupCarouselNavigation() {
+        const carouselButtons = document.querySelectorAll('.carousel-nav-btn');
+        
+        carouselButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const carouselType = button.dataset.carousel;
+                const isPrev = button.classList.contains('prev-btn');
+                const scrollContainer = document.getElementById(`${carouselType}-scroll`);
+                
+                if (scrollContainer) {
+                    const scrollAmount = 320; // Width of card + gap
+                    const direction = isPrev ? -1 : 1;
+                    
+                    scrollContainer.scrollBy({
+                        left: scrollAmount * direction,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update button states after scroll
+                    setTimeout(() => {
+                        this.updateCarouselButtons(carouselType);
+                    }, 100);
+                }
+            });
+        });
+
+        // Update button states on scroll
+        ['recommended', 'genres', 'binge'].forEach(type => {
+            const scrollContainer = document.getElementById(`${type}-scroll`);
+            if (scrollContainer) {
+                scrollContainer.addEventListener('scroll', () => {
+                    this.updateCarouselButtons(type);
+                });
+            }
+        });
+
+        // Initial update
+        setTimeout(() => {
+            ['recommended', 'genres', 'binge'].forEach(type => {
+                this.updateCarouselButtons(type);
+            });
+        }, 500);
+    }
+
+    /**
+     * Update carousel button states
+     */
+    updateCarouselButtons(carouselType) {
+        const scrollContainer = document.getElementById(`${carouselType}-scroll`);
+        if (!scrollContainer) return;
+
+        const prevBtn = document.querySelector(`.prev-btn[data-carousel="${carouselType}"]`);
+        const nextBtn = document.querySelector(`.next-btn[data-carousel="${carouselType}"]`);
+
+        if (!prevBtn || !nextBtn) return;
+
+        const scrollLeft = scrollContainer.scrollLeft;
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+        // Disable prev button at start
+        prevBtn.disabled = scrollLeft <= 5;
+        
+        // Disable next button at end
+        nextBtn.disabled = scrollLeft >= maxScroll - 5;
     }
 }
 

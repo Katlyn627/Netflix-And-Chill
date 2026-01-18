@@ -636,20 +636,6 @@ const chatComponent = new ChatComponent();
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
     chatComponent.init();
-    
-    // Set up icebreaker event listeners
-    const icebreakerBtns = document.querySelectorAll('.icebreaker-btn');
-    icebreakerBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const prompt = btn.getAttribute('data-prompt');
-            const messageInput = document.getElementById('message-input');
-            if (messageInput) {
-                messageInput.value = prompt;
-                messageInput.focus();
-                hideIcebreakers();
-            }
-        });
-    });
 });
 
 // Cleanup on page unload
@@ -659,17 +645,17 @@ window.addEventListener('beforeunload', () => {
 
 // Icebreaker utility functions
 function toggleIcebreakers() {
-    const icebreakerPrompts = document.getElementById('icebreaker-prompts');
-    if (icebreakerPrompts) {
-        const isHidden = icebreakerPrompts.style.display === 'none';
-        icebreakerPrompts.style.display = isHidden ? 'block' : 'none';
+    const icebreakerContainer = document.getElementById('icebreaker-dropdown-container');
+    if (icebreakerContainer) {
+        const isHidden = icebreakerContainer.style.display === 'none';
+        icebreakerContainer.style.display = isHidden ? 'flex' : 'none';
     }
 }
 
 function hideIcebreakers() {
-    const icebreakerPrompts = document.getElementById('icebreaker-prompts');
-    if (icebreakerPrompts) {
-        icebreakerPrompts.style.display = 'none';
+    const icebreakerContainer = document.getElementById('icebreaker-dropdown-container');
+    if (icebreakerContainer) {
+        icebreakerContainer.style.display = 'none';
     }
 }
 
