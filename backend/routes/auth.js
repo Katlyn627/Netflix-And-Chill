@@ -95,7 +95,9 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Check for OAuth errors
     if (error) {
       console.error('OAuth error:', error, error_description);
-      return res.redirect(`/profile?error=${encodeURIComponent(error_description || error)}`);
+      const userId = req.query.userId || stateStore.get(state)?.userId;
+      const redirectUrl = userId ? `/streaming-services.html?userId=${userId}` : '/profile';
+      return res.redirect(`${redirectUrl}?error=${encodeURIComponent(error_description || error)}`);
     }
 
     // Verify state token
@@ -121,6 +123,24 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Store OAuth token
     user.setStreamingOAuthToken(provider, tokenData);
 
+    // Add service to user's streaming services list
+    const providerNames = {
+      netflix: 'Netflix',
+      hulu: 'Hulu',
+      disney: 'Disney+',
+      prime: 'Amazon Prime Video',
+      hbo: 'HBO Max',
+      appletv: 'Apple TV+'
+    };
+    
+    const serviceName = providerNames[provider];
+    if (serviceName) {
+      user.addStreamingService({
+        name: serviceName,
+        logoUrl: null // Could be fetched from a mapping
+      });
+    }
+
     // Try to sync watch history
     try {
       const watchHistory = await streamingOAuthService.getWatchHistory(
@@ -143,11 +163,13 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     // Save user
     await database.updateUser(userId, user);
 
-    // Redirect to success page
-    res.redirect(`/profile?connected=${provider}&success=true`);
+    // Redirect to success page - update to redirect to streaming-services page
+    res.redirect(`/streaming-services.html?userId=${userId}&connected=${provider}&success=true`);
   } catch (error) {
     console.error('Error in OAuth callback:', error);
-    res.redirect(`/profile?error=${encodeURIComponent('Failed to connect streaming platform')}`);
+    const userId = req.query.userId || stateStore.get(state)?.userId;
+    const redirectUrl = userId ? `/streaming-services.html?userId=${userId}` : '/profile';
+    res.redirect(`${redirectUrl}?error=${encodeURIComponent('Failed to connect streaming platform')}`);
   }
 });
 
@@ -294,6 +316,59 @@ router.get('/:provider/status', rateLimiters.api, async (req, res) => {
   } catch (error) {
     console.error('Error checking provider status:', error);
     res.status(500).json({ error: 'Failed to check provider status' });
+  }
+});
+
+/**
+ * GET /api/auth/providers/status
+ * Get connection status for all providers for a specific user
+ */
+router.get('/providers/status', rateLimiters.api, async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+
+    // Get user
+    const user = await database.getUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const enabledProviders = streamingOAuthService.getEnabledProviders();
+    const providerInfo = {
+      netflix: { name: 'Netflix', icon: '🎬', color: '#E50914' },
+      hulu: { name: 'Hulu', icon: '🎭', color: '#1CE783' },
+      disney: { name: 'Disney+', icon: '🏰', color: '#113CCF' },
+      prime: { name: 'Amazon Prime Video', icon: '📦', color: '#00A8E1' },
+      hbo: { name: 'HBO Max', icon: '👑', color: '#B300F0' },
+      appletv: { name: 'Apple TV+', icon: '🍎', color: '#000000' }
+    };
+
+    const statuses = enabledProviders.map(provider => {
+      const connected = user.isStreamingProviderConnected(provider);
+      const token = user.getStreamingOAuthToken(provider);
+      
+      return {
+        id: provider,
+        ...providerInfo[provider],
+        connected,
+        connectedAt: token?.connectedAt || null,
+        expiresAt: token?.expiresAt || null,
+        expired: token ? user.isStreamingOAuthTokenExpired(provider) : null
+      };
+    });
+
+    res.json({
+      userId,
+      providers: statuses,
+      count: statuses.length
+    });
+  } catch (error) {
+    console.error('Error getting provider statuses:', error);
+    res.status(500).json({ error: 'Failed to get provider statuses' });
   }
 });
 
