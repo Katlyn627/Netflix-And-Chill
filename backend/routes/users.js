@@ -93,4 +93,9 @@ router.post('/:userId/premium/features', userController.addPremiumFeature.bind(u
 router.post('/:userId/boost', userController.activateBoost.bind(userController));
 router.get('/:userId/boost', userController.getBoostStatus.bind(userController));
 
+// Streaming service usage tracking routes
+router.get('/:userId/viewing-stats', userController.getViewingStatistics.bind(userController));
+router.get('/:userId/streaming-services/:serviceName/stats', userController.getServiceUsageStats.bind(userController));
+router.put('/:userId/streaming-services/:serviceName/usage', userController.updateServiceUsage.bind(userController));
+
 module.exports = router;
