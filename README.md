@@ -319,6 +319,18 @@ Netflix and Chill integrates with various external APIs and services to provide 
 | **TMDB** | Movie/TV data, posters, details | ✅ Yes | FREE | [Get Key](https://www.themoviedb.org/settings/api) |
 | **Database** | User data storage | ⚠️ Recommended | FREE tier | MongoDB, PostgreSQL, or file-based |
 
+### API Marketplace & Integration
+
+| Service | Purpose | Required | Cost | Get API Key |
+|---------|---------|----------|------|-------------|
+| **RapidAPI** | API marketplace integration, key authorization | 🟡 Optional | FREE tier | [Get Key](https://rapidapi.com/) |
+
+**RapidAPI Integration:**
+- **Server Mode**: Publish your API on RapidAPI marketplace with key authentication
+- **Client Mode**: Access thousands of APIs from RapidAPI marketplace
+- Standardized authentication with `X-RapidAPI-Key` headers
+- Built-in rate limiting and usage tracking
+
 ### Authentication (Choose One)
 
 | Service | Purpose | Required | Cost | Get API Key |
