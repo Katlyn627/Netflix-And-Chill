@@ -87,6 +87,7 @@ class PostgreSQLAdapter {
         from_user_id VARCHAR(255) REFERENCES users(id),
         to_user_id VARCHAR(255) REFERENCES users(id),
         type VARCHAR(50),
+        read BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
@@ -226,12 +227,12 @@ class PostgreSQLAdapter {
   // Like operations
   async addLike(like) {
     const query = `
-      INSERT INTO likes (id, from_user_id, to_user_id, type, created_at)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO likes (id, from_user_id, to_user_id, type, read, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
     
-    const values = [like.id, like.fromUserId, like.toUserId, like.type, like.createdAt];
+    const values = [like.id, like.fromUserId, like.toUserId, like.type, like.read || false, like.createdAt];
     const result = await this.pool.query(query, values);
     return this.formatLike(result.rows[0]);
   }
@@ -262,6 +263,14 @@ class PostgreSQLAdapter {
     });
     
     return mutual;
+  }
+
+  async markLikeAsRead(likeId) {
+    const result = await this.pool.query(
+      'UPDATE likes SET read = true WHERE id = $1',
+      [likeId]
+    );
+    return result.rowCount > 0;
   }
 
   // Chat operations
@@ -385,6 +394,7 @@ class PostgreSQLAdapter {
       fromUserId: row.from_user_id,
       toUserId: row.to_user_id,
       type: row.type,
+      read: row.read || false,
       createdAt: row.created_at
     };
   }

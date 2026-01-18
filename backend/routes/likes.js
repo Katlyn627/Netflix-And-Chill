@@ -87,6 +87,9 @@ router.get('/:userId/received', async (req, res) => {
     }
 
     const likes = await dataStore.findLikesToUser(userId);
+    
+    // Count unread likes for badge indicator
+    const unreadCount = likes.filter(like => !like.read).length;
 
     // For premium users, include full user details of who liked them
     if (user.isPremium) {
@@ -114,6 +117,7 @@ router.get('/:userId/received', async (req, res) => {
       return res.json({
         userId,
         count: likes.length,
+        unreadCount: unreadCount,
         likes: likesWithUserDetails.filter(l => l.fromUser !== null),
         isPremium: true
       });
@@ -123,6 +127,7 @@ router.get('/:userId/received', async (req, res) => {
     res.json({
       userId,
       count: likes.length,
+      unreadCount: unreadCount,
       likes: [],
       isPremium: false,
       message: 'Upgrade to premium to see who liked you'
@@ -157,6 +162,32 @@ router.get('/:userId/mutual', async (req, res) => {
   } catch (error) {
     console.error('Error getting mutual likes:', error);
     res.status(500).json({ error: 'Failed to get mutual likes' });
+  }
+});
+
+/**
+ * PUT /api/likes/:likeId/read
+ * Mark a like as read
+ */
+router.put('/:likeId/read', async (req, res) => {
+  try {
+    const { likeId } = req.params;
+
+    const dataStore = await getDatabase();
+    const success = await dataStore.markLikeAsRead(likeId);
+
+    if (!success) {
+      return res.status(404).json({ error: 'Like not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Like marked as read',
+      likeId
+    });
+  } catch (error) {
+    console.error('Error marking like as read:', error);
+    res.status(500).json({ error: 'Failed to mark like as read' });
   }
 });
 

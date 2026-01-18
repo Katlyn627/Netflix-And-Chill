@@ -27,32 +27,26 @@ class BottomNavigation {
     }
 
     async init() {
-        // Fetch user data to check premium status
+        // Fetch notification counts (includes unread likes)
         if (this.userId) {
-            await this.fetchUserData();
             await this.fetchNotificationCounts();
+            // Also get user premium status
+            await this.fetchUserPremiumStatus();
         }
         this.render();
         this.attachEventListeners();
         this.startNotificationPolling();
     }
 
-    async fetchUserData() {
+    async fetchUserPremiumStatus() {
         try {
             const response = await fetch(`http://localhost:3000/api/users/${this.userId}`);
             if (response.ok) {
                 const user = await response.json();
                 this.isPremium = user.isPremium || false;
-                
-                // Fetch liked you count
-                const likesResponse = await fetch(`http://localhost:3000/api/likes/${this.userId}/received`);
-                if (likesResponse.ok) {
-                    const likesData = await likesResponse.json();
-                    this.likedYouCount = likesData.count || 0;
-                }
             }
         } catch (error) {
-            console.error('Error fetching user data:', error);
+            console.error('Error fetching user premium status:', error);
         }
     }
 
@@ -64,6 +58,7 @@ class BottomNavigation {
                 const data = await response.json();
                 this.unreadMessagesCount = data.totalUnreadMessages || 0;
                 this.unreadInvitationsCount = data.unreadInvitations || 0;
+                this.likedYouCount = data.unreadLikes || 0;
             }
         } catch (error) {
             console.error('[BottomNav] Error fetching notification counts:', error);
@@ -73,14 +68,16 @@ class BottomNavigation {
     startNotificationPolling() {
         // If there's already a global notification manager, subscribe to its updates
         if (window.notificationManager) {
-            window.notificationManager.setUpdateCallback((messages, invitations) => {
+            window.notificationManager.setUpdateCallback((messages, invitations, likes) => {
                 this.unreadMessagesCount = messages;
                 this.unreadInvitationsCount = invitations;
+                this.likedYouCount = likes || 0;
                 this.updateNotificationBadges();
             });
             // Initial sync
             this.unreadMessagesCount = window.notificationManager.unreadMessagesCount || 0;
             this.unreadInvitationsCount = window.notificationManager.unreadInvitationsCount || 0;
+            this.likedYouCount = window.notificationManager.unreadLikesCount || 0;
             this.updateNotificationBadges();
             return;
         }
@@ -124,6 +121,17 @@ class BottomNavigation {
                 watchBadge.style.display = '';
             } else {
                 watchBadge.style.display = 'none';
+            }
+        }
+
+        // Update liked you badge
+        const likedYouBadge = document.querySelector('.bottom-nav-item[data-page="liked-you"] .bottom-nav-badge');
+        if (likedYouBadge) {
+            if (this.likedYouCount > 0) {
+                likedYouBadge.textContent = this.likedYouCount;
+                likedYouBadge.style.display = '';
+            } else {
+                likedYouBadge.style.display = 'none';
             }
         }
     }
