@@ -1,6 +1,6 @@
 /**
  * Bottom Navigation Component - Bumble Style
- * Provides 5-tab navigation: Profile, Discover, Swipe (center), Liked You, Chats
+ * Provides 6-tab navigation: Profile, Discover, Swipe (center), Liked You, Chats, Watch Together
  */
 
 class BottomNavigation {
@@ -20,6 +20,7 @@ class BottomNavigation {
         if (path.includes('swipe')) return 'swipe';
         if (path.includes('liked-you')) return 'liked-you';
         if (path.includes('chat')) return 'chats';
+        if (path.includes('watch-together')) return 'watch-together';
         return 'swipe'; // default
     }
 
@@ -80,6 +81,11 @@ class BottomNavigation {
                     <div class="bottom-nav-icon">💬</div>
                     <div class="bottom-nav-label">Chats</div>
                     ${this.unreadMessagesCount > 0 ? `<span class="bottom-nav-badge">${this.unreadMessagesCount}</span>` : ''}
+                </a>
+                
+                <a href="watch-together.html" class="bottom-nav-item ${this.currentPage === 'watch-together' ? 'active' : ''}" data-page="watch-together">
+                    <div class="bottom-nav-icon">📺</div>
+                    <div class="bottom-nav-label">Watch</div>
                 </a>
             </nav>
         `;
