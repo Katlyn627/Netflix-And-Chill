@@ -399,7 +399,8 @@ const api = new NetflixAndChillAPI();
 // Export as global API for use in other scripts
 const API = api;
 
-// Make API_BASE_URL available globally
+// Make API_BASE_URL and api available globally
 if (typeof window !== 'undefined') {
     window.API_BASE_URL = API_BASE_URL;
+    window.api = api;
 }
