@@ -1,6 +1,6 @@
 /**
  * Bottom Navigation Component - Bumble Style
- * Provides 6-tab navigation: Profile, Discover, Swipe (center), Liked You, Chats, Watch Together
+ * Provides 7-tab navigation: Logout, Profile, Discover, Swipe (center), Liked You, Chats, Watch Together
  */
 
 class BottomNavigation {
@@ -56,6 +56,11 @@ class BottomNavigation {
         // Create bottom nav HTML
         const navHTML = `
             <nav class="bottom-nav">
+                <button type="button" class="bottom-nav-item" id="logout-btn" data-page="logout">
+                    <div class="bottom-nav-icon">🚪</div>
+                    <div class="bottom-nav-label">Logout</div>
+                </button>
+                
                 <a href="profile-view.html" class="bottom-nav-item ${this.currentPage === 'profile' ? 'active' : ''}" data-page="profile">
                     <div class="bottom-nav-icon">👤</div>
                     <div class="bottom-nav-label">Profile</div>
@@ -108,6 +113,25 @@ class BottomNavigation {
                 console.log(`Navigating to: ${page}`);
             });
         });
+
+        // Add logout functionality
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    // Clear all user-related data from localStorage
+                    localStorage.removeItem('currentUserId');
+                    localStorage.removeItem('profileCreated');
+                    localStorage.removeItem('initialSwipeComplete');
+                    localStorage.removeItem('debateResponses');
+                    localStorage.removeItem('promptResponses');
+                    // Clear any other session-specific data
+                    sessionStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            });
+        }
     }
 
     updateBadges(likedYouCount, unreadMessagesCount) {
