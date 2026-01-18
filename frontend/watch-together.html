@@ -91,15 +91,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="watch-date">Date:</label>
-                        <input type="date" id="watch-date" required>
-                        <p class="input-hint">When do you want to watch?</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="watch-time">Time:</label>
-                        <input type="time" id="watch-time" required>
-                        <p class="input-hint">What time should you start?</p>
+                        <label for="watch-datetime">Date & Time:</label>
+                        <div class="datetime-dropdown-container">
+                            <select id="watch-datetime" required class="datetime-dropdown">
+                                <option value="">Select date and time...</option>
+                            </select>
+                        </div>
+                        <p class="input-hint">Choose when you want to watch together</p>
                     </div>
 
                     <div class="form-group">

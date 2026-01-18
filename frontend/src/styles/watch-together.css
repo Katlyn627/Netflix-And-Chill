@@ -338,6 +338,57 @@
     outline: none;
 }
 
+/* DateTime Dropdown Styles */
+.datetime-dropdown-container {
+    position: relative;
+}
+
+.datetime-dropdown {
+    width: 100%;
+    padding: 12px 16px;
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+}
+
+.datetime-dropdown:hover {
+    border-color: #E50914;
+    background-color: #222;
+}
+
+.datetime-dropdown:focus {
+    border-color: #E50914;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+}
+
+.datetime-dropdown option {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 12px;
+    font-size: 15px;
+}
+
+.datetime-dropdown option:hover {
+    background: #E50914;
+}
+
+.datetime-dropdown option[value=""] {
+    color: #888;
+}
+
 .input-hint {
     font-size: 14px;
     color: #888;
