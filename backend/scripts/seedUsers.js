@@ -558,8 +558,8 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
       const likesCount = randomInt(2, 8);
       const likedUserIds = randomItems(otherUserIds, likesCount);
       
-      // Generate 0-2 super likes per user
-      const superLikesCount = randomInt(0, 2);
+      // Generate 1-2 super likes per user (at least 1 for testing)
+      const superLikesCount = randomInt(1, 2);
       const superLikedUserIds = randomItems(
         otherUserIds.filter(id => !likedUserIds.includes(id)),
         superLikesCount
