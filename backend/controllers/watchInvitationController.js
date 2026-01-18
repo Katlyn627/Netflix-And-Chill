@@ -294,6 +294,117 @@ async function markInvitationAsRead(req, res) {
   }
 }
 
+// Get invitation templates for quick invites
+async function getInvitationTemplates(req, res) {
+  try {
+    const templates = [
+      {
+        id: 'template_tonight',
+        name: 'Tonight - Quick Watch',
+        platform: 'teleparty',
+        scheduledDate: new Date().toISOString().split('T')[0],
+        scheduledTime: '20:00',
+        description: 'Watch something together tonight at 8 PM'
+      },
+      {
+        id: 'template_weekend',
+        name: 'Weekend Movie Night',
+        platform: 'amazon-prime',
+        scheduledDate: getNextWeekendDate(),
+        scheduledTime: '19:00',
+        description: 'Perfect for a weekend movie marathon'
+      },
+      {
+        id: 'template_disney',
+        name: 'Disney+ Family Night',
+        platform: 'disney-plus',
+        scheduledDate: new Date().toISOString().split('T')[0],
+        scheduledTime: '18:30',
+        description: 'Family-friendly Disney content'
+      },
+      {
+        id: 'template_lunch',
+        name: 'Lunch Break Episode',
+        platform: 'zoom',
+        scheduledDate: new Date().toISOString().split('T')[0],
+        scheduledTime: '12:00',
+        description: 'Quick episode during lunch'
+      }
+    ];
+
+    res.json({
+      success: true,
+      templates
+    });
+  } catch (error) {
+    console.error('Error getting invitation templates:', error);
+    res.status(500).json({ error: 'Failed to get templates' });
+  }
+}
+
+// Helper function to get next weekend date
+function getNextWeekendDate() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilSaturday = dayOfWeek === 6 ? 7 : (6 - dayOfWeek + 7) % 7;
+  const saturday = new Date(today);
+  saturday.setDate(today.getDate() + daysUntilSaturday);
+  return saturday.toISOString().split('T')[0];
+}
+
+// Suggest alternative times for an invitation
+async function suggestAlternativeTime(req, res) {
+  try {
+    const { invitationId, proposedDate, proposedTime, fromUserId } = req.body;
+
+    if (!invitationId || !proposedDate || !proposedTime || !fromUserId) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: invitationId, proposedDate, proposedTime, fromUserId' 
+      });
+    }
+
+    const invitationsFile = path.join(__dirname, '../../data/watchInvitations.json');
+    let invitations = [];
+    
+    try {
+      const data = await fs.readFile(invitationsFile, 'utf8');
+      invitations = JSON.parse(data);
+    } catch (error) {
+      invitations = [];
+    }
+    
+    const invitationIndex = invitations.findIndex(inv => inv.id === invitationId);
+
+    if (invitationIndex === -1) {
+      return res.status(404).json({ error: 'Invitation not found' });
+    }
+
+    // Add alternative time suggestion
+    if (!invitations[invitationIndex].alternativeSuggestions) {
+      invitations[invitationIndex].alternativeSuggestions = [];
+    }
+
+    invitations[invitationIndex].alternativeSuggestions.push({
+      suggestedBy: fromUserId,
+      proposedDate,
+      proposedTime,
+      timestamp: new Date().toISOString()
+    });
+
+    invitations[invitationIndex].updatedAt = new Date().toISOString();
+
+    await fs.writeFile(invitationsFile, JSON.stringify(invitations, null, 2));
+
+    res.json({
+      success: true,
+      invitation: invitations[invitationIndex]
+    });
+  } catch (error) {
+    console.error('Error suggesting alternative time:', error);
+    res.status(500).json({ error: 'Failed to suggest alternative time' });
+  }
+}
+
 module.exports = {
   createWatchInvitation,
   getUserInvitations,
@@ -301,5 +412,7 @@ module.exports = {
   updateInvitationStatus,
   deleteInvitation,
   getUnreadInvitationCounts,
-  markInvitationAsRead
+  markInvitationAsRead,
+  getInvitationTemplates,
+  suggestAlternativeTime
 };

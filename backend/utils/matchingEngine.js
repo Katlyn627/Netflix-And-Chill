@@ -1,5 +1,7 @@
 const Match = require('../models/Match');
 const swipeAnalytics = require('./swipeAnalytics');
+const { determineArchetype, calculateArchetypeCompatibility } = require('./movieArchetypes');
+const { calculateDebateCompatibility } = require('./debatePrompts');
 
 class MatchingEngine {
   // Scoring constants
@@ -73,6 +75,14 @@ class MatchingEngine {
     // Quiz compatibility - new enhanced feature
     const quizCompatibility = this.calculateQuizCompatibility(user1, user2);
     score += quizCompatibility;
+
+    // Movie Personality Archetype compatibility - UNIQUE FEATURE
+    const archetypeCompatibility = this.calculateArchetypeCompatibility(user1, user2);
+    score += archetypeCompatibility;
+
+    // Debate prompts compatibility - UNIQUE FEATURE
+    const debateCompatibility = this.calculateDebateCompatibility(user1, user2);
+    score += debateCompatibility;
 
     // Bonus for matching video chat preference
     if (user1.videoChatPreference && user2.videoChatPreference) {
@@ -1203,6 +1213,55 @@ class MatchingEngine {
       }
     } catch (error) {
       console.error('Could not calculate active service compatibility:', error.message);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate Movie Personality Archetype compatibility
+   * Unique feature that categorizes users by viewing personality
+   */
+  static calculateArchetypeCompatibility(user1, user2) {
+    try {
+      const user1Archetype = determineArchetype(user1);
+      const user2Archetype = determineArchetype(user2);
+
+      // Store archetype info on users for display (non-persistent)
+      user1.archetype = user1Archetype.primary;
+      user2.archetype = user2Archetype.primary;
+
+      const compatScore = calculateArchetypeCompatibility(
+        user1Archetype.primary.type,
+        user2Archetype.primary.type
+      );
+
+      // Scale from 0-100 to 0-15 points
+      return Math.round(compatScore * 0.15);
+    } catch (error) {
+      console.error('Could not calculate archetype compatibility:', error.message);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate Debate Prompts compatibility
+   * Unique feature based on controversial movie/show opinions
+   */
+  static calculateDebateCompatibility(user1, user2) {
+    try {
+      const user1Debates = user1.debateAnswers || [];
+      const user2Debates = user2.debateAnswers || [];
+
+      if (user1Debates.length === 0 || user2Debates.length === 0) {
+        return 0; // No debate data yet
+      }
+
+      const compatibility = calculateDebateCompatibility(user1Debates, user2Debates);
+
+      // Scale debate compatibility score (0-100) to 0-10 points
+      return Math.round(compatibility.score * 0.10);
+    } catch (error) {
+      console.error('Could not calculate debate compatibility:', error.message);
       return 0;
     }
   }
