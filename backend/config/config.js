@@ -66,6 +66,17 @@ module.exports = {
     clientHost: process.env.RAPIDAPI_CLIENT_HOST || null
   },
 
+  // Auth0 Configuration (User Authentication)
+  // Get credentials at: https://auth0.com/
+  // See AUTH0_SETUP_GUIDE.md for setup instructions
+  auth0: {
+    domain: process.env.AUTH0_DOMAIN || null,
+    clientId: process.env.AUTH0_CLIENT_ID || null,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET || null,
+    audience: process.env.AUTH0_AUDIENCE || null,
+    callbackUrl: process.env.AUTH0_CALLBACK_URL || `${process.env.BASE_URL || 'http://localhost:3000'}/callback.html`
+  },
+
   // Streaming Platform OAuth Configuration
   // OAuth integration for Netflix, Hulu, Disney+, Prime Video, HBO Max, Apple TV+
   // Note: Most streaming platforms have restricted API access

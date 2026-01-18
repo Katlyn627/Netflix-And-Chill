@@ -14,6 +14,7 @@ const chatRoutes = require('./routes/chat');
 const swipeRoutes = require('./routes/swipe');
 const watchInvitationRoutes = require('./routes/watchInvitations');
 const authRoutes = require('./routes/auth');
+const configRoutes = require('./routes/config');
 const { validateRapidApiKey } = require('./middleware/rapidApiAuth');
 
 const app = express();
@@ -73,11 +74,11 @@ app.use((req, res, next) => {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com",
+      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://cdn.auth0.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: http:",
-      "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com",
+      "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com https://*.auth0.com",
       "frame-src 'self' https://*.firebaseapp.com",
       "object-src 'none'",
       "base-uri 'self'"
@@ -96,11 +97,19 @@ app.use((req, res, next) => {
 // Serve static files from frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Apply RapidAPI key validation middleware to all API routes
+// Apply RapidAPI key validation middleware to all API routes except config
 // This protects your API when published on RapidAPI marketplace
-app.use('/api', validateRapidApiKey);
+// Config endpoint is excluded to allow frontend to load Auth0 configuration
+app.use('/api', (req, res, next) => {
+  // Skip validation for config endpoint
+  if (req.path.startsWith('/config')) {
+    return next();
+  }
+  validateRapidApiKey(req, res, next);
+});
 
 // Routes
+app.use('/api/config', configRoutes); // Public config endpoint (no auth required)
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/recommendations', recommendationRoutes);
