@@ -322,7 +322,7 @@ function generateTVWatchlist(tvShows) {
 function generateLeastFavoriteMovies(movies) {
   if (!movies || movies.length === 0) return [];
   
-  const count = randomInt(0, 3);
+  const count = randomInt(1, 3); // Changed from 0-3 to 1-3 to ensure at least 1 movie
   const selected = randomItems(movies, count);
   
   return selected.map(movie => movie.title);
@@ -544,6 +544,41 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     }
     
     console.log('\n✅ Successfully created and saved all users!');
+    
+    // Populate likes and superLikes arrays for users
+    console.log('\n💕 Populating likes and super likes...');
+    const { randomInt, randomItems } = require('../utils/fakeDataGenerator');
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      
+      // Get other user IDs (excluding self)
+      const otherUserIds = users.filter(u => u.id !== user.id).map(u => u.id);
+      
+      // Generate 2-8 likes per user
+      const likesCount = randomInt(2, 8);
+      const likedUserIds = randomItems(otherUserIds, likesCount);
+      
+      // Generate 0-2 super likes per user
+      const superLikesCount = randomInt(0, 2);
+      const superLikedUserIds = randomItems(
+        otherUserIds.filter(id => !likedUserIds.includes(id)),
+        superLikesCount
+      );
+      
+      // Update user with likes and superLikes
+      user.likes = likedUserIds;
+      user.superLikes = superLikedUserIds;
+      
+      // Save updated user
+      await database.updateUser(user.id, user);
+      
+      // Show progress
+      if ((i + 1) % 10 === 0 || i === users.length - 1) {
+        console.log(`  Updated ${i + 1}/${users.length} users with likes...`);
+      }
+    }
+    
+    console.log('\n✅ Successfully populated likes and super likes!');
     
     // Generate credentials file
     console.log('\n📄 Generating test credentials file...');
