@@ -122,11 +122,11 @@ class CustomSocialConnectionService {
     }
     
     // Validate environment variables
-    const clientId = process.env[`${providerId.toUpperCase()}_CLIENT_ID`];
-    const clientSecret = process.env[`${providerId.toUpperCase()}_CLIENT_SECRET`];
+    const clientId = process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_ID`];
+    const clientSecret = process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_SECRET`];
     
     if (!clientId || !clientSecret) {
-      throw new Error(`Missing OAuth credentials for ${providerId}. Set ${providerId.toUpperCase()}_CLIENT_ID and ${providerId.toUpperCase()}_CLIENT_SECRET`);
+      throw new Error(`Missing OAuth credentials for ${providerId}. Set ${providerId.toUpperCase()}_CUSTOM_CLIENT_ID and ${providerId.toUpperCase()}_CUSTOM_CLIENT_SECRET`);
     }
     
     const token = await this.getManagementToken();
@@ -161,8 +161,8 @@ class CustomSocialConnectionService {
       enabled_clients: [process.env.AUTH0_CLIENT_ID],
       
       options: {
-        client_id: process.env[`${providerId.toUpperCase()}_CLIENT_ID`],
-        client_secret: process.env[`${providerId.toUpperCase()}_CLIENT_SECRET`],
+        client_id: process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_ID`],
+        client_secret: process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_SECRET`],
         
         authorizationURL: provider.oauth.authorizationURL,
         tokenURL: provider.oauth.tokenURL,
@@ -211,8 +211,8 @@ class CustomSocialConnectionService {
       enabled_clients: [process.env.AUTH0_CLIENT_ID],
       
       options: {
-        client_id: process.env[`${providerId.toUpperCase()}_CLIENT_ID`],
-        client_secret: process.env[`${providerId.toUpperCase()}_CLIENT_SECRET`],
+        client_id: process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_ID`],
+        client_secret: process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_SECRET`],
         
         authorizationURL: provider.oauth.authorizationURL,
         tokenURL: provider.oauth.tokenURL,
@@ -452,20 +452,20 @@ class CustomSocialConnectionService {
       };
     }
     
-    const clientId = process.env[`${providerId.toUpperCase()}_CLIENT_ID`];
-    const clientSecret = process.env[`${providerId.toUpperCase()}_CLIENT_SECRET`];
+    const clientId = process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_ID`];
+    const clientSecret = process.env[`${providerId.toUpperCase()}_CUSTOM_CLIENT_SECRET`];
     
     if (!clientId) {
       return {
         valid: false,
-        error: `Missing ${providerId.toUpperCase()}_CLIENT_ID environment variable`
+        error: `Missing ${providerId.toUpperCase()}_CUSTOM_CLIENT_ID environment variable`
       };
     }
     
     if (!clientSecret) {
       return {
         valid: false,
-        error: `Missing ${providerId.toUpperCase()}_CLIENT_SECRET environment variable`
+        error: `Missing ${providerId.toUpperCase()}_CUSTOM_CLIENT_SECRET environment variable`
       };
     }
     

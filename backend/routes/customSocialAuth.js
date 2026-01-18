@@ -53,7 +53,7 @@ router.post('/setup/:provider', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: validation.error,
-        hint: `Set ${provider.toUpperCase()}_CLIENT_ID and ${provider.toUpperCase()}_CLIENT_SECRET in your environment variables`
+        hint: `Set ${provider.toUpperCase()}_CUSTOM_CLIENT_ID and ${provider.toUpperCase()}_CUSTOM_CLIENT_SECRET in your environment variables`
       });
     }
     
