@@ -136,7 +136,10 @@ class DiscoverPage {
             return matches;
         }
 
-        const userGenres = new Set(this.currentUser.preferences.genres);
+        // Extract genre IDs or names for comparison
+        const userGenreIds = new Set(
+            this.currentUser.preferences.genres.map(g => g.id || g.name || g)
+        );
         
         // Only include matches that have at least one matching genre
         return matches.filter(match => {
@@ -145,15 +148,24 @@ class DiscoverPage {
                 return false;
             }
 
-            // Check if user has any matching genres
-            return user.preferences.genres.some(genre => userGenres.has(genre));
+            // Check if user has any matching genres by ID or name
+            return user.preferences.genres.some(genre => {
+                const genreId = genre.id || genre.name || genre;
+                return userGenreIds.has(genreId);
+            });
         }).sort((a, b) => {
             // Sort by number of matching genres
             const aGenres = a.user.preferences.genres || [];
             const bGenres = b.user.preferences.genres || [];
             
-            const aMatches = aGenres.filter(g => userGenres.has(g)).length;
-            const bMatches = bGenres.filter(g => userGenres.has(g)).length;
+            const aMatches = aGenres.filter(g => {
+                const genreId = g.id || g.name || g;
+                return userGenreIds.has(genreId);
+            }).length;
+            const bMatches = bGenres.filter(g => {
+                const genreId = g.id || g.name || g;
+                return userGenreIds.has(genreId);
+            }).length;
             
             return bMatches - aMatches;
         });
@@ -217,7 +229,7 @@ class DiscoverPage {
         // Get movie preferences/genres as tags
         const genres = user.preferences?.genres || [];
         const genreTags = genres.slice(0, 3).map(genre => 
-            `<span class="movie-tag">${genre}</span>`
+            `<span class="movie-tag">${genre.name || genre}</span>`
         ).join('');
 
         // Get streaming services
