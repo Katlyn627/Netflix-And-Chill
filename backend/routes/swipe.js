@@ -364,6 +364,16 @@ router.get('/movies/:userId', async (req, res) => {
     const watchlistMovieIds = (user.movieWatchlist || []).map(m => m.tmdbId);
     const watchlistTVIds = (user.tvWatchlist || []).map(tv => tv.tmdbId);
     
+    // ENHANCED: Analyze swipe history to identify preferred genres from liked content
+    // Using Set-based approach for O(n) complexity instead of O(n²)
+    const likedGenresSet = new Set();
+    if (user.swipedMovies && user.swipedMovies.length > 0) {
+      const likedMovies = user.swipedMovies.filter(m => m.action === 'like' || m.action === 'superlike');
+      const allGenreIds = likedMovies.flatMap(m => m.genreIds || []);
+      allGenreIds.forEach(genreId => likedGenresSet.add(genreId));
+    }
+    const likedGenres = Array.from(likedGenresSet);
+    
     // Get genre IDs from user's watch history to enhance recommendations
     const watchHistoryGenres = [];
     if (user.watchHistory && user.watchHistory.length > 0) {
@@ -377,8 +387,9 @@ router.get('/movies/:userId', async (req, res) => {
     let content = [];
 
     try {
-      // Combine genre IDs from preferences and watch history
-      const allGenreIds = [...new Set([...genreIds])];
+      // ENHANCED: Combine genre IDs from preferences, watch history, AND liked swipes
+      // Prioritize genres from liked swipes as they show direct user preference
+      const allGenreIds = [...new Set([...likedGenres, ...genreIds])];
       
       // Use new diverse content fetching strategy that combines movies and TV shows from multiple sources
       // This ensures users get different content each time they swipe

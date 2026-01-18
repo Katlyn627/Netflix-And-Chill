@@ -61,6 +61,12 @@ router.post('/:userId/favorite-movies', userController.addFavoriteMovie.bind(use
 router.get('/:userId/favorite-movies', userController.getFavoriteMovies.bind(userController));
 router.delete('/:userId/favorite-movies/:movieId', userController.removeFavoriteMovie.bind(userController));
 
+// Favorite TV Shows routes
+// Note: tvShowId in the route is the TMDB ID of the TV show
+router.post('/:userId/favorite-tv-shows', userController.addFavoriteTVShow.bind(userController));
+router.get('/:userId/favorite-tv-shows', userController.getFavoriteTVShows.bind(userController));
+router.delete('/:userId/favorite-tv-shows/:tvShowId', userController.removeFavoriteTVShow.bind(userController));
+
 // Delete user profile
 router.delete('/:userId', userController.deleteUser.bind(userController));
 

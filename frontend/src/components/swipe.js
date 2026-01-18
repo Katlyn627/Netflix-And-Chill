@@ -474,7 +474,7 @@ function handleDislikeButton() {
 /**
  * Handle super like button
  */
-function handleSuperLikeButton() {
+async function handleSuperLikeButton() {
   if (superLikesRemaining <= 0) {
     alert('No Super Likes remaining today! Come back tomorrow for more.');
     return;
@@ -497,9 +497,12 @@ function handleSuperLikeButton() {
   card.style.transition = 'transform 0.5s ease';
   card.style.transform = 'translateY(-100vh) scale(0.8)';
   
-  setTimeout(() => {
+  setTimeout(async () => {
     // Record super like
-    recordSwipeAction('superlike', movie);
+    await recordSwipeAction('superlike', movie);
+    
+    // Add to favorite movies on profile
+    await addToFavorites(movie);
     
     // Save to history for undo
     swipeHistory.push({
@@ -549,6 +552,52 @@ function handleUndoButton() {
 }
 
 
+
+/**
+ * Add movie/TV show to favorites
+ * Note: Backend swipe route unifies date fields - both movies (release_date) and 
+ * TV shows (first_air_date) are returned as 'releaseDate' for simplified frontend handling
+ */
+async function addToFavorites(content) {
+  const userId = window.currentUserId || localStorage.getItem('currentUserId');
+  if (!userId) return;
+
+  try {
+    const favoriteData = {
+      tmdbId: content.tmdbId,
+      title: content.title,
+      posterPath: content.posterPath,
+      overview: content.overview
+    };
+
+    // Backend expects different field names for movies vs TV shows
+    // The unified 'releaseDate' from swipe route is mapped to the appropriate field
+    if (content.contentType === 'tv') {
+      favoriteData.firstAirDate = content.releaseDate;
+    } else {
+      favoriteData.releaseDate = content.releaseDate;
+    }
+
+    const endpoint = content.contentType === 'tv' 
+      ? `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-tv-shows`
+      : `${window.API_BASE_URL || 'http://localhost:3000/api'}/users/${userId}/favorite-movies`;
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(favoriteData)
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      console.log(`${content.contentType === 'tv' ? 'TV show' : 'Movie'} added to favorites:`, content.title);
+    }
+  } catch (error) {
+    console.error('Error adding to favorites:', error);
+  }
+}
 
 /**
  * Record swipe action to backend
