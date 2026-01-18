@@ -2,6 +2,46 @@
 
 A modern dating application that matches users based on their streaming preferences, watch history, and binge-watching habits. Find your perfect streaming partner!
 
+## ⭐ Unique Features That Set Us Apart
+
+### 🎭 Movie Personality Archetypes
+Discover your viewing personality! Our app categorizes users into one of 8 unique archetypes based on their watching patterns:
+- **🎯 Binge Warrior** - Marathon viewing masters
+- **🌙 Casual Viewer** - One episode at a time
+- **🎭 The Critic** - Quality over quantity
+- **🗺️ Genre Explorer** - Adventurous and diverse
+- **☕ Comfort Watcher** - Rewatches and cozy content
+- **⭐ Loyal Fan** - Franchise dedicated
+- **🎬 Indie Lover** - Hidden gems hunter
+- **🌊 Trend Surfer** - Always watching what's hot
+
+Archetype compatibility is factored into match scoring for better connections!
+
+### 🔥 Debate Prompts & Hot Takes
+Answer controversial movie and TV show questions to spark conversations:
+- 20+ debate prompts across categories (Hot Takes, Viewing Habits, Classics)
+- "Would You Rather" scenarios for viewing preferences
+- "This or That" quick preference questions
+- Find matches who share or hilariously oppose your opinions
+- Optimal compatibility at 60-80% agreement (some common ground, some debate!)
+
+### ⚡ Quick Watch Together Templates
+Schedule watch parties with pre-filled templates:
+- **Tonight - Quick Watch** - Spontaneous viewing at 8 PM
+- **Weekend Movie Night** - Saturday movie marathon
+- **Disney+ Family Night** - Family-friendly content
+- **Lunch Break Episode** - Quick viewing during lunch
+- Suggest alternative times if schedules don't align
+
+### 💬 Enhanced Chat Experience
+- **Message Reactions** - React with emojis to messages
+- **Reply Threading** - Quote and respond to specific messages  
+- **Multiple Message Types** - Text, voice (coming soon), GIFs, stickers
+- **Typing Indicators** - See when matches are composing messages
+- Real-time or polling-based chat (Stream Chat optional)
+
+[📖 Read more about our unique features](docs/features/UNIQUE_FEATURES.md)
+
 ## Features
 
 - **Onboarding Experience**: Beautiful onboarding flow introducing users to the app's core features
