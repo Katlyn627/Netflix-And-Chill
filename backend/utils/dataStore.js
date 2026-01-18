@@ -58,6 +58,11 @@ class DataStore {
     return users.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
   }
 
+  async findUserByAuth0Id(auth0Id) {
+    const users = await this.loadUsers();
+    return users.find(u => u.auth0Id === auth0Id);
+  }
+
   async updateUser(userId, updates) {
     await this.ensureDataDir();
     await this.ensureFile(this.usersFile);

@@ -1375,6 +1375,83 @@ class UserController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Create or update user from Auth0 authentication
+  async createOrUpdateAuth0User(req, res) {
+    try {
+      const { email, username, auth0Id, profilePicture } = req.body;
+
+      if (!email || !auth0Id) {
+        return res.status(400).json({ error: 'Email and auth0Id are required' });
+      }
+
+      const dataStore = await getDatabase();
+
+      // Check if user with this Auth0 ID already exists
+      let userData = await dataStore.findUserByAuth0Id(auth0Id);
+      
+      if (userData) {
+        // User exists, update their info
+        const user = new User(userData);
+        
+        // Update profile picture if provided
+        if (profilePicture && profilePicture !== user.profilePicture) {
+          user.profilePicture = profilePicture;
+        }
+        
+        // Update username if provided and different
+        if (username && username !== user.username) {
+          user.username = username;
+        }
+        
+        await this.saveUserData(user.id, user);
+        
+        return res.json({
+          message: 'User updated successfully',
+          id: user.id,
+          user: this.filterSensitiveData(user)
+        });
+      }
+      
+      // User doesn't exist, create new user
+      // Check if email is already used (by non-Auth0 user)
+      const existingUserByEmail = await dataStore.findUserByEmail(email);
+      if (existingUserByEmail && !existingUserByEmail.auth0Id) {
+        return res.status(400).json({ 
+          error: 'User with this email already exists. Please use a different login method.' 
+        });
+      }
+      
+      const newUserData = {
+        username: username || email.split('@')[0],
+        email,
+        auth0Id,
+        profilePicture: profilePicture || '',
+        password: null, // No password for Auth0 users
+        age: null,
+        location: '',
+        bio: 'Tell us about yourself!',
+        gender: null,
+        sexualOrientation: null
+      };
+
+      const user = new User(newUserData);
+      
+      // Save user data
+      const userDataToStore = user.toJSON();
+      userDataToStore.auth0Id = auth0Id;
+      await dataStore.addUser(userDataToStore);
+
+      res.status(201).json({
+        message: 'User created successfully',
+        id: user.id,
+        user: this.filterSensitiveData(user)
+      });
+    } catch (error) {
+      console.error('Error creating/updating Auth0 user:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();

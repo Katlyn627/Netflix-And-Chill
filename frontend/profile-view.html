@@ -621,6 +621,19 @@
     <script src="src/utils/errorHandler.js"></script>
     <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
+    
+    <!-- Auth0 SPA SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    
+    <!-- Auth0 Configuration -->
+    <script>
+        // Auth0 Configuration - Update these values with your Auth0 credentials
+        window.AUTH0_DOMAIN = 'YOUR_AUTH0_DOMAIN.auth0.com';
+        window.AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
+        window.AUTH0_AUDIENCE = 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/';
+    </script>
+    <script src="src/utils/auth0-config.js"></script>
+    
     <script src="src/utils/navigation.js"></script>
     <script src="src/components/bottom-nav.js"></script>
     <script src="src/components/quiz.js"></script>

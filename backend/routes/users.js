@@ -98,4 +98,7 @@ router.get('/:userId/viewing-stats', userController.getViewingStatistics.bind(us
 router.get('/:userId/streaming-services/:serviceName/stats', userController.getServiceUsageStats.bind(userController));
 router.put('/:userId/streaming-services/:serviceName/usage', userController.updateServiceUsage.bind(userController));
 
+// Auth0 integration route
+router.post('/auth0', userController.createOrUpdateAuth0User.bind(userController));
+
 module.exports = router;
