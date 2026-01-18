@@ -212,9 +212,105 @@ class DiscoverPage {
         alert('It\'s a match! 🎉 You can now chat with this user.');
     }
 
-    viewProfile(userId) {
-        // Navigate to user profile view
-        window.location.href = `profile-view.html?userId=${userId}`;
+    async viewProfile(userId) {
+        // Show modal with basic user info instead of navigating to profile-view.html
+        try {
+            const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+            if (!response.ok) throw new Error('Failed to load user');
+            
+            const user = await response.json();
+            this.showUserInfoModal(user);
+        } catch (error) {
+            console.error('Error loading user:', error);
+            alert('Failed to load user information. Please try again.');
+        }
+    }
+
+    showUserInfoModal(user) {
+        // Create and show modal with basic user information
+        const existingModal = document.getElementById('user-info-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'user-info-modal';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        
+        const profilePicture = user.profilePicture || user.photos?.[0]?.url || 'assets/images/default-avatar.png';
+        const age = user.age || 'N/A';
+        const location = user.location || 'Not specified';
+        const bio = user.bio || 'No bio available';
+        const genres = user.preferences?.genres || [];
+        const streamingServices = user.streamingServices || [];
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">User Info</h2>
+                    <button id="close-user-info-modal" class="btn btn-secondary" style="padding: 8px 15px;">Close</button>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${profilePicture}" alt="${user.username}" 
+                         style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover;"
+                         onerror="this.src='assets/images/default-avatar.png'">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <h3 style="margin: 0 0 10px 0;">${user.username}, ${age}</h3>
+                    <p style="color: #666; margin: 5px 0;"><strong>Location:</strong> ${location}</p>
+                    ${user.gender ? `<p style="color: #666; margin: 5px 0;"><strong>Gender:</strong> ${user.gender.charAt(0).toUpperCase() + user.gender.slice(1)}</p>` : ''}
+                    ${user.sexualOrientation ? `<p style="color: #666; margin: 5px 0;"><strong>Orientation:</strong> ${user.sexualOrientation.charAt(0).toUpperCase() + user.sexualOrientation.slice(1)}</p>` : ''}
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <p style="font-style: italic; color: #888;">"${bio}"</p>
+                </div>
+                
+                ${genres.length > 0 ? `
+                <div style="margin-bottom: 15px;">
+                    <strong>Favorite Genres:</strong>
+                    <div style="margin-top: 8px;">
+                        ${genres.map(genre => `<span style="display: inline-block; background: #E50914; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${genre}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${streamingServices.length > 0 ? `
+                <div style="margin-bottom: 15px;">
+                    <strong>Streaming Services:</strong>
+                    <div style="margin-top: 8px;">
+                        ${streamingServices.map(service => `<span style="display: inline-block; background: #333; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${service}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${user.preferences?.bingeCount ? `
+                <div style="margin-bottom: 15px;">
+                    <p style="color: #666;"><strong>Binge Watch Episodes:</strong> ${user.preferences.bingeCount} per session</p>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Close modal handler
+        const closeBtn = document.getElementById('close-user-info-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.remove();
+            });
+        }
+        
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
     }
 
     attachEventListeners() {

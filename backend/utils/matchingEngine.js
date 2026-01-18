@@ -77,6 +77,27 @@ class MatchingEngine {
       }
     }
 
+    // CREATIVE MATCHING FACTORS - Enhanced uniqueness
+    // 1. Viewing time preferences (night owl vs early bird)
+    const viewingTimeCompatibility = this.calculateViewingTimeCompatibility(user1, user2);
+    score += viewingTimeCompatibility;
+
+    // 2. Movie marathon compatibility (preference for long vs short viewing sessions)
+    const marathonCompatibility = this.calculateMarathonCompatibility(user1, user2);
+    score += marathonCompatibility;
+
+    // 3. Genre diversity score (do they both like exploring or stick to favorites)
+    const diversityCompatibility = this.calculateDiversityCompatibility(user1, user2);
+    score += diversityCompatibility;
+
+    // 4. Rewatch tendency compatibility (do they both rewatch favorites or always watch new content)
+    const rewatchCompatibility = this.calculateRewatchCompatibility(user1, user2);
+    score += rewatchCompatibility;
+
+    // 5. Spontaneity factor (planned watching vs spontaneous browsing)
+    const spontaneityCompatibility = this.calculateSpontaneityCompatibility(user1, user2);
+    score += spontaneityCompatibility;
+
     // Normalize score to 0-100 range
     const normalizedScore = Math.min(100, score);
 
@@ -89,6 +110,11 @@ class MatchingEngine {
       sharedShows,
       emotionalToneCompatibility,
       quizCompatibility,
+      viewingTimeCompatibility,
+      marathonCompatibility,
+      diversityCompatibility,
+      rewatchCompatibility,
+      spontaneityCompatibility,
       user1,
       user2
     });
@@ -754,6 +780,102 @@ class MatchingEngine {
     }
 
     return true;
+  }
+
+  /**
+   * Calculate viewing time compatibility (night owl vs early bird)
+   * Based on watch history patterns and quiz responses
+   */
+  static calculateViewingTimeCompatibility(user1, user2) {
+    // This would ideally use actual viewing timestamp data
+    // For now, we'll use a simplified heuristic based on binge count and quiz data
+    const u1NightOwl = (user1.preferences?.bingeWatchCount || 0) > 5;
+    const u2NightOwl = (user2.preferences?.bingeWatchCount || 0) > 5;
+    
+    // Award points if both are night owls or both are not
+    return u1NightOwl === u2NightOwl ? 8 : 3;
+  }
+
+  /**
+   * Calculate marathon compatibility (long vs short viewing sessions)
+   * Based on binge count patterns
+   */
+  static calculateMarathonCompatibility(user1, user2) {
+    const u1Binge = user1.preferences?.bingeWatchCount || 0;
+    const u2Binge = user2.preferences?.bingeWatchCount || 0;
+    
+    // Calculate similarity in marathon preference
+    const difference = Math.abs(u1Binge - u2Binge);
+    
+    if (difference === 0) return 10;
+    if (difference <= 2) return 7;
+    if (difference <= 4) return 4;
+    return 1;
+  }
+
+  /**
+   * Calculate diversity compatibility (exploring new genres vs favorites)
+   * Based on genre count and watch history variety
+   */
+  static calculateDiversityCompatibility(user1, user2) {
+    const u1Genres = (user1.preferences?.genres || []).length;
+    const u2Genres = (user2.preferences?.genres || []).length;
+    
+    // Both have diverse tastes (many genres)
+    if (u1Genres >= 5 && u2Genres >= 5) return 10;
+    
+    // Both have focused tastes (few genres)
+    if (u1Genres <= 2 && u2Genres <= 2) return 8;
+    
+    // Mixed diversity
+    return 4;
+  }
+
+  /**
+   * Calculate rewatch compatibility
+   * Based on watch history patterns (if they have rewatched content)
+   */
+  static calculateRewatchCompatibility(user1, user2) {
+    // Check if users have duplicates in watch history (indicating rewatching)
+    const u1Rewatcher = this.hasRewatchPattern(user1);
+    const u2Rewatcher = this.hasRewatchPattern(user2);
+    
+    // Both rewatch or both don't
+    return u1Rewatcher === u2Rewatcher ? 7 : 2;
+  }
+
+  /**
+   * Helper method to detect rewatch patterns
+   */
+  static hasRewatchPattern(user) {
+    const watchHistory = user.watchHistory || [];
+    const titles = new Set();
+    
+    for (const item of watchHistory) {
+      const normalizedTitle = item.title.toLowerCase().trim();
+      if (titles.has(normalizedTitle)) {
+        return true; // Found a rewatch
+      }
+      titles.add(normalizedTitle);
+    }
+    
+    return false;
+  }
+
+  /**
+   * Calculate spontaneity compatibility
+   * Based on watchlist size and quiz responses
+   */
+  static calculateSpontaneityCompatibility(user1, user2) {
+    const u1Watchlist = (user1.movieWatchlist || []).length;
+    const u2Watchlist = (user2.movieWatchlist || []).length;
+    
+    // Large watchlist = planner, small watchlist = spontaneous
+    const u1Planner = u1Watchlist > 10;
+    const u2Planner = u2Watchlist > 10;
+    
+    // Both are planners or both are spontaneous
+    return u1Planner === u2Planner ? 6 : 2;
   }
 }
 
