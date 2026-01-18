@@ -100,13 +100,13 @@ async function runTests() {
       episodesWatched: 5
     });
     await addWatchHistory(testUserId1, {
-      title: 'The Handmaid\'s Tale',
+      title: "The Handmaid's Tale",
       type: 'tvshow',
       genre: 'Drama',
       service: 'Hulu',
       episodesWatched: 10
     });
-    log('✓ Added Alice\'s watch history: Stranger Things, The Crown, The Handmaid\'s Tale', 'green');
+    log(`✓ Added Alice's watch history: Stranger Things, The Crown, The Handmaid's Tale`, 'green');
     
     // Bob's watch history (shares Stranger Things with Alice)
     await addWatchHistory(testUserId2, {
@@ -333,7 +333,7 @@ async function findMatches(userId) {
 if (require.main === module) {
   runTests().catch(error => {
     log(`\n❌ Unexpected error: ${error.message}`, 'red');
-    process.exit(1);
+    throw error; // Let Node.js handle the error naturally
   });
 }
 
