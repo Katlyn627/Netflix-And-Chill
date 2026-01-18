@@ -222,6 +222,14 @@ class MongoDBAdapter {
     return mutual;
   }
 
+  async markLikeAsRead(likeId) {
+    const result = await this.db.collection('likes').updateOne(
+      { id: likeId },
+      { $set: { read: true } }
+    );
+    return result.modifiedCount > 0;
+  }
+
   // Chat operations
   async addChatMessage(chatMessage) {
     const result = await this.db.collection('chats').insertOne(chatMessage);

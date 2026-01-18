@@ -196,6 +196,22 @@ class DataStore {
     await fs.writeFile(this.likesFile, JSON.stringify(filteredLikes, null, 2));
   }
 
+  async markLikeAsRead(likeId) {
+    await this.ensureDataDir();
+    await this.ensureFile(this.likesFile);
+    
+    const likes = await this.loadLikes();
+    const likeIndex = likes.findIndex(l => l.id === likeId);
+    
+    if (likeIndex === -1) {
+      return false;
+    }
+    
+    likes[likeIndex].read = true;
+    await fs.writeFile(this.likesFile, JSON.stringify(likes, null, 2));
+    return true;
+  }
+
   async deleteUserMatches(userId) {
     await this.ensureDataDir();
     await this.ensureFile(this.matchesFile);

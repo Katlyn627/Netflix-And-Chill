@@ -44,11 +44,11 @@ class BottomNavigation {
                 const user = await response.json();
                 this.isPremium = user.isPremium || false;
                 
-                // Fetch liked you count
+                // Fetch liked you count (unread only for badge)
                 const likesResponse = await fetch(`http://localhost:3000/api/likes/${this.userId}/received`);
                 if (likesResponse.ok) {
                     const likesData = await likesResponse.json();
-                    this.likedYouCount = likesData.count || 0;
+                    this.likedYouCount = likesData.unreadCount || 0;
                 }
             }
         } catch (error) {

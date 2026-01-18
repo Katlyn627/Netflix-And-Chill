@@ -4,6 +4,7 @@ class Like {
     this.fromUserId = fromUserId;
     this.toUserId = toUserId;
     this.type = type; // 'like' or 'superlike'
+    this.read = false; // Whether the recipient has viewed the like
     this.createdAt = new Date().toISOString();
   }
 
@@ -17,6 +18,7 @@ class Like {
       fromUserId: this.fromUserId,
       toUserId: this.toUserId,
       type: this.type,
+      read: this.read,
       createdAt: this.createdAt
     };
   }

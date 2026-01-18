@@ -339,6 +339,19 @@ class NetflixAndChillAPI {
         };
     }
 
+    async markLikeAsRead(likeId) {
+        const response = await fetch(`${API_BASE_URL}/likes/${likeId}/read`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to mark like as read');
+        }
+        return await response.json();
+    }
+
     async createWatchInvitation(invitationData) {
         const response = await fetch(`${API_BASE_URL}/watch-invitations`, {
             method: 'POST',

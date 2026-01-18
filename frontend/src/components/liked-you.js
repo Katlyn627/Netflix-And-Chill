@@ -50,11 +50,39 @@ class LikedYouPage {
                 if (countElement) {
                     countElement.textContent = data.count || 0;
                 }
+                
+                // Mark all unread likes as read (only for premium users who can see them)
+                if (this.isPremium && this.likes.length > 0) {
+                    this.markLikesAsRead();
+                }
             }
         } catch (error) {
             console.error('Error loading likes:', error);
         } finally {
             if (loading) loading.style.display = 'none';
+        }
+    }
+
+    async markLikesAsRead() {
+        // Mark each unread like as read
+        for (const like of this.likes) {
+            if (!like.read) {
+                try {
+                    await API.markLikeAsRead(like.id);
+                } catch (error) {
+                    console.error('Error marking like as read:', error);
+                }
+            }
+        }
+        
+        // Update global notification manager if available
+        if (window.notificationManager) {
+            await window.notificationManager.fetchAndUpdate();
+        }
+        
+        // Also update bottom nav if available
+        if (window.bottomNav) {
+            await window.bottomNav.fetchUserData();
         }
     }
 

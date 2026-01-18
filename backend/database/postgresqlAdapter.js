@@ -264,6 +264,14 @@ class PostgreSQLAdapter {
     return mutual;
   }
 
+  async markLikeAsRead(likeId) {
+    const result = await this.pool.query(
+      'UPDATE likes SET read = true WHERE id = $1',
+      [likeId]
+    );
+    return result.rowCount > 0;
+  }
+
   // Chat operations
   async addChatMessage(chatMessage) {
     const query = `
