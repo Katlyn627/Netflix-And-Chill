@@ -9,6 +9,9 @@
     let selectedInvitation = null;
     let urlMatchId = null;
     let urlInvitationId = null;
+    let currentCalendarDate = new Date();
+    let selectedDate = null;
+    let selectedTime = null;
 
     // Platform information
     const platformInfo = {
@@ -78,69 +81,232 @@
         loadInvitations();
         loadQuickTemplates(); // NEW: Load quick templates
         setupEventListeners();
-        populateDateTimeDropdown();
+        initializeCalendar();
         checkForConflictingExtensions();
         
         // Handle URL parameters for direct links
         handleURLParameters();
     });
 
-    function populateDateTimeDropdown() {
-        const dropdown = document.getElementById('watch-datetime');
-        if (!dropdown) return;
+    function initializeCalendar() {
+        renderCalendar();
+        setupCalendarEventListeners();
+        setupTouchGestures();
+    }
 
-        // Clear existing options except the first one
-        dropdown.innerHTML = '<option value="">Select date and time...</option>';
+    function setupCalendarEventListeners() {
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
 
-        const now = new Date();
-        const options = [];
-        
-        // Configuration constants
-        const DAYS_TO_GENERATE = 14;
-        const START_HOUR = 8;  // 8 AM
-        const END_HOUR = 23;   // 11 PM
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 
-        // Generate options for the next 14 days
-        for (let dayOffset = 0; dayOffset < DAYS_TO_GENERATE; dayOffset++) {
-            const date = new Date(now);
-            date.setDate(date.getDate() + dayOffset);
-            
-            // Skip past times for today
-            const startHour = (dayOffset === 0) ? Math.max(now.getHours() + 1, START_HOUR) : START_HOUR;
-            
-            // Generate time slots for each day (8 AM to 11 PM in 1-hour increments)
-            for (let hour = startHour; hour <= END_HOUR; hour++) {
-                const dateTimeValue = new Date(date);
-                dateTimeValue.setHours(hour, 0, 0, 0);
-                
-                const dateStr = dateTimeValue.toISOString().split('T')[0];
-                const timeStr = `${hour.toString().padStart(2, '0')}:00`;
-                const value = `${dateStr}T${timeStr}`;
-                
-                // Format display text
-                const dayName = dayOffset === 0 ? 'Today' : 
-                               dayOffset === 1 ? 'Tomorrow' : 
-                               dateTimeValue.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                
-                const timeDisplay = dateTimeValue.toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit',
-                    hour12: true 
-                });
-                
-                const optionText = `📅 ${dayName} at ${timeDisplay}`;
-                
-                options.push({ value, text: optionText });
+    function setupTouchGestures() {
+        const calendarDays = document.getElementById('calendar-days');
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        calendarDays.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        calendarDays.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next month
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                } else {
+                    // Swipe right - previous month
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                }
+                renderCalendar();
             }
         }
+    }
 
-        // Add all options to dropdown
-        options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt.value;
-            option.textContent = opt.text;
-            dropdown.appendChild(option);
-        });
+    function renderCalendar() {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+        
+        // Update month/year display
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
+
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+        const calendarDaysEl = document.getElementById('calendar-days');
+        calendarDaysEl.innerHTML = '';
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Add previous month's trailing days
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const day = daysInPrevMonth - i;
+            const dayEl = createDayElement(day, true, false);
+            calendarDaysEl.appendChild(dayEl);
+        }
+
+        // Add current month's days
+        for (let day = 1; day <= daysInMonth; day++) {
+            const currentDate = new Date(year, month, day);
+            currentDate.setHours(0, 0, 0, 0);
+            
+            const isToday = currentDate.getTime() === today.getTime();
+            const isDisabled = currentDate < today;
+            const isSelected = selectedDate && 
+                currentDate.getTime() === new Date(selectedDate).setHours(0, 0, 0, 0);
+            
+            const dayEl = createDayElement(day, false, isDisabled, isToday, isSelected);
+            
+            if (!isDisabled) {
+                dayEl.addEventListener('click', () => selectDate(year, month, day));
+            }
+            
+            calendarDaysEl.appendChild(dayEl);
+        }
+
+        // Add next month's leading days to fill the grid
+        const totalCells = calendarDaysEl.children.length;
+        const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+        
+        for (let day = 1; day <= remainingCells; day++) {
+            const dayEl = createDayElement(day, true, false);
+            calendarDaysEl.appendChild(dayEl);
+        }
+    }
+
+    function createDayElement(day, isOtherMonth, isDisabled, isToday, isSelected) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = day;
+        
+        if (isOtherMonth) {
+            dayEl.classList.add('other-month');
+        }
+        if (isDisabled) {
+            dayEl.classList.add('disabled');
+        }
+        if (isToday) {
+            dayEl.classList.add('today');
+        }
+        if (isSelected) {
+            dayEl.classList.add('selected');
+        }
+        
+        return dayEl;
+    }
+
+    function selectDate(year, month, day) {
+        selectedDate = new Date(year, month, day);
+        selectedTime = null; // Reset time selection when date changes
+        
+        // Re-render calendar to show selection
+        renderCalendar();
+        
+        // Show time picker
+        const timePicker = document.getElementById('calendar-time-picker');
+        timePicker.style.display = 'block';
+        
+        // Generate time slots
+        renderTimeSlots();
+        
+        // Scroll to time picker
+        timePicker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function renderTimeSlots() {
+        const timeSlotsEl = document.getElementById('time-slots');
+        timeSlotsEl.innerHTML = '';
+        
+        const now = new Date();
+        const isToday = selectedDate && 
+            selectedDate.toDateString() === now.toDateString();
+        
+        const START_HOUR = 8;  // 8 AM
+        const END_HOUR = 23;   // 11 PM
+        
+        // Determine starting hour
+        const startHour = isToday ? Math.max(now.getHours() + 1, START_HOUR) : START_HOUR;
+        
+        // Generate time slots (hourly intervals)
+        for (let hour = startHour; hour <= END_HOUR; hour++) {
+            const timeSlot = document.createElement('div');
+            timeSlot.className = 'time-slot';
+            
+            const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+            const displayTime = new Date(2000, 0, 1, hour, 0).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            timeSlot.textContent = displayTime;
+            timeSlot.dataset.time = timeStr;
+            
+            // Check if this time is selected
+            if (selectedTime === timeStr) {
+                timeSlot.classList.add('selected');
+            }
+            
+            timeSlot.addEventListener('click', () => selectTime(timeStr));
+            timeSlotsEl.appendChild(timeSlot);
+        }
+    }
+
+    function selectTime(timeStr) {
+        selectedTime = timeStr;
+        
+        // Re-render time slots to show selection
+        renderTimeSlots();
+        
+        // Update hidden input and display
+        updateDateTimeValue();
+    }
+
+    function updateDateTimeValue() {
+        if (selectedDate && selectedTime) {
+            const dateStr = selectedDate.toISOString().split('T')[0];
+            const value = `${dateStr}T${selectedTime}`;
+            
+            // Update hidden input
+            document.getElementById('watch-datetime').value = value;
+            
+            // Update display
+            const displayEl = document.getElementById('calendar-selected-display');
+            const dateTimeObj = new Date(selectedDate);
+            const [hours, minutes] = selectedTime.split(':');
+            dateTimeObj.setHours(parseInt(hours), parseInt(minutes));
+            
+            const formattedDateTime = dateTimeObj.toLocaleString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            displayEl.innerHTML = `<strong>Selected:</strong> ${formattedDateTime}`;
+        }
     }
 
     function handleURLParameters() {
@@ -227,9 +393,25 @@
         // Fill in the form with template values
         document.getElementById('watch-platform').value = template.platform;
         
-        // Combine date and time for the new dropdown format
-        const dateTimeValue = `${template.scheduledDate}T${template.scheduledTime}`;
-        document.getElementById('watch-datetime').value = dateTimeValue;
+        // Parse date and time for calendar
+        const [year, month, day] = template.scheduledDate.split('-').map(Number);
+        const [hours, minutes] = template.scheduledTime.split(':').map(Number);
+        
+        // Set calendar to the template date
+        currentCalendarDate = new Date(year, month - 1, day);
+        selectedDate = new Date(year, month - 1, day);
+        selectedTime = template.scheduledTime;
+        
+        // Render calendar with selection
+        renderCalendar();
+        
+        // Show and populate time picker
+        const timePicker = document.getElementById('calendar-time-picker');
+        timePicker.style.display = 'block';
+        renderTimeSlots();
+        
+        // Update the datetime value
+        updateDateTimeValue();
 
         // Trigger platform info display
         const platformSelect = document.getElementById('watch-platform');
@@ -240,7 +422,7 @@
         document.getElementById('create-invitation-section').scrollIntoView({ behavior: 'smooth' });
         
         // Show success message
-        showSuccessMessage('Template applied! Select a match to send the invitation.');
+        alert('Template applied! Select a match to send the invitation.');
     };
 
     async function loadCurrentUser() {
