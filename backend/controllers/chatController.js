@@ -284,6 +284,103 @@ class ChatController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Add reaction to a message
+  async addReaction(req, res) {
+    try {
+      const { messageId, userId, emoji } = req.body;
+
+      if (!messageId || !userId || !emoji) {
+        return res.status(400).json({ error: 'messageId, userId, and emoji are required' });
+      }
+
+      const dataStore = await getDatabase();
+      const allMessages = await dataStore.loadChats();
+      
+      const messageIndex = allMessages.findIndex(msg => msg.id === messageId);
+      
+      if (messageIndex === -1) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+
+      // Initialize reactions array if it doesn't exist
+      if (!allMessages[messageIndex].reactions) {
+        allMessages[messageIndex].reactions = [];
+      }
+
+      // Remove existing reaction from this user
+      allMessages[messageIndex].reactions = allMessages[messageIndex].reactions.filter(
+        r => r.userId !== userId
+      );
+
+      // Add new reaction
+      allMessages[messageIndex].reactions.push({
+        userId,
+        emoji,
+        timestamp: new Date().toISOString()
+      });
+
+      await dataStore.saveChats(allMessages);
+
+      res.json({
+        success: true,
+        message: allMessages[messageIndex]
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Remove reaction from a message
+  async removeReaction(req, res) {
+    try {
+      const { messageId, userId } = req.body;
+
+      if (!messageId || !userId) {
+        return res.status(400).json({ error: 'messageId and userId are required' });
+      }
+
+      const dataStore = await getDatabase();
+      const allMessages = await dataStore.loadChats();
+      
+      const messageIndex = allMessages.findIndex(msg => msg.id === messageId);
+      
+      if (messageIndex === -1) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+
+      if (allMessages[messageIndex].reactions) {
+        allMessages[messageIndex].reactions = allMessages[messageIndex].reactions.filter(
+          r => r.userId !== userId
+        );
+      }
+
+      await dataStore.saveChats(allMessages);
+
+      res.json({
+        success: true,
+        message: allMessages[messageIndex]
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Get typing indicator status (placeholder - requires WebSocket for real-time)
+  async getTypingStatus(req, res) {
+    try {
+      const { userId, otherUserId } = req.params;
+
+      // This is a placeholder - in production, use WebSockets or Stream Chat for real-time typing indicators
+      res.json({
+        success: true,
+        typing: false,
+        note: 'Real-time typing requires WebSocket integration or Stream Chat'
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new ChatController();

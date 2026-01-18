@@ -16,6 +16,7 @@ const watchInvitationRoutes = require('./routes/watchInvitations');
 const authRoutes = require('./routes/auth');
 const configRoutes = require('./routes/config');
 const customSocialAuthRoutes = require('./routes/customSocialAuth');
+const archetypeRoutes = require('./routes/archetypes');
 const { validateRapidApiKey } = require('./middleware/rapidApiAuth');
 
 const app = express();
@@ -122,6 +123,7 @@ app.use('/api/swipe', swipeRoutes);
 app.use('/api/watch-invitations', watchInvitationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/custom-social', customSocialAuthRoutes);
+app.use('/api/archetypes', archetypeRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

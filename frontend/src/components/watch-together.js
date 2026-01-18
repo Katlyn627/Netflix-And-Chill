@@ -76,6 +76,7 @@
         loadCurrentUser();
         loadMatches();
         loadInvitations();
+        loadQuickTemplates(); // NEW: Load quick templates
         setupEventListeners();
         setMinDate();
         checkForConflictingExtensions();
@@ -115,6 +116,78 @@
             console.info('ℹ️ Note: Streaming browser extensions (like Teleparty) may show warnings when running on localhost. These can be safely ignored.');
         }
     }
+
+    async function loadQuickTemplates() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/watch-invitations/templates`);
+            const data = await response.json();
+
+            if (!data.success || !data.templates) {
+                console.error('Failed to load templates');
+                return;
+            }
+
+            const templatesContainer = document.getElementById('templates-container');
+            if (!templatesContainer) return;
+
+            templatesContainer.innerHTML = '';
+
+            data.templates.forEach(template => {
+                const templateCard = document.createElement('div');
+                templateCard.className = 'template-card';
+                templateCard.innerHTML = `
+                    <h3>${template.name}</h3>
+                    <p class="template-description">${template.description}</p>
+                    <div class="template-details">
+                        <span class="template-platform">📺 ${getPlatformName(template.platform)}</span>
+                        <span class="template-time">⏰ ${template.scheduledTime}</span>
+                    </div>
+                    <button class="btn btn-secondary use-template-btn" onclick="useTemplate('${template.id}')">
+                        Use This Template
+                    </button>
+                `;
+                templatesContainer.appendChild(templateCard);
+            });
+
+            // Store templates globally for use
+            window.invitationTemplates = data.templates;
+
+        } catch (error) {
+            console.error('Error loading templates:', error);
+        }
+    }
+
+    function getPlatformName(platformKey) {
+        const names = {
+            'teleparty': 'Teleparty',
+            'amazon-prime': 'Amazon Prime',
+            'disney-plus': 'Disney+',
+            'scener': 'Scener',
+            'zoom': 'Zoom'
+        };
+        return names[platformKey] || platformKey;
+    }
+
+    window.useTemplate = function(templateId) {
+        const template = window.invitationTemplates?.find(t => t.id === templateId);
+        if (!template) return;
+
+        // Fill in the form with template values
+        document.getElementById('watch-platform').value = template.platform;
+        document.getElementById('watch-date').value = template.scheduledDate;
+        document.getElementById('watch-time').value = template.scheduledTime;
+
+        // Trigger platform info display
+        const platformSelect = document.getElementById('watch-platform');
+        const event = new Event('change');
+        platformSelect.dispatchEvent(event);
+
+        // Scroll to form
+        document.getElementById('create-invitation-section').scrollIntoView({ behavior: 'smooth' });
+        
+        // Show success message
+        showSuccessMessage('Template applied! Select a match to send the invitation.');
+    };
 
     async function loadCurrentUser() {
         try {
