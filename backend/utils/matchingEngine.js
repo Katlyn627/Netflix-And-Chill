@@ -565,7 +565,8 @@ class MatchingEngine {
           descriptions.push('both love binge-watching TV series');
         }
       } catch (error) {
-        // Skip if analytics fails
+        // Skip if analytics fails for description generation
+        console.error('Could not analyze swipe data for match description:', error.message);
       }
     }
     
