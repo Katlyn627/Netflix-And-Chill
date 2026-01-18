@@ -649,10 +649,30 @@ class ProfileView {
         });
 
         // Logout button
-        document.getElementById('logout-btn').addEventListener('click', () => {
+        document.getElementById('logout-btn').addEventListener('click', async () => {
             if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('currentUserId');
-                window.location.href = 'login.html';
+                try {
+                    // Check if Auth0 is available and user is authenticated via Auth0
+                    if (window.Auth0Manager) {
+                        const isAuth0User = localStorage.getItem('auth0User');
+                        if (isAuth0User) {
+                            // Logout from Auth0
+                            await Auth0Manager.logout();
+                            return; // Auth0 will handle redirect
+                        }
+                    }
+                    
+                    // Fallback to regular logout for non-Auth0 users
+                    localStorage.removeItem('currentUserId');
+                    localStorage.removeItem('auth0User');
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    // Fallback to regular logout on error
+                    localStorage.removeItem('currentUserId');
+                    localStorage.removeItem('auth0User');
+                    window.location.href = 'login.html';
+                }
             }
         });
 
