@@ -8,6 +8,7 @@ class DiscoverPage {
         this.userId = localStorage.getItem('currentUserId');
         this.allMatches = [];
         this.likedUsers = new Set();
+        this.apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
         this.init();
     }
 
@@ -215,8 +216,7 @@ class DiscoverPage {
     async viewProfile(userId) {
         // Show modal with basic user info instead of navigating to profile-view.html
         try {
-            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
-            const response = await fetch(`${apiBaseUrl}/users/${userId}`);
+            const response = await fetch(`${this.apiBaseUrl}/users/${userId}`);
             if (!response.ok) throw new Error('Failed to load user');
             
             const user = await response.json();
@@ -253,7 +253,6 @@ class DiscoverPage {
         const username = escapeHtml(user.username || 'Unknown');
         const genres = user.preferences?.genres || [];
         const streamingServices = user.streamingServices || [];
-        const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
         
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px;">

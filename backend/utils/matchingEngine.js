@@ -5,6 +5,7 @@ class MatchingEngine {
   static POINTS_PER_SHARED_SNACK = 3;
   static POINTS_PER_SHARED_DEBATE = 2;
   static POINTS_PER_EMOTIONAL_TONE = 10; // Max points for emotional tone alignment
+  static WATCHLIST_PLANNER_THRESHOLD = 10; // Watchlist size threshold for planner vs spontaneous
   /**
    * Calculate match score between two users based on shared content
    * @param {User} user1 
@@ -821,8 +822,9 @@ class MatchingEngine {
    * Based on binge count patterns
    */
   static calculateMarathonCompatibility(user1, user2) {
-    const u1Binge = user1.preferences?.bingeWatchCount || 0;
-    const u2Binge = user2.preferences?.bingeWatchCount || 0;
+    // Support both bingeWatchCount and bingeCount for compatibility
+    const u1Binge = user1.preferences?.bingeWatchCount || user1.preferences?.bingeCount || 0;
+    const u2Binge = user2.preferences?.bingeWatchCount || user2.preferences?.bingeCount || 0;
     
     // Calculate similarity in marathon preference
     const difference = Math.abs(u1Binge - u2Binge);
@@ -872,6 +874,9 @@ class MatchingEngine {
     const titles = new Set();
     
     for (const item of watchHistory) {
+      // Check if title exists before processing
+      if (!item || !item.title) continue;
+      
       const normalizedTitle = item.title.toLowerCase().trim();
       if (titles.has(normalizedTitle)) {
         return true; // Found a rewatch
@@ -891,8 +896,8 @@ class MatchingEngine {
     const u2Watchlist = (user2.movieWatchlist || []).length;
     
     // Large watchlist = planner, small watchlist = spontaneous
-    const u1Planner = u1Watchlist > 10;
-    const u2Planner = u2Watchlist > 10;
+    const u1Planner = u1Watchlist > this.WATCHLIST_PLANNER_THRESHOLD;
+    const u2Planner = u2Watchlist > this.WATCHLIST_PLANNER_THRESHOLD;
     
     // Both are planners or both are spontaneous
     return u1Planner === u2Planner ? 6 : 2;
