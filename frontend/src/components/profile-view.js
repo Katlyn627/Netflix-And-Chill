@@ -1837,9 +1837,9 @@ class ProfileView {
         const form = document.getElementById('update-streaming-services-form');
         const servicesList = document.getElementById('streaming-services-list');
 
-        updateBtn.addEventListener('click', async () => {
-            modal.style.display = 'block';
-            await this.loadStreamingServicesForUpdate();
+        updateBtn.addEventListener('click', () => {
+            // Redirect to the new streaming services management page
+            window.location.href = `streaming-services.html?userId=${this.userId}`;
         });
 
         cancelBtn.addEventListener('click', () => {

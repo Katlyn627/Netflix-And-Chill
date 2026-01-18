@@ -1,4 +1,5 @@
 const API_BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'http://localhost:3000';
 
 class NetflixAndChillAPI {
     async createUser(userData) {
@@ -415,6 +416,31 @@ class NetflixAndChillAPI {
         });
         if (!response.ok) {
             throw new Error('Failed to mark invitation as read');
+        }
+        return await response.json();
+    }
+
+    // Generic HTTP methods
+    async get(endpoint) {
+        const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    }
+
+    async post(endpoint, data) {
+        const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
     }
