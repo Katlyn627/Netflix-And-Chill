@@ -322,7 +322,7 @@ function generateTVWatchlist(tvShows) {
 function generateLeastFavoriteMovies(movies) {
   if (!movies || movies.length === 0) return [];
   
-  const count = randomInt(0, 3);
+  const count = randomInt(1, 3); // Changed from 0-3 to 1-3 to ensure at least 1 movie
   const selected = randomItems(movies, count);
   
   return selected.map(movie => movie.title);
@@ -544,6 +544,58 @@ async function seedUsers(count = DEFAULT_USER_COUNT) {
     }
     
     console.log('\n✅ Successfully created and saved all users!');
+    
+    // Populate likes and superLikes arrays for users
+    console.log('\n💕 Populating likes and super likes...');
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      
+      // Get other user IDs (excluding self)
+      const otherUserIds = users.filter(u => u.id !== user.id).map(u => u.id);
+      
+      // If there's only 1 other user, they get both a like and superlike
+      // If there are 2 other users, split them between likes and superLikes
+      // If there are 3+ other users, use normal distribution
+      let likedUserIds = [];
+      let superLikedUserIds = [];
+      
+      if (otherUserIds.length === 1) {
+        // With only 1 other user, put them in likes and also in superLikes for testing
+        // NOTE: This is intentional overlap for testing purposes with minimal data
+        // In production with realistic user counts, likes and superLikes would be separate
+        likedUserIds = [otherUserIds[0]];
+        superLikedUserIds = [otherUserIds[0]];
+      } else if (otherUserIds.length === 2) {
+        // With 2 other users, give one to likes and one to superLikes
+        likedUserIds = [otherUserIds[0]];
+        superLikedUserIds = [otherUserIds[1]];
+      } else {
+        // Normal case: 3+ other users
+        // Reserve at least 1 user for superLikes
+        const maxLikes = Math.max(1, otherUserIds.length - 1);
+        const likesCount = Math.min(randomInt(2, 8), maxLikes);
+        likedUserIds = randomItems(otherUserIds, likesCount);
+        
+        // Get remaining users for superLikes (ensuring at least 1)
+        const availableForSuperLikes = otherUserIds.filter(id => !likedUserIds.includes(id));
+        const superLikesCount = Math.min(randomInt(1, 2), availableForSuperLikes.length);
+        superLikedUserIds = randomItems(availableForSuperLikes, superLikesCount);
+      }
+      
+      // Update user with likes and superLikes
+      user.likes = likedUserIds;
+      user.superLikes = superLikedUserIds;
+      
+      // Save updated user
+      await database.updateUser(user.id, user);
+      
+      // Show progress
+      if ((i + 1) % 10 === 0 || i === users.length - 1) {
+        console.log(`  Updated ${i + 1}/${users.length} users with likes...`);
+      }
+    }
+    
+    console.log('\n✅ Successfully populated likes and super likes!');
     
     // Generate credentials file
     console.log('\n📄 Generating test credentials file...');
