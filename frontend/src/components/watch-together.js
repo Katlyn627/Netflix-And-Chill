@@ -113,9 +113,6 @@
                 const dateTimeValue = new Date(date);
                 dateTimeValue.setHours(hour, 0, 0, 0);
                 
-                // Skip if this time has already passed
-                if (dateTimeValue < now) continue;
-                
                 const dateStr = dateTimeValue.toISOString().split('T')[0];
                 const timeStr = `${hour.toString().padStart(2, '0')}:00`;
                 const value = `${dateStr}T${timeStr}`;
