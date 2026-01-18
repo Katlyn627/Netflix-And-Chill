@@ -3,7 +3,8 @@
 // Configuration is stored in environment variables on the server
 // This ensures sensitive values are not hardcoded in the frontend
 
-(async function loadAuth0Config() {
+// Promise that resolves when Auth0 configuration is loaded
+window.auth0ConfigReady = (async function loadAuth0Config() {
     try {
         // Determine API base URL based on current environment
         const API_BASE_URL = window.location.origin;
@@ -37,3 +38,4 @@
         window.AUTH0_AUDIENCE = 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/';
     }
 })();
+
