@@ -256,8 +256,8 @@ class CustomSocialConnectionService {
   generateFetchUserProfileScript(provider) {
     const mapping = provider.profileMapping;
     
-    // Generate dynamic field access code
-    const getField = (obj, path) => {
+    // Helper function to generate field access code
+    const getFieldAccess = (path) => {
       return path.includes('.') 
         ? `body.${path}`
         : `body['${path}']`;
@@ -307,18 +307,18 @@ class CustomSocialConnectionService {
       // This is returned in JSON format as specified in Auth0 documentation
       var profile = {
         // Required fields
-        user_id: String(${getField('body', mapping.user_id)}),
-        email: ${getField('body', mapping.email)},
-        email_verified: ${getField('body', mapping.email_verified)} || false,
+        user_id: String(${getFieldAccess(mapping.user_id)}),
+        email: ${getFieldAccess(mapping.email)},
+        email_verified: ${getFieldAccess(mapping.email_verified)} || false,
         
         // Standard profile fields
-        name: ${getField('body', mapping.name)} || ${getField('body', mapping.email)},
-        picture: ${getField('body', mapping.picture)} || 'https://via.placeholder.com/150',
+        name: ${getFieldAccess(mapping.name)} || ${getFieldAccess(mapping.email)},
+        picture: ${getFieldAccess(mapping.picture)} || 'https://via.placeholder.com/150',
         
         // Store provider-specific data in user_metadata
         user_metadata: {
           provider: '${provider.name.toLowerCase().replace(/[^a-z0-9]/g, '')}',
-          provider_user_id: String(${getField('body', mapping.user_id)}),
+          provider_user_id: String(${getFieldAccess(mapping.user_id)}),
           provider_access_token: accessToken,
           token_obtained_at: new Date().toISOString(),
           raw_profile: body

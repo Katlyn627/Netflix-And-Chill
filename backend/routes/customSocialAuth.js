@@ -200,6 +200,14 @@ router.post('/test/:provider', async (req, res) => {
       });
     }
     
+    // Validate userId format (should be user_TIMESTAMP_RANDOM)
+    if (!userId || !/^user_[0-9]+_[a-z0-9]+$/.test(userId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid userId format'
+      });
+    }
+    
     // Validate credentials
     const validation = customSocialConnectionService.validateProviderCredentials(provider);
     if (!validation.valid) {
@@ -209,15 +217,19 @@ router.post('/test/:provider', async (req, res) => {
       });
     }
     
+    // Generate secure state parameter
+    const crypto = require('crypto');
+    const secureState = crypto.randomBytes(32).toString('hex');
+    
     res.json({
       success: true,
       message: 'Provider is configured. Use Auth0 Universal Login to test the connection.',
       test_url: `https://${process.env.AUTH0_DOMAIN}/authorize?` +
-        `client_id=${process.env.AUTH0_CLIENT_ID}&` +
+        `client_id=${encodeURIComponent(process.env.AUTH0_CLIENT_ID)}&` +
         `response_type=code&` +
         `redirect_uri=${encodeURIComponent(process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback.html')}&` +
-        `connection=${provider}-custom&` +
-        `state=${userId}`,
+        `connection=${encodeURIComponent(provider)}-custom&` +
+        `state=${encodeURIComponent(secureState)}`,
       instructions: [
         '1. Navigate to the test_url in a browser',
         '2. You will be redirected to the provider\'s OAuth page',

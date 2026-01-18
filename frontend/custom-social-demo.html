@@ -392,7 +392,10 @@ console.log('Watch History:', user.user_metadata?.watch_history);</code>
                 statusEl.className = 'provider-status status-not-configured';
                 statusEl.textContent = '✗ Error';
                 if (!silent) {
-                    responseEl.textContent = 'Error: ' + error.message;
+                    // Sanitize error message
+                    const sanitizedError = document.createTextNode('Error: ' + (error.message || 'Unknown error'));
+                    responseEl.textContent = '';
+                    responseEl.appendChild(sanitizedError);
                     responseEl.style.display = 'block';
                 }
             }
@@ -423,7 +426,10 @@ console.log('Watch History:', user.user_metadata?.watch_history);</code>
                 }
             } catch (error) {
                 console.error('Error setting up connection:', error);
-                responseEl.textContent = 'Error: ' + error.message;
+                // Sanitize error message to prevent XSS
+                const sanitizedError = document.createTextNode('Error: ' + (error.message || 'Unknown error'));
+                responseEl.textContent = '';
+                responseEl.appendChild(sanitizedError);
                 responseEl.className = 'response-box alert-error';
             }
         }
@@ -444,7 +450,10 @@ console.log('Watch History:', user.user_metadata?.watch_history);</code>
                 responseEl.className = 'response-box';
             } catch (error) {
                 console.error('Error loading connections:', error);
-                responseEl.textContent = 'Error: ' + error.message;
+                // Sanitize error message
+                const sanitizedError = document.createTextNode('Error: ' + (error.message || 'Unknown error'));
+                responseEl.textContent = '';
+                responseEl.appendChild(sanitizedError);
                 responseEl.style.display = 'block';
                 responseEl.className = 'response-box alert-error';
             } finally {
@@ -465,7 +474,10 @@ console.log('Watch History:', user.user_metadata?.watch_history);</code>
                 responseEl.className = 'response-box';
             } catch (error) {
                 console.error('Error loading documentation:', error);
-                responseEl.textContent = 'Error: ' + error.message;
+                // Sanitize error message
+                const sanitizedError = document.createTextNode('Error: ' + (error.message || 'Unknown error'));
+                responseEl.textContent = '';
+                responseEl.appendChild(sanitizedError);
                 responseEl.className = 'response-box alert-error';
             }
         }
