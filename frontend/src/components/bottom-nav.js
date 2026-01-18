@@ -223,6 +223,7 @@ class BottomNavigation {
         this.likedYouCount = likedYouCount || 0;
         this.unreadMessagesCount = unreadMessagesCount || 0;
         this.render();
+        this.attachEventListeners(); // Re-attach event listeners after re-rendering
     }
 
     destroy() {
