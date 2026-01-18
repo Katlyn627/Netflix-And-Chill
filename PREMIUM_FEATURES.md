@@ -21,20 +21,7 @@ Premium users can access advanced filtering options to find more compatible matc
 3. Select your preferred filters
 4. Click "Apply Filters" to see filtered results
 
-### 2. Profile Boost 🚀
-Premium users can boost their profile to appear first in match results for 24 hours.
-
-#### Backend API:
-- `POST /api/users/:userId/boost` - Activate profile boost
-- `GET /api/users/:userId/boost` - Check boost status
-
-#### Features:
-- Boosted profiles appear at the top of match results
-- Boost lasts for 24 hours
-- Boost history is tracked
-- Boosted profiles show a "🚀 BOOSTED" badge
-
-### 3. See Who Liked You 💖
+### 2. See Who Liked You 💖
 Premium users can see the full details of users who have liked them.
 
 #### Backend API:
@@ -47,7 +34,7 @@ Premium users can see the full details of users who have liked them.
 - See profile pictures, bio, age, location
 - Direct access to chat with users who liked you
 
-### 4. Unlimited Swipes ♾️
+### 3. Unlimited Swipes ♾️
 Premium users have unlimited content swipes (already implemented in swipe.js).
 
 #### Features:
