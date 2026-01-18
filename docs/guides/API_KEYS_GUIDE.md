@@ -4,12 +4,13 @@ This guide will walk you through setting up all the API keys and external servic
 
 ## Table of Contents
 1. [Essential APIs](#essential-apis)
-2. [Authentication Services](#authentication-services)
-3. [Chat & Messaging](#chat--messaging)
-4. [Cloud Storage & Hosting](#cloud-storage--hosting)
-5. [Analytics](#analytics)
-6. [Email Services](#email-services)
-7. [Database Setup](#database-setup)
+2. [API Marketplace Integration](#api-marketplace-integration)
+3. [Authentication Services](#authentication-services)
+4. [Chat & Messaging](#chat--messaging)
+5. [Cloud Storage & Hosting](#cloud-storage--hosting)
+6. [Analytics](#analytics)
+7. [Email Services](#email-services)
+8. [Database Setup](#database-setup)
 
 ---
 
@@ -68,6 +69,310 @@ This guide will walk you through setting up all the API keys and external servic
 **Documentation:** https://api.watchmode.com/docs/
 
 **Note:** This feature is optional. If not configured, the app will still work but won't show streaming platform information on movie cards.
+
+---
+
+## API Marketplace Integration
+
+### RapidAPI - **OPTIONAL**
+
+**Purpose:** Integrate with RapidAPI marketplace for two-way API integration:
+- **Server Mode**: Publish and monetize your API on RapidAPI marketplace
+- **Client Mode**: Access thousands of external APIs through standardized authentication
+
+#### What is RapidAPI?
+
+RapidAPI is the world's largest API marketplace, providing:
+- Centralized access to 40,000+ APIs
+- Standardized authentication with `X-RapidAPI-Key` headers
+- Built-in rate limiting and usage analytics
+- API monetization capabilities
+- Easy integration with consistent patterns
+
+#### Server Mode: Publishing Your API
+
+If you want to publish the Netflix and Chill API on RapidAPI marketplace:
+
+**Setup Steps:**
+1. Go to [RapidAPI Hub](https://rapidapi.com/)
+2. Create a free account or login
+3. Navigate to **"My APIs"** > **"Add New API"**
+4. Fill in your API details:
+   - **API Name:** Netflix and Chill API
+   - **Description:** Dating app API that matches users based on streaming preferences
+   - **Category:** Entertainment
+   - **Base URL:** Your server URL (e.g., https://yourapp.com)
+5. Configure endpoints and documentation
+6. Enable API key authentication
+7. Copy the generated API keys that clients will use
+8. Add to `.env` file:
+   ```
+   RAPIDAPI_ENABLED=true
+   RAPIDAPI_API_KEYS=key1_from_rapidapi,key2_from_rapidapi,key3_from_rapidapi
+   RAPIDAPI_VALIDATE_HOST=true
+   RAPIDAPI_EXPECTED_HOST=your-api-name.p.rapidapi.com
+   ```
+
+**Features:**
+- Automatic API key validation on all `/api/*` endpoints
+- Rate limiting and usage tracking
+- API monetization with subscription plans
+- Developer portal and documentation
+- Analytics dashboard
+
+#### Client Mode: Consuming External APIs
+
+If you want to use external APIs from RapidAPI marketplace (e.g., alternative movie databases, recommendation engines):
+
+**Setup Steps:**
+1. Go to [RapidAPI Hub](https://rapidapi.com/)
+2. Browse and find the API you want to use
+3. Click **"Subscribe to Test"** or choose a pricing plan
+4. Go to your **Dashboard** > **Apps** > **Default Application**
+5. Copy your **Application Key**
+6. Note the **API Host** (shown in the API's code snippets as `X-RapidAPI-Host`)
+7. Add to `.env` file:
+   ```
+   RAPIDAPI_CLIENT_KEY=your_rapidapi_key_here
+   RAPIDAPI_CLIENT_HOST=api-host.p.rapidapi.com
+   ```
+
+**Usage Example:**
+
+```javascript
+const rapidAPIService = require('./backend/services/rapidAPIService');
+
+// Make a request to an external RapidAPI API
+const data = await rapidAPIService.get(
+  'https://api-host.p.rapidapi.com/endpoint',
+  { param1: 'value1' }
+);
+```
+
+**Cost:** FREE tier available (varies by API)
+
+**Benefits:**
+- No need to manage individual API keys and authentication methods
+- Consistent request/response patterns across all APIs
+- Automatic retry logic and error handling
+- Usage tracking and billing consolidation
+
+**Documentation:** 
+- https://docs.rapidapi.com/
+- https://docs.rapidapi.com/docs/keys-and-key-rotation
+
+**Security Notes:**
+- Never commit API keys to version control
+- Store keys in environment variables
+- Rotate keys regularly using RapidAPI dashboard
+- Monitor usage for suspicious activity
+- Use different keys for development and production
+
+---
+
+## Streaming Platform OAuth Integration
+
+### Connecting Streaming Services - **OPTIONAL**
+
+**Purpose:** Connect users' streaming accounts (Netflix, Hulu, Disney+, Prime Video, HBO Max, Apple TV+) to:
+- Automatically sync watch history
+- Import viewing preferences
+- Enable better matching based on actual viewing behavior
+- Provide personalized recommendations
+
+#### Important Notes
+
+**⚠️ API Access Restrictions:**
+Most major streaming platforms have highly restricted API access and do not offer public OAuth APIs. This feature requires:
+- Applying to each platform's developer/partner program
+- Enterprise-level agreements in most cases
+- Strict compliance with terms of service
+- Often requires significant business justification
+
+**Alternative Approaches:**
+1. **Manual Entry**: Users manually add their favorite shows/movies (current default)
+2. **Third-Party Services**: Use services like Watchmode API for availability data
+3. **Browser Extensions**: Build browser extensions that can extract watch history
+4. **Email Parsing**: Parse confirmation emails from streaming services
+5. **Partnership**: Establish official partnerships with streaming platforms
+
+#### Netflix OAuth (Not Publicly Available)
+
+Netflix currently does **not** offer a public OAuth API. Access requires:
+- Enterprise partnership agreements
+- Membership in Netflix Partner Program
+- Specific business use cases
+
+**If you have access:**
+
+1. Contact Netflix Partner Program at https://partner.netflix.com/
+2. Apply for API access through their partner portal
+3. Once approved, you'll receive:
+   - Client ID
+   - Client Secret
+   - API documentation
+4. Add to `.env` file:
+   ```
+   NETFLIX_OAUTH_ENABLED=true
+   NETFLIX_CLIENT_ID=your_netflix_client_id
+   NETFLIX_CLIENT_SECRET=your_netflix_client_secret
+   NETFLIX_REDIRECT_URI=http://localhost:3000/api/auth/netflix/callback
+   ```
+
+**Features:**
+- Access to user's viewing history
+- Profile information
+- Watch progress data
+- Viewing preferences
+
+#### Hulu OAuth (Partner Access Only)
+
+Hulu's API is restricted to partners and advertisers.
+
+**Contact:** https://www.hulu.com/advertising
+
+Configuration:
+```
+HULU_OAUTH_ENABLED=true
+HULU_CLIENT_ID=your_hulu_client_id
+HULU_CLIENT_SECRET=your_hulu_client_secret
+HULU_REDIRECT_URI=http://localhost:3000/api/auth/hulu/callback
+```
+
+#### Disney+ OAuth (Not Publicly Available)
+
+Disney+ does not currently offer public API access.
+
+**Alternative:** Use TMDB API for Disney content metadata.
+
+Configuration (if you have access):
+```
+DISNEY_OAUTH_ENABLED=true
+DISNEY_CLIENT_ID=your_disney_client_id
+DISNEY_CLIENT_SECRET=your_disney_client_secret
+DISNEY_REDIRECT_URI=http://localhost:3000/api/auth/disney/callback
+```
+
+#### Amazon Prime Video OAuth
+
+Prime Video access is part of Amazon's broader API ecosystem.
+
+**Setup:**
+1. Go to https://developer.amazon.com/
+2. Create a developer account
+3. Register a new Security Profile
+4. Request access to Prime Video APIs (if available)
+5. Add to `.env`:
+   ```
+   PRIME_OAUTH_ENABLED=true
+   PRIME_CLIENT_ID=your_prime_client_id
+   PRIME_CLIENT_SECRET=your_prime_client_secret
+   PRIME_REDIRECT_URI=http://localhost:3000/api/auth/prime/callback
+   ```
+
+**Documentation:** https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html
+
+#### HBO Max OAuth (Warner Bros. Discovery)
+
+HBO Max API access is restricted.
+
+Configuration (if available):
+```
+HBO_OAUTH_ENABLED=true
+HBO_CLIENT_ID=your_hbo_client_id
+HBO_CLIENT_SECRET=your_hbo_client_secret
+HBO_REDIRECT_URI=http://localhost:3000/api/auth/hbo/callback
+```
+
+#### Apple TV+ OAuth
+
+Apple TV+ uses Apple's Sign In with Apple system.
+
+**Setup:**
+1. Go to https://developer.apple.com/
+2. Enroll in Apple Developer Program ($99/year)
+3. Create an App ID with "Sign in with Apple" capability
+4. Create a Services ID for web authentication
+5. Configure domains and redirect URLs
+6. Generate a private key for authentication
+7. Add to `.env`:
+   ```
+   APPLETV_OAUTH_ENABLED=true
+   APPLETV_CLIENT_ID=your_services_id
+   APPLETV_CLIENT_SECRET=generated_jwt_token
+   APPLETV_REDIRECT_URI=http://localhost:3000/api/auth/appletv/callback
+   ```
+
+**Documentation:** https://developer.apple.com/sign-in-with-apple/
+
+#### Using the OAuth Integration
+
+Once configured, users can connect their streaming accounts through:
+
+1. **Profile Settings Page:**
+   - Click "Connect Streaming Services"
+   - Select platform (e.g., Netflix, Hulu)
+   - Redirected to platform's login page
+   - Authorize the app
+   - Redirected back with watch history synced
+
+2. **API Endpoints:**
+
+```javascript
+// Initiate OAuth flow
+GET /api/auth/:provider/connect?userId=user123
+
+// Check connection status
+GET /api/auth/:provider/status?userId=user123
+
+// Manually sync watch history
+POST /api/auth/:provider/sync-history
+Body: { userId: "user123" }
+
+// Disconnect platform
+POST /api/auth/:provider/disconnect
+Body: { userId: "user123" }
+
+// Refresh expired token
+POST /api/auth/:provider/refresh
+Body: { userId: "user123" }
+```
+
+3. **Available Providers:**
+```javascript
+// Get list of enabled providers
+GET /api/auth/providers
+```
+
+#### Security Considerations
+
+- **OAuth Tokens:** Stored encrypted in user profile
+- **Token Expiry:** Automatically handled with refresh tokens
+- **CSRF Protection:** State tokens prevent cross-site attacks
+- **Scope Limiting:** Request only necessary permissions
+- **Token Revocation:** Users can disconnect anytime
+- **Data Privacy:** Watch history stored locally, not shared
+
+#### Troubleshooting
+
+**"OAuth not configured" error:**
+- Verify environment variables are set
+- Check `ENABLED` flag is `true`
+- Ensure client ID/secret are valid
+
+**"Token expired" error:**
+- Use the refresh endpoint to get new tokens
+- Some platforms require users to reconnect periodically
+
+**"Failed to sync watch history":**
+- Check platform's API status
+- Verify OAuth scopes include history access
+- Some platforms limit historical data (e.g., last 90 days)
+
+**No watch history returned:**
+- Platform may not provide history via API
+- User may have privacy settings enabled
+- API access may be limited to specific data types
 
 ---
 

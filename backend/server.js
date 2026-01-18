@@ -13,6 +13,8 @@ const uploadRoutes = require('./routes/uploads');
 const chatRoutes = require('./routes/chat');
 const swipeRoutes = require('./routes/swipe');
 const watchInvitationRoutes = require('./routes/watchInvitations');
+const authRoutes = require('./routes/auth');
+const { validateRapidApiKey } = require('./middleware/rapidApiAuth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,6 +54,10 @@ app.use((req, res, next) => {
 // Serve static files from frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+// Apply RapidAPI key validation middleware to all API routes
+// This protects your API when published on RapidAPI marketplace
+app.use('/api', validateRapidApiKey);
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
@@ -62,6 +68,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/swipe', swipeRoutes);
 app.use('/api/watch-invitations', watchInvitationRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

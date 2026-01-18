@@ -64,6 +64,10 @@ class User {
     this.boostExpiresAt = data.boostExpiresAt || null; // When boost expires
     this.boostHistory = data.boostHistory || []; // Array of boost timestamps
     this.createdAt = data.createdAt || new Date().toISOString();
+    
+    // Streaming Platform OAuth Tokens
+    // Stores OAuth access tokens and metadata for connected streaming platforms
+    this.streamingOAuthTokens = data.streamingOAuthTokens || {}; // {provider: {accessToken, refreshToken, expiresAt, connectedAt}}
   }
 
   generateId() {
@@ -113,6 +117,71 @@ class User {
       };
     });
   }
+
+  /**
+   * Store OAuth token for a streaming provider
+   * @param {string} provider - Provider name (netflix, hulu, disney, prime, hbo, appletv)
+   * @param {Object} tokenData - Token data from OAuth flow
+   */
+  setStreamingOAuthToken(provider, tokenData) {
+    if (!this.streamingOAuthTokens) {
+      this.streamingOAuthTokens = {};
+    }
+    
+    this.streamingOAuthTokens[provider] = {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenType: tokenData.token_type || 'Bearer',
+      expiresIn: tokenData.expires_in,
+      expiresAt: tokenData.expires_in 
+        ? new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
+        : null,
+      connectedAt: new Date().toISOString(),
+      scope: tokenData.scope
+    };
+  }
+
+  /**
+   * Get OAuth token for a streaming provider
+   * @param {string} provider - Provider name
+   * @returns {Object|null} Token data
+   */
+  getStreamingOAuthToken(provider) {
+    return this.streamingOAuthTokens?.[provider] || null;
+  }
+
+  /**
+   * Check if OAuth token is expired
+   * @param {string} provider - Provider name
+   * @returns {boolean}
+   */
+  isStreamingOAuthTokenExpired(provider) {
+    const token = this.getStreamingOAuthToken(provider);
+    if (!token || !token.expiresAt) {
+      return true;
+    }
+    return new Date(token.expiresAt) <= new Date();
+  }
+
+  /**
+   * Remove OAuth token for a streaming provider
+   * @param {string} provider - Provider name
+   */
+  removeStreamingOAuthToken(provider) {
+    if (this.streamingOAuthTokens) {
+      delete this.streamingOAuthTokens[provider];
+    }
+  }
+
+  /**
+   * Check if a streaming provider is connected via OAuth
+   * @param {string} provider - Provider name
+   * @returns {boolean}
+   */
+  isStreamingProviderConnected(provider) {
+    return !!this.getStreamingOAuthToken(provider) && !this.isStreamingOAuthTokenExpired(provider);
+  }
+
 
   addToWatchHistory(item) {
     const watchEntry = {
