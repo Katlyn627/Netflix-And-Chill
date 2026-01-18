@@ -183,10 +183,6 @@ function createMatchCard(match, index) {
     const unreadCount = unreadMessageCounts[match.user.id] || 0;
     const hasUnreadMessages = unreadCount > 0;
     
-    // Check if profile is boosted
-    const isBoosted = match.isBoosted || false;
-    const boostBadge = isBoosted ? '<div class="match-boost-badge">🚀 BOOSTED</div>' : '';
-    
     // Add archetype badge if available
     const archetypeBadge = match.user.archetype 
         ? `<div class="archetype-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; margin: 8px 0; display: inline-block; font-weight: bold;">
@@ -199,7 +195,6 @@ function createMatchCard(match, index) {
             <div class="match-image-container" onclick="showMatchDetails(${index})">
                 <img src="${profilePhotoUrl}" alt="${username}" class="match-main-photo" />
                 ${match.user.verified ? '<div class="verification-badge">Verified</div>' : ''}
-                ${boostBadge}
                 <div class="safety-indicator">Safe Profile</div>
                 <div class="movie-ticket-overlay">
                     <div class="ticket-content">
