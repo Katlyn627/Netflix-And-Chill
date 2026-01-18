@@ -2107,6 +2107,20 @@ class ProfileView {
                 html += `<p style="font-style: italic; margin: 10px 0; padding: 12px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 5px; font-size: 0.9em;">${escapeHtml(user.personalityBio)}</p>`;
             }
             
+            // Display favorite genres from swipe analytics
+            if (user.swipePreferences && user.swipePreferences.topGenres && user.swipePreferences.topGenres.length > 0) {
+                const topGenres = user.swipePreferences.topGenres.slice(0, 5);
+                const totalLikes = user.swipePreferences.totalLikes || 0;
+                html += '<div style="margin-top: 15px; padding: 12px; background: #fff5f5; border-radius: 8px; border: 1px solid #ffe0e0;">';
+                html += '<h5 style="margin: 0 0 8px 0; color: #E50914;">❤️ Favorite Genres</h5>';
+                html += '<p style="margin: 5px 0; font-size: 0.85em; color: #666;">Based on ' + totalLikes + ' liked movies/shows</p>';
+                html += '<div style="margin-top: 8px;">';
+                topGenres.forEach(genreObj => {
+                    html += `<span style="display: inline-block; background: #E50914; color: white; padding: 5px 12px; border-radius: 15px; margin: 3px; font-size: 0.85em;">${escapeHtml(genreObj.genre)} ${genreObj.percentage}%</span>`;
+                });
+                html += '</div></div>';
+            }
+            
             // Display favorite snacks and video chat preference
             const snacks = user.favoriteSnacks || [];
             const videoChat = user.videoChatPreference || 'Not specified';
