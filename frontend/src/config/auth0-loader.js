@@ -40,6 +40,8 @@ window.auth0ConfigReady = (async function loadAuth0Config() {
             window.AUTH0_DOMAIN = config.domain;
             window.AUTH0_CLIENT_ID = config.clientId;
             window.AUTH0_AUDIENCE = config.audience;
+            window.AUTH0_CALLBACK_URL = config.callbackUrl;
+            window.AUTH0_LOGOUT_URL = config.logoutUrl;
             window.AUTH0_CONFIGURED = true;
             console.log('Auth0 configuration loaded successfully');
         } else {
