@@ -418,6 +418,31 @@ class NetflixAndChillAPI {
         }
         return await response.json();
     }
+
+    // Generic HTTP methods
+    async get(endpoint) {
+        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL.replace('/api', '')}${endpoint}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    }
+
+    async post(endpoint, data) {
+        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL.replace('/api', '')}${endpoint}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    }
 }
 
 const api = new NetflixAndChillAPI();
