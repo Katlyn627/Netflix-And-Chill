@@ -13,29 +13,38 @@ window.auth0ConfigReady = (async function loadAuth0Config() {
         const response = await fetch(`${API_BASE_URL}/api/config/auth0`);
         
         if (!response.ok) {
-            console.warn('Failed to fetch Auth0 configuration from server. Using defaults.');
-            // Set default placeholder values
-            window.AUTH0_DOMAIN = 'YOUR_AUTH0_DOMAIN.auth0.com';
-            window.AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
-            window.AUTH0_AUDIENCE = 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/';
+            console.warn('Failed to fetch Auth0 configuration from server. Auth0 login disabled.');
+            // Mark Auth0 as not configured
+            window.AUTH0_CONFIGURED = false;
             return;
         }
         
         const config = await response.json();
         
-        // Set Auth0 configuration globally
-        window.AUTH0_DOMAIN = config.domain;
-        window.AUTH0_CLIENT_ID = config.clientId;
-        window.AUTH0_AUDIENCE = config.audience;
+        // Check if Auth0 is actually configured (not using placeholder values)
+        const isConfigured = config.domain && 
+                            config.clientId && 
+                            config.domain !== 'YOUR_AUTH0_DOMAIN.auth0.com' &&
+                            config.clientId !== 'YOUR_AUTH0_CLIENT_ID' &&
+                            !config.domain.includes('null');
         
-        console.log('Auth0 configuration loaded successfully');
+        if (isConfigured) {
+            // Set Auth0 configuration globally
+            window.AUTH0_DOMAIN = config.domain;
+            window.AUTH0_CLIENT_ID = config.clientId;
+            window.AUTH0_AUDIENCE = config.audience;
+            window.AUTH0_CONFIGURED = true;
+            console.log('Auth0 configuration loaded successfully');
+        } else {
+            // Auth0 is not configured - disable Auth0 login
+            console.info('Auth0 not configured. Auth0 login disabled. Use traditional login instead.');
+            window.AUTH0_CONFIGURED = false;
+        }
         
     } catch (error) {
         console.error('Error loading Auth0 configuration:', error);
-        // Set default placeholder values on error
-        window.AUTH0_DOMAIN = 'YOUR_AUTH0_DOMAIN.auth0.com';
-        window.AUTH0_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
-        window.AUTH0_AUDIENCE = 'https://YOUR_AUTH0_DOMAIN.auth0.com/api/v2/';
+        // Mark Auth0 as not configured on error
+        window.AUTH0_CONFIGURED = false;
     }
 })();
 

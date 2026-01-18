@@ -14,19 +14,15 @@ async function initAuth0() {
             await window.auth0ConfigReady;
         }
         
+        // Check if Auth0 is configured
+        if (!window.AUTH0_CONFIGURED) {
+            throw new Error('Auth0 is not configured. Please set AUTH0_DOMAIN and AUTH0_CLIENT_ID environment variables on the server, or use traditional login.');
+        }
+        
         // Get Auth0 configuration from environment
         const domain = window.AUTH0_DOMAIN;
         const clientId = window.AUTH0_CLIENT_ID;
         const audience = window.AUTH0_AUDIENCE;
-        
-        // Validate required configuration
-        if (!domain || domain === 'YOUR_AUTH0_DOMAIN.auth0.com') {
-            throw new Error('Auth0 domain not configured. Please set AUTH0_DOMAIN environment variable on the server.');
-        }
-        
-        if (!clientId || clientId === 'YOUR_AUTH0_CLIENT_ID') {
-            throw new Error('Auth0 client ID not configured. Please set AUTH0_CLIENT_ID environment variable on the server.');
-        }
         
         // Import Auth0 SDK dynamically
         const { createAuth0Client } = window.auth0;
