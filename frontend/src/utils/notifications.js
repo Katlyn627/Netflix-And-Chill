@@ -17,7 +17,7 @@ class NotificationManager {
      */
     async fetchNotificationCounts() {
         if (!this.userId) {
-            return;
+            return null;
         }
 
         try {
@@ -30,11 +30,14 @@ class NotificationManager {
                     messages: this.unreadMessagesCount,
                     invitations: this.unreadInvitationsCount
                 };
+            } else {
+                console.warn(`[NotificationManager] Failed to fetch notifications: ${response.status}`);
+                return null;
             }
         } catch (error) {
-            console.error('Error fetching notification counts:', error);
+            console.error('[NotificationManager] Error fetching notification counts:', error);
+            return null;
         }
-        return null;
     }
 
     /**
@@ -103,6 +106,18 @@ class NotificationManager {
     async fetchAndUpdate() {
         await this.fetchNotificationCounts();
         this.updateTopNavBadges();
+        
+        // Notify any listeners that counts have been updated
+        if (this.onUpdate && typeof this.onUpdate === 'function') {
+            this.onUpdate(this.unreadMessagesCount, this.unreadInvitationsCount);
+        }
+    }
+
+    /**
+     * Register a callback to be notified when counts update
+     */
+    setUpdateCallback(callback) {
+        this.onUpdate = callback;
     }
 
     /**

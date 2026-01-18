@@ -66,43 +66,41 @@ class BottomNavigation {
                 this.unreadInvitationsCount = data.unreadInvitations || 0;
             }
         } catch (error) {
-            console.error('Error fetching notification counts:', error);
+            console.error('[BottomNav] Error fetching notification counts:', error);
         }
     }
 
     startNotificationPolling() {
-        // Don't start polling if there's already a global notification manager
+        // If there's already a global notification manager, subscribe to its updates
         if (window.notificationManager) {
-            // Use the global notification manager's data instead
-            this.syncWithGlobalManager();
+            window.notificationManager.setUpdateCallback((messages, invitations) => {
+                this.unreadMessagesCount = messages;
+                this.unreadInvitationsCount = invitations;
+                this.updateNotificationBadges();
+            });
+            // Initial sync
+            this.unreadMessagesCount = window.notificationManager.unreadMessagesCount || 0;
+            this.unreadInvitationsCount = window.notificationManager.unreadInvitationsCount || 0;
+            this.updateNotificationBadges();
             return;
         }
         
-        // Poll for notifications every 5 seconds
+        // Otherwise, poll independently every 5 seconds
         this.notificationPollInterval = setInterval(async () => {
             await this.fetchNotificationCounts();
             this.updateNotificationBadges();
         }, 5000);
     }
 
-    syncWithGlobalManager() {
-        // Subscribe to the global notification manager updates
-        const syncInterval = setInterval(() => {
-            if (window.notificationManager) {
-                this.unreadMessagesCount = window.notificationManager.unreadMessagesCount || 0;
-                this.unreadInvitationsCount = window.notificationManager.unreadInvitationsCount || 0;
-                this.updateNotificationBadges();
-            }
-        }, 1000); // Sync every second
-        
-        // Store for cleanup
-        this.notificationPollInterval = syncInterval;
-    }
-
     stopNotificationPolling() {
         if (this.notificationPollInterval) {
             clearInterval(this.notificationPollInterval);
             this.notificationPollInterval = null;
+        }
+        
+        // Unsubscribe from global notification manager if we were using it
+        if (window.notificationManager && window.notificationManager.onUpdate) {
+            window.notificationManager.onUpdate = null;
         }
     }
 
