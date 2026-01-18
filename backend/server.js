@@ -30,16 +30,26 @@ const corsOptions = {
       'http://localhost:3000',
       'http://localhost',
       'http://localhost:8080',
-      'http://10.0.2.2:3000',      // Android emulator
-      'capacitor://localhost',      // Capacitor
-      'ionic://localhost',          // Ionic
       process.env.BASE_URL,         // Production URL
     ];
     
+    // Development-only origins (only in development/test environments)
+    const devOrigins = [
+      'http://10.0.2.2:3000',      // Android emulator
+      'capacitor://localhost',      // Capacitor
+      'ionic://localhost',          // Ionic
+    ];
+    
+    // Add dev origins only in non-production environments
+    if (process.env.NODE_ENV !== 'production') {
+      allowedOrigins.push(...devOrigins);
+    }
+    
     // Allow any localhost port for development
-    if (origin.startsWith('http://localhost:') || 
-        origin.startsWith('http://127.0.0.1:') ||
-        allowedOrigins.indexOf(origin) !== -1) {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    if (isDevelopment && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) {
+      callback(null, true);
+    } else if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

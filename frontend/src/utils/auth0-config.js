@@ -9,10 +9,19 @@ let auth0Client = null;
  */
 async function initAuth0() {
     try {
-        // Get Auth0 configuration from environment or fallback to defaults
-        const domain = window.AUTH0_DOMAIN || 'YOUR_AUTH0_DOMAIN.auth0.com';
-        const clientId = window.AUTH0_CLIENT_ID || 'YOUR_AUTH0_CLIENT_ID';
-        const audience = window.AUTH0_AUDIENCE || `https://${domain}/api/v2/`;
+        // Get Auth0 configuration from environment
+        const domain = window.AUTH0_DOMAIN;
+        const clientId = window.AUTH0_CLIENT_ID;
+        const audience = window.AUTH0_AUDIENCE;
+        
+        // Validate required configuration
+        if (!domain || domain === 'YOUR_AUTH0_DOMAIN.auth0.com') {
+            throw new Error('Auth0 domain not configured. Please update AUTH0_DOMAIN in your configuration.');
+        }
+        
+        if (!clientId || clientId === 'YOUR_AUTH0_CLIENT_ID') {
+            throw new Error('Auth0 client ID not configured. Please update AUTH0_CLIENT_ID in your configuration.');
+        }
         
         // Import Auth0 SDK dynamically
         const { createAuth0Client } = window.auth0;

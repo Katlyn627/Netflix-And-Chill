@@ -1418,7 +1418,7 @@ class UserController {
       const existingUserByEmail = await dataStore.findUserByEmail(email);
       if (existingUserByEmail && !existingUserByEmail.auth0Id) {
         return res.status(400).json({ 
-          error: 'User with this email already exists. Please use a different login method.' 
+          error: 'This email is associated with a direct account. Please login using email/password, or contact support at support@netflixandchill.com to link your Auth0 account.' 
         });
       }
       
