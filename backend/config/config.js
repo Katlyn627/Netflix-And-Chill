@@ -1,4 +1,34 @@
 // Configuration file for API keys and settings
+
+/**
+ * Get the base URL with the correct protocol based on environment
+ * In production, always use HTTPS to prevent SSL errors with Auth0
+ * In development, use HTTP for localhost
+ */
+function getBaseUrl() {
+  // If BASE_URL is explicitly set, use it
+  if (process.env.BASE_URL) {
+    // Ensure production URLs use HTTPS
+    if (process.env.NODE_ENV === 'production' && process.env.BASE_URL.startsWith('http://')) {
+      return process.env.BASE_URL.replace('http://', 'https://');
+    }
+    return process.env.BASE_URL;
+  }
+  
+  // Default based on environment
+  if (process.env.NODE_ENV === 'production') {
+    // In production without BASE_URL, try to construct from Heroku environment
+    if (process.env.HEROKU_APP_NAME) {
+      return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+    }
+    // Fallback to HTTPS localhost (shouldn't happen in real production)
+    return 'https://localhost:3000';
+  }
+  
+  // Development default
+  return 'http://localhost:3000';
+}
+
 module.exports = {
   // TMDB API configuration (The Movie Database)
   // Get your free API key at: https://www.themoviedb.org/settings/api
@@ -74,8 +104,8 @@ module.exports = {
     clientId: process.env.AUTH0_CLIENT_ID || null,
     clientSecret: process.env.AUTH0_CLIENT_SECRET || null,
     audience: process.env.AUTH0_AUDIENCE || null,
-    callbackUrl: process.env.AUTH0_CALLBACK_URL || `${process.env.BASE_URL || 'http://localhost:3000'}/callback.html`,
-    logoutUrl: process.env.AUTH0_LOGOUT_URL || `${process.env.BASE_URL || 'http://localhost:3000'}/login.html`
+    callbackUrl: process.env.AUTH0_CALLBACK_URL || `${getBaseUrl()}/callback.html`,
+    logoutUrl: process.env.AUTH0_LOGOUT_URL || `${getBaseUrl()}/login.html`
   },
 
   // Streaming Platform OAuth Configuration
@@ -88,7 +118,7 @@ module.exports = {
         enabled: process.env.NETFLIX_OAUTH_ENABLED === 'true' || false,
         clientId: process.env.NETFLIX_CLIENT_ID || null,
         clientSecret: process.env.NETFLIX_CLIENT_SECRET || null,
-        redirectUri: process.env.NETFLIX_REDIRECT_URI || `${process.env.BASE_URL || 'http://localhost:3000'}/api/auth/netflix/callback`,
+        redirectUri: process.env.NETFLIX_REDIRECT_URI || `${getBaseUrl()}/api/auth/netflix/callback`,
         authUrl: 'https://www.netflix.com/oauth/authorize',
         tokenUrl: 'https://www.netflix.com/oauth/token',
         apiUrl: 'https://api.netflix.com/v1',
@@ -99,7 +129,7 @@ module.exports = {
         enabled: process.env.HULU_OAUTH_ENABLED === 'true' || false,
         clientId: process.env.HULU_CLIENT_ID || null,
         clientSecret: process.env.HULU_CLIENT_SECRET || null,
-        redirectUri: process.env.HULU_REDIRECT_URI || `${process.env.BASE_URL || 'http://localhost:3000'}/api/auth/hulu/callback`,
+        redirectUri: process.env.HULU_REDIRECT_URI || `${getBaseUrl()}/api/auth/hulu/callback`,
         authUrl: 'https://auth.hulu.com/oauth/authorize',
         tokenUrl: 'https://auth.hulu.com/oauth/token',
         apiUrl: 'https://api.hulu.com/v1',
@@ -110,7 +140,7 @@ module.exports = {
         enabled: process.env.DISNEY_OAUTH_ENABLED === 'true' || false,
         clientId: process.env.DISNEY_CLIENT_ID || null,
         clientSecret: process.env.DISNEY_CLIENT_SECRET || null,
-        redirectUri: process.env.DISNEY_REDIRECT_URI || `${process.env.BASE_URL || 'http://localhost:3000'}/api/auth/disney/callback`,
+        redirectUri: process.env.DISNEY_REDIRECT_URI || `${getBaseUrl()}/api/auth/disney/callback`,
         authUrl: 'https://www.disneyplus.com/oauth/authorize',
         tokenUrl: 'https://www.disneyplus.com/oauth/token',
         apiUrl: 'https://api.disneyplus.com/v1',
@@ -121,7 +151,7 @@ module.exports = {
         enabled: process.env.PRIME_OAUTH_ENABLED === 'true' || false,
         clientId: process.env.PRIME_CLIENT_ID || null,
         clientSecret: process.env.PRIME_CLIENT_SECRET || null,
-        redirectUri: process.env.PRIME_REDIRECT_URI || `${process.env.BASE_URL || 'http://localhost:3000'}/api/auth/prime/callback`,
+        redirectUri: process.env.PRIME_REDIRECT_URI || `${getBaseUrl()}/api/auth/prime/callback`,
         authUrl: 'https://www.amazon.com/ap/oa',
         tokenUrl: 'https://api.amazon.com/auth/o2/token',
         apiUrl: 'https://api.primevideo.com/v1',
@@ -132,7 +162,7 @@ module.exports = {
         enabled: process.env.HBO_OAUTH_ENABLED === 'true' || false,
         clientId: process.env.HBO_CLIENT_ID || null,
         clientSecret: process.env.HBO_CLIENT_SECRET || null,
-        redirectUri: process.env.HBO_REDIRECT_URI || `${process.env.BASE_URL || 'http://localhost:3000'}/api/auth/hbo/callback`,
+        redirectUri: process.env.HBO_REDIRECT_URI || `${getBaseUrl()}/api/auth/hbo/callback`,
         authUrl: 'https://auth.hbomax.com/oauth/authorize',
         tokenUrl: 'https://auth.hbomax.com/oauth/token',
         apiUrl: 'https://api.hbomax.com/v1',
@@ -143,7 +173,7 @@ module.exports = {
         enabled: process.env.APPLETV_OAUTH_ENABLED === 'true' || false,
         clientId: process.env.APPLETV_CLIENT_ID || null,
         clientSecret: process.env.APPLETV_CLIENT_SECRET || null,
-        redirectUri: process.env.APPLETV_REDIRECT_URI || `${process.env.BASE_URL || 'http://localhost:3000'}/api/auth/appletv/callback`,
+        redirectUri: process.env.APPLETV_REDIRECT_URI || `${getBaseUrl()}/api/auth/appletv/callback`,
         authUrl: 'https://appleid.apple.com/auth/authorize',
         tokenUrl: 'https://appleid.apple.com/auth/token',
         apiUrl: 'https://api.tv.apple.com/v1',
