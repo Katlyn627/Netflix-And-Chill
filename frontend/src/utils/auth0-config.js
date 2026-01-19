@@ -4,6 +4,29 @@
 let auth0Client = null;
 
 /**
+ * Get a safe redirect URI that works with Auth0
+ * Ensures localhost always uses HTTP, not HTTPS
+ * @param {string} path - The path for the redirect (e.g., '/callback.html')
+ * @returns {string} A valid redirect URI
+ */
+function getSafeRedirectUri(path) {
+    let origin = window.location.origin;
+    
+    // Check if this is localhost
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.startsWith('192.168.') ||
+                       window.location.hostname.startsWith('10.0.');
+    
+    // Force HTTP for localhost (Auth0 doesn't accept https://localhost)
+    if (isLocalhost && origin.startsWith('https://')) {
+        origin = origin.replace('https://', 'http://');
+    }
+    
+    return origin + path;
+}
+
+/**
  * Initialize Auth0 Client
  * Call this on page load to set up authentication
  */
@@ -31,7 +54,7 @@ async function initAuth0() {
             domain: domain,
             clientId: clientId,
             authorizationParams: {
-                redirect_uri: window.AUTH0_CALLBACK_URL || (window.location.origin + '/callback.html'),
+                redirect_uri: window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html'),
                 audience: audience,
                 scope: 'openid profile email read:current_user update:current_user_metadata'
             },
@@ -58,7 +81,7 @@ async function login() {
         
         await auth0Client.loginWithRedirect({
             authorizationParams: {
-                redirect_uri: window.AUTH0_CALLBACK_URL || (window.location.origin + '/callback.html')
+                redirect_uri: window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html')
             }
         });
     } catch (error) {
@@ -83,7 +106,7 @@ async function logout() {
         // Logout from Auth0
         await auth0Client.logout({
             logoutParams: {
-                returnTo: window.AUTH0_LOGOUT_URL || (window.location.origin + '/login.html')
+                returnTo: window.AUTH0_LOGOUT_URL || getSafeRedirectUri('/login.html')
             }
         });
     } catch (error) {
