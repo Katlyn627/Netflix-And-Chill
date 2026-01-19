@@ -16,8 +16,15 @@ function getBaseUrl() {
   // If BASE_URL is explicitly set, use it
   if (process.env.BASE_URL) {
     const baseUrl = process.env.BASE_URL;
-    // Ensure production URLs use HTTPS
-    if (process.env.NODE_ENV === 'production' && baseUrl.startsWith('http://')) {
+    
+    // Check if this is a localhost URL
+    const isLocalhost = baseUrl.includes('://localhost') || 
+                       baseUrl.includes('://127.0.0.1') ||
+                       baseUrl.includes('://192.168.') ||
+                       baseUrl.includes('://10.0.');
+    
+    // Ensure production URLs use HTTPS (but not for localhost)
+    if (process.env.NODE_ENV === 'production' && baseUrl.startsWith('http://') && !isLocalhost) {
       console.warn('WARNING: BASE_URL uses http:// in production. Automatically converting to https://');
       cachedBaseUrl = baseUrl.replace('http://', 'https://');
       return cachedBaseUrl;

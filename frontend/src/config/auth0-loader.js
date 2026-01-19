@@ -11,7 +11,23 @@ const AUTH0_PLACEHOLDER_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
 window.auth0ConfigReady = (async function loadAuth0Config() {
     try {
         // Determine API base URL based on current environment
-        const API_BASE_URL = window.location.origin;
+        // In production (when served over HTTPS), always use HTTPS
+        // This prevents ERR_SSL_PROTOCOL_ERROR when behind proxies/load balancers
+        let API_BASE_URL = window.location.origin;
+        
+        // Upgrade to HTTPS if:
+        // 1. Page is loaded over HTTPS, AND
+        // 2. Not localhost (localhost should remain HTTP in development)
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.hostname.startsWith('192.168.') ||
+                           window.location.hostname.startsWith('10.0.');
+        
+        if (window.location.protocol === 'https:' && 
+            API_BASE_URL.startsWith('http://') && 
+            !isLocalhost) {
+            API_BASE_URL = API_BASE_URL.replace('http://', 'https://');
+        }
         
         // Fetch Auth0 configuration from backend
         const response = await fetch(`${API_BASE_URL}/api/config/auth0`);
