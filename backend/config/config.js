@@ -17,7 +17,7 @@ function getBaseUrl() {
   if (process.env.BASE_URL) {
     const baseUrl = process.env.BASE_URL;
     // Ensure production URLs use HTTPS
-    if (process.env.NODE_ENV === 'production' && typeof baseUrl === 'string' && baseUrl.startsWith('http://')) {
+    if (process.env.NODE_ENV === 'production' && baseUrl.startsWith('http://')) {
       console.warn('WARNING: BASE_URL uses http:// in production. Automatically converting to https://');
       cachedBaseUrl = baseUrl.replace('http://', 'https://');
       return cachedBaseUrl;
@@ -34,10 +34,9 @@ function getBaseUrl() {
       return cachedBaseUrl;
     }
     // Production requires explicit BASE_URL configuration
-    console.error('ERROR: BASE_URL not set in production environment. Auth0 and OAuth callbacks will not work.');
-    console.error('Please set BASE_URL environment variable to your application URL (e.g., https://your-app.herokuapp.com)');
-    // Throw error to make misconfiguration explicit
-    throw new Error('BASE_URL environment variable is required in production for Auth0 and OAuth to work properly');
+    const errorMsg = 'BASE_URL environment variable is required in production for Auth0 and OAuth to work properly. Please set BASE_URL to your application URL (e.g., https://your-app.herokuapp.com)';
+    console.error(`ERROR: ${errorMsg}`);
+    throw new Error(errorMsg);
   }
   
   // Development default
