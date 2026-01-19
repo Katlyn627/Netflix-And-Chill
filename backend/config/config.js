@@ -4,32 +4,51 @@
  * Get the base URL with the correct protocol based on environment
  * In production, always use HTTPS to prevent SSL errors with Auth0
  * In development, use HTTP for localhost
+ * Cached to avoid repeated warnings
  */
+let cachedBaseUrl = null;
 function getBaseUrl() {
+  // Return cached value if already computed
+  if (cachedBaseUrl !== null) {
+    return cachedBaseUrl;
+  }
+  
   // If BASE_URL is explicitly set, use it
   if (process.env.BASE_URL) {
+    const baseUrl = process.env.BASE_URL;
     // Ensure production URLs use HTTPS
-    if (process.env.NODE_ENV === 'production' && process.env.BASE_URL.startsWith('http://')) {
-      return process.env.BASE_URL.replace('http://', 'https://');
+    if (process.env.NODE_ENV === 'production' && typeof baseUrl === 'string' && baseUrl.startsWith('http://')) {
+      console.warn('WARNING: BASE_URL uses http:// in production. Automatically converting to https://');
+      cachedBaseUrl = baseUrl.replace('http://', 'https://');
+      return cachedBaseUrl;
     }
-    return process.env.BASE_URL;
+    cachedBaseUrl = baseUrl;
+    return cachedBaseUrl;
   }
   
   // Default based on environment
   if (process.env.NODE_ENV === 'production') {
     // In production without BASE_URL, try to construct from Heroku environment
     if (process.env.HEROKU_APP_NAME) {
-      return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+      cachedBaseUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+      return cachedBaseUrl;
     }
-    // Fallback to HTTPS localhost (shouldn't happen in real production)
-    return 'https://localhost:3000';
+    // Production requires explicit BASE_URL configuration
+    console.error('ERROR: BASE_URL not set in production environment. Auth0 and OAuth callbacks will not work.');
+    console.error('Please set BASE_URL environment variable to your application URL (e.g., https://your-app.herokuapp.com)');
+    // Throw error to make misconfiguration explicit
+    throw new Error('BASE_URL environment variable is required in production for Auth0 and OAuth to work properly');
   }
   
   // Development default
-  return 'http://localhost:3000';
+  cachedBaseUrl = 'http://localhost:3000';
+  return cachedBaseUrl;
 }
 
 module.exports = {
+  // Export getBaseUrl for use in other modules
+  getBaseUrl,
+  
   // TMDB API configuration (The Movie Database)
   // Get your free API key at: https://www.themoviedb.org/settings/api
   tmdb: {
