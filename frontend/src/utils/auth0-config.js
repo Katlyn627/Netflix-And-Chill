@@ -3,6 +3,9 @@
 
 let auth0Client = null;
 
+// Standard scopes for Auth0 authentication
+const AUTH0_SCOPES = 'openid profile email read:current_user update:current_user_metadata';
+
 /**
  * Get a safe redirect URI that works with Auth0
  * Ensures localhost always uses HTTP, not HTTPS
@@ -56,7 +59,7 @@ async function initAuth0() {
             authorizationParams: {
                 redirect_uri: window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html'),
                 audience: audience,
-                scope: 'openid profile email read:current_user update:current_user_metadata'
+                scope: AUTH0_SCOPES
             },
             cacheLocation: 'localstorage',
             useRefreshTokens: true
@@ -93,7 +96,7 @@ async function login(options = {}) {
                 redirect_uri: callbackUrl,
                 // Add response_type and scope for better compatibility
                 response_type: 'code',
-                scope: 'openid profile email read:current_user update:current_user_metadata'
+                scope: AUTH0_SCOPES
             }
         };
         

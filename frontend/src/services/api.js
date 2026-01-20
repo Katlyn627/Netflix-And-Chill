@@ -10,9 +10,8 @@ const getApiBaseUrl = () => {
         // Development mode - use localhost
         return 'http://localhost:3000/api';
     } else {
-        // Production mode - use current origin with HTTPS
-        const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-        return `${protocol}//${window.location.host}/api`;
+        // Production mode - use current origin
+        return `${window.location.origin}/api`;
     }
 };
 
