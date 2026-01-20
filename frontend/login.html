@@ -97,10 +97,8 @@
             const autoLogin = urlParams.get('auto_login') === 'true';
             const returnTo = urlParams.get('returnTo');
             
-            // Store returnTo in sessionStorage for use after login
-            if (returnTo) {
-                sessionStorage.setItem('loginReturnTo', returnTo);
-            }
+            // Note: returnTo is passed via appState to Auth0, which will be available
+            // in callback.html after successful authentication
             
             // Only show and enable Auth0 button if it's configured
             if (window.AUTH0_CONFIGURED) {

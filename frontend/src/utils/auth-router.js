@@ -16,7 +16,7 @@ async function getLoginUrl(options = {}) {
     
     try {
         // Wait for Auth0 config to load if it's available
-        if (window.auth0ConfigReady) {
+        if (window.auth0ConfigReady && typeof window.auth0ConfigReady.then === 'function') {
             await window.auth0ConfigReady;
         }
         
@@ -55,6 +55,8 @@ async function redirectToLogin(options = {}) {
 
 /**
  * Check if user is authenticated
+ * Note: This is a simple check based on localStorage presence.
+ * For production use, consider adding token expiry validation.
  * @returns {boolean} True if user is logged in
  */
 function isAuthenticated() {
@@ -62,6 +64,7 @@ function isAuthenticated() {
     const auth0User = localStorage.getItem('auth0User');
     
     // User is authenticated if they have either a userId or auth0User
+    // TODO: Add token expiry validation for more robust authentication check
     return !!(userId || auth0User);
 }
 
