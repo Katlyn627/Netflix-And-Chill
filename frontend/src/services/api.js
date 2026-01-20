@@ -1,5 +1,25 @@
-const API_BASE_URL = 'http://localhost:3000/api';
-const BASE_URL = 'http://localhost:3000';
+// Determine API base URL dynamically based on environment
+// In development: http://localhost:3000/api
+// In production: Use current origin (e.g., https://your-app.herokuapp.com/api)
+const getApiBaseUrl = () => {
+    // Check if we're running on localhost
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1';
+    
+    if (isLocalhost) {
+        // Development mode - use localhost
+        return 'http://localhost:3000/api';
+    } else {
+        // Production mode - use current origin with HTTPS
+        const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+        return `${protocol}//${window.location.host}/api`;
+    }
+};
+
+const API_BASE_URL = getApiBaseUrl();
+const BASE_URL = API_BASE_URL.replace('/api', '');
+
+console.log('🌐 API Configuration:', { API_BASE_URL, BASE_URL });
 
 class NetflixAndChillAPI {
     async createUser(userData) {

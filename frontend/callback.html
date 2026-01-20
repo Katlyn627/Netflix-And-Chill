@@ -66,25 +66,34 @@
         // Handle Auth0 callback
         async function handleAuthCallback() {
             try {
+                console.log('🔐 Starting Auth0 callback handling...');
+                
                 // Wait for Auth0 config to load
                 if (window.auth0ConfigReady) {
+                    console.log('⏳ Waiting for Auth0 config to load...');
                     await window.auth0ConfigReady;
                 }
                 
                 // Check if Auth0 is configured
                 if (!window.AUTH0_CONFIGURED) {
-                    console.warn('Auth0 not configured. Redirecting to login with Auth0 option.');
+                    console.warn('❌ Auth0 not configured. Redirecting to login with Auth0 option.');
                     // Redirect to login page with parameter to show Auth0 setup message
                     window.location.href = '/login.html?auth0_required=true';
                     return;
                 }
                 
+                console.log('✅ Auth0 is configured');
+                
                 // Handle the redirect callback
+                console.log('📥 Handling redirect callback...');
                 const result = await Auth0Manager.handleCallback();
+                console.log('✅ Callback handled successfully');
                 
                 // Get or create user in our backend
+                console.log('🔑 Getting access token...');
                 const token = await Auth0Manager.getToken();
                 const auth0User = result.user;
+                console.log('✅ User info retrieved:', { email: auth0User.email, sub: auth0User.sub });
                 
                 // Map Auth0 user to our user model
                 const userData = {
@@ -94,8 +103,13 @@
                     profilePicture: auth0User.picture
                 };
                 
+                // Ensure API_BASE_URL is defined
+                const apiBaseUrl = window.API_BASE_URL || window.location.origin + '/api';
+                console.log('📡 Using API base URL:', apiBaseUrl);
+                
                 // Create or update user in backend
-                const response = await fetch(`${API_BASE_URL}/users/auth0`, {
+                console.log('👤 Creating/updating user in backend...');
+                const response = await fetch(`${apiBaseUrl}/users/auth0`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -105,27 +119,39 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to create/update user in backend');
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    console.error('❌ Backend user creation failed:', response.status, errorData);
+                    throw new Error(errorData.error || `Failed to create/update user in backend (${response.status})`);
                 }
                 
                 const backendUser = await response.json();
+                console.log('✅ User created/updated in backend:', backendUser.id);
                 
                 // Store user ID in localStorage for compatibility with existing code
                 localStorage.setItem('currentUserId', backendUser.id);
                 localStorage.setItem('auth0User', JSON.stringify(auth0User));
+                console.log('✅ User data stored in localStorage');
                 
                 // Redirect to profile or intended page
                 const redirectUrl = result.appState?.returnTo || '/profile-view.html?userId=' + backendUser.id;
+                console.log('🎯 Redirecting to:', redirectUrl);
                 window.location.href = redirectUrl;
                 
             } catch (error) {
-                console.error('Error during authentication callback:', error);
-                document.getElementById('error-message').textContent = 
-                    'Authentication failed. Please try again.';
+                console.error('❌ Error during authentication callback:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+                
+                // Show detailed error message
+                const errorMessage = error.message || 'Authentication failed. Please try again.';
+                document.getElementById('error-message').textContent = errorMessage;
                 document.getElementById('error-message').style.display = 'block';
                 
                 // Redirect to login after 3 seconds
                 setTimeout(() => {
+                    console.log('🔄 Redirecting to login page...');
                     window.location.href = '/login.html';
                 }, 3000);
             }
@@ -135,9 +161,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Check if we're handling a callback
             const params = new URLSearchParams(window.location.search);
+            console.log('📋 URL parameters:', Object.fromEntries(params.entries()));
+            
             if (params.has('code') && params.has('state')) {
+                console.log('✅ Auth0 callback parameters detected');
                 handleAuthCallback();
             } else {
+                console.warn('⚠️ No callback parameters found, redirecting to login');
                 // No callback parameters, redirect to login
                 window.location.href = '/login.html';
             }
