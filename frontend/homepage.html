@@ -21,7 +21,7 @@
             <p class="hero-description">Match with people who share your streaming preferences, watch history, and binge-watching habits</p>
             <div class="cta-buttons">
                 <a href="profile.html" class="btn btn-primary btn-large">Get Started</a>
-                <a href="login.html" class="btn btn-secondary btn-large">Login</a>
+                <button id="login-btn" class="btn btn-secondary btn-large" onclick="handleLogin()">Login</button>
             </div>
         </header>
 
@@ -103,7 +103,21 @@
 
     <script src="src/utils/errorHandler.js"></script>
     <script src="src/utils/settings.js"></script>
+    
+    <!-- Auth0 Configuration and Router -->
+    <script src="src/config/auth0-loader.js"></script>
+    <script src="src/utils/auth-router.js"></script>
+    
     <script>
+        // Handle login button click
+        async function handleLogin() {
+            if (window.AuthRouter) {
+                await window.AuthRouter.redirectToLogin({ autoLogin: true });
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+        
         // Check if user is logged in and redirect to profile
         document.addEventListener('DOMContentLoaded', () => {
             const userId = localStorage.getItem('currentUserId');
