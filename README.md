@@ -118,6 +118,9 @@ cp .env.example .env
 
 # Edit .env and add your API keys
 # See docs/guides/API_KEYS_GUIDE.md for detailed setup instructions
+
+# For Auth0 setup (to avoid ERR_SSL_PROTOCOL_ERROR):
+./setup-auth0.sh
 ```
 
 **Required API Keys:**
@@ -127,6 +130,11 @@ cp .env.example .env
 - **Chat Service** (Optional): SendBird, Twilio, or Stream for real-time messaging
 
 📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](docs/guides/API_KEYS_GUIDE.md)**
+
+⚠️ **Auth0 SSL Error Fix**: If you get `ERR_SSL_PROTOCOL_ERROR` when logging in with Auth0:
+- Use the `./setup-auth0.sh` script to configure Auth0 correctly
+- **NEVER** use `https://localhost` - always use `http://localhost` for development
+- See [docs/auth/AUTH0_SSL_FIX.md](docs/auth/AUTH0_SSL_FIX.md) for details
 
 4. Start the backend server:
 ```bash
