@@ -120,8 +120,14 @@ function completeOnboarding() {
 }
 
 // Navigate to login page for existing members
-function goToLogin() {
-    window.location.href = 'login.html';
+async function goToLogin() {
+    // Use the centralized auth router to handle login redirect
+    if (window.AuthRouter) {
+        await window.AuthRouter.redirectToLogin({ autoLogin: true });
+    } else {
+        // Fallback if auth router is not loaded
+        window.location.href = 'login.html';
+    }
 }
 
 // Add swipe gesture support for mobile devices
