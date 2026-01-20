@@ -23,6 +23,29 @@ function getBaseUrl() {
                        baseUrl.includes('://192.168.') ||
                        baseUrl.includes('://10.0.');
     
+    // CRITICAL: Check for HTTPS with localhost - this causes ERR_SSL_PROTOCOL_ERROR
+    if (isLocalhost && baseUrl.startsWith('https://')) {
+      console.error('');
+      console.error('❌ ERROR: BASE_URL is set to HTTPS with localhost!');
+      console.error('   This will cause ERR_SSL_PROTOCOL_ERROR with Auth0.');
+      console.error('');
+      console.error('   Current value: ' + baseUrl);
+      console.error('   Should be:     ' + baseUrl.replace('https://', 'http://'));
+      console.error('');
+      console.error('   Auth0 does NOT accept https://localhost URLs.');
+      console.error('   Please update your .env file to use HTTP for localhost:');
+      console.error('   BASE_URL=http://localhost:3000');
+      console.error('');
+      console.error('   For more information, see: docs/auth/AUTH0_SSL_FIX.md');
+      console.error('   Quick troubleshooting: docs/auth/AUTH0_SSL_TROUBLESHOOTING.md');
+      console.error('');
+      console.error('   Automatically converting to HTTP to prevent errors...');
+      console.error('');
+      
+      cachedBaseUrl = baseUrl.replace('https://', 'http://');
+      return cachedBaseUrl;
+    }
+    
     // Ensure production URLs use HTTPS (but not for localhost)
     if (process.env.NODE_ENV === 'production' && baseUrl.startsWith('http://') && !isLocalhost) {
       console.warn('WARNING: BASE_URL uses http:// in production. Automatically converting to https://');
@@ -208,3 +231,44 @@ module.exports = {
     }
   }
 };
+
+// Validate Auth0 configuration for common SSL errors
+function validateAuth0Config() {
+  const config = module.exports;
+  
+  // Check if Auth0 is configured
+  if (!config.auth0.domain || !config.auth0.clientId) {
+    return; // Not configured, skip validation
+  }
+  
+  // Check for HTTPS localhost in callback URL
+  if (config.auth0.callbackUrl && config.auth0.callbackUrl.startsWith('https://localhost')) {
+    console.error('');
+    console.error('❌ ERROR: AUTH0_CALLBACK_URL uses HTTPS with localhost!');
+    console.error('   This will cause ERR_SSL_PROTOCOL_ERROR.');
+    console.error('');
+    console.error('   Current value: ' + config.auth0.callbackUrl);
+    console.error('   Should be:     ' + config.auth0.callbackUrl.replace('https://', 'http://'));
+    console.error('');
+    console.error('   Please update your .env file:');
+    console.error('   AUTH0_CALLBACK_URL=' + config.auth0.callbackUrl.replace('https://', 'http://'));
+    console.error('');
+  }
+  
+  // Check for HTTPS localhost in logout URL
+  if (config.auth0.logoutUrl && config.auth0.logoutUrl.startsWith('https://localhost')) {
+    console.error('');
+    console.error('❌ ERROR: AUTH0_LOGOUT_URL uses HTTPS with localhost!');
+    console.error('   This will cause ERR_SSL_PROTOCOL_ERROR.');
+    console.error('');
+    console.error('   Current value: ' + config.auth0.logoutUrl);
+    console.error('   Should be:     ' + config.auth0.logoutUrl.replace('https://', 'http://'));
+    console.error('');
+    console.error('   Please update your .env file:');
+    console.error('   AUTH0_LOGOUT_URL=' + config.auth0.logoutUrl.replace('https://', 'http://'));
+    console.error('');
+  }
+}
+
+// Run validation on startup
+validateAuth0Config();
