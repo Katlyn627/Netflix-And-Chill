@@ -72,18 +72,27 @@ async function initAuth0() {
 /**
  * Login with Auth0
  * Redirects user to Auth0 Universal Login page
+ * @param {Object} options - Optional login options
+ * @param {Object} options.appState - State to preserve through the redirect (e.g., returnTo URL)
  */
-async function login() {
+async function login(options = {}) {
     try {
         if (!auth0Client) {
             await initAuth0();
         }
         
-        await auth0Client.loginWithRedirect({
+        const loginOptions = {
             authorizationParams: {
                 redirect_uri: window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html')
             }
-        });
+        };
+        
+        // Add appState if provided
+        if (options.appState) {
+            loginOptions.appState = options.appState;
+        }
+        
+        await auth0Client.loginWithRedirect(loginOptions);
     } catch (error) {
         console.error('Error during login:', error);
         throw error;

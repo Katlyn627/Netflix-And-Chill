@@ -8,7 +8,7 @@
  * Get the appropriate login URL based on Auth0 configuration
  * @param {Object} options - Configuration options
  * @param {boolean} options.autoLogin - Whether to auto-trigger Auth0 login
- * @param {boolean} options.returnTo - URL to return to after login
+ * @param {string} options.returnTo - URL to return to after login
  * @returns {string} The login URL to redirect to
  */
 async function getLoginUrl(options = {}) {
