@@ -89,6 +89,12 @@
             
             const auth0Button = document.getElementById('auth0-login-btn');
             const divider = document.querySelector('.auth-divider');
+            const errorDiv = document.getElementById('error-message');
+            
+            // Check if user came here expecting Auth0 login
+            const urlParams = new URLSearchParams(window.location.search);
+            const auth0Required = urlParams.get('auth0_required') === 'true';
+            const autoLogin = urlParams.get('auto_login') === 'true';
             
             // Only show and enable Auth0 button if it's configured
             if (window.AUTH0_CONFIGURED) {
@@ -98,17 +104,37 @@
                         await Auth0Manager.login();
                     } catch (error) {
                         console.error('Auth0 login error:', error);
-                        const errorDiv = document.getElementById('error-message');
                         errorDiv.textContent = 'Failed to login with Auth0. Please try again or use traditional login.';
                         errorDiv.style.display = 'block';
                     }
                 });
+                
+                // Auto-trigger Auth0 login if requested
+                if (autoLogin) {
+                    console.log('Auto-triggering Auth0 login...');
+                    setTimeout(async () => {
+                        try {
+                            await Auth0Manager.login();
+                        } catch (error) {
+                            console.error('Auto Auth0 login error:', error);
+                            errorDiv.textContent = 'Failed to automatically login with Auth0. Please click the Auth0 login button or use traditional login.';
+                            errorDiv.style.display = 'block';
+                        }
+                    }, 500);
+                }
             } else {
                 // Hide Auth0 button and divider if Auth0 is not configured
                 auth0Button.style.display = 'none';
                 if (divider) {
                     divider.style.display = 'none';
                 }
+                
+                // Show message if Auth0 was expected but not configured
+                if (auth0Required) {
+                    errorDiv.textContent = 'Auth0 authentication is not configured. Please use traditional login or contact the administrator to enable Auth0.';
+                    errorDiv.style.display = 'block';
+                }
+                
                 console.info('Auth0 login is not available. Please use traditional login.');
             }
         })();

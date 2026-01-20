@@ -120,8 +120,26 @@ function completeOnboarding() {
 }
 
 // Navigate to login page for existing members
-function goToLogin() {
-    window.location.href = 'login.html';
+async function goToLogin() {
+    // Check if Auth0 is configured and use it as default login
+    try {
+        // Wait for Auth0 config to load if it's available
+        if (window.auth0ConfigReady) {
+            await window.auth0ConfigReady;
+        }
+        
+        // If Auth0 is configured, redirect to login with auto-login parameter
+        if (window.AUTH0_CONFIGURED) {
+            window.location.href = 'login.html?auto_login=true';
+        } else {
+            // Otherwise, go to traditional login
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('Error checking Auth0 config:', error);
+        // Fallback to traditional login
+        window.location.href = 'login.html';
+    }
 }
 
 // Add swipe gesture support for mobile devices

@@ -73,8 +73,9 @@
                 
                 // Check if Auth0 is configured
                 if (!window.AUTH0_CONFIGURED) {
-                    console.warn('Auth0 not configured. Redirecting to login.');
-                    window.location.href = '/login.html';
+                    console.warn('Auth0 not configured. Redirecting to login with Auth0 option.');
+                    // Redirect to login page with parameter to show Auth0 setup message
+                    window.location.href = '/login.html?auth0_required=true';
                     return;
                 }
                 
