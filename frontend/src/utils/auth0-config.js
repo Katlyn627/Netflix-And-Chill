@@ -77,24 +77,41 @@ async function initAuth0() {
  */
 async function login(options = {}) {
     try {
+        console.log('🔐 Auth0 login initiated...');
+        
         if (!auth0Client) {
+            console.log('⏳ Initializing Auth0 client...');
             await initAuth0();
         }
         
+        const callbackUrl = window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html');
+        console.log('📍 Callback URL:', callbackUrl);
+        console.log('🌐 Auth0 Domain:', window.AUTH0_DOMAIN);
+        
         const loginOptions = {
             authorizationParams: {
-                redirect_uri: window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html')
+                redirect_uri: callbackUrl,
+                // Add response_type and scope for better compatibility
+                response_type: 'code',
+                scope: 'openid profile email read:current_user update:current_user_metadata'
             }
         };
         
         // Add appState if provided
         if (options.appState) {
             loginOptions.appState = options.appState;
+            console.log('📋 AppState:', options.appState);
         }
         
+        console.log('🚀 Redirecting to Auth0 Universal Login...');
         await auth0Client.loginWithRedirect(loginOptions);
     } catch (error) {
-        console.error('Error during login:', error);
+        console.error('❌ Error during login:', error);
+        console.error('Error details:', {
+            message: error.message,
+            error_description: error.error_description,
+            error: error.error
+        });
         throw error;
     }
 }

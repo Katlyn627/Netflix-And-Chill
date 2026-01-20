@@ -163,6 +163,34 @@
             const params = new URLSearchParams(window.location.search);
             console.log('📋 URL parameters:', Object.fromEntries(params.entries()));
             
+            // Check for Auth0 errors first (error, error_description)
+            if (params.has('error')) {
+                const error = params.get('error');
+                const errorDescription = params.get('error_description') || 'Unknown error';
+                console.error('❌ Auth0 returned an error:', error, errorDescription);
+                
+                // Show user-friendly error message
+                document.querySelector('.callback-message').textContent = 'Authentication Error';
+                document.getElementById('error-message').innerHTML = `
+                    <strong>Auth0 Error: ${error}</strong><br>
+                    ${errorDescription}<br><br>
+                    <small>Common solutions:</small><br>
+                    <small>• Check callback URL in Auth0 Dashboard matches: ${window.location.origin}/callback.html</small><br>
+                    <small>• Verify application type is "Single Page Application"</small><br>
+                    <small>• Check Allowed Web Origins includes: ${window.location.origin}</small><br>
+                    <small>• See console for detailed logs</small>
+                `;
+                document.getElementById('error-message').style.display = 'block';
+                document.querySelector('.spinner').style.display = 'none';
+                
+                // Redirect to login after 10 seconds
+                setTimeout(() => {
+                    console.log('🔄 Redirecting to login page...');
+                    window.location.href = '/login.html?error=' + encodeURIComponent(error);
+                }, 10000);
+                return;
+            }
+            
             if (params.has('code') && params.has('state')) {
                 console.log('✅ Auth0 callback parameters detected');
                 handleAuthCallback();
