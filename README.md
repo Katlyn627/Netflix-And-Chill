@@ -134,7 +134,8 @@ cp .env.example .env
 ⚠️ **Auth0 SSL Error Fix**: If you get `ERR_SSL_PROTOCOL_ERROR` when logging in with Auth0:
 - Use the `./setup-auth0.sh` script to configure Auth0 correctly
 - **NEVER** use `https://localhost` - always use `http://localhost` for development
-- See [docs/auth/AUTH0_SSL_FIX.md](docs/auth/AUTH0_SSL_FIX.md) for details
+- See [docs/auth/AUTH0_SSL_TROUBLESHOOTING.md](docs/auth/AUTH0_SSL_TROUBLESHOOTING.md) for quick fix
+- See [docs/auth/AUTH0_SSL_FIX.md](docs/auth/AUTH0_SSL_FIX.md) for detailed explanation
 
 4. Start the backend server:
 ```bash

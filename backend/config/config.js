@@ -37,6 +37,7 @@ function getBaseUrl() {
       console.error('   BASE_URL=http://localhost:3000');
       console.error('');
       console.error('   For more information, see: docs/auth/AUTH0_SSL_FIX.md');
+      console.error('   Quick troubleshooting: docs/auth/AUTH0_SSL_TROUBLESHOOTING.md');
       console.error('');
       console.error('   Automatically converting to HTTP to prevent errors...');
       console.error('');
