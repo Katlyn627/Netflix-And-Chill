@@ -38,6 +38,7 @@ class PostgreSQLAdapter {
         id VARCHAR(255) PRIMARY KEY,
         username VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
+        auth0_id VARCHAR(255),
         bio TEXT,
         age INTEGER,
         location VARCHAR(255),
@@ -112,19 +113,19 @@ class PostgreSQLAdapter {
   // User operations
   async addUser(user) {
     const query = `
-      INSERT INTO users (id, username, email, bio, age, location, gender, sexual_orientation,
+      INSERT INTO users (id, username, email, auth0_id, bio, age, location, gender, sexual_orientation,
         profile_picture, photo_gallery, streaming_services, watch_history, preferences, 
         likes, super_likes, least_favorite_movies, movie_debate_topics, favorite_snacks,
         video_chat_preference, swiped_movies, favorite_movies, favorite_tv_shows, 
         movie_ratings, movie_watchlist, tv_watchlist, quiz_attempts, personality_profile,
         personality_bio, archetype, last_quiz_completed_at, created_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, 
-        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
+        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32)
       RETURNING *
     `;
     
     const values = [
-      user.id, user.username, user.email, user.bio, user.age, user.location,
+      user.id, user.username, user.email, user.auth0Id || null, user.bio, user.age, user.location,
       user.gender, user.sexualOrientation, user.profilePicture, 
       JSON.stringify(user.photoGallery), JSON.stringify(user.streamingServices), 
       JSON.stringify(user.watchHistory), JSON.stringify(user.preferences), 
@@ -157,6 +158,11 @@ class PostgreSQLAdapter {
 
   async findUserByUsername(username) {
     const result = await this.pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
+    return result.rows.length > 0 ? this.formatUser(result.rows[0]) : null;
+  }
+
+  async findUserByAuth0Id(auth0Id) {
+    const result = await this.pool.query('SELECT * FROM users WHERE auth0_id = $1', [auth0Id]);
     return result.rows.length > 0 ? this.formatUser(result.rows[0]) : null;
   }
 
@@ -344,6 +350,7 @@ class PostgreSQLAdapter {
       id: row.id,
       username: row.username,
       email: row.email,
+      auth0Id: row.auth0_id,
       bio: row.bio,
       age: row.age,
       location: row.location,

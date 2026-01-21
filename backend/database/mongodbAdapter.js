@@ -155,6 +155,10 @@ class MongoDBAdapter {
     });
   }
 
+  async findUserByAuth0Id(auth0Id) {
+    return await this.db.collection('users').findOne({ auth0Id });
+  }
+
   async updateUser(userId, updates) {
     const result = await this.db.collection('users').findOneAndUpdate(
       { id: userId },
