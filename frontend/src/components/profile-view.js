@@ -70,6 +70,12 @@ class ProfileView {
         document.getElementById('profile-gender').textContent = capitalize(user.gender);
         document.getElementById('profile-sexual-orientation').textContent = capitalize(user.sexualOrientation);
         document.getElementById('profile-bio').textContent = user.bio || 'No bio added yet.';
+        
+        // Update hero section
+        const profileUsernameHero = document.getElementById('profile-username-hero');
+        const profileAgeHero = document.getElementById('profile-age-hero');
+        if (profileUsernameHero) profileUsernameHero.textContent = user.username;
+        if (profileAgeHero) profileAgeHero.textContent = user.age || 'N/A';
 
         // User email in account settings
         document.getElementById('user-email').textContent = user.email || 'N/A';
@@ -109,6 +115,8 @@ class ProfileView {
         const user = this.userData;
         const profilePictureElement = document.getElementById('profile-picture');
         const noPhotoElement = document.getElementById('no-photo');
+        const profilePictureHeroElement = document.getElementById('profile-picture-hero');
+        const noPhotoHeroElement = document.getElementById('no-photo-hero');
 
         console.log('[ProfileView] Rendering profile picture:', {
             hasProfilePicture: !!user.profilePicture,
@@ -117,9 +125,17 @@ class ProfileView {
         });
 
         if (user.profilePicture) {
+            // Update main profile picture
             profilePictureElement.src = user.profilePicture;
             profilePictureElement.style.display = 'block';
             noPhotoElement.style.display = 'none';
+            
+            // Update hero section profile picture
+            if (profilePictureHeroElement && noPhotoHeroElement) {
+                profilePictureHeroElement.src = user.profilePicture;
+                profilePictureHeroElement.style.display = 'block';
+                noPhotoHeroElement.style.display = 'none';
+            }
 
             // Get the original container (the parent that should hold the profile picture or frame wrapper)
             let pictureContainer = profilePictureElement.parentElement;
@@ -167,8 +183,13 @@ class ProfileView {
                 pictureContainer.appendChild(frameWrapper);
             }
             
-            console.log('[ProfileView] Profile picture rendered successfully');
+            console.log('[ProfileView] Profile picture rendered successfully in main and hero sections');
         } else {
+            // Update hero section to show no photo
+            if (profilePictureHeroElement && noPhotoHeroElement) {
+                profilePictureHeroElement.style.display = 'none';
+                noPhotoHeroElement.style.display = 'flex';
+            }
             console.log('[ProfileView] No profile picture set, showing placeholder');
         }
     }
