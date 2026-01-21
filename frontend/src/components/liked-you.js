@@ -436,22 +436,14 @@ class LikedYouPage {
     }
 
     async startChat(userId) {
-        try {
-            // Navigate to chat page with the user
-            window.location.href = `chat.html?userId=${userId}`;
-        } catch (error) {
-            console.error('Error starting chat:', error);
-            alert('Failed to start chat. Please try again.');
-        }
+        // Navigate to chat page with the user
+        window.location.href = `chat.html?userId=${userId}`;
     }
 
     async sendWatchInvitation(userId) {
         try {
             // Get user information
-            const response = await fetch(`${this.apiBaseUrl}/users/${userId}`);
-            if (!response.ok) throw new Error('Failed to load user');
-            
-            const user = await response.json();
+            const user = await API.getUser(userId);
             this.showWatchInvitationModal(user);
         } catch (error) {
             console.error('Error sending watch invitation:', error);
@@ -564,30 +556,21 @@ class LikedYouPage {
                 const joinLink = document.getElementById('watch-link').value;
                 
                 try {
-                    const response = await fetch(`${this.apiBaseUrl}/watch-invitations`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            fromUserId: this.userId,
-                            toUserId: user.id,
-                            platform,
-                            movie: movie || 'Watch Together',
-                            scheduledDate: date,
-                            scheduledTime: time,
-                            joinLink
-                        })
+                    await API.createWatchInvitation({
+                        fromUserId: this.userId,
+                        toUserId: user.id,
+                        platform,
+                        movie: movie || 'Watch Together',
+                        scheduledDate: date,
+                        scheduledTime: time,
+                        joinLink
                     });
                     
-                    if (response.ok) {
-                        alert('✅ Watch invitation sent successfully!');
-                        modal.remove();
-                    } else {
-                        const error = await response.json();
-                        alert(`❌ Failed to send invitation: ${error.error || 'Unknown error'}`);
-                    }
+                    alert('✅ Watch invitation sent successfully!');
+                    modal.remove();
                 } catch (error) {
                     console.error('Error sending watch invitation:', error);
-                    alert('❌ Failed to send invitation. Please try again.');
+                    alert(`❌ Failed to send invitation: ${error.message}`);
                 }
             });
         }
