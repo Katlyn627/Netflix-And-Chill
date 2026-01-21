@@ -121,7 +121,25 @@ module.exports = {
     domain: process.env.AUTH0_DOMAIN || null,
     clientId: process.env.AUTH0_CLIENT_ID || null,
     clientSecret: process.env.AUTH0_CLIENT_SECRET || null,
-    audience: process.env.AUTH0_AUDIENCE || null,
+    // IMPORTANT: Do not set audience to Management API (/api/v2/) for Single Page Applications
+    // The Management API should only be accessed by Machine-to-Machine applications
+    // For SPA, either omit audience or use a custom API identifier
+    audience: (() => {
+      const audience = process.env.AUTH0_AUDIENCE || null;
+      if (audience && audience.includes('/api/v2/')) {
+        console.warn('');
+        console.warn('⚠️  WARNING: AUTH0_AUDIENCE is set to Management API endpoint!');
+        console.warn('   Management API (/api/v2/) should only be used by Machine-to-Machine apps.');
+        console.warn('   For Single Page Applications, either:');
+        console.warn('   1. Remove AUTH0_AUDIENCE from .env (recommended), OR');
+        console.warn('   2. Set it to a custom API identifier (not /api/v2/)');
+        console.warn('');
+        console.warn('   Current value: ' + audience);
+        console.warn('   This will cause "access_denied" errors during authentication.');
+        console.warn('');
+      }
+      return audience;
+    })(),
     callbackUrl: process.env.AUTH0_CALLBACK_URL || `${getBaseUrl()}/callback.html`,
     logoutUrl: process.env.AUTH0_LOGOUT_URL || `${getBaseUrl()}/login.html`
   },

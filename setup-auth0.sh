@@ -72,7 +72,8 @@ sed -i.tmp "s|^AUTH0_CLIENT_ID=.*|AUTH0_CLIENT_ID=$auth0_client_id|g" .env
 sed -i.tmp "s|^AUTH0_CLIENT_SECRET=.*|AUTH0_CLIENT_SECRET=$auth0_client_secret|g" .env
 sed -i.tmp "s|^AUTH0_CALLBACK_URL=.*|AUTH0_CALLBACK_URL=${base_url}/callback.html|g" .env
 sed -i.tmp "s|^AUTH0_LOGOUT_URL=.*|AUTH0_LOGOUT_URL=${base_url}/login.html|g" .env
-sed -i.tmp "s|^AUTH0_AUDIENCE=.*|AUTH0_AUDIENCE=https://${auth0_domain}/api/v2/|g" .env
+# Comment out AUTH0_AUDIENCE to avoid Management API audience issue
+sed -i.tmp "s|^AUTH0_AUDIENCE=.*|# AUTH0_AUDIENCE=  # Leave commented for SPAs (do NOT use Management API endpoint)|g" .env
 
 # Clean up temp files
 rm -f .env.tmp

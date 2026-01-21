@@ -48,22 +48,37 @@ async function initAuth0() {
         // Get Auth0 configuration from environment
         const domain = window.AUTH0_DOMAIN;
         const clientId = window.AUTH0_CLIENT_ID;
-        const audience = window.AUTH0_AUDIENCE;
+        let audience = window.AUTH0_AUDIENCE;
+        
+        // IMPORTANT: Do not use Management API as audience for SPA applications
+        // The Management API (/api/v2/) should only be called by Machine-to-Machine apps
+        // If audience is set to Management API, remove it to use default audience
+        if (audience && audience.includes('/api/v2/')) {
+            console.warn('⚠️ AUTH0_AUDIENCE is set to Management API. This is not supported for Single Page Applications.');
+            console.warn('   Removing audience to use default. Use backend API for user data operations.');
+            audience = undefined; // Use default audience instead
+        }
         
         // Import Auth0 SDK dynamically
         const { createAuth0Client } = window.auth0;
         
-        auth0Client = await createAuth0Client({
+        const auth0Config = {
             domain: domain,
             clientId: clientId,
             authorizationParams: {
                 redirect_uri: window.AUTH0_CALLBACK_URL || getSafeRedirectUri('/callback.html'),
-                audience: audience,
                 scope: AUTH0_SCOPES
             },
             cacheLocation: 'localstorage',
             useRefreshTokens: true
-        });
+        };
+        
+        // Only add audience if it's defined and not the Management API
+        if (audience) {
+            auth0Config.authorizationParams.audience = audience;
+        }
+        
+        auth0Client = await createAuth0Client(auth0Config);
 
         return auth0Client;
     } catch (error) {
@@ -228,33 +243,19 @@ async function getToken() {
 
 /**
  * Update user metadata (for storing streaming API keys)
+ * NOTE: This function stores metadata in the backend, not Auth0 directly.
+ * Direct calls to Auth0 Management API from frontend are not supported.
+ * Use the backend API to store user-specific data instead.
  */
 async function updateUserMetadata(metadata) {
     try {
-        const token = await getToken();
-        const user = await getUser();
+        console.warn('updateUserMetadata: Direct Auth0 Management API calls are not supported from the frontend.');
+        console.warn('Please use the backend API to store user-specific data instead.');
+        console.warn('Example: POST /api/users/:userId/metadata');
         
-        if (!user) {
-            throw new Error('User not authenticated');
-        }
-        
-        // Call Auth0 Management API to update user metadata
-        const response = await fetch(`https://${window.AUTH0_DOMAIN}/api/v2/users/${user.sub}`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                user_metadata: metadata
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to update user metadata');
-        }
-        
-        return await response.json();
+        // Throw error to indicate this function is not implemented
+        // In a real implementation, you would call your backend API
+        throw new Error('updateUserMetadata is not implemented. Use backend API endpoints to store user data.');
     } catch (error) {
         console.error('Error updating user metadata:', error);
         throw error;
@@ -263,6 +264,8 @@ async function updateUserMetadata(metadata) {
 
 /**
  * Get user metadata (streaming API keys, etc.)
+ * NOTE: User metadata is already included in the user object from Auth0.
+ * For additional user data, query your backend API instead.
  */
 async function getUserMetadata() {
     try {
@@ -272,7 +275,8 @@ async function getUserMetadata() {
             throw new Error('User not authenticated');
         }
         
-        // User metadata is included in the user object
+        // User metadata is already included in the user object from Auth0
+        // This includes basic metadata but not app_metadata
         return user.user_metadata || {};
     } catch (error) {
         console.error('Error getting user metadata:', error);
