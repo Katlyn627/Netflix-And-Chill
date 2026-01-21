@@ -1,13 +1,16 @@
 /**
- * Liked You Page Component - Bumble Style
- * Shows users who have liked the current user
+ * Liked You Page Component - Bumble Style with Three Tabs
+ * Shows users who have liked the current user, users you liked, and mutual matches
  */
 
 class LikedYouPage {
     constructor() {
         this.userId = localStorage.getItem('currentUserId');
         this.isPremium = false;
-        this.likes = [];
+        this.currentTab = 'received'; // 'received', 'sent', 'matches'
+        this.receivedLikes = [];
+        this.sentLikes = [];
+        this.matches = [];
         this.apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
         this.init();
     }
@@ -19,7 +22,7 @@ class LikedYouPage {
         }
 
         await this.loadUserData();
-        await this.loadLikes();
+        await this.loadAllData();
         this.render();
         this.attachEventListeners();
     }
@@ -36,7 +39,16 @@ class LikedYouPage {
         }
     }
 
-    async loadLikes() {
+    async loadAllData() {
+        await Promise.all([
+            this.loadReceivedLikes(),
+            this.loadSentLikes(),
+            this.loadMatches()
+        ]);
+        this.updateTabCounts();
+    }
+
+    async loadReceivedLikes() {
         const loading = document.getElementById('liked-you-loading');
         if (loading) loading.style.display = 'block';
 
@@ -44,29 +56,127 @@ class LikedYouPage {
             const response = await fetch(`http://localhost:3000/api/likes/${this.userId}/received`);
             if (response.ok) {
                 const data = await response.json();
-                this.likes = data.likes || [];
-                
-                // Update likes count
-                const countElement = document.getElementById('likes-count');
-                if (countElement) {
-                    countElement.textContent = data.count || 0;
-                }
+                this.receivedLikes = data.likes || [];
                 
                 // Mark all unread likes as read (only for premium users who can see them)
-                if (this.isPremium && this.likes.length > 0) {
+                if (this.isPremium && this.receivedLikes.length > 0) {
                     this.markLikesAsRead();
                 }
             }
         } catch (error) {
-            console.error('Error loading likes:', error);
+            console.error('Error loading received likes:', error);
         } finally {
             if (loading) loading.style.display = 'none';
         }
     }
 
+    async loadSentLikes() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/likes/${this.userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                const likes = data.likes || [];
+                
+                // Enrich with user details
+                this.sentLikes = await Promise.all(
+                    likes.map(async (like) => {
+                        try {
+                            const userResponse = await fetch(`http://localhost:3000/api/users/${like.toUserId}`);
+                            if (userResponse.ok) {
+                                const toUser = await userResponse.json();
+                                return {
+                                    ...like,
+                                    toUser: {
+                                        id: toUser.id,
+                                        username: toUser.username,
+                                        age: toUser.age,
+                                        location: toUser.location,
+                                        bio: toUser.bio,
+                                        profilePicture: toUser.profilePicture,
+                                        gender: toUser.gender,
+                                        sexualOrientation: toUser.sexualOrientation,
+                                        streamingServices: toUser.streamingServices,
+                                        archetype: toUser.archetype,
+                                        preferences: toUser.preferences,
+                                        swipePreferences: toUser.swipePreferences,
+                                        verified: toUser.verified
+                                    }
+                                };
+                            }
+                        } catch (error) {
+                            console.error('Error loading user details:', error);
+                        }
+                        return null;
+                    })
+                );
+                this.sentLikes = this.sentLikes.filter(l => l !== null && l.toUser);
+            }
+        } catch (error) {
+            console.error('Error loading sent likes:', error);
+        }
+    }
+
+    async loadMatches() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/likes/${this.userId}/mutual`);
+            if (response.ok) {
+                const data = await response.json();
+                const mutualLikes = data.mutualLikes || [];
+                
+                // Enrich with user details
+                this.matches = await Promise.all(
+                    mutualLikes.map(async (match) => {
+                        try {
+                            // Get the other user's ID
+                            const otherUserId = match.fromUserId === this.userId ? match.toUserId : match.fromUserId;
+                            const userResponse = await fetch(`http://localhost:3000/api/users/${otherUserId}`);
+                            if (userResponse.ok) {
+                                const user = await userResponse.json();
+                                return {
+                                    ...match,
+                                    user: {
+                                        id: user.id,
+                                        username: user.username,
+                                        age: user.age,
+                                        location: user.location,
+                                        bio: user.bio,
+                                        profilePicture: user.profilePicture,
+                                        gender: user.gender,
+                                        sexualOrientation: user.sexualOrientation,
+                                        streamingServices: user.streamingServices,
+                                        archetype: user.archetype,
+                                        preferences: user.preferences,
+                                        swipePreferences: user.swipePreferences,
+                                        verified: user.verified
+                                    }
+                                };
+                            }
+                        } catch (error) {
+                            console.error('Error loading user details:', error);
+                        }
+                        return null;
+                    })
+                );
+                this.matches = this.matches.filter(m => m !== null && m.user);
+            }
+        } catch (error) {
+            console.error('Error loading matches:', error);
+        }
+    }
+
+    updateTabCounts() {
+        const receivedCount = document.getElementById('received-count');
+        const sentCount = document.getElementById('sent-count');
+        const matchesCount = document.getElementById('matches-count');
+        
+        if (receivedCount) receivedCount.textContent = this.receivedLikes.length;
+        if (sentCount) sentCount.textContent = this.sentLikes.length;
+        if (matchesCount) matchesCount.textContent = this.matches.length;
+    }
+
     async markLikesAsRead() {
         // Mark each unread like as read
-        for (const like of this.likes) {
+        for (const like of this.receivedLikes) {
             if (!like.read) {
                 try {
                     await API.markLikeAsRead(like.id);
@@ -92,59 +202,121 @@ class LikedYouPage {
         // Show/hide premium upsell
         const upsellBanner = document.getElementById('premium-upsell');
         if (upsellBanner) {
-            upsellBanner.style.display = this.isPremium ? 'none' : 'block';
+            upsellBanner.style.display = (this.currentTab === 'received' && !this.isPremium) ? 'block' : 'none';
         }
 
-        // Render likes grid
-        this.renderLikesGrid();
+        // Render appropriate grid based on current tab
+        this.renderCurrentTab();
     }
 
-    renderLikesGrid() {
+    renderCurrentTab() {
         const grid = document.getElementById('likes-grid');
         const emptyState = document.getElementById('empty-state');
+        const likesCounter = document.querySelector('.likes-counter');
         
         if (!grid) return;
 
-        if (this.likes.length === 0) {
+        let data = [];
+        let emptyMessage = '';
+        let counterTextSuffix = '';
+
+        switch(this.currentTab) {
+            case 'received':
+                data = this.receivedLikes;
+                emptyMessage = 'No likes yet. Keep swiping to get more matches!';
+                counterTextSuffix = 'people liked you';
+                break;
+            case 'sent':
+                data = this.sentLikes;
+                emptyMessage = 'You haven\'t liked anyone yet. Start swiping!';
+                counterTextSuffix = 'people';
+                break;
+            case 'matches':
+                data = this.matches;
+                emptyMessage = 'No matches yet. Keep swiping to find your perfect match!';
+                counterTextSuffix = 'matches';
+                break;
+        }
+
+        // Update counter
+        if (likesCounter) {
+            const counterTextEl = likesCounter.querySelector('.counter-text');
+            if (counterTextEl) {
+                counterTextEl.innerHTML = `<span id="likes-count">${data.length}</span> ${counterTextSuffix}`;
+            }
+        }
+
+        if (data.length === 0) {
             grid.innerHTML = '';
-            if (emptyState) emptyState.style.display = 'block';
+            if (emptyState) {
+                emptyState.style.display = 'block';
+                const emptyStateText = emptyState.querySelector('p');
+                if (emptyStateText) {
+                    emptyStateText.textContent = emptyMessage;
+                }
+            }
             return;
         }
 
         if (emptyState) emptyState.style.display = 'none';
 
-        grid.innerHTML = this.likes.map(like => this.createLikeCard(like)).join('');
+        grid.innerHTML = data.map(item => this.createProfileCard(item)).join('');
     }
 
-    createLikeCard(like) {
-        const user = like.fromUser;
+    createProfileCard(item) {
+        // Determine user object based on tab
+        let user = null;
+        let matchScore = 0;
+        
+        switch(this.currentTab) {
+            case 'received':
+                user = item.fromUser;
+                matchScore = item.matchScore || 0;
+                break;
+            case 'sent':
+                user = item.toUser;
+                matchScore = item.matchScore || 0;
+                break;
+            case 'matches':
+                user = item.user;
+                matchScore = item.matchScore || 0;
+                break;
+        }
+
         if (!user) return '';
 
-        const isBlurred = !this.isPremium;
+        // For received tab with free users - show blurred cards
+        if (this.currentTab === 'received' && !this.isPremium) {
+            return this.createBlurredCard(user);
+        }
+
+        // For all other cases - show detailed cards
+        return this.createDetailedCard(user, matchScore);
+    }
+
+    createBlurredCard(user) {
+        const profilePicture = user.profilePicture || user.photos?.[0]?.url || 'assets/images/default-avatar.png';
+        
+        return `
+            <div class="liked-profile-card blurred" 
+                 data-user-id="${user.id}"
+                 onclick="window.likedYouPage.handleCardClick('${user.id}')">
+                <div class="liked-card-image">
+                    <img src="${profilePicture}" alt="${user.username}" onerror="this.src='assets/images/default-avatar.png'">
+                    <div class="blur-overlay">🔒</div>
+                </div>
+                <div class="liked-card-info">
+                    <div class="liked-card-name">Premium User</div>
+                    <div class="liked-card-details">Upgrade to see</div>
+                </div>
+            </div>
+        `;
+    }
+
+    createDetailedCard(user, matchScore) {
         const profilePicture = user.profilePicture || user.photos?.[0]?.url || 'assets/images/default-avatar.png';
         const age = user.age || '?';
         const location = user.location || 'Location not set';
-
-        // For blurred cards (free users)
-        if (isBlurred) {
-            return `
-                <div class="liked-profile-card blurred" 
-                     data-user-id="${user.id}"
-                     onclick="window.likedYouPage.handleCardClick('${user.id}')">
-                    <div class="liked-card-image">
-                        <img src="${profilePicture}" alt="${user.username}" onerror="this.src='assets/images/default-avatar.png'">
-                        <div class="blur-overlay">🔒</div>
-                    </div>
-                    <div class="liked-card-info">
-                        <div class="liked-card-name">Premium User</div>
-                        <div class="liked-card-details">Upgrade to see</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // For premium users - show detailed information
-        const matchScore = like.matchScore || 0;
         
         // Get movie personality (archetype)
         const archetype = user.archetype;
@@ -214,13 +386,30 @@ class LikedYouPage {
     }
 
     handleCardClick(userId) {
-        if (!this.isPremium) {
+        if (this.currentTab === 'received' && !this.isPremium) {
             this.upgradeToPremium();
             return;
         }
 
         // Show modal with basic user info instead of navigating to profile-view.html
         this.viewProfile(userId);
+    }
+
+    switchTab(tabName) {
+        this.currentTab = tabName;
+        
+        // Update tab buttons
+        const tabs = document.querySelectorAll('.liked-tab');
+        tabs.forEach(tab => {
+            if (tab.dataset.tab === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Re-render current tab
+        this.render();
     }
 
     async viewProfile(userId) {
@@ -584,6 +773,15 @@ class LikedYouPage {
                 window.location.href = 'profile-view.html';
             });
         }
+
+        // Tab buttons
+        const tabs = document.querySelectorAll('.liked-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                this.switchTab(tabName);
+            });
+        });
     }
 }
 

@@ -2,7 +2,7 @@
 
 .liked-you-header {
     background: #FFFFFF;
-    padding: 20px;
+    padding: 20px 20px 0;
     border-bottom: 1px solid #E0E0E0;
     position: sticky;
     top: 0;
@@ -22,6 +22,64 @@
     font-weight: 700;
     color: #000000;
     margin: 0;
+}
+
+/* Tab Navigation */
+.liked-tabs {
+    display: flex;
+    gap: 0;
+    margin-top: 20px;
+    border-bottom: none;
+}
+
+.liked-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 15px 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    color: #767676;
+}
+
+.liked-tab:hover {
+    background: #F5F5F5;
+}
+
+.liked-tab.active {
+    color: #E50914;
+    border-bottom-color: #E50914;
+}
+
+.tab-icon {
+    font-size: 24px;
+}
+
+.tab-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tab-count {
+    background: #E0E0E0;
+    color: #000000;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+}
+
+.liked-tab.active .tab-count {
+    background: #E50914;
+    color: #FFFFFF;
 }
 
 .liked-you-content {
