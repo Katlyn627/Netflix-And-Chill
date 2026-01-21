@@ -16,38 +16,8 @@ function getBaseUrl() {
   // If BASE_URL is explicitly set, use it
   if (process.env.BASE_URL) {
     const baseUrl = process.env.BASE_URL;
-    
-    // Check if this is a localhost URL
-    const isLocalhost = baseUrl.includes('://localhost') || 
-                       baseUrl.includes('://127.0.0.1') ||
-                       baseUrl.includes('://192.168.') ||
-                       baseUrl.includes('://10.0.');
-    
-    // CRITICAL: Check for HTTPS with localhost - this causes ERR_SSL_PROTOCOL_ERROR
-    if (isLocalhost && baseUrl.startsWith('https://')) {
-      console.error('');
-      console.error('❌ ERROR: BASE_URL is set to HTTPS with localhost!');
-      console.error('   This will cause ERR_SSL_PROTOCOL_ERROR with Auth0.');
-      console.error('');
-      console.error('   Current value: ' + baseUrl);
-      console.error('   Should be:     ' + baseUrl.replace('https://', 'http://'));
-      console.error('');
-      console.error('   Auth0 does NOT accept https://localhost URLs.');
-      console.error('   Please update your .env file to use HTTP for localhost:');
-      console.error('   BASE_URL=http://localhost:3000');
-      console.error('');
-      console.error('   For more information, see: docs/auth/AUTH0_SSL_FIX.md');
-      console.error('   Quick troubleshooting: docs/auth/AUTH0_SSL_TROUBLESHOOTING.md');
-      console.error('');
-      console.error('   Automatically converting to HTTP to prevent errors...');
-      console.error('');
-      
-      cachedBaseUrl = baseUrl.replace('https://', 'http://');
-      return cachedBaseUrl;
-    }
-    
-    // Ensure production URLs use HTTPS (but not for localhost)
-    if (process.env.NODE_ENV === 'production' && baseUrl.startsWith('http://') && !isLocalhost) {
+    // Ensure production URLs use HTTPS
+    if (process.env.NODE_ENV === 'production' && baseUrl.startsWith('http://')) {
       console.warn('WARNING: BASE_URL uses http:// in production. Automatically converting to https://');
       cachedBaseUrl = baseUrl.replace('http://', 'https://');
       return cachedBaseUrl;
