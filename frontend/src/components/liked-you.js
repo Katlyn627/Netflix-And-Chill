@@ -118,46 +118,142 @@ class LikedYouPage {
 
     async loadMatches() {
         try {
-            const response = await fetch(`http://localhost:3000/api/likes/${this.userId}/mutual`);
-            if (response.ok) {
-                const data = await response.json();
-                const mutualLikes = data.mutualLikes || [];
+            // For premium users, combine both mutual likes and algorithmic matches
+            // For free users, only show mutual likes
+            if (this.isPremium) {
+                // Load both mutual likes and engine matches in parallel
+                const [mutualResponse, engineResponse] = await Promise.all([
+                    fetch(`http://localhost:3000/api/likes/${this.userId}/mutual`),
+                    fetch(`http://localhost:3000/api/matches/find/${this.userId}?limit=50`)
+                ]);
                 
-                // Enrich with user details
-                this.matches = await Promise.all(
-                    mutualLikes.map(async (match) => {
-                        try {
-                            // Get the other user's ID
-                            const otherUserId = match.fromUserId === this.userId ? match.toUserId : match.fromUserId;
-                            const userResponse = await fetch(`http://localhost:3000/api/users/${otherUserId}`);
-                            if (userResponse.ok) {
-                                const user = await userResponse.json();
-                                return {
-                                    ...match,
-                                    user: {
-                                        id: user.id,
-                                        username: user.username,
-                                        age: user.age,
-                                        location: user.location,
-                                        bio: user.bio,
-                                        profilePicture: user.profilePicture,
-                                        gender: user.gender,
-                                        sexualOrientation: user.sexualOrientation,
-                                        streamingServices: user.streamingServices,
-                                        archetype: user.archetype,
-                                        preferences: user.preferences,
-                                        swipePreferences: user.swipePreferences,
-                                        verified: user.verified
-                                    }
-                                };
+                const mutualLikes = [];
+                const engineMatches = [];
+                
+                // Process mutual likes
+                if (mutualResponse.ok) {
+                    const mutualData = await mutualResponse.json();
+                    const rawMutualLikes = mutualData.mutualLikes || [];
+                    
+                    // Enrich with user details
+                    const enrichedMutual = await Promise.all(
+                        rawMutualLikes.map(async (match) => {
+                            try {
+                                const otherUserId = match.fromUserId === this.userId ? match.toUserId : match.fromUserId;
+                                const userResponse = await fetch(`http://localhost:3000/api/users/${otherUserId}`);
+                                if (userResponse.ok) {
+                                    const user = await userResponse.json();
+                                    return {
+                                        ...match,
+                                        isMutualLike: true,
+                                        matchScore: match.matchScore || 0,
+                                        user: {
+                                            id: user.id,
+                                            username: user.username,
+                                            age: user.age,
+                                            location: user.location,
+                                            bio: user.bio,
+                                            profilePicture: user.profilePicture,
+                                            gender: user.gender,
+                                            sexualOrientation: user.sexualOrientation,
+                                            streamingServices: user.streamingServices,
+                                            archetype: user.archetype,
+                                            preferences: user.preferences,
+                                            swipePreferences: user.swipePreferences,
+                                            verified: user.verified
+                                        }
+                                    };
+                                }
+                            } catch (error) {
+                                console.error('Error loading user details for mutual like:', error);
                             }
-                        } catch (error) {
-                            console.error('Error loading user details:', error);
-                        }
-                        return null;
-                    })
-                );
-                this.matches = this.matches.filter(m => m !== null && m.user);
+                            return null;
+                        })
+                    );
+                    
+                    mutualLikes.push(...enrichedMutual.filter(m => m !== null && m.user));
+                }
+                
+                // Process engine matches
+                if (engineResponse.ok) {
+                    const engineData = await engineResponse.json();
+                    const rawEngineMatches = engineData.matches || [];
+                    
+                    // Transform engine matches to match the format
+                    engineMatches.push(...rawEngineMatches.map(m => ({
+                        isMutualLike: false,
+                        matchScore: m.matchScore || 0,
+                        matchDescription: m.matchDescription,
+                        sharedContent: m.sharedContent,
+                        quizCompatibility: m.quizCompatibility,
+                        snackCompatibility: m.snackCompatibility,
+                        debateCompatibility: m.debateCompatibility,
+                        emotionalToneCompatibility: m.emotionalToneCompatibility,
+                        bingeCompatibility: m.bingeCompatibility,
+                        swipeGenreCompatibility: m.swipeGenreCompatibility,
+                        contentTypeCompatibility: m.contentTypeCompatibility,
+                        user: m.user
+                    })).filter(m => m.user));
+                }
+                
+                // Create a set of mutual like user IDs for deduplication
+                const mutualUserIds = new Set(mutualLikes.map(m => m.user.id));
+                
+                // Combine: mutual likes first, then engine matches (excluding duplicates)
+                const uniqueEngineMatches = engineMatches.filter(m => !mutualUserIds.has(m.user.id));
+                this.matches = [...mutualLikes, ...uniqueEngineMatches];
+                
+                // Sort by: mutual likes first, then by match score
+                this.matches.sort((a, b) => {
+                    if (a.isMutualLike && !b.isMutualLike) return -1;
+                    if (!a.isMutualLike && b.isMutualLike) return 1;
+                    return (b.matchScore || 0) - (a.matchScore || 0);
+                });
+                
+            } else {
+                // Free users: only show mutual likes (original behavior)
+                const response = await fetch(`http://localhost:3000/api/likes/${this.userId}/mutual`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const mutualLikes = data.mutualLikes || [];
+                    
+                    // Enrich with user details
+                    this.matches = await Promise.all(
+                        mutualLikes.map(async (match) => {
+                            try {
+                                const otherUserId = match.fromUserId === this.userId ? match.toUserId : match.fromUserId;
+                                const userResponse = await fetch(`http://localhost:3000/api/users/${otherUserId}`);
+                                if (userResponse.ok) {
+                                    const user = await userResponse.json();
+                                    return {
+                                        ...match,
+                                        isMutualLike: true,
+                                        matchScore: match.matchScore || 0,
+                                        user: {
+                                            id: user.id,
+                                            username: user.username,
+                                            age: user.age,
+                                            location: user.location,
+                                            bio: user.bio,
+                                            profilePicture: user.profilePicture,
+                                            gender: user.gender,
+                                            sexualOrientation: user.sexualOrientation,
+                                            streamingServices: user.streamingServices,
+                                            archetype: user.archetype,
+                                            preferences: user.preferences,
+                                            swipePreferences: user.swipePreferences,
+                                            verified: user.verified
+                                        }
+                                    };
+                                }
+                            } catch (error) {
+                                console.error('Error loading user details:', error);
+                            }
+                            return null;
+                        })
+                    );
+                    this.matches = this.matches.filter(m => m !== null && m.user);
+                }
             }
         } catch (error) {
             console.error('Error loading matches:', error);

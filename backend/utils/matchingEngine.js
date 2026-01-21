@@ -159,6 +159,7 @@ class MatchingEngine {
       snackCompatibility: snackCompatibility,
       emotionalToneCompatibility: emotionalToneCompatibility,
       quizCompatibility: quizCompatibility,
+      debateCompatibility: debateCompatibility,
       bingeCompatibility: bingeCompatibility,
       swipeGenreCompatibility: swipeGenreCompatibility,
       contentTypeCompatibility: contentTypeCompatibility,
