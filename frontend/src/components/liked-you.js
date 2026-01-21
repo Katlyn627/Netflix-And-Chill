@@ -218,23 +218,23 @@ class LikedYouPage {
 
         let data = [];
         let emptyMessage = '';
-        let counterText = '';
+        let counterTextSuffix = '';
 
         switch(this.currentTab) {
             case 'received':
                 data = this.receivedLikes;
                 emptyMessage = 'No likes yet. Keep swiping to get more matches!';
-                counterText = `${data.length} people liked you`;
+                counterTextSuffix = 'people liked you';
                 break;
             case 'sent':
                 data = this.sentLikes;
                 emptyMessage = 'You haven\'t liked anyone yet. Start swiping!';
-                counterText = `You liked ${data.length} people`;
+                counterTextSuffix = 'people';
                 break;
             case 'matches':
                 data = this.matches;
                 emptyMessage = 'No matches yet. Keep swiping to find your perfect match!';
-                counterText = `${data.length} matches`;
+                counterTextSuffix = 'matches';
                 break;
         }
 
@@ -242,7 +242,7 @@ class LikedYouPage {
         if (likesCounter) {
             const counterTextEl = likesCounter.querySelector('.counter-text');
             if (counterTextEl) {
-                counterTextEl.innerHTML = `<span id="likes-count">${data.length}</span> ${counterText.replace(/^\d+\s*/, '')}`;
+                counterTextEl.innerHTML = `<span id="likes-count">${data.length}</span> ${counterTextSuffix}`;
             }
         }
 
