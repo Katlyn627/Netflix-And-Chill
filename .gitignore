@@ -3,6 +3,8 @@ data/
 *.log
 .DS_Store
 .env
+.env.local
+.env.*.local
 dist/
 build/
 *.tmp
@@ -14,6 +16,13 @@ frontend/assets/uploads/*
 # Ignore test credentials files
 TEST_CREDENTIALS.md
 TEST_CREDENTIALS.json
+
+# Secret files and credentials
+*.pem
+*.p8
+*.key
+secrets/
+credentials/
 
 # Next.js
 .next/
