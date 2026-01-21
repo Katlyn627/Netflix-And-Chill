@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const streamingOAuthService = require('../services/streamingOAuthService');
-const database = require('../utils/database');
+const { getDatabase } = require('../utils/database');
 const { rateLimiters } = require('../middleware/rateLimiter');
+const User = require('../models/User');
 
 // Store for CSRF state tokens
 // NOTE: In production with multiple server instances, use Redis or database storage
@@ -39,8 +40,9 @@ router.get('/:provider/connect', rateLimiters.auth, async (req, res) => {
     }
 
     // Verify user exists
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -118,10 +120,14 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     const tokenData = await streamingOAuthService.exchangeCodeForToken(provider, code);
 
     // Get user
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create User instance to access methods
+    const user = new User(userData);
 
     // Store OAuth token
     user.setStreamingOAuthToken(provider, tokenData);
@@ -191,7 +197,7 @@ router.get('/:provider/callback', rateLimiters.auth, async (req, res) => {
     }
 
     // Save user
-    await database.updateUser(userId, user);
+    await dataStore.updateUser(userId, user);
 
     // Redirect to success page - update to redirect to streaming-services page
     res.redirect(`/streaming-services.html?userId=${encodeURIComponent(userId)}&connected=${encodeURIComponent(provider)}&success=true`);
@@ -221,10 +227,14 @@ router.post('/:provider/disconnect', rateLimiters.auth, async (req, res) => {
     }
 
     // Get user
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create User instance to access methods
+    const user = new User(userData);
 
     // Get token before removing
     const token = user.getStreamingOAuthToken(provider);
@@ -255,7 +265,7 @@ router.post('/:provider/disconnect', rateLimiters.auth, async (req, res) => {
     user.removeStreamingService(null, providerNames[provider]);
 
     // Save user
-    await database.updateUser(userId, user);
+    await dataStore.updateUser(userId, user);
 
     res.json({ 
       success: true, 
@@ -282,10 +292,14 @@ router.post('/:provider/refresh', rateLimiters.auth, async (req, res) => {
     }
 
     // Get user
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create User instance to access methods
+    const user = new User(userData);
 
     // Get existing token
     const token = user.getStreamingOAuthToken(provider);
@@ -303,7 +317,7 @@ router.post('/:provider/refresh', rateLimiters.auth, async (req, res) => {
     user.setStreamingOAuthToken(provider, newTokenData);
 
     // Save user
-    await database.updateUser(userId, user);
+    await dataStore.updateUser(userId, user);
 
     res.json({ 
       success: true, 
@@ -331,10 +345,14 @@ router.get('/:provider/status', rateLimiters.api, async (req, res) => {
     }
 
     // Get user
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create User instance to access methods
+    const user = new User(userData);
 
     const connected = user.isStreamingProviderConnected(provider);
     const token = user.getStreamingOAuthToken(provider);
@@ -365,10 +383,14 @@ router.get('/providers/status', rateLimiters.api, async (req, res) => {
     }
 
     // Get user
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create User instance to access methods
+    const user = new User(userData);
 
     const enabledProviders = streamingOAuthService.getEnabledProviders();
     const providerInfo = {
@@ -453,10 +475,14 @@ router.post('/:provider/sync-history', rateLimiters.auth, async (req, res) => {
     }
 
     // Get user
-    const user = await database.getUser(userId);
-    if (!user) {
+    const dataStore = await getDatabase();
+    const userData = await dataStore.findUserById(userId);
+    if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create User instance to access methods
+    const user = new User(userData);
 
     // Get OAuth token
     const token = user.getStreamingOAuthToken(provider);
@@ -481,7 +507,7 @@ router.post('/:provider/sync-history', rateLimiters.auth, async (req, res) => {
     user.watchHistory.push(...newHistory);
 
     // Save user
-    await database.updateUser(userId, user);
+    await dataStore.updateUser(userId, user);
 
     res.json({
       success: true,
