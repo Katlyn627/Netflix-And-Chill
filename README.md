@@ -519,6 +519,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Troubleshooting
 
+### Auth0 MFA Error
+
+If you get the error **"invalid_request: No MFA factors enabled for enrollment"**:
+- This is a configuration issue in your Auth0 dashboard
+- See [docs/auth/AUTH0_MFA_TROUBLESHOOTING.md](docs/auth/AUTH0_MFA_TROUBLESHOOTING.md) for detailed step-by-step fix
+- **Quick Fix**: Go to Auth0 Dashboard > Security > Multi-factor Auth > Set to "Never" (or enable at least one MFA factor)
+
 ### Browser Extension Console Errors
 
 If you see console errors like "Host validation failed" or "Host is not supported", these are from streaming browser extensions (like Teleparty, Netflix Party) that don't recognize localhost. These errors are harmless and automatically suppressed by our error handler.
