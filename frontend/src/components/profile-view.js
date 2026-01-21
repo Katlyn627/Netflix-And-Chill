@@ -717,6 +717,7 @@ class ProfileView {
 
     async addPhoto(photoUrl) {
         try {
+            console.log('[ProfileView] Adding photo:', photoUrl);
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}/photos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -726,6 +727,11 @@ class ProfileView {
             if (!response.ok) throw new Error('Failed to add photo');
 
             this.userData = (await response.json()).user;
+            console.log('[ProfileView] Photo added successfully. User data updated:', {
+                userId: this.userId,
+                photoCount: this.userData.photos?.length || 0,
+                profilePicture: this.userData.profilePicture
+            });
             
             // If user has no profile picture yet, automatically set this as profile picture
             if (!this.userData.profilePicture) {
@@ -832,6 +838,11 @@ class ProfileView {
 
     async setAsProfilePicture(photoUrl) {
         try {
+            console.log('[ProfileView] Setting profile picture:', {
+                userId: this.userId,
+                photoUrl: photoUrl
+            });
+            
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}/profile-picture`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -841,6 +852,14 @@ class ProfileView {
             if (!response.ok) throw new Error('Failed to set profile picture');
 
             this.userData = (await response.json()).user;
+            
+            console.log('[ProfileView] Profile picture set successfully:', {
+                userId: this.userId,
+                profilePicture: this.userData.profilePicture
+            });
+            
+            // Store profile picture in localStorage for quick access
+            localStorage.setItem('userProfilePicture', this.userData.profilePicture);
             
             // Update the profile picture display in the header
             const profilePictureImg = document.getElementById('profile-picture');
@@ -856,6 +875,11 @@ class ProfileView {
             
             // Update navigation icon
             await updateNavProfileIcon(this.userId);
+            
+            // Update bottom navigation if it exists
+            if (window.bottomNav) {
+                await window.bottomNav.updateProfileIcon(this.userData.profilePicture);
+            }
             
             alert('Profile picture updated successfully!');
         } catch (error) {
