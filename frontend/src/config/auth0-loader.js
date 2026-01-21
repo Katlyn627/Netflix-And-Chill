@@ -10,6 +10,8 @@ const AUTH0_PLACEHOLDER_CLIENT_ID = 'YOUR_AUTH0_CLIENT_ID';
 // Promise that resolves when Auth0 configuration is loaded
 window.auth0ConfigReady = (async function loadAuth0Config() {
     try {
+        console.log('🔧 Loading Auth0 configuration...');
+        
         // Determine API base URL based on current environment
         // In production (when served over HTTPS), always use HTTPS
         // This prevents ERR_SSL_PROTOCOL_ERROR when behind proxies/load balancers
@@ -29,17 +31,24 @@ window.auth0ConfigReady = (async function loadAuth0Config() {
             API_BASE_URL = API_BASE_URL.replace('http://', 'https://');
         }
         
+        console.log('📡 Fetching config from:', `${API_BASE_URL}/api/config/auth0`);
+        
         // Fetch Auth0 configuration from backend
         const response = await fetch(`${API_BASE_URL}/api/config/auth0`);
         
         if (!response.ok) {
-            console.warn('Failed to fetch Auth0 configuration from server. Auth0 login disabled.');
+            console.warn(`⚠️ Failed to fetch Auth0 configuration from server (${response.status}). Auth0 login disabled.`);
             // Mark Auth0 as not configured
             window.AUTH0_CONFIGURED = false;
             return;
         }
         
         const config = await response.json();
+        console.log('✅ Auth0 config received:', {
+            domain: config.domain,
+            clientId: config.clientId ? '***' : null,
+            audience: config.audience
+        });
         
         // Check if Auth0 is actually configured (not using placeholder values)
         const isConfigured = config.domain && 
@@ -59,15 +68,19 @@ window.auth0ConfigReady = (async function loadAuth0Config() {
             window.AUTH0_CALLBACK_URL = config.callbackUrl;
             window.AUTH0_LOGOUT_URL = config.logoutUrl;
             window.AUTH0_CONFIGURED = true;
-            console.log('Auth0 configuration loaded successfully');
+            console.log('✅ Auth0 configuration loaded successfully');
         } else {
             // Auth0 is not configured - disable Auth0 login
-            console.info('Auth0 not configured. Auth0 login disabled. Use traditional login instead.');
+            console.info('ℹ️ Auth0 not configured. Auth0 login disabled. Use traditional login instead.');
             window.AUTH0_CONFIGURED = false;
         }
         
     } catch (error) {
-        console.error('Error loading Auth0 configuration:', error);
+        console.error('❌ Error loading Auth0 configuration:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+        });
         // Mark Auth0 as not configured on error
         window.AUTH0_CONFIGURED = false;
     }

@@ -82,8 +82,11 @@
     <script>
         // Add Auth0 login handler after config is loaded
         (async function setupAuth0Login() {
+            console.log('🔐 Setting up Auth0 login...');
+            
             // Wait for Auth0 configuration to be loaded
             if (window.auth0ConfigReady) {
+                console.log('⏳ Waiting for Auth0 config to load...');
                 await window.auth0ConfigReady;
             }
             
@@ -96,47 +99,84 @@
             const auth0Required = urlParams.get('auth0_required') === 'true';
             const autoLogin = urlParams.get('auto_login') === 'true';
             const returnTo = urlParams.get('returnTo');
+            const error = urlParams.get('error');
+            
+            console.log('📋 Login page parameters:', {
+                auth0Required,
+                autoLogin,
+                returnTo,
+                error,
+                auth0Configured: window.AUTH0_CONFIGURED
+            });
+            
+            // Show Auth0 error if present
+            if (error) {
+                console.error('❌ Auth0 error from callback:', error);
+                errorDiv.innerHTML = `
+                    <strong>Authentication Failed</strong><br>
+                    Error: ${error}<br><br>
+                    <small>Please try again or use traditional login.</small><br>
+                    <small>If this persists, check Auth0 Dashboard configuration.</small>
+                `;
+                errorDiv.style.display = 'block';
+            }
             
             // Note: returnTo is passed via appState to Auth0, which will be available
             // in callback.html after successful authentication
             
             // Only show and enable Auth0 button if it's configured
             if (window.AUTH0_CONFIGURED) {
+                console.log('✅ Auth0 is configured, showing login button');
                 auth0Button.style.display = 'block';
                 auth0Button.addEventListener('click', async () => {
                     try {
+                        console.log('🔑 Initiating Auth0 login...');
+                        // Clear any previous errors
+                        errorDiv.style.display = 'none';
+                        
                         // Pass returnTo as appState to Auth0
                         const options = {};
                         if (returnTo) {
                             options.appState = { returnTo };
+                            console.log('🎯 Will return to:', returnTo);
                         }
                         await Auth0Manager.login(options);
                     } catch (error) {
-                        console.error('Auth0 login error:', error);
-                        errorDiv.textContent = 'Failed to login with Auth0. Please try again or use traditional login.';
+                        console.error('❌ Auth0 login error:', error);
+                        errorDiv.innerHTML = `
+                            <strong>Failed to login with Auth0</strong><br>
+                            ${error.message || 'Unknown error'}<br><br>
+                            <small>Please try again or use traditional login.</small>
+                        `;
                         errorDiv.style.display = 'block';
                     }
                 });
                 
                 // Auto-trigger Auth0 login if requested
-                if (autoLogin) {
-                    console.log('Auto-triggering Auth0 login...');
+                if (autoLogin && !error) {
+                    console.log('🚀 Auto-triggering Auth0 login...');
                     setTimeout(async () => {
                         try {
                             // Pass returnTo as appState to Auth0
                             const options = {};
                             if (returnTo) {
                                 options.appState = { returnTo };
+                                console.log('🎯 Will return to:', returnTo);
                             }
                             await Auth0Manager.login(options);
                         } catch (error) {
-                            console.error('Auto Auth0 login error:', error);
-                            errorDiv.textContent = 'Failed to automatically login with Auth0. Please click the Auth0 login button or use traditional login.';
+                            console.error('❌ Auto Auth0 login error:', error);
+                            errorDiv.innerHTML = `
+                                <strong>Failed to automatically login with Auth0</strong><br>
+                                ${error.message || 'Unknown error'}<br><br>
+                                <small>Please click the Auth0 login button or use traditional login.</small>
+                            `;
                             errorDiv.style.display = 'block';
                         }
                     }, 500);
                 }
             } else {
+                console.warn('⚠️ Auth0 is not configured');
                 // Hide Auth0 button and divider if Auth0 is not configured
                 auth0Button.style.display = 'none';
                 if (divider) {
@@ -145,11 +185,16 @@
                 
                 // Show message if Auth0 was expected but not configured
                 if (auth0Required) {
-                    errorDiv.textContent = 'Auth0 authentication is not configured. Please use traditional login or contact the administrator to enable Auth0.';
+                    console.error('❌ Auth0 required but not configured');
+                    errorDiv.innerHTML = `
+                        <strong>Auth0 authentication is not configured.</strong><br>
+                        Please use traditional login or contact the administrator to enable Auth0.<br>
+                        <small>See AUTH0_SETUP_GUIDE.md for setup instructions.</small>
+                    `;
                     errorDiv.style.display = 'block';
                 }
                 
-                console.info('Auth0 login is not available. Please use traditional login.');
+                console.info('ℹ️ Auth0 login is not available. Please use traditional login.');
             }
         })();
     </script>
