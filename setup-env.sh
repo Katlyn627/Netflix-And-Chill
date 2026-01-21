@@ -92,9 +92,13 @@ if [ "$setup_auth0" = "y" ]; then
     update_env_value "AUTH0_CLIENT_ID" "$auth0_client_id"
     update_env_value "AUTH0_CLIENT_SECRET" "$auth0_client_secret"
     update_env_value "AUTH0_CALLBACK_URL" "http://localhost:${port}/callback.html"
-    update_env_value "AUTH0_AUDIENCE" "https://${auth0_domain}/api/v2/"
+    # Do not set AUTH0_AUDIENCE for SPAs - it causes "access_denied" errors
+    # update_env_value "AUTH0_AUDIENCE" "https://${auth0_domain}/api/v2/"
     
     echo "✅ Auth0 configured"
+    echo ""
+    echo "ℹ️  Note: AUTH0_AUDIENCE is intentionally not set for Single Page Applications"
+    echo "   Using Management API as audience causes authentication errors"
     echo ""
     echo "📝 Don't forget to configure in Auth0 Dashboard:"
     echo "   - Allowed Callback URLs: http://localhost:${port}/callback.html"
