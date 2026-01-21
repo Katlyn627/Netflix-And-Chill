@@ -12,6 +12,7 @@ class BottomNavigation {
         this.unreadMessagesCount = 0;
         this.unreadInvitationsCount = 0;
         this.notificationPollInterval = null;
+        this.profilePicture = null;
         this.init();
     }
 
@@ -30,8 +31,9 @@ class BottomNavigation {
         // Fetch notification counts (includes unread likes)
         if (this.userId) {
             await this.fetchNotificationCounts();
-            // Also get user premium status
+            // Also get user premium status and profile picture
             await this.fetchUserPremiumStatus();
+            await this.fetchProfilePicture();
         }
         this.render();
         this.attachEventListeners();
@@ -40,13 +42,44 @@ class BottomNavigation {
 
     async fetchUserPremiumStatus() {
         try {
-            const response = await fetch(`http://localhost:3000/api/users/${this.userId}`);
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/users/${this.userId}`);
             if (response.ok) {
                 const user = await response.json();
                 this.isPremium = user.isPremium || false;
             }
         } catch (error) {
             console.error('Error fetching user premium status:', error);
+        }
+    }
+
+    async fetchProfilePicture() {
+        try {
+            // Try to get from localStorage first for faster loading
+            const cachedPicture = localStorage.getItem('userProfilePicture');
+            if (cachedPicture) {
+                this.profilePicture = cachedPicture;
+                console.log('[BottomNav] Loaded profile picture from cache:', cachedPicture);
+            }
+            
+            // Then fetch fresh data from API
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/users/${this.userId}`);
+            if (response.ok) {
+                const user = await response.json();
+                if (user.profilePicture) {
+                    this.profilePicture = user.profilePicture;
+                    // Update cache
+                    localStorage.setItem('userProfilePicture', user.profilePicture);
+                    console.log('[BottomNav] Fetched and cached profile picture:', user.profilePicture);
+                    // Re-render if picture changed
+                    if (cachedPicture !== user.profilePicture) {
+                        this.updateProfileIcon(user.profilePicture);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('[BottomNav] Error fetching profile picture:', error);
         }
     }
 
@@ -137,6 +170,14 @@ class BottomNavigation {
     }
 
     render() {
+        // Create profile icon HTML based on whether user has a profile picture
+        let profileIconHtml;
+        if (this.profilePicture) {
+            profileIconHtml = `<div class="bottom-nav-icon bottom-nav-profile-icon"><img src="${this.profilePicture}" alt="Profile"></div>`;
+        } else {
+            profileIconHtml = `<div class="bottom-nav-icon">👤</div>`;
+        }
+        
         // Create bottom nav HTML
         const navHTML = `
             <nav class="bottom-nav">
@@ -146,7 +187,7 @@ class BottomNavigation {
                 </button>
                 
                 <a href="profile-view.html" class="bottom-nav-item ${this.currentPage === 'profile' ? 'active' : ''}" data-page="profile">
-                    <div class="bottom-nav-icon">👤</div>
+                    ${profileIconHtml}
                     <div class="bottom-nav-label">Profile</div>
                 </a>
                 
@@ -224,6 +265,27 @@ class BottomNavigation {
         this.unreadMessagesCount = unreadMessagesCount || 0;
         this.render();
         this.attachEventListeners(); // Re-attach event listeners after re-rendering
+    }
+
+    async updateProfileIcon(profilePictureUrl) {
+        console.log('[BottomNav] Updating profile icon:', profilePictureUrl);
+        this.profilePicture = profilePictureUrl;
+        
+        // Update cache
+        if (profilePictureUrl) {
+            localStorage.setItem('userProfilePicture', profilePictureUrl);
+        }
+        
+        // Update the profile icon in the DOM
+        const profileNavItem = document.querySelector('.bottom-nav-item[data-page="profile"]');
+        if (profileNavItem) {
+            const iconDiv = profileNavItem.querySelector('.bottom-nav-icon');
+            if (iconDiv && profilePictureUrl) {
+                iconDiv.classList.add('bottom-nav-profile-icon');
+                iconDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile">`;
+                console.log('[BottomNav] Profile icon updated in DOM');
+            }
+        }
     }
 
     destroy() {

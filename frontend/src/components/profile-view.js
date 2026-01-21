@@ -30,10 +30,23 @@ class ProfileView {
 
     async loadProfile() {
         try {
+            console.log('[ProfileView] Loading profile for userId:', this.userId);
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}`);
             if (!response.ok) throw new Error('Failed to load profile');
             
             this.userData = await response.json();
+            console.log('[ProfileView] Profile loaded successfully:', {
+                userId: this.userId,
+                hasProfilePicture: !!this.userData.profilePicture,
+                profilePicture: this.userData.profilePicture,
+                photoCount: this.userData.photoGallery?.length || 0
+            });
+            
+            // Cache profile picture for bottom nav
+            if (this.userData.profilePicture) {
+                localStorage.setItem('userProfilePicture', this.userData.profilePicture);
+            }
+            
             this.renderProfile();
         } catch (error) {
             console.error('Error loading profile:', error);
@@ -57,6 +70,12 @@ class ProfileView {
         document.getElementById('profile-gender').textContent = capitalize(user.gender);
         document.getElementById('profile-sexual-orientation').textContent = capitalize(user.sexualOrientation);
         document.getElementById('profile-bio').textContent = user.bio || 'No bio added yet.';
+        
+        // Update hero section
+        const profileUsernameHero = document.getElementById('profile-username-hero');
+        const profileAgeHero = document.getElementById('profile-age-hero');
+        if (profileUsernameHero) profileUsernameHero.textContent = user.username;
+        if (profileAgeHero) profileAgeHero.textContent = user.age || 'N/A';
 
         // User email in account settings
         document.getElementById('user-email').textContent = user.email || 'N/A';
@@ -96,11 +115,27 @@ class ProfileView {
         const user = this.userData;
         const profilePictureElement = document.getElementById('profile-picture');
         const noPhotoElement = document.getElementById('no-photo');
+        const profilePictureHeroElement = document.getElementById('profile-picture-hero');
+        const noPhotoHeroElement = document.getElementById('no-photo-hero');
+
+        console.log('[ProfileView] Rendering profile picture:', {
+            hasProfilePicture: !!user.profilePicture,
+            profilePicture: user.profilePicture,
+            hasFrame: !!(user.profileFrame && user.profileFrame.isActive)
+        });
 
         if (user.profilePicture) {
+            // Update main profile picture
             profilePictureElement.src = user.profilePicture;
             profilePictureElement.style.display = 'block';
             noPhotoElement.style.display = 'none';
+            
+            // Update hero section profile picture
+            if (profilePictureHeroElement && noPhotoHeroElement) {
+                profilePictureHeroElement.src = user.profilePicture;
+                profilePictureHeroElement.style.display = 'block';
+                noPhotoHeroElement.style.display = 'none';
+            }
 
             // Get the original container (the parent that should hold the profile picture or frame wrapper)
             let pictureContainer = profilePictureElement.parentElement;
@@ -147,6 +182,15 @@ class ProfileView {
                 // Insert the complete frame wrapper into the container
                 pictureContainer.appendChild(frameWrapper);
             }
+            
+            console.log('[ProfileView] Profile picture rendered successfully in main and hero sections');
+        } else {
+            // Update hero section to show no photo
+            if (profilePictureHeroElement && noPhotoHeroElement) {
+                profilePictureHeroElement.style.display = 'none';
+                noPhotoHeroElement.style.display = 'flex';
+            }
+            console.log('[ProfileView] No profile picture set, showing placeholder');
         }
     }
 
@@ -717,6 +761,7 @@ class ProfileView {
 
     async addPhoto(photoUrl) {
         try {
+            console.log('[ProfileView] Adding photo:', photoUrl);
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}/photos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -726,6 +771,11 @@ class ProfileView {
             if (!response.ok) throw new Error('Failed to add photo');
 
             this.userData = (await response.json()).user;
+            console.log('[ProfileView] Photo added successfully. User data updated:', {
+                userId: this.userId,
+                photoCount: this.userData.photos?.length || 0,
+                profilePicture: this.userData.profilePicture
+            });
             
             // If user has no profile picture yet, automatically set this as profile picture
             if (!this.userData.profilePicture) {
@@ -832,6 +882,11 @@ class ProfileView {
 
     async setAsProfilePicture(photoUrl) {
         try {
+            console.log('[ProfileView] Setting profile picture:', {
+                userId: this.userId,
+                photoUrl: photoUrl
+            });
+            
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}/profile-picture`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -841,6 +896,14 @@ class ProfileView {
             if (!response.ok) throw new Error('Failed to set profile picture');
 
             this.userData = (await response.json()).user;
+            
+            console.log('[ProfileView] Profile picture set successfully:', {
+                userId: this.userId,
+                profilePicture: this.userData.profilePicture
+            });
+            
+            // Store profile picture in localStorage for quick access
+            localStorage.setItem('userProfilePicture', this.userData.profilePicture);
             
             // Update the profile picture display in the header
             const profilePictureImg = document.getElementById('profile-picture');
@@ -856,6 +919,11 @@ class ProfileView {
             
             // Update navigation icon
             await updateNavProfileIcon(this.userId);
+            
+            // Update bottom navigation if it exists
+            if (window.bottomNav) {
+                await window.bottomNav.updateProfileIcon(this.userData.profilePicture);
+            }
             
             alert('Profile picture updated successfully!');
         } catch (error) {
