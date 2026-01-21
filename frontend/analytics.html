@@ -8,31 +8,22 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#E50914">
     <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/profile-bumble.css">
+    <link rel="stylesheet" href="src/styles/bottom-nav.css">
     <link rel="stylesheet" href="src/styles/analytics.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="nav-icons">
-                <div class="nav-left">
-                    <a href="matches.html" class="nav-icon-btn matches" title="Matches">❤️</a>
-                    <a href="chat.html" class="nav-icon-btn chat" title="Chat">💬</a>
-                    <a href="watch-together.html" class="nav-icon-btn watch" title="Watch Together">📺</a>
-                </div>
-                <div class="nav-right">
-                    <a href="homepage.html" class="nav-icon-btn home" title="Home">🏠</a>
-                    <a href="profile-view.html" class="nav-icon-btn profile" id="profile-nav-btn" title="My Profile">
-                        <span id="profile-nav-icon">👤</span>
-                    </a>
-                    <button type="button" class="nav-icon-btn logout" id="logout-btn" title="Logout" aria-label="Logout">🚪➡️</button>
-                </div>
+        <header class="swipe-header-bumble">
+            <div class="header-top">
+                <button class="icon-btn" id="back-btn" title="Back">
+                    <span class="icon">←</span>
+                </button>
+                <h1>📊 Analytics</h1>
+                <button class="icon-btn" id="settings-btn" title="Settings">
+                    <span class="icon">⚙️</span>
+                </button>
             </div>
-            <div class="logo-banner">
-                <a href="swipe.html">
-                    <img src="assets/images/logo.png" alt="Netflix & Chill Logo">
-                </a>
-            </div>
-            <p class="tagline">Your Swipe Analytics</p>
         </header>
 
         <main>
@@ -51,6 +42,7 @@
     <script src="src/utils/settings.js"></script>
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
+    <script src="src/components/bottom-nav.js"></script>
     <script src="src/components/swipeAnalytics.js"></script>
     <script>
         // Initialize analytics dashboard when page loads
@@ -63,6 +55,22 @@
             
             if (window.SwipeAnalyticsModule && typeof window.SwipeAnalyticsModule.renderAnalyticsDashboard === 'function') {
                 window.SwipeAnalyticsModule.renderAnalyticsDashboard('analytics-container', userId);
+            }
+
+            // Back button
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    window.location.href = 'swipe-history.html';
+                });
+            }
+
+            // Settings button
+            const settingsBtn = document.getElementById('settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    window.location.href = 'profile-view.html';
+                });
             }
         });
     </script>
