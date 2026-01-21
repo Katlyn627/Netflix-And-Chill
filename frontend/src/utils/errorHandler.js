@@ -22,11 +22,10 @@
     ];
     
     // Auth0 errors that are already handled by the application
+    // These are matched only when the error message starts with the Auth0 prefix
     const knownAuth0Errors = [
-        /Auth0 error from callback:/i,
-        /access_denied/i,
-        /unauthorized/i,
-        /login_required/i
+        /❌ Auth0 error from callback:/i,
+        /Error during authentication callback/i
     ];
 
     /**
@@ -46,9 +45,8 @@
      */
     function isHandledAuth0Error(message) {
         const messageStr = String(message);
-        // Only suppress if it contains both "Auth0" and one of the known error patterns
-        const hasAuth0Prefix = /Auth0/i.test(messageStr);
-        return hasAuth0Prefix && knownAuth0Errors.some(pattern => pattern.test(messageStr));
+        // Only match specific Auth0 error messages that are already displayed in the UI
+        return knownAuth0Errors.some(pattern => pattern.test(messageStr));
     }
 
     /**
