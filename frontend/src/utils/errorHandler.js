@@ -17,7 +17,15 @@
         /Host is not in insights whitelist/i,
         /hostName.*hostType/i,
         /content\.js:\d+/i,  // Common pattern for browser extension content scripts
-        /read\.js:\d+/i      // Common pattern for browser extension read scripts
+        /read\.js:\d+/i,     // Common pattern for browser extension read scripts
+        /installHook\.js/i   // Browser extension install hooks
+    ];
+    
+    // Auth0 errors that are already handled by the application
+    // These are matched only when the error message starts with the Auth0 prefix
+    const knownAuth0Errors = [
+        /❌ Auth0 error from callback:/i,
+        /Error during authentication callback/i
     ];
 
     /**
@@ -28,6 +36,17 @@
     function isKnownExtensionError(message) {
         const messageStr = String(message);
         return knownExtensionErrors.some(pattern => pattern.test(messageStr));
+    }
+    
+    /**
+     * Checks if an error message is an Auth0 error already handled by the app
+     * @param {string} message - The error message to check
+     * @returns {boolean} - True if the error is an Auth0 error already being handled
+     */
+    function isHandledAuth0Error(message) {
+        const messageStr = String(message);
+        // Only match specific Auth0 error messages that are already displayed in the UI
+        return knownAuth0Errors.some(pattern => pattern.test(messageStr));
     }
 
     /**
@@ -40,6 +59,14 @@
             // Optionally log to a debug console if needed
             if (window.debugMode) {
                 originalConsoleLog('[Suppressed Extension Error]:', ...args);
+            }
+            return;
+        }
+        
+        if (isHandledAuth0Error(errorMessage)) {
+            // Optionally log to a debug console if needed
+            if (window.debugMode) {
+                originalConsoleLog('[Suppressed Auth0 Error - Already Handled]:', ...args);
             }
             return;
         }
