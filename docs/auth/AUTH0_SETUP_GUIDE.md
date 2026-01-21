@@ -429,6 +429,22 @@ fetch('/api/users/me', {
 - Check that `update:current_user_metadata` scope is included
 - Ensure token has proper permissions
 
+### Issue: "invalid_request: No MFA factors enabled for enrollment"
+
+**Cause**: Auth0 is configured to require Multi-Factor Authentication (MFA), but no MFA factors are enabled in your Auth0 tenant.
+
+**Solution**: This is a **configuration issue in your Auth0 dashboard**. See the detailed guide:
+- [AUTH0_MFA_TROUBLESHOOTING.md](AUTH0_MFA_TROUBLESHOOTING.md) - Complete step-by-step guide
+
+**Quick Fix**:
+1. Go to [Auth0 Dashboard](https://manage.auth0.com/) > **Security** > **Multi-factor Auth**
+2. Either:
+   - Set "Require Multi-factor Auth" to **"Never"** (if you don't need MFA), OR
+   - Enable at least one MFA factor (OTP, SMS, Email)
+3. Go to **Authentication** > **Authentication Profile**
+4. Select "Identifier + Password" and click **Save** (this resets the profile)
+5. Try logging in again
+
 ---
 
 ## Security Best Practices

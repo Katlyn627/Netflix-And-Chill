@@ -63,6 +63,23 @@
     <script src="src/services/api.js"></script>
     
     <script>
+        // Constants for error handling timeouts
+        const MFA_ERROR_TIMEOUT = 8000; // 8 seconds for MFA errors (more time to read)
+        const STANDARD_ERROR_TIMEOUT = 3000; // 3 seconds for standard errors
+        
+        // MFA error keywords for detection
+        const MFA_ERROR_KEYWORDS = ['mfa', 'multi-factor', 'no mfa factors enabled'];
+        
+        /**
+         * Check if an error description is MFA-related
+         * @param {string} errorDescription - The error description from Auth0
+         * @returns {boolean} - True if this is an MFA-related error
+         */
+        function isMfaRelatedError(errorDescription) {
+            const lowerDescription = errorDescription.toLowerCase();
+            return MFA_ERROR_KEYWORDS.some(keyword => lowerDescription.includes(keyword));
+        }
+        
         // Handle Auth0 callback
         async function handleAuthCallback() {
             try {
@@ -169,25 +186,50 @@
                 const errorDescription = params.get('error_description') || 'Unknown error';
                 console.warn('⚠️ Auth0 returned an error:', error, errorDescription);
                 
+                // Check for MFA-specific errors
+                const isMfaError = isMfaRelatedError(errorDescription);
+                
                 // Show user-friendly error message
                 document.querySelector('.callback-message').textContent = 'Authentication Error';
-                document.getElementById('error-message').innerHTML = `
-                    <strong>Auth0 Error: ${error}</strong><br>
-                    ${errorDescription}<br><br>
-                    <small>Common solutions:</small><br>
-                    <small>• Check callback URL in Auth0 Dashboard matches: ${window.location.origin}/callback.html</small><br>
-                    <small>• Verify application type is "Single Page Application"</small><br>
-                    <small>• Check Allowed Web Origins includes: ${window.location.origin}</small><br>
-                    <small>• See console for detailed logs</small>
-                `;
+                
+                if (isMfaError) {
+                    // Special handling for MFA-related errors
+                    document.getElementById('error-message').innerHTML = `
+                        <strong>MFA Configuration Error</strong><br>
+                        ${errorDescription}<br><br>
+                        <strong>How to Fix This in Auth0 Dashboard:</strong><br>
+                        <small>1. Log in to <a href="https://manage.auth0.com" target="_blank">Auth0 Dashboard</a></small><br>
+                        <small>2. Go to <strong>Security > Multi-factor Auth</strong></small><br>
+                        <small>3. Either:</small><br>
+                        <small>&nbsp;&nbsp;• Set "Require Multi-factor Auth" to <strong>"Never"</strong> (if you don't need MFA), OR</small><br>
+                        <small>&nbsp;&nbsp;• Enable at least one MFA factor (SMS, OTP, etc.)</small><br>
+                        <small>4. Go to <strong>Authentication > Authentication Profile</strong></small><br>
+                        <small>5. Select "Identifier + Password" and click <strong>Save</strong></small><br>
+                        <small>6. Check <strong>Actions > Flows</strong> for any MFA-enforcing rules</small><br><br>
+                        <small>See <a href="docs/auth/AUTH0_SETUP_GUIDE.md#troubleshooting" target="_blank">AUTH0_SETUP_GUIDE.md</a> for more details.</small>
+                    `;
+                } else {
+                    // Standard error handling for other Auth0 errors
+                    document.getElementById('error-message').innerHTML = `
+                        <strong>Auth0 Error: ${error}</strong><br>
+                        ${errorDescription}<br><br>
+                        <small>Common solutions:</small><br>
+                        <small>• Check callback URL in Auth0 Dashboard matches: ${window.location.origin}/callback.html</small><br>
+                        <small>• Verify application type is "Single Page Application"</small><br>
+                        <small>• Check Allowed Web Origins includes: ${window.location.origin}</small><br>
+                        <small>• See console for detailed logs</small>
+                    `;
+                }
+                
                 document.getElementById('error-message').style.display = 'block';
                 document.querySelector('.spinner').style.display = 'none';
                 
-                // Redirect to login after 3 seconds
+                // Redirect to login after appropriate timeout
+                const redirectTimeout = isMfaError ? MFA_ERROR_TIMEOUT : STANDARD_ERROR_TIMEOUT;
                 setTimeout(() => {
                     console.log('🔄 Redirecting to login page...');
                     window.location.href = '/login.html?error=' + encodeURIComponent(error);
-                }, 3000);
+                }, redirectTimeout);
                 return;
             }
             
