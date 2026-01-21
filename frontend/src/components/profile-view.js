@@ -30,10 +30,23 @@ class ProfileView {
 
     async loadProfile() {
         try {
+            console.log('[ProfileView] Loading profile for userId:', this.userId);
             const response = await fetch(`${API_BASE_URL}/users/${this.userId}`);
             if (!response.ok) throw new Error('Failed to load profile');
             
             this.userData = await response.json();
+            console.log('[ProfileView] Profile loaded successfully:', {
+                userId: this.userId,
+                hasProfilePicture: !!this.userData.profilePicture,
+                profilePicture: this.userData.profilePicture,
+                photoCount: this.userData.photoGallery?.length || 0
+            });
+            
+            // Cache profile picture for bottom nav
+            if (this.userData.profilePicture) {
+                localStorage.setItem('userProfilePicture', this.userData.profilePicture);
+            }
+            
             this.renderProfile();
         } catch (error) {
             console.error('Error loading profile:', error);
@@ -97,6 +110,12 @@ class ProfileView {
         const profilePictureElement = document.getElementById('profile-picture');
         const noPhotoElement = document.getElementById('no-photo');
 
+        console.log('[ProfileView] Rendering profile picture:', {
+            hasProfilePicture: !!user.profilePicture,
+            profilePicture: user.profilePicture,
+            hasFrame: !!(user.profileFrame && user.profileFrame.isActive)
+        });
+
         if (user.profilePicture) {
             profilePictureElement.src = user.profilePicture;
             profilePictureElement.style.display = 'block';
@@ -147,6 +166,10 @@ class ProfileView {
                 // Insert the complete frame wrapper into the container
                 pictureContainer.appendChild(frameWrapper);
             }
+            
+            console.log('[ProfileView] Profile picture rendered successfully');
+        } else {
+            console.log('[ProfileView] No profile picture set, showing placeholder');
         }
     }
 
