@@ -112,12 +112,35 @@
             // Show Auth0 error if present
             if (error) {
                 console.error('❌ Auth0 error from callback:', error);
-                errorDiv.innerHTML = `
-                    <strong>Authentication Failed</strong><br>
-                    Error: ${error}<br><br>
-                    <small>Please try again or use traditional login.</small><br>
-                    <small>If this persists, check Auth0 Dashboard configuration.</small>
-                `;
+                
+                // Provide specific guidance based on error type
+                let errorMessage = '<strong>Authentication Failed</strong><br>';
+                let errorDetails = '';
+                
+                if (error === 'access_denied') {
+                    errorMessage += 'Error: Access Denied<br><br>';
+                    errorDetails = `
+                        <small><strong>Common causes:</strong></small><br>
+                        <small>• Callback URL mismatch in Auth0 Dashboard</small><br>
+                        <small>• Missing permissions or scopes</small><br>
+                        <small>• Application not enabled for this connection</small><br><br>
+                        <small><strong>To fix:</strong></small><br>
+                        <small>1. Check Auth0 Dashboard → Your App → Settings</small><br>
+                        <small>2. Verify "Allowed Callback URLs" includes: ${window.location.origin}/callback.html</small><br>
+                        <small>3. Verify "Allowed Web Origins" includes: ${window.location.origin}</small><br>
+                        <small>4. Ensure Application Type is "Single Page Application"</small><br><br>
+                        <small>See docs/auth/AUTH0_ERRORS_QUICK_FIX.md for more help.</small>
+                    `;
+                } else {
+                    errorMessage += `Error: ${error}<br><br>`;
+                    errorDetails = `
+                        <small>Please try again or use traditional login.</small><br>
+                        <small>If this persists, check Auth0 Dashboard configuration.</small><br>
+                        <small>See docs/auth/AUTH0_ERRORS_QUICK_FIX.md for troubleshooting.</small>
+                    `;
+                }
+                
+                errorDiv.innerHTML = errorMessage + errorDetails;
                 errorDiv.style.display = 'block';
             }
             
