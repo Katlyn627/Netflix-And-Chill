@@ -8,6 +8,7 @@ class LikedYouPage {
         this.userId = localStorage.getItem('currentUserId');
         this.isPremium = false;
         this.likes = [];
+        this.apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
         this.init();
     }
 
@@ -157,7 +158,7 @@ class LikedYouPage {
     async viewProfile(userId) {
         // Show modal with basic user info instead of navigating to profile-view.html
         try {
-            const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+            const response = await fetch(`${this.apiBaseUrl}/users/${userId}`);
             if (!response.ok) throw new Error('Failed to load user');
             
             const user = await response.json();
