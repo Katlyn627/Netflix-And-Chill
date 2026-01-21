@@ -24,3 +24,4 @@ out/
 package-lock.json
 yarn.lock
 frontend/test-frame-selector.html
+frontend/test-mfa-error-handling.html
