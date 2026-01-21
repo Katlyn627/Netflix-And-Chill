@@ -11,15 +11,15 @@ console.log('🧪 Testing Auth0 Configuration Fix\n');
 console.log('Test 1: Backend config warning for Management API audience');
 console.log('-------------------------------------------------------');
 
-// Temporarily set environment variable
+// Clear the require cache first for clean test state
+const configPath = require('path').join(__dirname, '../config/config.js');
+delete require.cache[require.resolve(configPath)];
+
+// Set environment variables after clearing cache
 process.env.AUTH0_DOMAIN = 'dev-test.us.auth0.com';
 process.env.AUTH0_CLIENT_ID = 'test_client_id';
 process.env.AUTH0_CLIENT_SECRET = 'test_client_secret';
 process.env.AUTH0_AUDIENCE = 'https://dev-test.us.auth0.com/api/v2/';
-
-// Clear the require cache to reload the config
-const configPath = require('path').join(__dirname, '../config/config.js');
-delete require.cache[require.resolve(configPath)];
 
 console.log('Loading backend config with AUTH0_AUDIENCE set to Management API...\n');
 

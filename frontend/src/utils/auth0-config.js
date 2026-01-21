@@ -253,7 +253,7 @@ async function updateUserMetadata(metadata) {
         console.warn('Please use the backend API to store user-specific data instead.');
         console.warn('Example: POST /api/users/:userId/metadata');
         
-        // For now, we'll just return the metadata as if it was saved
+        // Throw error to indicate this function is not implemented
         // In a real implementation, you would call your backend API
         throw new Error('updateUserMetadata is not implemented. Use backend API endpoints to store user data.');
     } catch (error) {
