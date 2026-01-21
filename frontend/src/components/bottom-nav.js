@@ -42,7 +42,8 @@ class BottomNavigation {
 
     async fetchUserPremiumStatus() {
         try {
-            const response = await fetch(`http://localhost:3000/api/users/${this.userId}`);
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/users/${this.userId}`);
             if (response.ok) {
                 const user = await response.json();
                 this.isPremium = user.isPremium || false;
@@ -62,7 +63,8 @@ class BottomNavigation {
             }
             
             // Then fetch fresh data from API
-            const response = await fetch(`http://localhost:3000/api/users/${this.userId}`);
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${apiBaseUrl}/users/${this.userId}`);
             if (response.ok) {
                 const user = await response.json();
                 if (user.profilePicture) {
@@ -171,7 +173,7 @@ class BottomNavigation {
         // Create profile icon HTML based on whether user has a profile picture
         let profileIconHtml;
         if (this.profilePicture) {
-            profileIconHtml = `<div class="bottom-nav-icon bottom-nav-profile-icon"><img src="${this.profilePicture}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>`;
+            profileIconHtml = `<div class="bottom-nav-icon bottom-nav-profile-icon"><img src="${this.profilePicture}" alt="Profile"></div>`;
         } else {
             profileIconHtml = `<div class="bottom-nav-icon">👤</div>`;
         }
@@ -280,7 +282,7 @@ class BottomNavigation {
             const iconDiv = profileNavItem.querySelector('.bottom-nav-icon');
             if (iconDiv && profilePictureUrl) {
                 iconDiv.classList.add('bottom-nav-profile-icon');
-                iconDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                iconDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile">`;
                 console.log('[BottomNav] Profile icon updated in DOM');
             }
         }
