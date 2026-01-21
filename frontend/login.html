@@ -111,7 +111,7 @@
             
             // Show Auth0 error if present
             if (error) {
-                console.error('❌ Auth0 error from callback:', error);
+                console.warn('⚠️ Auth0 error from callback:', error);
                 errorDiv.innerHTML = `
                     <strong>Authentication Failed</strong><br>
                     Error: ${error}<br><br>
@@ -142,7 +142,7 @@
                         }
                         await Auth0Manager.login(options);
                     } catch (error) {
-                        console.error('❌ Auth0 login error:', error);
+                        console.warn('⚠️ Auth0 login error:', error);
                         errorDiv.innerHTML = `
                             <strong>Failed to login with Auth0</strong><br>
                             ${error.message || 'Unknown error'}<br><br>
@@ -165,7 +165,7 @@
                             }
                             await Auth0Manager.login(options);
                         } catch (error) {
-                            console.error('❌ Auto Auth0 login error:', error);
+                            console.warn('⚠️ Auto Auth0 login error:', error);
                             errorDiv.innerHTML = `
                                 <strong>Failed to automatically login with Auth0</strong><br>
                                 ${error.message || 'Unknown error'}<br><br>
@@ -185,7 +185,7 @@
                 
                 // Show message if Auth0 was expected but not configured
                 if (auth0Required) {
-                    console.error('❌ Auth0 required but not configured');
+                    console.warn('⚠️ Auth0 required but not configured');
                     errorDiv.innerHTML = `
                         <strong>Auth0 authentication is not configured.</strong><br>
                         Please use traditional login or contact the administrator to enable Auth0.<br>

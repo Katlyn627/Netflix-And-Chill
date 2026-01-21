@@ -167,7 +167,7 @@
             if (params.has('error')) {
                 const error = params.get('error');
                 const errorDescription = params.get('error_description') || 'Unknown error';
-                console.error('❌ Auth0 returned an error:', error, errorDescription);
+                console.warn('⚠️ Auth0 returned an error:', error, errorDescription);
                 
                 // Show user-friendly error message
                 document.querySelector('.callback-message').textContent = 'Authentication Error';
