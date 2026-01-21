@@ -63,6 +63,23 @@
     <script src="src/services/api.js"></script>
     
     <script>
+        // Constants for error handling timeouts
+        const MFA_ERROR_TIMEOUT = 8000; // 8 seconds for MFA errors (more time to read)
+        const STANDARD_ERROR_TIMEOUT = 3000; // 3 seconds for standard errors
+        
+        // MFA error keywords for detection
+        const MFA_ERROR_KEYWORDS = ['mfa', 'multi-factor', 'no mfa factors enabled'];
+        
+        /**
+         * Check if an error description is MFA-related
+         * @param {string} errorDescription - The error description from Auth0
+         * @returns {boolean} - True if this is an MFA-related error
+         */
+        function isMfaRelatedError(errorDescription) {
+            const lowerDescription = errorDescription.toLowerCase();
+            return MFA_ERROR_KEYWORDS.some(keyword => lowerDescription.includes(keyword));
+        }
+        
         // Handle Auth0 callback
         async function handleAuthCallback() {
             try {
@@ -170,9 +187,7 @@
                 console.warn('⚠️ Auth0 returned an error:', error, errorDescription);
                 
                 // Check for MFA-specific errors
-                const isMfaError = errorDescription.toLowerCase().includes('mfa') || 
-                                   errorDescription.toLowerCase().includes('multi-factor') ||
-                                   errorDescription.toLowerCase().includes('no mfa factors enabled');
+                const isMfaError = isMfaRelatedError(errorDescription);
                 
                 // Show user-friendly error message
                 document.querySelector('.callback-message').textContent = 'Authentication Error';
@@ -209,11 +224,12 @@
                 document.getElementById('error-message').style.display = 'block';
                 document.querySelector('.spinner').style.display = 'none';
                 
-                // Redirect to login after 5 seconds (longer for MFA errors so users can read the instructions)
+                // Redirect to login after appropriate timeout
+                const redirectTimeout = isMfaError ? MFA_ERROR_TIMEOUT : STANDARD_ERROR_TIMEOUT;
                 setTimeout(() => {
                     console.log('🔄 Redirecting to login page...');
                     window.location.href = '/login.html?error=' + encodeURIComponent(error);
-                }, isMfaError ? 8000 : 3000);
+                }, redirectTimeout);
                 return;
             }
             
