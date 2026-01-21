@@ -128,8 +128,11 @@ cp .env.example .env
 - **Database** (Optional): MongoDB, PostgreSQL, or use file-based storage (default)
 - **Authentication** (Optional): Firebase or Auth0 for user authentication
 - **Chat Service** (Optional): SendBird, Twilio, or Stream for real-time messaging
+- **Streaming OAuth** (Optional): Netflix, Hulu, Disney+, Prime Video, HBO Max, Apple TV+ API access
 
 📖 **For detailed setup instructions, see [API_KEYS_GUIDE.md](docs/guides/API_KEYS_GUIDE.md)**
+
+🔐 **For OAuth credentials for streaming services, see [OBTAINING_STREAMING_OAUTH_CREDENTIALS.md](docs/guides/OBTAINING_STREAMING_OAUTH_CREDENTIALS.md)**
 
 ⚠️ **Auth0 SSL Error Fix**: If you get `ERR_SSL_PROTOCOL_ERROR` when logging in with Auth0:
 - Use the `./setup-auth0.sh` script to configure Auth0 correctly
