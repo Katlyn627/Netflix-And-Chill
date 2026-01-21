@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Like = require('../models/Like');
+const User = require('../models/User');
 const { getDatabase } = require('../utils/database');
+const MatchingEngine = require('../utils/matchingEngine');
 
 /**
  * POST /api/likes
@@ -140,7 +142,7 @@ router.get('/:userId/received', async (req, res) => {
 
 /**
  * GET /api/likes/:userId/mutual
- * Get mutual likes (matches)
+ * Get mutual likes (matches) with compatibility scores
  */
 router.get('/:userId/mutual', async (req, res) => {
   try {
@@ -154,10 +156,49 @@ router.get('/:userId/mutual', async (req, res) => {
 
     const mutualLikes = await dataStore.findMutualLikes(userId);
 
+    // Enrich mutual likes with match scores calculated from all user data
+    const enrichedMutualLikes = await Promise.all(
+      mutualLikes.map(async (mutualLike) => {
+        try {
+          const otherUser = await dataStore.findUserById(mutualLike.userId);
+          if (!otherUser) {
+            return null;
+          }
+
+          // Calculate match score using the MatchingEngine
+          const currentUser = new User(user);
+          const matchedUser = new User(otherUser);
+          const matchResult = MatchingEngine.calculateMatch(currentUser, matchedUser);
+
+          return {
+            fromUserId: userId,
+            toUserId: mutualLike.userId,
+            matched: true,
+            matchScore: matchResult.score,
+            matchDescription: matchResult.matchDescription,
+            sharedContent: matchResult.sharedContent,
+            quizCompatibility: matchResult.quizCompatibility || 0,
+            snackCompatibility: matchResult.snackCompatibility || 0,
+            debateCompatibility: matchResult.debateCompatibility || 0,
+            emotionalToneCompatibility: matchResult.emotionalToneCompatibility || 0,
+            bingeCompatibility: matchResult.bingeCompatibility || 0,
+            swipeGenreCompatibility: matchResult.swipeGenreCompatibility || 0,
+            contentTypeCompatibility: matchResult.contentTypeCompatibility || 0
+          };
+        } catch (error) {
+          console.error('Error calculating match score for mutual like:', error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out any null entries
+    const validMutualLikes = enrichedMutualLikes.filter(m => m !== null);
+
     res.json({
       userId,
-      count: mutualLikes.length,
-      mutualLikes
+      count: validMutualLikes.length,
+      mutualLikes: validMutualLikes
     });
   } catch (error) {
     console.error('Error getting mutual likes:', error);
