@@ -19,11 +19,11 @@ class DatabaseFactory {
         } catch (error) {
           console.error('\n❌ Failed to connect to MongoDB:\n');
           console.error(error.message);
-          console.error('\n💡 Tip: You can use the file-based database instead by:');
-          console.error('   - Removing DB_TYPE from your .env file, OR');
-          console.error('   - Setting DB_TYPE=file in your .env file, OR');
-          console.error('   - Running the seeder without DB_TYPE: npm run seed\n');
-          throw error;
+          console.error('\n⚠️  Falling back to file-based database.');
+          console.error('   Data will NOT be saved to MongoDB until the connection is fixed.');
+          console.error('   To use MongoDB, fix the connection issue above and restart.');
+          console.error('   To suppress this warning, set DB_TYPE=file in your .env file.\n');
+          return new DataStore();
         }
 
       case 'postgresql':

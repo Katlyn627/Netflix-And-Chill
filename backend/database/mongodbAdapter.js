@@ -52,25 +52,11 @@ class MongoDBAdapter {
       if (error.message.includes('MongoDB connection string is not properly configured')) {
         // Re-throw our custom validation error as-is
         throw error;
-      } else if (error.code === 'ENOTFOUND' || error.syscall === 'querySrv') {
+      } else if (error.code === 'ENOTFOUND' || error.syscall === 'querySrv' || error.code === 'ECONNREFUSED') {
         // Redact credentials from URI for security
         const safeUri = this._redactCredentials(uri);
-        throw new Error(
-          'Unable to connect to MongoDB Atlas.\n\n' +
-          'This error usually means:\n' +
-          '1. Your MONGODB_URI connection string contains placeholder values\n' +
-          '2. Your MongoDB cluster URL is incorrect\n' +
-          '3. Your internet connection is not working\n\n' +
-          'Current MONGODB_URI (credentials redacted): ' + safeUri + '\n\n' +
-          'Please check your .env file and ensure:\n' +
-          '- You have replaced placeholder values with real credentials\n' +
-          '- Your MongoDB Atlas cluster is active\n' +
-          '- You have internet connectivity\n\n' +
-          'See MONGODB_CONNECTION_SETUP.md for detailed setup instructions.\n\n' +
-          'Original error: ' + error.message
-        );
-      } else if (error.message.includes('ECONNREFUSED')) {
-        if (uri && (uri.includes('localhost') || uri.includes('127.0.0.1'))) {
+        const isLocal = uri && (uri.includes('localhost') || uri.includes('127.0.0.1'));
+        if (isLocal) {
           throw new Error(
             'Unable to connect to local MongoDB server.\n\n' +
             'This error means MongoDB is not running on localhost:27017.\n\n' +
@@ -87,8 +73,21 @@ class MongoDBAdapter {
             'Original error: ' + error.message
           );
         }
-        // If not localhost, re-throw the original error
-        throw error;
+        throw new Error(
+          'Unable to connect to MongoDB Atlas.\n\n' +
+          'This error usually means:\n' +
+          '1. Your MONGODB_URI connection string contains placeholder values\n' +
+          '2. Your MongoDB cluster URL is incorrect or the cluster is paused/inactive\n' +
+          '3. Your internet connection is not working\n\n' +
+          'Current MONGODB_URI (credentials redacted): ' + safeUri + '\n\n' +
+          'Please check your .env file and ensure:\n' +
+          '- You have replaced placeholder values with real credentials\n' +
+          '- Your MongoDB Atlas cluster is active (not paused)\n' +
+          '- Your IP address is whitelisted in MongoDB Atlas Network Access\n' +
+          '- You have internet connectivity\n\n' +
+          'See MONGODB_CONNECTION_SETUP.md for detailed setup instructions.\n\n' +
+          'Original error: ' + error.message
+        );
       } else {
         console.error('MongoDB connection error:', error);
         throw error;
