@@ -43,7 +43,6 @@
     <script src="src/services/api.js"></script>
     <script src="src/utils/navigation.js"></script>
     <script src="src/components/bottom-nav.js"></script>
-    <script src="src/components/swipeAnalytics.js"></script>
     <script>
         // Initialize analytics dashboard when page loads
         document.addEventListener('DOMContentLoaded', () => {
@@ -52,16 +51,12 @@
                 window.location.href = 'login.html';
                 return;
             }
-            
-            if (window.SwipeAnalyticsModule && typeof window.SwipeAnalyticsModule.renderAnalyticsDashboard === 'function') {
-                window.SwipeAnalyticsModule.renderAnalyticsDashboard('analytics-container', userId);
-            }
 
             // Back button
             const backBtn = document.getElementById('back-btn');
             if (backBtn) {
                 backBtn.addEventListener('click', () => {
-                    window.location.href = 'swipe-history.html';
+                    window.location.href = 'movie-dna.html';
                 });
             }
 

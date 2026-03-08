@@ -15,8 +15,8 @@
         // Check if user is logged in
         const userId = localStorage.getItem('currentUserId');
         if (userId) {
-            // Logged in - go to swipe page (main interface)
-            window.location.href = 'swipe.html' + params;
+            // Logged in - go to Movie DNA page (main interface)
+            window.location.href = 'movie-dna.html' + params;
         } else {
             // Not logged in - go to splash/onboarding
             window.location.href = 'splash.html' + params;

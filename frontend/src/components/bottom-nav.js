@@ -20,11 +20,11 @@ class BottomNavigation {
         const path = window.location.pathname;
         if (path.includes('profile')) return 'profile';
         if (path.includes('discover')) return 'discover';
-        if (path.includes('swipe')) return 'swipe';
+        if (path.includes('movie-dna')) return 'movie-dna';
         if (path.includes('liked-you')) return 'liked-you';
         if (path.includes('chat')) return 'chats';
         if (path.includes('watch-together')) return 'watch-together';
-        return 'swipe'; // default
+        return 'movie-dna'; // default
     }
 
     async init() {
@@ -196,9 +196,9 @@ class BottomNavigation {
                     <div class="bottom-nav-label">Discover</div>
                 </a>
                 
-                <a href="swipe.html" class="bottom-nav-item center ${this.currentPage === 'swipe' ? 'active' : ''}" data-page="swipe">
-                    <div class="bottom-nav-icon">🎬</div>
-                    <div class="bottom-nav-label">Swipe</div>
+                <a href="movie-dna.html" class="bottom-nav-item center ${this.currentPage === 'movie-dna' ? 'active' : ''}" data-page="movie-dna">
+                    <div class="bottom-nav-icon">🧬</div>
+                    <div class="bottom-nav-label">DNA</div>
                 </a>
                 
                 <a href="liked-you.html" class="bottom-nav-item ${this.currentPage === 'liked-you' ? 'active' : ''}" data-page="liked-you">
@@ -249,7 +249,6 @@ class BottomNavigation {
                     // Clear all user-related data from localStorage
                     localStorage.removeItem('currentUserId');
                     localStorage.removeItem('profileCreated');
-                    localStorage.removeItem('initialSwipeComplete');
                     localStorage.removeItem('debateResponses');
                     localStorage.removeItem('promptResponses');
                     // Clear any other session-specific data

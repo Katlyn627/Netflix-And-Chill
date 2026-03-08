@@ -11,7 +11,6 @@ const likeRoutes = require('./routes/likes');
 const streamingRoutes = require('./routes/streaming');
 const uploadRoutes = require('./routes/uploads');
 const chatRoutes = require('./routes/chat');
-const swipeRoutes = require('./routes/swipe');
 const watchInvitationRoutes = require('./routes/watchInvitations');
 const authRoutes = require('./routes/auth');
 const configRoutes = require('./routes/config');
@@ -120,7 +119,6 @@ app.use('/api/likes', likeRoutes);
 app.use('/api/streaming', streamingRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/swipe', swipeRoutes);
 app.use('/api/watch-invitations', watchInvitationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/custom-social', customSocialAuthRoutes);
@@ -142,11 +140,15 @@ app.get('/api', (req, res) => {
   res.json({
     name: 'Netflix and Chill API',
     version: '1.0.0',
-    description: 'Dating app that matches users based on their streaming preferences',
+    description: 'Dating app powered by Movie DNA — matches users based on emotional storytelling compatibility',
     endpoints: {
       users: '/api/users',
       matches: '/api/matches',
       movieDNA: '/api/movie-dna',
+      dnaProfile: '/api/movie-dna/profile/:userId',
+      buildDNA: '/api/movie-dna/build/:userId',
+      dnaTypes: '/api/movie-dna/types',
+      dnaDimensions: '/api/movie-dna/dimensions',
       challenges: '/api/movie-dna/challenges',
       directors: '/api/movie-dna/directors',
       archetypes: '/api/movie-dna/archetypes',

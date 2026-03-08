@@ -43,12 +43,6 @@ router.delete('/:userId/photos', userController.removePhotoFromGallery.bind(user
 // Update extended profile details
 router.put('/:userId/profile-details', userController.updateProfileDetails.bind(userController));
 
-// Submit quiz responses
-router.put('/:userId/quiz', userController.submitQuizResponses.bind(userController));
-
-// Get quiz attempts
-router.get('/:userId/quiz/attempts', userController.getQuizAttempts.bind(userController));
-
 // Update password
 router.put('/:userId/password', userController.updatePassword.bind(userController));
 
@@ -70,10 +64,6 @@ router.delete('/:userId/favorite-tv-shows/:tvShowId', userController.removeFavor
 // Delete user profile
 router.delete('/:userId', userController.deleteUser.bind(userController));
 
-// Adaptive Quiz routes
-router.get('/quiz/adaptive', userController.getAdaptiveQuiz.bind(userController));
-router.get('/quiz/options', userController.getQuizOptions.bind(userController));
-
 // Compatibility Report routes
 router.get('/:userId/compatibility/report', userController.getCompatibilityReport.bind(userController));
 router.post('/compatibility/group', userController.getGroupCompatibilityReport.bind(userController));
@@ -81,10 +71,6 @@ router.post('/compatibility/group', userController.getGroupCompatibilityReport.b
 // Archetype Recommendations routes
 router.get('/:userId/recommendations/archetype', userController.getArchetypeRecommendations.bind(userController));
 router.get('/:userId/recommendations/mood', userController.getMoodBasedRecommendations.bind(userController));
-
-// Quiz Feedback routes
-router.post('/:userId/quiz/feedback', userController.submitQuizFeedback.bind(userController));
-router.post('/:userId/quiz/question-feedback', userController.submitQuestionFeedback.bind(userController));
 
 // Profile Frame routes
 router.get('/:userId/profile-frames', userController.getAvailableFrames.bind(userController));
