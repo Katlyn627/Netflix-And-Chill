@@ -1397,10 +1397,10 @@ document.addEventListener('visibilitychange', async () => {
     }
 });
 
-// Discover button functionality - routes to swipe page
+// Discover button functionality - routes to Movie DNA page
 const discoverBtn = document.getElementById('discover-btn');
 if (discoverBtn) {
     discoverBtn.addEventListener('click', () => {
-        window.location.href = 'swipe.html';
+        window.location.href = 'movie-dna.html';
     });
 }

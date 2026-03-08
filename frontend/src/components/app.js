@@ -319,10 +319,10 @@ document.getElementById('preferences-form').addEventListener('submit', async (e)
         // Save user ID to localStorage for match page
         localStorage.setItem('currentUserId', currentUserId);
         
-        // Navigate directly to swipe page, skipping movie preferences
+        // Navigate to Movie DNA page
         // Delay allows the success message to be visible to the user
         setTimeout(() => {
-            window.location.href = 'swipe.html';
+            window.location.href = 'movie-dna.html';
         }, 1000); // 1 second delay
     } catch (error) {
         showMessage('Error saving preferences: ' + error.message, true);
@@ -358,9 +358,9 @@ if (moviePreferencesForm) {
                 videoChatPreference: videoChatPreference
             });
             showMessage('Movie preferences saved!');
-            // Navigate to dedicated swipe page
+            // Navigate to Movie DNA page
             setTimeout(() => {
-                window.location.href = 'swipe.html';
+                window.location.href = 'movie-dna.html';
             }, 1000);
         } catch (error) {
             showMessage('Error saving movie preferences: ' + error.message, true);
@@ -372,19 +372,18 @@ if (moviePreferencesForm) {
 const skipMoviePrefsBtn = document.getElementById('skip-movie-prefs-btn');
 if (skipMoviePrefsBtn) {
     skipMoviePrefsBtn.addEventListener('click', () => {
-        // Navigate to dedicated swipe page
-        window.location.href = 'swipe.html';
+        // Navigate to Movie DNA page
+        window.location.href = 'movie-dna.html';
     });
 }
 
-// Skip swipe button - continue to matches
+// Skip to DNA button - continue to Movie DNA
 const skipSwipeBtn = document.getElementById('skip-swipe-btn');
 if (skipSwipeBtn) {
     skipSwipeBtn.addEventListener('click', () => {
-        // Mark profile as created and navigate to homepage
+        // Mark profile as created and navigate to Movie DNA
         localStorage.setItem('profileCreated', 'true');
-        localStorage.setItem('initialSwipeComplete', 'true');
-        window.location.href = 'homepage.html';
+        window.location.href = 'movie-dna.html';
     });
 }
 
