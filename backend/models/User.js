@@ -64,10 +64,63 @@ class User {
     this.boostExpiresAt = data.boostExpiresAt || null; // When boost expires
     this.boostHistory = data.boostHistory || []; // Array of boost timestamps
     this.createdAt = data.createdAt || new Date().toISOString();
-    
+
     // Streaming Platform OAuth Tokens
-    // Stores OAuth access tokens and metadata for connected streaming platforms
-    this.streamingOAuthTokens = data.streamingOAuthTokens || {}; // {provider: {accessToken, refreshToken, expiresAt, connectedAt}}
+    this.streamingOAuthTokens = data.streamingOAuthTokens || {};
+
+    // ============================================================
+    // MOVIE DNA FEATURES (Feature 1 — Movie DNA Personality Matching)
+    // Stores the full computed DNA profile for this user.
+    // Built by backend/utils/movieDNA.js::buildMovieDNA()
+    // ============================================================
+    this.movieDNA = data.movieDNA || null;
+
+    // Feature 1 inputs — explicit user selections (dimensions)
+    // emotionalTone: array of tone IDs  e.g. ['dark', 'romantic']
+    // eraPreference: array of era IDs   e.g. ['nineties', 'indie']
+    // storyArchetypes: array of archetype IDs e.g. ['enemiesToLovers', 'tragicRomance']
+    // characterArchetypes: array e.g. ['antihero', 'trickster']
+    if (!this.movieDNA) {
+      this.movieDNA = {
+        personalityType: data.dnaPersonalityType || null,
+        dimensions: {
+          emotionalTone: data.emotionalTone
+            ? { dominant: Array.isArray(data.emotionalTone) ? data.emotionalTone[0] : data.emotionalTone }
+            : null,
+          eraPreference: data.eraPreference || null,
+          storyArchetypes: data.storyArchetypes || [],
+          characterArchetypes: data.characterArchetypes || [],
+          favoriteGenres: data.preferences?.genres || []
+        }
+      };
+    }
+
+    // Feature 8 — explicit story archetype preferences (top-level for quick access)
+    this.storyArchetypes = data.storyArchetypes || this.movieDNA?.dimensions?.storyArchetypes || [];
+
+    // Feature 9 — Director Compatibility
+    // Array of director name strings from FEATURED_DIRECTORS
+    this.favoriteDirectors = data.favoriteDirectors || [];
+
+    // Feature 4 — Scene That Made Me Cry
+    // { scene: string, movieThatChangedMe: string, villainTheyAgreeWith: string }
+    this.sceneThatMadeMeCry = data.sceneThatMadeMeCry || null;
+
+    // Feature 5 — Movie Mood Matching
+    // Current mood ID from MOVIE_MOODS: 'romCom', 'philosophical', 'horror', etc.
+    this.movieMood = data.movieMood || null;
+
+    // Feature 6 — Cinema Date Finder
+    // { city: string, upcomingMovies: [{title, theater, date, seats}] }
+    this.cinemaDates = data.cinemaDates || null;
+
+    // Feature 7 — Red Flag Movies
+    // Array of movie title strings the user refuses to date someone who loves
+    this.redFlagMovies = data.redFlagMovies || [];
+
+    // Feature 10 — Relationship Genre (last computed prediction)
+    // { id, name, emoji, description } from RELATIONSHIP_GENRES
+    this.relationshipGenre = data.relationshipGenre || null;
   }
 
   generateId() {
