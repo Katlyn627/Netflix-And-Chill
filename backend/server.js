@@ -17,6 +17,7 @@ const authRoutes = require('./routes/auth');
 const configRoutes = require('./routes/config');
 const customSocialAuthRoutes = require('./routes/customSocialAuth');
 const archetypeRoutes = require('./routes/archetypes');
+const movieDNARoutes = require('./routes/movieDNA');
 const { validateRapidApiKey } = require('./middleware/rapidApiAuth');
 
 const app = express();
@@ -124,6 +125,7 @@ app.use('/api/watch-invitations', watchInvitationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/custom-social', customSocialAuthRoutes);
 app.use('/api/archetypes', archetypeRoutes);
+app.use('/api/movie-dna', movieDNARoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -143,7 +145,13 @@ app.get('/api', (req, res) => {
     description: 'Dating app that matches users based on their streaming preferences',
     endpoints: {
       users: '/api/users',
-      matches: '/api/matches'
+      matches: '/api/matches',
+      movieDNA: '/api/movie-dna',
+      challenges: '/api/movie-dna/challenges',
+      directors: '/api/movie-dna/directors',
+      archetypes: '/api/movie-dna/archetypes',
+      loveStory: '/api/movie-dna/love-story/:userId1/:userId2',
+      relationshipGenre: '/api/movie-dna/relationship-genre/:userId1/:userId2'
     }
   });
 });
