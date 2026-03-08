@@ -178,18 +178,29 @@ function createMatchCard(match, index) {
     const location = escapeHtml(match.user.location || 'Not specified');
     const age = match.user.age || 'N/A';
     const matchScore = Math.round(match.matchScore);
-    
+
     // Get unread message count for this user
     const unreadCount = unreadMessageCounts[match.user.id] || 0;
     const hasUnreadMessages = unreadCount > 0;
-    
+
     // Add archetype badge if available
-    const archetypeBadge = match.user.archetype 
+    const archetypeBadge = match.user.archetype
         ? `<div class="archetype-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; margin: 8px 0; display: inline-block; font-weight: bold;">
             ⭐ ${escapeHtml(match.user.archetype.name)}
            </div>`
         : '';
-    
+
+    // Relationship genre badge from the emotional storytelling algorithm
+    const rg = match.relationshipGenre;
+    const relationshipGenreBadge = rg
+        ? `<div class="relationship-genre-badge" style="background: linear-gradient(135deg, #E50914 0%, #b20710 100%); color: white; padding: 7px 14px; border-radius: 15px; font-size: 0.85em; margin: 6px 0; display: inline-block; font-weight: bold;">
+            ${escapeHtml(rg.emoji || '')} ${escapeHtml(rg.name)}
+           </div>`
+        : '';
+
+    // DNA compatibility score from breakdown
+    const dnaPoints = match.breakdown?.movieDNA?.points ?? null;
+
     return `
         <div class="carousel-card ${index === 0 ? 'active' : ''} ${hasUnreadMessages ? 'has-unread-messages' : ''}" data-index="${index}">
             <div class="match-image-container" onclick="showMatchDetails(${index})">
@@ -208,12 +219,13 @@ function createMatchCard(match, index) {
                 <h3 class="match-username">${username}, ${age}</h3>
                 <p class="match-location">📍 ${location}</p>
                 ${archetypeBadge}
+                ${relationshipGenreBadge}
                 <p class="match-bio">${bio.length > 100 ? bio.substring(0, 100) + '...' : bio}</p>
                 <div class="match-stats-preview">
                     <div class="stat-item">
-                        <span class="stat-icon">🎬</span>
-                        <span class="stat-value">${match.sharedContent ? match.sharedContent.length : 0}</span>
-                        <span class="stat-label">Shared</span>
+                        <span class="stat-icon">🧬</span>
+                        <span class="stat-value">${dnaPoints !== null ? dnaPoints : '—'}</span>
+                        <span class="stat-label">DNA pts</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-icon">📺</span>
@@ -405,7 +417,7 @@ function showMatchDetails(index) {
     `;
     
     // Add archetype section if available
-    const archetypeHtml = match.user.archetype 
+    const archetypeHtml = match.user.archetype
         ? `<div class="detail-section archetype-section">
             <h4>⭐ Movie Personality</h4>
             <div class="archetype-display" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
@@ -414,6 +426,77 @@ function showMatchDetails(index) {
                 ${match.user.archetype.strength ? `<p style="margin: 8px 0 0 0; font-size: 0.85em; opacity: 0.9;">Strength: ${Math.round(match.user.archetype.strength)}%</p>` : ''}
             </div>
             ${match.user.personalityBio ? `<p style="font-style: italic; margin: 12px 0 0 0; padding: 12px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 5px;">${escapeHtml(match.user.personalityBio)}</p>` : ''}
+           </div>`
+        : '';
+
+    // Relationship genre (emotional storytelling result)
+    const rg = match.relationshipGenre;
+    const relationshipGenreHtml = rg
+        ? `<div class="detail-section" style="background: linear-gradient(135deg, #1a0a2e 0%, #0d1b2a 100%); border-radius: 10px; padding: 18px; color: white; margin-top: 14px;">
+            <h4 style="color: white; margin-bottom: 10px;">🎭 Your Relationship Genre</h4>
+            <div style="font-size: 2em; margin-bottom: 6px;">${escapeHtml(rg.emoji || '')}</div>
+            <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 8px;">${escapeHtml(rg.name)}</div>
+            <p style="font-size: 0.9em; opacity: 0.85; margin: 0;">${escapeHtml(rg.description)}</p>
+           </div>`
+        : '';
+
+    // Love story movie
+    const ls = match.loveStory;
+    const loveStoryHtml = ls && ls.title
+        ? `<div class="detail-section" style="margin-top: 14px; padding: 16px; border: 2px solid #E50914; border-radius: 10px;">
+            <h4>🎬 Your Love Story Movie</h4>
+            <div style="margin-top: 8px;">
+                <div style="font-weight: bold; font-size: 1.05em;">${escapeHtml(ls.title)}</div>
+                ${ls.genre ? `<div style="font-size: 0.82em; opacity: 0.7; margin: 2px 0 6px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(ls.genre)}</div>` : ''}
+                ${ls.tagline ? `<p style="font-style: italic; font-size: 0.9em; margin: 6px 0;">"${escapeHtml(ls.tagline)}"</p>` : ''}
+                ${ls.rating ? `<div style="font-size: 0.85em; opacity: 0.8;">Rating: ${escapeHtml(String(ls.rating))}/10</div>` : ''}
+            </div>
+           </div>`
+        : '';
+
+    // DNA compatibility breakdown
+    const bd = match.breakdown;
+    const dnaCompatHtml = bd
+        ? (() => {
+            const dims = [
+                { key: 'movieDNA', label: '🧬 Movie DNA', max: 35 },
+                { key: 'storyArchetypes', label: '⚔️ Story Archetypes', max: 20 },
+                { key: 'directorCompatibility', label: '🎥 Director Taste', max: 15 },
+                { key: 'emotionalDepth', label: '💧 Emotional Depth', max: 10 },
+                { key: 'movieMood', label: '🎭 Movie Mood', max: 10 }
+            ];
+            const rows = dims.map(d => {
+                const entry = bd[d.key];
+                if (!entry) return '';
+                const pts = entry.points !== undefined ? entry.points : 0;
+                const pct = Math.round((pts / d.max) * 100);
+                return `<div style="margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 3px;">
+                        <span>${d.label}</span><span>${pts}/${d.max} pts</span>
+                    </div>
+                    <div style="background: #333; border-radius: 6px; height: 7px;">
+                        <div style="background: #E50914; width: ${pct}%; height: 100%; border-radius: 6px;"></div>
+                    </div>
+                </div>`;
+            }).join('');
+            const penalty = bd.redFlags && bd.redFlags.penalty ? bd.redFlags.penalty : 0;
+            const penaltyRow = penalty > 0
+                ? `<div style="color: #ff6b6b; font-size: 0.85em; margin-top: 6px;">⚠️ Red flag penalty: −${penalty} pts</div>`
+                : '';
+            return `<div class="detail-section" style="margin-top: 14px;">
+                <h4>🧬 Emotional Storytelling Breakdown</h4>
+                <div style="margin-top: 10px;">${rows}${penaltyRow}</div>
+               </div>`;
+        })()
+        : '';
+
+    // Red flags
+    const redFlagsHtml = match.redFlags && match.redFlags.length > 0
+        ? `<div class="detail-section" style="margin-top: 14px; border: 1px solid #ff6b6b; border-radius: 8px; padding: 14px; background: #fff0f0;">
+            <h4 style="color: #c0392b;">⚠️ Compatibility Flags</h4>
+            ${match.redFlags.map(f => `<p style="margin: 6px 0; font-size: 0.9em; color: #333;">
+                <strong>${escapeHtml(f.flaggedBy)}</strong> flagged <em>${escapeHtml(f.movie)}</em>
+            </p>`).join('')}
            </div>`
         : '';
     
@@ -476,28 +559,16 @@ function showMatchDetails(index) {
            </div>`
         : '';
     
-    // Add quiz compatibility section
-    const quizCompatibilityHtml = match.quizCompatibility && match.quizCompatibility > 0
-        ? `<div class="detail-section quiz-compatibility-section">
-            <h4>🎯 Quiz Compatibility</h4>
-            <div class="compatibility-bar-container">
-                <div class="compatibility-bar" style="width: ${(match.quizCompatibility / 50) * 100}%"></div>
-            </div>
-            <p class="compatibility-score">${Math.round((match.quizCompatibility / 50) * 100)}% quiz match</p>
-            <p class="compatibility-text">You both answered ${match.quizCompatibility > 40 ? 'most' : match.quizCompatibility > 25 ? 'many' : 'some'} questions similarly!</p>
-           </div>`
-        : '';
-    
     // Add text prompts section (debate responses and movie prompts)
     const debateResponses = match.user.movieDebateResponses || {};
     const moviePrompts = match.user.moviePromptResponses || {};
     const hasDebateResponses = Object.keys(debateResponses).length > 0;
     const hasMoviePrompts = Object.keys(moviePrompts).length > 0;
-    
+
     let textPromptsHtml = '';
     if (hasDebateResponses || hasMoviePrompts) {
         textPromptsHtml = '<div class="detail-section text-prompts-section">';
-        
+
         if (hasDebateResponses) {
             const debateEntries = Object.entries(debateResponses).slice(0, MAX_DISPLAYED_RESPONSES);
             textPromptsHtml += `
@@ -510,7 +581,7 @@ function showMatchDetails(index) {
                 `).join('')}
             `;
         }
-        
+
         if (hasMoviePrompts) {
             const promptEntries = Object.entries(moviePrompts).slice(0, MAX_DISPLAYED_RESPONSES);
             textPromptsHtml += `
@@ -523,10 +594,10 @@ function showMatchDetails(index) {
                 `).join('')}
             `;
         }
-        
+
         textPromptsHtml += '</div>';
     }
-    
+
     // Create or update modal
     let modal = document.getElementById('match-details-modal');
     if (!modal) {
@@ -535,7 +606,7 @@ function showMatchDetails(index) {
         modal.className = 'modal';
         document.body.appendChild(modal);
     }
-    
+
     modal.innerHTML = `
         <div class="modal-content match-details-content">
             <div class="match-details-header">
@@ -555,7 +626,10 @@ function showMatchDetails(index) {
                         <p><strong>Bio:</strong> ${bio}</p>
                     </div>
                     ${archetypeHtml}
-                    ${quizCompatibilityHtml}
+                    ${relationshipGenreHtml}
+                    ${loveStoryHtml}
+                    ${dnaCompatHtml}
+                    ${redFlagsHtml}
                     ${textPromptsHtml}
                     ${streamingServicesHtml}
                     ${sharedContentHtml}

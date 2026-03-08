@@ -83,7 +83,8 @@ class MatchController {
       const userObjects = allUsers.map(u => new User(u));
       const currentUser = new User(user);
 
-      const matches = MatchingEngine.findMatches(currentUser, userObjects, limit, filters);
+      // Use the emotional storytelling algorithm: pass limit and filters as an options object
+      const matches = MatchingEngine.findMatches(currentUser, userObjects, { limit, filters });
 
       // Create boost status map for efficient sorting
       const boostStatusMap = new Map();
@@ -91,40 +92,57 @@ class MatchController {
         boostStatusMap.set(u.id, u.isBoostActive());
       });
 
-      // Prioritize boosted profiles by sorting them to the top
+      // Prioritize boosted profiles, then sort by emotional storytelling score
       matches.sort((a, b) => {
-        const aIsBoosted = boostStatusMap.get(a.user2Id) || false;
-        const bIsBoosted = boostStatusMap.get(b.user2Id) || false;
-        
+        const aIsBoosted = boostStatusMap.get(a.userId) || false;
+        const bIsBoosted = boostStatusMap.get(b.userId) || false;
+
         if (aIsBoosted && !bIsBoosted) return -1;
         if (!aIsBoosted && bIsBoosted) return 1;
-        
-        // If both boosted or both not boosted, sort by match score
-        return b.matchScore - a.matchScore;
+
+        return b.score - a.score;
       });
 
-      // Save matches to database
+      // Save matches to database using fields the engine actually returns
       for (const match of matches) {
-        await dataStore.addMatch(match);
+        const dbRecord = {
+          id: `match_${currentUser.id}_${match.userId}_${Date.now()}`,
+          user1Id: currentUser.id,
+          user2Id: match.userId,
+          matchScore: match.score,
+          matchDescription: match.matchDescription,
+          relationshipGenre: match.relationshipGenre,
+          loveStory: match.loveStory,
+          breakdown: match.breakdown,
+          sharedContent: match.sharedContent || [],
+          createdAt: new Date().toISOString()
+        };
+        await dataStore.addMatch(dbRecord);
       }
 
-      // Populate match results with user details
+      // Populate match results with user details and new emotional storytelling fields
       const matchesWithDetails = await Promise.all(
         matches.map(async (match) => {
-          const matchedUser = await dataStore.findUserById(match.user2Id);
+          const matchedUser = await dataStore.findUserById(match.userId);
+          if (!matchedUser) {
+            console.warn(`[MatchController] Candidate user ${match.userId} returned by engine but not found in store — skipping`);
+            return null;
+          }
           const matchedUserObj = new User(matchedUser);
           return {
-            matchId: match.id,
-            matchScore: match.matchScore,
+            matchScore: match.score,
             matchDescription: match.matchDescription,
-            sharedContent: match.sharedContent,
-            quizCompatibility: match.quizCompatibility,
-            snackCompatibility: match.snackCompatibility,
-            debateCompatibility: match.debateCompatibility,
-            emotionalToneCompatibility: match.emotionalToneCompatibility,
-            bingeCompatibility: match.bingeCompatibility,
-            swipeGenreCompatibility: match.swipeGenreCompatibility,
-            contentTypeCompatibility: match.contentTypeCompatibility,
+            // Emotional storytelling fields
+            relationshipGenre: match.relationshipGenre,
+            loveStory: match.loveStory,
+            breakdown: match.breakdown,
+            dnaCompatibility: match.dnaCompatibility,
+            archetypeCompatibility: match.archetypeCompatibility,
+            directorCompatibility: match.directorCompatibility,
+            redFlags: match.redFlags,
+            // Legacy / shared content (kept for backward-compat)
+            sharedContent: match.sharedContent || [],
+            sharedGenres: match.sharedGenres || [],
             isBoosted: matchedUserObj.isBoostActive(),
             user: {
               id: matchedUser.id,
@@ -149,10 +167,14 @@ class MatchController {
         })
       );
 
+      // Remove null entries (matched user no longer exists)
+      const validMatches = matchesWithDetails.filter(m => m !== null);
+
       res.json({
         success: true,
         userId: userId,
-        matches: matchesWithDetails
+        algorithm: 'emotional-storytelling-v2',
+        matches: validMatches
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -185,14 +207,11 @@ class MatchController {
             matchId: match.id,
             matchScore: match.matchScore,
             matchDescription: match.matchDescription,
-            sharedContent: match.sharedContent,
-            quizCompatibility: match.quizCompatibility,
-            snackCompatibility: match.snackCompatibility,
-            debateCompatibility: match.debateCompatibility,
-            emotionalToneCompatibility: match.emotionalToneCompatibility,
-            bingeCompatibility: match.bingeCompatibility,
-            swipeGenreCompatibility: match.swipeGenreCompatibility,
-            contentTypeCompatibility: match.contentTypeCompatibility,
+            relationshipGenre: match.relationshipGenre,
+            loveStory: match.loveStory,
+            breakdown: match.breakdown,
+            redFlags: match.redFlags,
+            sharedContent: match.sharedContent || [],
             createdAt: match.createdAt,
             user: {
               id: matchedUser.id,

@@ -432,8 +432,8 @@ function calculateDNACompatibility(dna1, dna2) {
   }
 
   // 5. Genre affinity overlap (10 pts max)
-  const genres1 = new Set((dna1.dimensions?.favoriteGenres || []).map(g => g.toLowerCase()));
-  const genres2 = new Set((dna2.dimensions?.favoriteGenres || []).map(g => g.toLowerCase()));
+  const genres1 = new Set((dna1.dimensions?.favoriteGenres || []).map(g => String(g).toLowerCase()));
+  const genres2 = new Set((dna2.dimensions?.favoriteGenres || []).map(g => String(g).toLowerCase()));
   const genreOverlap = [...genres1].filter(g => genres2.has(g)).length;
   const genreScore = Math.min(10, genreOverlap * 3);
   score += genreScore;
